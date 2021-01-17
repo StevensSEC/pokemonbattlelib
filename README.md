@@ -2,6 +2,9 @@
 
 A portable library for accurately simulating pokemon battles.
 
+![CI Test](https://github.com/StevensSEC/pokemonbattlelib/workflows/CI%20Test/badge.svg)
+[![codecov](https://codecov.io/gh/StevensSEC/pokemonbattlelib/branch/main/graph/badge.svg?token=lFGcKzL3Cp)](https://codecov.io/gh/StevensSEC/pokemonbattlelib)
+
 # Usage
 
 TODO: Link to documentation
