@@ -16,5 +16,5 @@ jobs:
           git config --global user.email "dyc3@users.noreply.github.com"
       - name: Tag and Push
         run: |
-          git tag -af "v0-nightly"
+          git tag -f "v0-nightly"
           git push origin master --tags
