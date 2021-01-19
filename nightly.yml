@@ -1,0 +1,20 @@
+name: Nightly Release
+
+on:
+  workflow_dispatch:
+  schedule:
+    # release new nightly version every night at midnight EST
+    - cron: "0 5 * * *"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          git config --global user.name "Github Actions"
+          git config --global user.email "dyc3@users.noreply.github.com"
+      - name: Tag and Push
+        run: |
+          git tag -af "v0-nightly"
+          git push origin master --tags
