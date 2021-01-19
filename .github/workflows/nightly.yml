@@ -17,4 +17,4 @@ jobs:
       - name: Tag and Push
         run: |
           git tag -f "v0-nightly"
-          git push origin master --tags
+          git push origin ${{ github.ref }} --tags
