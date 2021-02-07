@@ -1,11 +1,14 @@
 package pokemonbattlelib
 
+import "fmt"
+
 type Pokemon struct {
     NatDex uint16                    // National Pokedex Number
     Nickname string                  // player-given name for the Pokemon
     Level Level                      // value from 1-100 influencing stats
     Ability Ability                  // name of this Pokemon's ability
     TotalExperience uint             // the total amount of exp this Pokemon has gained, influencing its level
+    Gender Gender                    // this Pokemon's gender
     IVs [6]IndividualValue           // values from 0-31 that represents a Pokemon's 'genetic' potential
     EVs [6]EffortValue               // values from 0-255 that represents a Pokemon's training in a particular stat
     Nature Nature                    // represents a Pokemon's disposition and affects stats
@@ -22,6 +25,7 @@ func (p *Pokemon) GetName() string {
 	return PokemonNames[p.NatDex]
 }
 
+/*
 func (p *Pokemon) GetExpGroup() ExpGroup {
     //TODO
 }
@@ -30,7 +34,7 @@ func (p *Pokemon) GetElementalTypes() (ElementalType, ElementalType) {
     // TODO
 }
 
-func (p *Pokemon) GetBaseStats() BaseStats[6] {
+func (p *Pokemon) GetBaseStats() [6]BaseStat {
     // TODO
 } 
 
@@ -49,19 +53,39 @@ func (p *Pokemon) GetBaseExperienceYield() uint8 {
 func (p *Pokemon) GetEffortValueYield() [6]uint8 {
     //TODO
 } 
+*/
 
 func (p *Pokemon) ComputeLevel() {
-    // TODO: Implement function to compute
-    // pokemon's level based on its
-    // total exp and exp group
-    // and set the level to that computed amount
+    /*  TODO: Implement function to compute
+        pokemon's level based on its
+        total exp and exp group
+        and set the level to that computed amount
+    */
 } 
 
 func (p *Pokemon) ComputeStats() {
-    // TODO: Implement function to compute
-    // Pokemon's actual stats based on the Pokemon's
-    // base stats, IVs, EVs, level, and Nature
-    // and set the stats to the computed amounts
+    /* TODO: Implement function to compute
+       Pokemon's actual stats based on the Pokemon's
+       base stats, IVs, EVs, level, and Nature
+       and set the stats to the computed amounts
+    */
+}
+
+// implement Stringer
+
+// display a Pokemon close to how appear in a Pokemon battle
+func (p *Pokemon) String() string {
+    var displayName string
+
+    if (p.Nickname == "") {
+        displayName = p.GetName()
+    } else { // the pokemon has a nickname
+        displayName = p.Nickname
+    }
+    
+    return fmt.Sprintf("%v%v\t\tLv%d\nHP: %d/%d", displayName, 
+        p.Gender, p.Level, p.CurrentHP, p.Stats[0])
+
 }
 
 type Level uint8
