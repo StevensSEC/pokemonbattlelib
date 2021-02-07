@@ -18,6 +18,6 @@ func (g Gender) String() string {
     } else if (g == Male) {
         return "\u2642"
     } else {
-        panic("Printing gender reached unhandled condition")    
+        panic("Stringing gender reached unhandled condition")    
     }
 }
