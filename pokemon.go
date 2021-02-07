@@ -4,7 +4,6 @@ import "fmt"
 
 type Pokemon struct {
     NatDex              uint16      // National Pokedex Number
-    Nickname            string      // player-given name for the Pokemon
     Level               uint8       // value from 1-100 influencing stats
     Ability             Ability     // name of this Pokemon's ability
     TotalExperience     uint        // the total amount of exp this Pokemon has gained, influencing its level
@@ -38,9 +37,9 @@ func (p *Pokemon) HasValidIVs() bool {
 }
 
 func (p *Pokemon) HasValidEVs() bool {
-    var totalEVs := 0
+    totalEVs := 0
     for _, EV := range p.EVs {
-        totalEVs += EV
+        totalEVs += int(EV)
     }
     
     if (totalEVs > 510) {
@@ -52,17 +51,9 @@ func (p *Pokemon) HasValidEVs() bool {
 
 // implement Stringer
 
-// display a Pokemon close to how appear in a Pokemon battle
+// display a Pokemon close to how it would appear in a Pokemon battle
 func (p *Pokemon) String() string {
-    var displayName string
-
-    if (p.Nickname == "") {
-        displayName = p.GetName()
-    } else { // the pokemon has a nickname
-        displayName = p.Nickname
-    }
-    
-    return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", displayName, 
+    return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(), 
         p.Gender, p.Level, p.CurrentHP, p.Stats[0])
 }
 
