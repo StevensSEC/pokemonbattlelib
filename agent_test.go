@@ -16,7 +16,7 @@ func onBattleEnd() {
 
 func ExampleAgent() {
 	p1 := NewAgent(handleTurn)
-	p := Pokemon{1}
+    p := Pokemon{NatDex: 1}
 	p1.AddPokemon(p)
 	p1.AddPokemon(Pokemon{NatDex: 7})
 	p1.RegisterHook(BATTLE_END, onBattleEnd)
@@ -35,14 +35,14 @@ func TestAgent(t *testing.T) {
 		}
 		return "attack"
 	})
-	p1.AddPokemon(Pokemon{1}, Pokemon{11}, Pokemon{14})
+    p1.AddPokemon(Pokemon{NatDex: 1}, Pokemon{NatDex: 11}, Pokemon{NatDex: 14})
 	if len(p1.Party) != 3 {
 		t.Errorf("expected 3 Pokemon in player 1 party, got %d", len(p1.Party))
 	}
 	if p1.Party[2].NatDex != 14 {
 		t.Errorf("expected last Pokemon in player 1 party to be 14, got %d", p1.Party[2].NatDex)
 	}
-	p2.AddPokemon(Pokemon{4}, Pokemon{25}, Pokemon{47}, Pokemon{52})
+    p2.AddPokemon(Pokemon{NatDex: 4}, Pokemon{NatDex: 25}, Pokemon{NatDex: 47}, Pokemon{NatDex: 52})
 	p2.RemovePokemon(2)
 	if len(p2.Party) != 3 {
 		t.Errorf("expected 3 Pokemon in player 2 party, got %d", len(p2.Party))
