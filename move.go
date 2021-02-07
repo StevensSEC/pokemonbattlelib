@@ -11,10 +11,8 @@ type Move struct{
 	Priority int
 	Power int
 	Accuracy int
-	//Side effects not implemented yet
 }
 
-//Stringer implementation
 func (m Move) String() string{
-	return fmt.Sprintf("Name: %v\nType: %v\nCategory: %v\nMax PP: %v\nPriority: %v\nPower: %v\nAccuracy: %v\n", m.Name, m.Type, m.Category, m.Max_PP, m.Priority, m.Power, m.Accuracy);
+	return fmt.Sprintf("%v\nType: %v, Power: %v, Accuracy: %v\n", m.Name, m.Type, m.Power, m.Accuracy);
 }

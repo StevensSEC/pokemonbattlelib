@@ -12,7 +12,7 @@ func TestMoveString(t *testing.T) {
 		Power: 80,
 		Accuracy: 100,
 	}
-	if m.String() != "Name: Shadow Ball\nType: Ghost\nCategory: Special\nMax PP: 15\nPriority: 0\nPower: 80\nAccuracy: 100\n"{
+	if m.String() != "Shadow Ball\nType: Ghost, Power: 80, Accuracy: 100\n"{
 		t.Fail();
 	}
 }
