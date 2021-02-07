@@ -9,8 +9,9 @@ import (
 	"strconv"
 )
 
-const english_language_id = 9
-const national_dex_id = 1
+const ENGLISH_LANGUAGE_ID = 9
+const NATIONAL_DEX_ID = 1
+const HIGHEST_GEN = 4
 
 type data_pokemon struct {
 	Identifier     string
@@ -93,7 +94,7 @@ func main() {
 			break
 		}
 		gen_id, err := strconv.Atoi(record[2])
-		if gen_id <= 4 {
+		if gen_id <= HIGHEST_GEN {
 			group_id, _ := strconv.Atoi(record[0])
 			valid_version_groups = append(valid_version_groups, group_id)
 		}
@@ -162,7 +163,7 @@ func main() {
 			break
 		}
 		lang, err := strconv.Atoi(record[1])
-		if lang != english_language_id {
+		if lang != ENGLISH_LANGUAGE_ID {
 			continue
 		}
 		sid, err := strconv.Atoi(record[0])
@@ -185,7 +186,7 @@ func main() {
 			break
 		}
 		dexid, err := strconv.Atoi(record[1])
-		if dexid != national_dex_id {
+		if dexid != NATIONAL_DEX_ID {
 			continue
 		}
 		sid, err := strconv.Atoi(record[0])
@@ -231,7 +232,7 @@ func main() {
 			break
 		}
 		gid, err := strconv.Atoi(record[2])
-		if gid > 4 {
+		if gid > HIGHEST_GEN {
 			continue
 		}
 		mid, err := strconv.Atoi(record[0])
@@ -264,7 +265,7 @@ func main() {
 			break
 		}
 		lang, err := strconv.Atoi(record[1])
-		if lang != english_language_id {
+		if lang != ENGLISH_LANGUAGE_ID {
 			continue
 		}
 		mid, err := strconv.Atoi(record[0])
