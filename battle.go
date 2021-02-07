@@ -1,15 +1,22 @@
 package pokemonbattlelib
 
-import "fmt"
+import (
+	"log"
+)
 
 type Battle struct {
 	// TODO
 	State   BattleState
-	Player1 *Client
-	Player2 *Client
+	Players []*Agent
 }
 type BattleState int
 
+type Player int
+
+const (
+	PLAYER1 Player = iota
+	PLAYER2
+)
 const (
 	BEFORE_START BattleState = iota
 	BATTLE_START
@@ -20,7 +27,7 @@ const (
 	BATTLE_END
 )
 
-// Creates a new battle instance that clients can connect to
+// Creates a new battle instance that agents can connect to
 func NewBattle() *Battle {
 	return &Battle{State: BEFORE_START}
 }
@@ -28,63 +35,51 @@ func NewBattle() *Battle {
 // Updates the battle state and dispatches calls to custom event hooks
 func (b *Battle) Dispatch(state BattleState) {
 	b.State = state
-	if handler, ok := b.Player1.EventHooks[state]; ok {
-		handler()
-	}
-	if handler, ok := b.Player2.EventHooks[state]; ok {
-		handler()
+	for _, player := range b.Players {
+		if handler, ok := player.EventHooks[state]; ok {
+			handler()
+		}
 	}
 }
 
-// Adds a player to the battle
+// Adds player(s) to the battle
 // Fails if two players are already connected
-func (b *Battle) AddClient(c *Client) error {
-	if b.Player1 == nil {
-		b.Player1 = c
-	} else if b.Player2 == nil {
-		b.Player2 = c
-	} else {
-		return fmt.Errorf("battle already has two clients connected")
+func (b *Battle) AddAgents(a ...*Agent) {
+	if len(b.Players)+len(a) > 2 {
+		log.Panicf("battle cannot have more than two agents connected")
 	}
-	return nil
+	b.Players = append(b.Players, a...)
 }
 
 // Removes a player by their ID from the battle
-func (b *Battle) RemoveClient(clientID int64) error {
-	if b.Player1 != nil && b.Player1.ID == clientID {
-		b.Player1 = nil
-	} else if b.Player2 != nil && b.Player2.ID == clientID {
-		b.Player2 = nil
-	} else {
-		return fmt.Errorf("no client with ID '%v' found", clientID)
+func (b *Battle) RemoveAgent(agentID int64) {
+	players := make([]*Agent, 0)
+	for _, p := range b.Players {
+		if p.ID != agentID {
+			players = append(players, p)
+		}
 	}
-	return nil
-}
-
-// Swaps player 1 with player 2 in a battle
-func (b *Battle) SwapPlayers() error {
-	if b.Player1 == nil || b.Player2 == nil {
-		return fmt.Errorf("battle does not have two clients/players")
+	if len(players) == len(b.Players) {
+		log.Panicf("no agent with ID '%v' found", agentID)
 	}
-	b.Player1, b.Player2 = b.Player2, b.Player1
-	return nil
+	b.Players = players
 }
 
 // Starts a battle if all pre-conditions are satisfied
-func (b *Battle) Start() error {
-	if b.Player1 == nil || b.Player2 == nil {
-		return fmt.Errorf("not enough players to start a battle")
+func (b *Battle) Start() {
+	if len(b.Players) < 2 {
+		log.Panicf("not enough players to start a battle")
 	}
-	if len(b.Player1.Party) < 1 || len(b.Player2.Party) < 1 {
-		return fmt.Errorf("not enough Pokemon in player parties to start a battle")
+	if len(b.Players[PLAYER1].Party) < 1 || len(b.Players[PLAYER2].Party) < 1 {
+		log.Panicf("not enough Pokemon in player parties to start a battle")
 	}
-	return b.Simulate()
+	b.Simulate()
 }
 
 // Simulates a battle using an event loop to handle all I/O and event dispatching
-func (b *Battle) Simulate() error {
+func (b *Battle) Simulate() {
 	b.Dispatch(BATTLE_START)
-	for {
+	for b.State != BATTLE_END {
 		switch b.State {
 		case BATTLE_START:
 			// Initialize battle conditions (weather, abilities, etc)
@@ -109,9 +104,10 @@ func (b *Battle) Simulate() error {
 			// Temporarily end battle after 1 round
 			if true {
 				b.Dispatch(BATTLE_END)
-				return nil
+				break
 			}
 			b.Dispatch(BEFORE_PLAYER1_TURN)
 		}
 	}
+	// Cleanup after battle is over / ask to start new battle
 }
