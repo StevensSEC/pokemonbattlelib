@@ -83,7 +83,7 @@ func (p *Pokemon) String() string {
         displayName = p.Nickname
     }
     
-    return fmt.Sprintf("%v%v\t\tLv%d\nHP: %d/%d", displayName, 
+    return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", displayName, 
         p.Gender, p.Level, p.CurrentHP, p.Stats[0])
 
 }
