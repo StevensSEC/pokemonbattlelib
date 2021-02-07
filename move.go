@@ -2,7 +2,7 @@ package pokemonbattlelib
 
 import "fmt"
 
-//A type for moves
+// Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
 type Move struct{
 	Name string
 	Type string
