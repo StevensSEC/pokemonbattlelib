@@ -25,52 +25,6 @@ func (p *Pokemon) GetName() string {
 	return PokemonNames[p.NatDex]
 }
 
-/*
-func (p *Pokemon) GetExpGroup() ExpGroup {
-    //TODO
-}
-
-func (p *Pokemon) GetElementalTypes() (ElementalType, ElementalType) {
-    // TODO
-}
-
-func (p *Pokemon) GetBaseStats() [6]BaseStat {
-    // TODO
-} 
-
-func (p *Pokemon) GetMoveList() []Move {
-    //TODO
-}
-
-func (p *Pokemon) GetLearnSet() map[Level][]Move {
-    //TODO
-}
-
-func (p *Pokemon) GetBaseExperienceYield() uint8 {
-    //TODO
-} 
-
-func (p *Pokemon) GetEffortValueYield() [6]uint8 {
-    //TODO
-} 
-*/
-
-func (p *Pokemon) ComputeLevel() {
-    /*  TODO: Implement function to compute
-        pokemon's level based on its
-        total exp and exp group
-        and set the level to that computed amount
-    */
-} 
-
-func (p *Pokemon) ComputeStats() {
-    /* TODO: Implement function to compute
-       Pokemon's actual stats based on the Pokemon's
-       base stats, IVs, EVs, level, and Nature
-       and set the stats to the computed amounts
-    */
-}
-
 // implement Stringer
 
 // display a Pokemon close to how appear in a Pokemon battle
