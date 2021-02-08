@@ -51,5 +51,3 @@ func (p *Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
 		p.Gender, p.Level, p.CurrentHP, p.Stats[0])
 }
-
-type Item string

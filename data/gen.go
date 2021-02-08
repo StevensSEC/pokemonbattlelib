@@ -55,6 +55,9 @@ type data_item struct {
 }
 
 func parseInt(s string) (n int) {
+	if s == "" {
+		return 0
+	}
 	n, err := strconv.Atoi(s)
 	if err != nil {
 		log.Panicln(err)
@@ -94,6 +97,9 @@ func createCodeOutput() *os.File {
 	_, err = file.WriteString("// Code generated - DO NOT EDIT.\n" +
 		"// Regenerate with `go generate`.\n\n" +
 		"package pokemonbattlelib\n\n")
+	if err != nil {
+		log.Panicln(err)
+	}
 	return file
 }
 
@@ -228,7 +234,7 @@ func main() {
 	for _, p := range pokemon {
 		// fmt.Printf("%v\n", p)
 		// TODO: add more fields
-		_, err = output.WriteString(fmt.Sprintf("\t{ NatDex: %d },\n", p.NatDex))
+		_, err = output.WriteString(fmt.Sprintf("\t{NatDex: %d},\n", p.NatDex))
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -337,10 +343,33 @@ func main() {
 	if err != nil {
 		log.Panicln(err)
 	}
-	for _, r := range records[1:] {
-		item := new(data_item)
-		item.ID = r[0]
-		item.Identifier = r[1]
-
+	for _, r := range records {
+		item := data_item{
+			ID:            r[0],
+			Identifier:    r[1],
+			CategoryID:    parseInt(r[2]),
+			FlingPower:    parseInt(r[4]),
+			FlingEffectID: parseInt(r[5]),
+		}
+		items = append(items, item)
+	}
+	// Write output to file
+	_, err = output.WriteString("// A collection of all items in the game\n" +
+		"var ALL_ITEMS = []Item{\n")
+	if err != nil {
+		log.Panicln(err)
+	}
+	// Fix: add item name from `item_names.csv`
+	for _, item := range items {
+		s := fmt.Sprintf("\t{ID: %s, Name: \"%s\", Category: %d, FlingPower: %d, FlingEffect: %d},\n",
+			item.ID, item.Identifier, item.CategoryID, item.FlingPower, item.FlingEffectID)
+		_, err = output.WriteString(s)
+		if err != nil {
+			log.Panicln(err)
+		}
+	}
+	_, err = output.WriteString("}\n\n")
+	if err != nil {
+		log.Panicln(err)
 	}
 }
