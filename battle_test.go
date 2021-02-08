@@ -2,25 +2,65 @@ package pokemonbattlelib
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
-func ExampleBattle() {
-	b := NewBattle()
-	c1 := NewAgent(func(b *Battle) interface{} { return "P1" })
-	c1.RegisterHook(BEFORE_PLAYER1_TURN, func() {
-		fmt.Println("called before player 1 turn")
-	})
-	c2 := NewAgent(func(b *Battle) interface{} { return "P2" })
-	c2.RegisterHook(BATTLE_END, func() {
-		fmt.Println("called after battle ended")
-	})
-	b.AddAgents(c1, c2)
-	b.Start()
+// Blindly uses the first move on the first opponent pokemon.
+type dumbAgent struct{}
+
+func (dumbAgent) Act(b BattleInfo) Turn {
+	opponent := b.Opponents()[0]
+	return FightTurn{
+		moveIdx:   0,
+		targetIdx: opponent,
+	}
 }
 
-func TestBattle(t *testing.T) {
-	// Write test cases
+func TestBattleSetup(t *testing.T) {
+	a1 := Agent(dumbAgent{})
+	a2 := Agent(dumbAgent{})
+	b := Battle{}
+	b.AddAgent(&a1, &a2)
+	party1 := Party{}
+	pkmn1 := GetPokemon(4)
+	party1.AddPokemon(&pkmn1)
+	party2 := Party{}
+	pkmn2 := GetPokemon(7)
+	party2.AddPokemon(&pkmn2)
+	b.AddParty(&party1, &party2)
+	b.LinkAgentParty(0, 0)
+	b.LinkAgentParty(1, 1)
+	b.SetTeams([][]int{{0}, {1}})
+}
+
+func TestBattleOneRound(t *testing.T) {
+	a1 := Agent(dumbAgent{})
+	a2 := Agent(dumbAgent{})
+	b := Battle{}
+	b.AddAgent(&a1, &a2)
+	party1 := Party{}
+	pkmn1 := GetPokemon(4)
+	party1.AddPokemon(&pkmn1)
+	party2 := Party{}
+	pkmn2 := GetPokemon(7)
+	party2.AddPokemon(&pkmn2)
+	b.AddParty(&party1, &party2)
+	b.LinkAgentParty(0, 0)
+	b.LinkAgentParty(1, 1)
+	b.SetTeams([][]int{{0}, {1}})
+
+	b.Start()
+	for p, party := range b.Parties {
+		got := party.GetActive()
+		if !reflect.DeepEqual(got, []int{0}) {
+			t.Fatalf("Must send out first pokemon in each at the beginning of the battle. Party %d gave: %v", p, got)
+		}
+	}
+	b.SimulateRound()
+	// output:
+	// TODO: Implement fight {0 1}
+	// TODO: Implement fight {0 0}
 }
 
 func TestTurnPriority(t *testing.T) {
