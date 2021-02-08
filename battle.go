@@ -5,7 +5,8 @@ import (
 )
 
 type Battle struct {
-	// TODO
+	Weather      int  // one of the 6 in-battle weather conditions
+	ShiftSet     bool // shift or set battle style for NPC trainer battles
 	State        BattleState
 	Parties      []*Party
 	Agents       []*Agent
