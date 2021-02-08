@@ -149,6 +149,17 @@ type battleContext struct {
 	self          int
 }
 
+func (c *battleContext) getTeam() []int {
+	selfAgent := c.ActivePokemon[c.self].AgentIdx
+	var team []int
+	for _, t := range c.Context.teams {
+		if contains(t, selfAgent) {
+			team = t
+			break
+		}
+	}
+	return team
+}
 func (c *battleContext) GetPokemon(idx int) Pokemon {
 	ap := c.ActivePokemon[idx]
 	b := c.Context
@@ -162,14 +173,7 @@ func (c *battleContext) Self() int {
 	return c.self
 }
 func (c *battleContext) Allies() []int {
-	selfAgent := c.ActivePokemon[c.self].AgentIdx
-	var team []int
-	for _, t := range c.Context.teams {
-		if contains(t, selfAgent) {
-			team = t
-			break
-		}
-	}
+	team := c.getTeam()
 
 	allies := []int{}
 	for i, ap := range c.ActivePokemon {
@@ -181,14 +185,7 @@ func (c *battleContext) Allies() []int {
 	return allies
 }
 func (c *battleContext) Opponents() []int {
-	selfAgent := c.ActivePokemon[c.self].AgentIdx
-	var team []int
-	for _, t := range c.Context.teams {
-		if contains(t, selfAgent) {
-			team = t
-			break
-		}
-	}
+	team := c.getTeam()
 
 	opponents := []int{}
 	for i, ap := range c.ActivePokemon {
