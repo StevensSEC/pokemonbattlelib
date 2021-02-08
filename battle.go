@@ -52,20 +52,6 @@ func (b *Battle) AddAgents(a ...*Agent) {
 	b.Players = append(b.Players, a...)
 }
 
-// Removes a player by their ID from the battle
-func (b *Battle) RemoveAgent(agentID int64) {
-	players := make([]*Agent, 0)
-	for _, p := range b.Players {
-		if p.ID != agentID {
-			players = append(players, p)
-		}
-	}
-	if len(players) == len(b.Players) {
-		log.Panicf("no agent with ID '%v' found", agentID)
-	}
-	b.Players = players
-}
-
 // Starts a battle if all pre-conditions are satisfied
 func (b *Battle) Start() {
 	if len(b.Players) < 2 {
