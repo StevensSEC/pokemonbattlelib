@@ -22,3 +22,24 @@ func ExampleBattle() {
 func TestBattle(t *testing.T) {
 	// Write test cases
 }
+
+func TestTurnPriority(t *testing.T) {
+	tests := []struct {
+		turn Turn
+		want int
+	}{
+		{
+			turn: FightTurn{},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%T priority", tt.turn), func(t *testing.T) {
+			t.Parallel()
+			got := tt.turn.Priority()
+			if got != tt.want {
+				t.Errorf("TurnPriority(%T) got %v, want %v", tt.turn, got, tt.want)
+			}
+		})
+	}
+}

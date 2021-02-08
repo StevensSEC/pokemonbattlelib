@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -110,4 +111,35 @@ func (b *Battle) Simulate() {
 		}
 	}
 	// Cleanup after battle is over / ask to start new battle
+}
+
+func (b *Battle) getActivePokemon(idx int) *Pokemon {
+	// TODO: implment
+	// 1. find active pokemon in all parties
+	// 2. should return the pokemon at the given index
+	return nil
+}
+
+// Tells the battle that the active this pokemon is making this move.
+func (b *Battle) processTurn(activePokemon int, t Turn) {
+	switch t := t.(type) {
+	case FightTurn:
+		fmt.Printf("TODO: Implement fight %v", t)
+	default:
+		panic("Unknown turn")
+	}
+}
+
+// An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
+type Turn interface {
+	Priority() int // Gets the turn's priority. Higher values go first.
+}
+
+type FightTurn struct {
+	moveIdx   int // Denotes which of the pokemon's moves to use.
+	targetIdx int // The active pokemon that on the receiving end of the move.
+}
+
+func (turn FightTurn) Priority() int {
+	return 0
 }
