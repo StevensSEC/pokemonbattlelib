@@ -233,18 +233,31 @@ func main() {
 	}
 	for _, p := range pokemon {
 		// fmt.Printf("%v\n", p)
-		// TODO: add more fields
-		_, err = output.WriteString(fmt.Sprintf("\t{NatDex: %d},\n", p.NatDex))
-		if err != nil {
-			log.Panicln(err)
-		}
+		output.WriteString(fmt.Sprintf("\t{\n"))
+		output.WriteString(fmt.Sprintf("\t\tNatDex:            %d,\n", p.NatDex))
+		output.WriteString(fmt.Sprintf("\t\tLevel:             %d,\n", uint8(1)))
+		output.WriteString(fmt.Sprintf("\t\tAbility:           %s,\n", "new(Ability)"))
+		output.WriteString(fmt.Sprintf("\t\tTotalExperience:   %d,\n", uint(0)))
+		output.WriteString(fmt.Sprintf("\t\tGender:            %s,\n", "Genderless"))
+		output.WriteString(fmt.Sprintf("\t\tIVs:               %s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}"))
+		output.WriteString(fmt.Sprintf("\t\tEVs:               %s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}"))
+		output.WriteString(fmt.Sprintf("\t\tNature:            %s,\n", "new(Nature)"))
+		output.WriteString(fmt.Sprintf("\t\tStats:             %s,\n", "[6]uint{0, 0, 0, 0, 0, 0}"))
+		output.WriteString(fmt.Sprintf("\t\tCurrentHP:         %d,\n", uint(0)))
+		output.WriteString(fmt.Sprintf("\t\tHeldItem:          %v,\n", "new(Item)"))
+		output.WriteString(fmt.Sprintf("\t\tMoves:             %s,\n", "[4]*Move{}"))
+		output.WriteString(fmt.Sprintf("\t\tFriendship:        %d,\n", uint8(0)))
+		output.WriteString(fmt.Sprintf("\t\tOriginalTrainerID: %d,\n", uint16(0)))
+		output.WriteString(fmt.Sprintf("\t},\n"))
 	}
+
 	_, err = output.WriteString("}\n\n" +
 		"// A map of national pokedex numbers to pokemon names.\n" +
 		"var PokemonNames = map[uint16]string{\n")
 	if err != nil {
 		log.Panicln(err)
 	}
+
 	for _, p := range pokemon {
 		// fmt.Printf("%v\n", p)
 		if p.NatDex == 0 {
