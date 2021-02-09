@@ -207,6 +207,8 @@ type Turn interface {
 	Priority() int // Gets the turn's priority. Higher values go first.
 }
 
+// Indicates that the Pokemon will fight. The active Pokemon indicated by `Self()` in the battle context will use
+// the move at `moveIdx` on the active Pokemon indicated by `targetIdx`.
 type FightTurn struct {
 	moveIdx   int // Denotes which of the pokemon's moves to use.
 	targetIdx int // The active pokemon that on the receiving end of the move.
