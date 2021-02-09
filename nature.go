@@ -1,6 +1,6 @@
 package pokemonbattlelib
 
 type Nature struct {
-    StatUp string
-    StatDown string
+	StatUp   string
+	StatDown string
 }

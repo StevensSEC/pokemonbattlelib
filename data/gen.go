@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"strconv"
 )
 
@@ -47,6 +48,25 @@ type data_move struct {
 	Flags       data_move_flags
 }
 
+type data_item struct {
+	ID            string
+	Identifier    string
+	CategoryID    int
+	FlingPower    int
+	FlingEffectID int
+}
+
+func parseInt(s string) (n int) {
+	if s == "" {
+		return 0
+	}
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		log.Panicln(err)
+	}
+	return n
+}
+
 func getCsvReader(path string) *csv.Reader {
 	log.Printf("Reading csv: %s\n", path)
 	file, err := os.Open(path)
@@ -55,7 +75,10 @@ func getCsvReader(path string) *csv.Reader {
 	}
 	reader := csv.NewReader(file)
 	reader.ReuseRecord = true
-	reader.Read() // skip header line
+	_, err = reader.Read() // skip header line
+	if err != nil {
+		log.Panicln(err)
+	}
 	return reader
 }
 
@@ -68,14 +91,17 @@ func contains(s []int, e int) bool {
 	return false
 }
 
-func createCodeOutput(filename string) *os.File {
-	file, err := os.Create(filename)
+func createCodeOutput() *os.File {
+	file, err := os.Create("pokedex_GEN.go")
 	if err != nil {
 		log.Panicln(err)
 	}
-	file.WriteString("// Code generated - DO NOT EDIT.\n")
-	file.WriteString("// Regenerate with `go generate`.\n\n")
-	file.WriteString("package pokemonbattlelib\n\n")
+	_, err = file.WriteString("// Code generated - DO NOT EDIT.\n" +
+		"// Regenerate with `go generate`.\n\n" +
+		"package pokemonbattlelib\n\n")
+	if err != nil {
+		log.Panicln(err)
+	}
 	return file
 }
 
@@ -94,9 +120,9 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		gen_id, err := strconv.Atoi(record[2])
+		gen_id := parseInt(record[2])
 		if gen_id <= HIGHEST_GEN {
-			group_id, _ := strconv.Atoi(record[0])
+			group_id := parseInt(record[0])
 			valid_version_groups = append(valid_version_groups, group_id)
 		}
 	}
@@ -107,9 +133,9 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		group_id, err := strconv.Atoi(record[1])
+		group_id := parseInt(record[1])
 		if contains(valid_version_groups, group_id) {
-			vid, _ := strconv.Atoi(record[0])
+			vid := parseInt(record[0])
 			valid_versions = append(valid_versions, vid)
 		}
 	}
@@ -122,9 +148,9 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		vid, err := strconv.Atoi(record[1])
+		vid := parseInt(record[1])
 		if contains(valid_versions, vid) {
-			pid, _ := strconv.Atoi(record[0])
+			pid := parseInt(record[0])
 			valid_pkmn_ids = append(valid_pkmn_ids, pid)
 		}
 	}
@@ -138,14 +164,14 @@ func main() {
 			break
 		}
 		// fmt.Printf("%v\n", record)
-		id, err := strconv.Atoi(record[0])
+		id := parseInt(record[0])
 		if !contains(valid_pkmn_ids, id) {
 			continue
 		}
-		species_id, err := strconv.Atoi(record[2])
-		height, err := strconv.Atoi(record[3])
-		weight, err := strconv.Atoi(record[4])
-		baseexp, err := strconv.Atoi(record[5])
+		species_id := parseInt(record[2])
+		height := parseInt(record[3])
+		weight := parseInt(record[4])
+		baseexp := parseInt(record[5])
 		pokemon = append(pokemon, data_pokemon{
 			Identifier:     record[1],
 			SpeciesId:      species_id,
@@ -163,12 +189,11 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		lang, err := strconv.Atoi(record[1])
+		lang := parseInt(record[1])
 		if lang != ENGLISH_LANGUAGE_ID {
 			continue
 		}
-		sid, err := strconv.Atoi(record[0])
-
+		sid := parseInt(record[0])
 		for i, p := range pokemon {
 			if p.SpeciesId != sid {
 				continue
@@ -186,17 +211,16 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		dexid, err := strconv.Atoi(record[1])
+		dexid := parseInt(record[1])
 		if dexid != NATIONAL_DEX_ID {
 			continue
 		}
-		sid, err := strconv.Atoi(record[0])
-
+		sid := parseInt(record[0])
 		for i, p := range pokemon {
 			if p.SpeciesId != sid {
 				continue
 			}
-			dexnum, _ := strconv.Atoi(record[2])
+			dexnum := parseInt(record[2])
 			(&pokemon[i]).NatDex = uint16(dexnum)
 			break
 		}
@@ -204,25 +228,39 @@ func main() {
 
 	// print out pokemon
 	log.Println("generating code for pokemon")
-	output := createCodeOutput("pokedex_GEN.go")
-	output.WriteString("var ALL_POKEMON = []Pokemon{\n")
+	output := createCodeOutput()
+	_, err = output.WriteString("var ALL_POKEMON = []Pokemon{\n")
+	if err != nil {
+		log.Panicln(err)
+	}
 	for _, p := range pokemon {
 		// fmt.Printf("%v\n", p)
 		// TODO: add more fields
-		output.WriteString(fmt.Sprintf("\t{ NatDex: %d },\n", p.NatDex))
+		_, err = output.WriteString(fmt.Sprintf("\t{NatDex: %d},\n", p.NatDex))
+		if err != nil {
+			log.Panicln(err)
+		}
 	}
-	output.WriteString("}\n\n")
-	output.WriteString("// A map of national pokedex numbers to pokemon names.\n")
-	output.WriteString("var PokemonNames = map[uint16]string{\n")
+	_, err = output.WriteString("}\n\n" +
+		"// A map of national pokedex numbers to pokemon names.\n" +
+		"var PokemonNames = map[uint16]string{\n")
+	if err != nil {
+		log.Panicln(err)
+	}
 	for _, p := range pokemon {
 		// fmt.Printf("%v\n", p)
 		if p.NatDex == 0 {
 			continue
 		}
-		output.WriteString(fmt.Sprintf("\t%d: \"%s\",\n", p.NatDex, p.Name))
+		_, err = output.WriteString(fmt.Sprintf("\t%d: \"%s\",\n", p.NatDex, p.Name))
+		if err != nil {
+			log.Panicln(err)
+		}
 	}
-	output.WriteString("}\n\n")
-
+	_, err = output.WriteString("}\n\n")
+	if err != nil {
+		log.Panicln(err)
+	}
 	// find all moves
 	moves := []data_move{}
 	log.Println("finding available moves")
@@ -238,19 +276,19 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		gid, err := strconv.Atoi(record[2])
+		gid := parseInt(record[2])
 		if gid > HIGHEST_GEN {
 			continue
 		}
-		mid, err := strconv.Atoi(record[0])
-		moveType, err := strconv.Atoi(record[3])
-		power, err := strconv.Atoi(record[4])
-		pp, err := strconv.Atoi(record[5])
-		accuracy, err := strconv.Atoi(record[6])
-		priority, err := strconv.Atoi(record[7])
-		targets, err := strconv.Atoi(record[8])
-		damageClass, err := strconv.Atoi(record[9])
-		effect, err := strconv.Atoi(record[10])
+		mid := parseInt(record[0])
+		moveType := parseInt(record[3])
+		power := parseInt(record[4])
+		pp := parseInt(record[5])
+		accuracy := parseInt(record[6])
+		priority := parseInt(record[7])
+		targets := parseInt(record[8])
+		damageClass := parseInt(record[9])
+		effect := parseInt(record[10])
 		moves = append(moves, data_move{
 			Id:          mid,
 			Identifier:  record[1],
@@ -273,12 +311,11 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		lang, err := strconv.Atoi(record[1])
+		lang := parseInt(record[1])
 		if lang != ENGLISH_LANGUAGE_ID {
 			continue
 		}
-		mid, err := strconv.Atoi(record[0])
-
+		mid := parseInt(record[0])
 		for i, m := range moves {
 			if m.Id != mid {
 				continue
@@ -296,8 +333,8 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		mid, err := strconv.Atoi(record[0])
-		flag, err := strconv.Atoi(record[1])
+		mid := parseInt(record[0])
+		flag := parseInt(record[1])
 		for i, m := range moves {
 			if m.Id != mid {
 				continue
@@ -308,11 +345,55 @@ func main() {
 	}
 
 	log.Println("generating code for moves")
-
 	output.WriteString("var ALL_MOVES = []Move{\n")
 	for _, p := range moves {
 		output.WriteString(fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, Max_PP: %d,"+
 			" Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.Priority, p.Power, p.Accuracy))
 	}
-	output.WriteString("}")
+	output.WriteString("}\n\n")
+
+	// Generate hold item data
+	items := make([]data_item, 0)
+	items_csv := getCsvReader("data/items.csv")
+	records, err := items_csv.ReadAll()
+	if err != nil {
+		log.Panicln(err)
+	}
+	for _, r := range records {
+		item := data_item{
+			ID:            r[0],
+			Identifier:    r[1],
+			CategoryID:    parseInt(r[2]),
+			FlingPower:    parseInt(r[4]),
+			FlingEffectID: parseInt(r[5]),
+		}
+		items = append(items, item)
+	}
+	// Write output to file
+	_, err = output.WriteString("// A collection of all items in the game\n" +
+		"var ALL_ITEMS = []Item{\n")
+	if err != nil {
+		log.Panicln(err)
+	}
+	// Fix: add item name from `item_names.csv`
+	for _, item := range items {
+		s := fmt.Sprintf("\t{ID: %s, Name: \"%s\", Category: %d, FlingPower: %d, FlingEffect: %d},\n",
+			item.ID, item.Identifier, item.CategoryID, item.FlingPower, item.FlingEffectID)
+		_, err = output.WriteString(s)
+		if err != nil {
+			log.Panicln(err)
+		}
+	}
+	_, err = output.WriteString("}\n\n")
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	// run gofmt on generated code
+	log.Println("Formatting generated code...")
+	cmd := exec.Command("gofmt", "-w", "pokedex_GEN.go")
+	err = cmd.Run()
+	if err != nil {
+		log.Fatalf("Failed to format generated code: %v", err)
+	}
 }
