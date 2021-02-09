@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// A Pokemon battle. Enforces rules of the battle, and queries `Agent`s for turns.
 type Battle struct {
 	Weather      int  // one of the 6 in-battle weather conditions
 	ShiftSet     bool // shift or set battle style for NPC trainer battles
@@ -14,6 +15,7 @@ type Battle struct {
 	teams        [][]int     // An array of teams, which are arrays of Agents. Used to derive allies and opponents
 }
 
+// A Pokemon party. Can hold up to 6 Pokemon. Also manages how many pokemon are out on the battlefield.
 type Party struct {
 	Pokemon []*Pokemon
 	active  []int // Which pokemon in the party are out on the battlefield
