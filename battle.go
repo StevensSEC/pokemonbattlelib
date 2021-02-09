@@ -16,13 +16,14 @@ type Battle struct {
 
 type Party struct {
 	Pokemon []*Pokemon
-	active  []int
+	active  []int // Which pokemon in the party are out on the battlefield
 }
 
 func (p *Party) AddPokemon(pkmn ...*Pokemon) {
 	p.Pokemon = append(p.Pokemon, pkmn...)
 }
 
+// Set the indeces of which pokemon are on the battlefield.
 func (p *Party) SetActive(idx int) {
 	if len(p.active) == 0 {
 		p.active = append(p.active, idx)
@@ -31,6 +32,7 @@ func (p *Party) SetActive(idx int) {
 	}
 }
 
+// Get the indeces of which pokemon are on the battlefield.
 func (p *Party) GetActive() []int {
 	return p.active
 }
