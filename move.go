@@ -2,21 +2,21 @@ package pokemonbattlelib
 
 import "fmt"
 
-type Category int
+type MoveCategory int
 
 const (
-	status Category = iota + 1
-	physical
-	special
+	Status MoveCategory = iota + 1
+	Physical
+	Special
 )
 
-func (c Category) String() string {
+func (c MoveCategory) String() string {
 	switch c {
-	case status:
+	case Status:
 		return "Status"
-	case physical:
+	case Physical:
 		return "Physical"
-	case special:
+	case Special:
 		return "Special"
 	default:
 		panic("Unexpected value for move category")
@@ -28,7 +28,7 @@ type Move struct {
 	ID       int
 	Name     string
 	Type     int // update this to elementalType when PR #27 is complete
-	Category Category
+	Category MoveCategory
 	Max_PP   int
 	Priority int
 	Power    int

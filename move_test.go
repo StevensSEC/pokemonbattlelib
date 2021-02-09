@@ -18,7 +18,7 @@ func TestMoveString(t *testing.T) {
 }
 
 func TestMoveCategoryString(t *testing.T) {
-	var c1, c2, c3 Category = 1, 2, 3
+	var c1, c2, c3 MoveCategory = 1, 2, 3
 
 	if c1.String() != "Status" {
 		t.Fail()
