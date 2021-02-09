@@ -5,7 +5,7 @@ import "fmt"
 type MoveCategory int
 
 const (
-	Status MoveCategory = iota + 1
+	Status MoveCategory = iota
 	Physical
 	Special
 )

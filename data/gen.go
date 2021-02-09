@@ -42,7 +42,7 @@ type data_move struct {
 	Priority int
 	// see: move_targets.csv
 	Targets     int
-	DamageClass int
+	DamageClass string
 	Effect      int
 	Flags       data_move_flags
 }
@@ -227,6 +227,12 @@ func main() {
 	moves := []data_move{}
 	log.Println("finding available moves")
 	moves_csv := getCsvReader("data/moves.csv")
+
+	moveMap := map[int]string{
+		1: "Status",
+		2: "Physical",
+		3: "Special",
+	}
 	for {
 		record, err := moves_csv.Read()
 		if err == io.EOF {
@@ -254,7 +260,7 @@ func main() {
 			Accuracy:    accuracy,
 			Priority:    priority,
 			Targets:     targets,
-			DamageClass: damageClass,
+			DamageClass: moveMap[damageClass],
 			Effect:      effect,
 		})
 	}
@@ -302,10 +308,10 @@ func main() {
 	}
 
 	log.Println("generating code for moves")
-	// output = createCodeOutput("moves_GEN.go")
+
 	output.WriteString("var ALL_MOVES = []Move{\n")
 	for _, p := range moves {
-		output.WriteString(fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %d, Max_PP: %d,"+
+		output.WriteString(fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, Max_PP: %d,"+
 			" Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.Priority, p.Power, p.Accuracy))
 	}
 	output.WriteString("}")
