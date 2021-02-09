@@ -35,6 +35,7 @@ type data_move struct {
 	BaseExperience int
 
 	Name     string
+	Type     int
 	Power    int
 	PP       int
 	Accuracy int
@@ -67,8 +68,8 @@ func contains(s []int, e int) bool {
 	return false
 }
 
-func createCodeOutput() *os.File {
-	file, err := os.Create("pokedex_GEN.go")
+func createCodeOutput(filename string) *os.File {
+	file, err := os.Create(filename)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -203,7 +204,7 @@ func main() {
 
 	// print out pokemon
 	log.Println("generating code for pokemon")
-	output := createCodeOutput()
+	output := createCodeOutput("pokedex_GEN.go")
 	output.WriteString("var ALL_POKEMON = []Pokemon{\n")
 	for _, p := range pokemon {
 		// fmt.Printf("%v\n", p)
@@ -224,7 +225,7 @@ func main() {
 
 	// find all moves
 	moves := []data_move{}
-	log.Println("finding availble moves")
+	log.Println("finding available moves")
 	moves_csv := getCsvReader("data/moves.csv")
 	for {
 		record, err := moves_csv.Read()
@@ -236,6 +237,7 @@ func main() {
 			continue
 		}
 		mid, err := strconv.Atoi(record[0])
+		moveType, err := strconv.Atoi(record[3])
 		power, err := strconv.Atoi(record[4])
 		pp, err := strconv.Atoi(record[5])
 		accuracy, err := strconv.Atoi(record[6])
@@ -246,6 +248,7 @@ func main() {
 		moves = append(moves, data_move{
 			Id:          mid,
 			Identifier:  record[1],
+			Type:        moveType,
 			Power:       power,
 			PP:          pp,
 			Accuracy:    accuracy,
@@ -298,5 +301,15 @@ func main() {
 		}
 	}
 
-	log.Println("TODO: generate code for moves")
+	log.Println("generating code for moves")
+	output = createCodeOutput("moves_GEN.go")
+	output.WriteString("var ALL_MOVES = []Move{\n")
+	for _, p := range moves {
+
+		// fmt.Printf("%v\n", p)
+		// TODO: add more fields
+		output.WriteString(fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %d, Max_PP: %d,"+
+			" Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.Priority, p.Power, p.Accuracy))
+	}
+	output.WriteString("}")
 }
