@@ -133,6 +133,7 @@ func (b *Battle) SimulateRound() {
 	}
 }
 
+// References a Pokemon currently on the battlefield.
 type activePokemon struct {
 	AgentIdx   int
 	PokemonIdx int
