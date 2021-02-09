@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// A Pokemon battle. Enforces rules of the battle, and queries `Agent`s for turns.
 type Battle struct {
 	Weather      int  // one of the 6 in-battle weather conditions
 	ShiftSet     bool // shift or set battle style for NPC trainer battles
@@ -14,6 +15,7 @@ type Battle struct {
 	teams        [][]int     // An array of teams, which are arrays of Agents. Used to derive allies and opponents
 }
 
+// A Pokemon party. Can hold up to 6 Pokemon. Also manages how many pokemon are out on the battlefield.
 type Party struct {
 	Pokemon []*Pokemon
 	active  []int // Which pokemon in the party are out on the battlefield
@@ -87,18 +89,7 @@ func (b *Battle) Start() error {
 
 // Simulates a single round of the battle.
 func (b *Battle) SimulateRound() {
-	// get the currently active pokemon
-	active := []activePokemon{}
-	for a := range b.Agents {
-		party := b.Parties[b.agentParties[a]]
-		for _, idx := range party.GetActive() {
-			ap := activePokemon{
-				AgentIdx:   a,
-				PokemonIdx: idx,
-			}
-			active = append(active, ap)
-		}
-	}
+	active := b.getActivePokemon()
 
 	context := battleContext{
 		Context:       *b,
@@ -131,6 +122,28 @@ func (b *Battle) SimulateRound() {
 	}
 }
 
+// Get references to all Pokemon that are active on the battlefield.
+func (b *Battle) getActivePokemon() []activePokemon {
+	active := []activePokemon{}
+	for a := range b.Agents {
+		party := b.Parties[b.agentParties[a]]
+		for _, idx := range party.GetActive() {
+			ap := activePokemon{
+				AgentIdx:   a,
+				PokemonIdx: idx,
+			}
+			active = append(active, ap)
+		}
+	}
+	return active
+}
+
+// Get a pointer to the actual Pokemon that `ap` is referencing.
+func (b *Battle) derefActivePokemon(ap activePokemon) *Pokemon {
+	return (*b.Parties[b.agentParties[ap.AgentIdx]]).Pokemon[ap.PokemonIdx]
+}
+
+// References a Pokemon currently on the battlefield.
 type activePokemon struct {
 	AgentIdx   int
 	PokemonIdx int
@@ -163,9 +176,7 @@ func (c *battleContext) getTeam() []int {
 	return team
 }
 func (c *battleContext) GetPokemon(idx int) Pokemon {
-	ap := c.ActivePokemon[idx]
-	b := c.Context
-	p := (*b.Parties[b.agentParties[ap.AgentIdx]]).Pokemon[ap.PokemonIdx]
+	p := c.Context.derefActivePokemon(c.ActivePokemon[idx])
 	return *p
 }
 func (c *battleContext) SetSelf(idx int) {
@@ -207,6 +218,8 @@ type Turn interface {
 	Priority() int // Gets the turn's priority. Higher values go first.
 }
 
+// Indicates that the Pokemon will fight. The active Pokemon indicated by `Self()` in the battle context will use
+// the move at `moveIdx` on the active Pokemon indicated by `targetIdx`.
 type FightTurn struct {
 	moveIdx   int // Denotes which of the pokemon's moves to use.
 	targetIdx int // The active pokemon that on the receiving end of the move.
