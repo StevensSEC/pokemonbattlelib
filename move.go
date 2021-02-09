@@ -2,7 +2,7 @@ package pokemonbattlelib
 
 import "fmt"
 
-type MoveCategory int
+type MoveCategory uint8
 
 const (
 	Status MoveCategory = iota
