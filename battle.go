@@ -171,6 +171,9 @@ func (c *battleContext) GetPokemon(idx int) Pokemon {
 func (c *battleContext) SetSelf(idx int) {
 	c.self = idx
 }
+
+// Get the index of the active Pokemon that this battle context is referencing.
+// In other words, the Pokemon you are acting as.
 func (c *battleContext) Self() int {
 	return c.self
 }
