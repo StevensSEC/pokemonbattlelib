@@ -89,18 +89,7 @@ func (b *Battle) Start() error {
 
 // Simulates a single round of the battle.
 func (b *Battle) SimulateRound() {
-	// get the currently active pokemon
-	active := []activePokemon{}
-	for a := range b.Agents {
-		party := b.Parties[b.agentParties[a]]
-		for _, idx := range party.GetActive() {
-			ap := activePokemon{
-				AgentIdx:   a,
-				PokemonIdx: idx,
-			}
-			active = append(active, ap)
-		}
-	}
+	active := b.getActivePokemon()
 
 	context := battleContext{
 		Context:       *b,
@@ -131,6 +120,27 @@ func (b *Battle) SimulateRound() {
 			panic("Unknown turn")
 		}
 	}
+}
+
+// Get references to all Pokemon that are active on the battlefield.
+func (b *Battle) getActivePokemon() []activePokemon {
+	active := []activePokemon{}
+	for a := range b.Agents {
+		party := b.Parties[b.agentParties[a]]
+		for _, idx := range party.GetActive() {
+			ap := activePokemon{
+				AgentIdx:   a,
+				PokemonIdx: idx,
+			}
+			active = append(active, ap)
+		}
+	}
+	return active
+}
+
+// Get a pointer to the actual Pokemon that `ap` is referencing.
+func (b *Battle) derefActivePokemon(ap activePokemon) *Pokemon {
+	return (*b.Parties[b.agentParties[ap.AgentIdx]]).Pokemon[ap.PokemonIdx]
 }
 
 // References a Pokemon currently on the battlefield.
@@ -166,9 +176,7 @@ func (c *battleContext) getTeam() []int {
 	return team
 }
 func (c *battleContext) GetPokemon(idx int) Pokemon {
-	ap := c.ActivePokemon[idx]
-	b := c.Context
-	p := (*b.Parties[b.agentParties[ap.AgentIdx]]).Pokemon[ap.PokemonIdx]
+	p := c.Context.derefActivePokemon(c.ActivePokemon[idx])
 	return *p
 }
 func (c *battleContext) SetSelf(idx int) {
