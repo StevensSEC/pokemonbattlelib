@@ -1,115 +1,217 @@
 package pokemonbattlelib
 
 import (
-	"log"
+	"fmt"
 )
 
 type Battle struct {
-	Weather  int  // one of the 6 in-battle weather conditions
-	ShiftSet bool // shift or set battle style for NPC trainer battles
-	State    BattleState
-	Players  []*Agent
+	Weather      int  // one of the 6 in-battle weather conditions
+	ShiftSet     bool // shift or set battle style for NPC trainer battles
+	State        BattleState
+	Parties      []*Party
+	Agents       []*Agent
+	agentParties map[int]int // Maps agent indexes to party indexes
+	teams        [][]int     // An array of teams, which are arrays of Agents. Used to derive allies and opponents
+}
+
+type Party struct {
+	Pokemon []*Pokemon
+	active  []int // Which pokemon in the party are out on the battlefield
+}
+
+func (p *Party) AddPokemon(pkmn ...*Pokemon) {
+	p.Pokemon = append(p.Pokemon, pkmn...)
+}
+
+// Set the indeces of which pokemon are on the battlefield.
+func (p *Party) SetActive(idx int) {
+	if len(p.active) == 0 {
+		p.active = append(p.active, idx)
+	} else {
+		p.active[0] = idx
+	}
+}
+
+// Get the indeces of which pokemon are on the battlefield.
+func (p *Party) GetActive() []int {
+	return p.active
+}
+
+// Gives an Agent control over a Party.
+func (b *Battle) LinkAgentParty(agentIdx, partyIdx int) error {
+	if b.agentParties == nil {
+		b.agentParties = make(map[int]int)
+	}
+	// TODO: check if agentIdx, partyIdx are valid indexes
+	// TODO: check if agent is already linked
+	// TODO: check if party is already linked
+	b.agentParties[agentIdx] = partyIdx
+	return nil
+}
+
+// Set which agents have which allies. Not to be confused with `Party`.
+func (b *Battle) SetTeams(t [][]int) error {
+	// TODO: validate
+	b.teams = t
+	return nil
 }
 
 type BattleState int
 
-type Player int
-
-const (
-	PLAYER1 Player = iota
-	PLAYER2
-)
 const (
 	BEFORE_START BattleState = iota
-	BATTLE_START
-	BEFORE_PLAYER1_TURN
-	AFTER_PLAYER1_TURN
-	BEFORE_PLAYER2_TURN
-	AFTER_PLAYER2_TURN
+	BATTLE_IN_PROGRESS
 	BATTLE_END
 )
 
-// Creates a new battle instance that agents can connect to
-func NewBattle() *Battle {
-	return &Battle{State: BEFORE_START}
+// Adds Agent(s) to the battle.
+func (b *Battle) AddAgent(a ...*Agent) {
+	b.Agents = append(b.Agents, a...)
 }
 
-// Updates the battle state and dispatches calls to custom event hooks
-func (b *Battle) Dispatch(state BattleState) {
-	b.State = state
-	for _, player := range b.Players {
-		if handler, ok := player.EventHooks[state]; ok {
-			handler()
-		}
-	}
+// Adds Parties to the battle.
+func (b *Battle) AddParty(p ...*Party) {
+	b.Parties = append(b.Parties, p...)
 }
 
-// Adds player(s) to the battle
-// Fails if two players are already connected
-func (b *Battle) AddAgents(a ...*Agent) {
-	if len(b.Players)+len(a) > 2 {
-		log.Panicf("battle cannot have more than two agents connected")
+func (b *Battle) Start() error {
+	// TODO: validate the battle, return error if invalid
+
+	// Initiate the battle! Send out the first pokemon in the parties.
+	b.State = BATTLE_IN_PROGRESS
+	for _, p := range b.Parties {
+		p.SetActive(0)
 	}
-	b.Players = append(b.Players, a...)
+	return nil
 }
 
-// Removes a player by their ID from the battle
-func (b *Battle) RemoveAgent(agentID int64) {
-	players := make([]*Agent, 0)
-	for _, p := range b.Players {
-		if p.ID != agentID {
-			players = append(players, p)
-		}
-	}
-	if len(players) == len(b.Players) {
-		log.Panicf("no agent with ID '%v' found", agentID)
-	}
-	b.Players = players
-}
-
-// Starts a battle if all pre-conditions are satisfied
-func (b *Battle) Start() {
-	if len(b.Players) < 2 {
-		log.Panicf("not enough players to start a battle")
-	}
-	if len(b.Players[PLAYER1].Party) < 1 || len(b.Players[PLAYER2].Party) < 1 {
-		log.Panicf("not enough Pokemon in player parties to start a battle")
-	}
-	b.Simulate()
-}
-
-// Simulates a battle using an event loop to handle all I/O and event dispatching
-func (b *Battle) Simulate() {
-	b.Dispatch(BATTLE_START)
-	for b.State != BATTLE_END {
-		switch b.State {
-		case BATTLE_START:
-			// Initialize battle conditions (weather, abilities, etc)
-			b.Dispatch(BEFORE_PLAYER1_TURN)
-		case BEFORE_PLAYER1_TURN:
-			// action := b.Player1.HandleTurn()
-			// Fix: Handle action
-			// fmt.Println("player 1 action:", action)
-			b.Dispatch(AFTER_PLAYER1_TURN)
-		case AFTER_PLAYER1_TURN:
-			// Fix: Handle events that occur between turns
-			// This includes weather, status effects, abilities, swaps, etc
-			b.Dispatch(BEFORE_PLAYER2_TURN)
-		case BEFORE_PLAYER2_TURN:
-			// action := b.Player2.HandleTurn()
-			// Fix: Handle action
-			// fmt.Println("player 2 action:", action)
-			b.Dispatch(AFTER_PLAYER2_TURN)
-		case AFTER_PLAYER2_TURN:
-			// Fix: Handle events that occur after both players move
-			// Also check if battle is over, otherwise go back to player 1
-			// Temporarily end battle after 1 round
-			if true {
-				b.Dispatch(BATTLE_END)
-				break
+// Simulates a single round of the battle.
+func (b *Battle) SimulateRound() {
+	// get the currently active pokemon
+	active := []activePokemon{}
+	for a := range b.Agents {
+		party := b.Parties[b.agentParties[a]]
+		for _, idx := range party.GetActive() {
+			ap := activePokemon{
+				AgentIdx:   a,
+				PokemonIdx: idx,
 			}
-			b.Dispatch(BEFORE_PLAYER1_TURN)
+			active = append(active, ap)
 		}
 	}
-	// Cleanup after battle is over / ask to start new battle
+
+	context := battleContext{
+		Context:       *b,
+		ActivePokemon: active,
+	}
+
+	// get turns from agents
+	// map of active pokemon indexes to their turns
+	turns := map[int]Turn{}
+	for i, ap := range active {
+		context.SetSelf(i)
+		agent := *b.Agents[ap.AgentIdx]
+		turn := agent.Act(&context)
+		turns[i] = turn
+	}
+
+	turnOrder := []int{}
+	// TODO: determine the correct order based on priority and other factors
+	for i := range active {
+		turnOrder = append(turnOrder, i)
+	}
+
+	for _, apIdx := range turnOrder {
+		switch t := turns[apIdx].(type) {
+		case FightTurn:
+			fmt.Printf("TODO: Implement fight %v\n", t)
+		default:
+			panic("Unknown turn")
+		}
+	}
+}
+
+type activePokemon struct {
+	AgentIdx   int
+	PokemonIdx int
+}
+
+// Used to provide data to Agents such that the Agent can't maliciously modify the state of the battle.
+type BattleInfo interface {
+	GetPokemon(int) Pokemon
+	Self() int
+	Allies() []int
+	Opponents() []int
+}
+
+// Implements the BattleInfo interface. Passed to Agents so they can decide a turn.
+type battleContext struct {
+	Context       Battle
+	ActivePokemon []activePokemon
+	self          int
+}
+
+func (c *battleContext) getTeam() []int {
+	selfAgent := c.ActivePokemon[c.self].AgentIdx
+	var team []int
+	for _, t := range c.Context.teams {
+		if contains(t, selfAgent) {
+			team = t
+			break
+		}
+	}
+	return team
+}
+func (c *battleContext) GetPokemon(idx int) Pokemon {
+	ap := c.ActivePokemon[idx]
+	b := c.Context
+	p := (*b.Parties[b.agentParties[ap.AgentIdx]]).Pokemon[ap.PokemonIdx]
+	return *p
+}
+func (c *battleContext) SetSelf(idx int) {
+	c.self = idx
+}
+
+// Get the index of the active Pokemon that this battle context is referencing.
+// In other words, the Pokemon you are acting as.
+func (c *battleContext) Self() int {
+	return c.self
+}
+func (c *battleContext) Allies() []int {
+	team := c.getTeam()
+
+	allies := []int{}
+	for i, ap := range c.ActivePokemon {
+		if i != c.self && contains(team, ap.AgentIdx) {
+			allies = append(allies, i)
+		}
+	}
+
+	return allies
+}
+func (c *battleContext) Opponents() []int {
+	team := c.getTeam()
+
+	opponents := []int{}
+	for i, ap := range c.ActivePokemon {
+		if !contains(team, ap.AgentIdx) {
+			opponents = append(opponents, i)
+		}
+	}
+
+	return opponents
+}
+
+// An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
+type Turn interface {
+	Priority() int // Gets the turn's priority. Higher values go first.
+}
+
+type FightTurn struct {
+	moveIdx   int // Denotes which of the pokemon's moves to use.
+	targetIdx int // The active pokemon that on the receiving end of the move.
+}
+
+func (turn FightTurn) Priority() int {
+	return 0
 }

@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"strconv"
 )
 
@@ -35,13 +36,14 @@ type data_move struct {
 	BaseExperience int
 
 	Name     string
+	Type     int
 	Power    int
 	PP       int
 	Accuracy int
 	Priority int
 	// see: move_targets.csv
 	Targets     int
-	DamageClass int
+	DamageClass string
 	Effect      int
 	Flags       data_move_flags
 }
@@ -274,8 +276,14 @@ func main() {
 	}
 	// find all moves
 	moves := []data_move{}
-	log.Println("finding availble moves")
+	log.Println("finding available moves")
 	moves_csv := getCsvReader("data/moves.csv")
+
+	moveMap := map[int]string{
+		1: "Status",
+		2: "Physical",
+		3: "Special",
+	}
 	for {
 		record, err := moves_csv.Read()
 		if err == io.EOF {
@@ -286,6 +294,7 @@ func main() {
 			continue
 		}
 		mid := parseInt(record[0])
+		moveType := parseInt(record[3])
 		power := parseInt(record[4])
 		pp := parseInt(record[5])
 		accuracy := parseInt(record[6])
@@ -296,12 +305,13 @@ func main() {
 		moves = append(moves, data_move{
 			Id:          mid,
 			Identifier:  record[1],
+			Type:        moveType,
 			Power:       power,
 			PP:          pp,
 			Accuracy:    accuracy,
 			Priority:    priority,
 			Targets:     targets,
-			DamageClass: damageClass,
+			DamageClass: moveMap[damageClass],
 			Effect:      effect,
 		})
 	}
@@ -347,7 +357,13 @@ func main() {
 		}
 	}
 
-	log.Println("TODO: generate code for moves")
+	log.Println("generating code for moves")
+	output.WriteString("var ALL_MOVES = []Move{\n")
+	for _, p := range moves {
+		output.WriteString(fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, Max_PP: %d,"+
+			" Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.Priority, p.Power, p.Accuracy))
+	}
+	output.WriteString("}\n\n")
 
 	// Generate hold item data
 	items := make([]data_item, 0)
@@ -384,5 +400,13 @@ func main() {
 	_, err = output.WriteString("}\n\n")
 	if err != nil {
 		log.Panicln(err)
+	}
+
+	// run gofmt on generated code
+	log.Println("Formatting generated code...")
+	cmd := exec.Command("gofmt", "-w", "pokedex_GEN.go")
+	err = cmd.Run()
+	if err != nil {
+		log.Fatalf("Failed to format generated code: %v", err)
 	}
 }

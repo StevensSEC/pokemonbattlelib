@@ -8,6 +8,22 @@ on:
 
 jobs:
 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+
+    - name: Make sure generated code is up to date
+      run: go generate && test -z $(git status --porcelain | tr -d '\n')
+
+    - name: Enforce formatting with gofmt
+      run: test -z $(gofmt -l . | tr -d '\n')
+
   build:
     runs-on: ubuntu-latest
     steps:

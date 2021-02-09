@@ -7,7 +7,7 @@ A portable library for accurately simulating pokemon battles.
 
 # Usage
 
-TODO: Link to documentation
+[Documentation](https://pkg.go.dev/github.com/StevensSEC/pokemonbattlelib)
 
 # Contributing
 
