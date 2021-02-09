@@ -302,12 +302,9 @@ func main() {
 	}
 
 	log.Println("generating code for moves")
-	output = createCodeOutput("moves_GEN.go")
+	// output = createCodeOutput("moves_GEN.go")
 	output.WriteString("var ALL_MOVES = []Move{\n")
 	for _, p := range moves {
-
-		// fmt.Printf("%v\n", p)
-		// TODO: add more fields
 		output.WriteString(fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %d, Max_PP: %d,"+
 			" Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.Priority, p.Power, p.Accuracy))
 	}
