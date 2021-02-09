@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"strconv"
 )
 
@@ -371,5 +372,13 @@ func main() {
 	_, err = output.WriteString("}\n\n")
 	if err != nil {
 		log.Panicln(err)
+	}
+
+	// run gofmt on generated code
+	log.Println("Formatting generated code...")
+	cmd := exec.Command("gofmt", "-w", "pokedex_GEN.go")
+	err = cmd.Run()
+	if err != nil {
+		log.Fatalf("Failed to format generated code: %v", err)
 	}
 }
