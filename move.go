@@ -2,11 +2,33 @@ package pokemonbattlelib
 
 import "fmt"
 
+type MoveCategory uint8
+
+const (
+	Status MoveCategory = iota
+	Physical
+	Special
+)
+
+func (c MoveCategory) String() string {
+	switch c {
+	case Status:
+		return "Status"
+	case Physical:
+		return "Physical"
+	case Special:
+		return "Special"
+	default:
+		panic("Unexpected value for move category")
+	}
+}
+
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
 type Move struct {
+	ID       int
 	Name     string
-	Type     string
-	Category string
+	Type     int // update this to elementalType when PR #27 is complete
+	Category MoveCategory
 	Max_PP   int
 	Priority int
 	Power    int
