@@ -12,6 +12,7 @@ type Pokemon struct {
 	EVs               [6]uint8 // values from 0-255 that represents a Pokemon's training in a particular stat
 	Nature            *Nature  // represents a Pokemon's disposition and affects stats
 	Stats             [6]uint  // the actual stats of a Pokemon determined from the above data
+	StatusEffects     uint     // the current status effects inflicted on a Pokemon
 	CurrentHP         uint     // the remaining HP of this Pokemon
 	HeldItem          *Item    // the item a Pokemon is holding
 	Moves             [4]*Move // the moves the Pokemon currenly knows
@@ -70,4 +71,18 @@ func (p *Pokemon) HasValidEVs() bool {
 func (p *Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
 		p.Gender, p.Level, p.CurrentHP, p.Stats[0])
+}
+
+// Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
+func (p *Pokemon) RestoreHP(amount uint) {
+	if p.Stats[STAT_HP]-p.CurrentHP >= amount {
+		p.CurrentHP = p.Stats[STAT_HP]
+	} else {
+		p.CurrentHP += amount
+	}
+}
+
+// Cures a status ailment from a Pokemon.
+func (p *Pokemon) CureStatusEffect(status uint) {
+	p.StatusEffects &= ^status
 }

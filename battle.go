@@ -116,6 +116,13 @@ func (b *Battle) SimulateRound() {
 		switch t := turns[apIdx].(type) {
 		case FightTurn:
 			fmt.Printf("TODO: Implement fight %v\n", t)
+		case ItemTurn:
+			switch t.item.Category {
+			case ItemPPRecovery:
+				t.item.UseMoveItem(t.target, t.move)
+			default:
+				t.item.UseItem(t.target, nil)
+			}
 		default:
 			panic("Unknown turn")
 		}
@@ -214,6 +221,9 @@ func (c *battleContext) Opponents() []int {
 }
 
 // An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
+const PRIORITY_MAX = 5
+const PRIORITY_MIN = -7
+
 type Turn interface {
 	Priority() int // Gets the turn's priority. Higher values go first.
 }
@@ -227,4 +237,15 @@ type FightTurn struct {
 
 func (turn FightTurn) Priority() int {
 	return 0
+}
+
+// An item turn has the a higher priority than any move.
+type ItemTurn struct {
+	item   *Item    // Which item is being consumed
+	target *Pokemon // The target Pokemon for the item
+	move   *Move    // Reference to a move for certain items
+}
+
+func (turn ItemTurn) Priority() int {
+	return PRIORITY_MAX
 }

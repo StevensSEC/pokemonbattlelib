@@ -36,11 +36,13 @@ const (
 	ItemUnused
 	ItemLoot
 	ItemAllMail
+	// Medicine
 	ItemVitamins
 	ItemHealing
 	ItemPPRecovery
 	ItemRevival
 	ItemStatusCures
+
 	ItemMulch
 	ItemSpecialBalls
 	ItemStandardBalls
@@ -74,4 +76,39 @@ const (
 // Creates a new item from its ID
 func NewItem(itemID int) *Item {
 	return &ALL_ITEMS[itemID-1]
+}
+
+func (i *Item) UseItem(target *Pokemon, params interface{}) {
+	switch i.Category {
+	case ItemVitamins, ItemHealing, ItemRevival, ItemStatusCures:
+		i.UseMedicine(target)
+	}
+}
+
+func (i *Item) UseMedicine(target *Pokemon) {
+	switch i.Name {
+	case "berry-juice", "potion", "sweet-heart":
+		target.RestoreHP(20)
+	case "fresh-water", "super-potion":
+		target.RestoreHP(50)
+	case "antidote":
+		target.CureStatusEffect(STATUS_POISON)
+	}
+}
+
+func (i *Item) UseMoveItem(target *Pokemon, move *Move) {
+	switch i.Name {
+	case "elixir":
+		for _, m := range target.Moves {
+			m.RestorePP(10)
+		}
+	case "ether":
+		move.RestorePP(10)
+	case "max-elixir":
+		for _, m := range target.Moves {
+			m.RestorePP(m.MaxPP)
+		}
+	case "max-ether":
+		move.RestorePP(move.MaxPP)
+	}
 }

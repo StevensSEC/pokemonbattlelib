@@ -7,7 +7,8 @@ import (
 )
 
 // Blindly uses the first move on the first opponent pokemon.
-type dumbAgent struct{}
+type dumbAgent struct {
+}
 
 func (dumbAgent) Act(b BattleInfo) Turn {
 	opponent := b.Opponents()[0]
@@ -15,6 +16,10 @@ func (dumbAgent) Act(b BattleInfo) Turn {
 		moveIdx:   0,
 		targetIdx: opponent,
 	}
+}
+
+func (dumbAgent) GetAgentType() AgentType {
+	return AGENT_TRAINER
 }
 
 func TestBattleSetup(t *testing.T) {
