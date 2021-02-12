@@ -8,19 +8,18 @@ import (
 
 // A Pokemon battle. Enforces rules of the battle, and queries `Agent`s for turns.
 type Battle struct {
-	Weather      int  // one of the 6 in-battle weather conditions
-	ShiftSet     bool // shift or set battle style for NPC trainer battles
-	State        BattleState
-	Parties      []*Party
-	Agents       []*Agent
-	agentParties map[int]int // Maps agent indexes to party indexes
-	teams        [][]int     // An array of teams, which are arrays of Agents. Used to derive allies and opponents
+	Weather  int  // one of the 6 in-battle weather conditions
+	ShiftSet bool // shift or set battle style for NPC trainer battles
+	State    BattleState
+	Parties  []*Party
+	teams    [][]int // An array of teams, which are arrays of Party ids. Used to derive allies and opponents
 }
 
 // A Pokemon party. Can hold up to 6 Pokemon. Also manages how many pokemon are out on the battlefield.
 type Party struct {
 	Pokemon []*Pokemon
-	active  []int // Which pokemon in the party are out on the battlefield
+	active  []int  // Which pokemon in the party are out on the battlefield
+	Agent   *Agent // The agent that has control over this party
 }
 
 func (p *Party) AddPokemon(pkmn ...*Pokemon) {
@@ -41,18 +40,6 @@ func (p *Party) GetActive() []int {
 	return p.active
 }
 
-// Gives an Agent control over a Party.
-func (b *Battle) LinkAgentParty(agentIdx, partyIdx int) error {
-	if b.agentParties == nil {
-		b.agentParties = make(map[int]int)
-	}
-	// TODO: check if agentIdx, partyIdx are valid indexes
-	// TODO: check if agent is already linked
-	// TODO: check if party is already linked
-	b.agentParties[agentIdx] = partyIdx
-	return nil
-}
-
 // Set which agents have which allies. Not to be confused with `Party`.
 func (b *Battle) SetTeams(t [][]int) error {
 	// TODO: validate
@@ -67,11 +54,6 @@ const (
 	BATTLE_IN_PROGRESS
 	BATTLE_END
 )
-
-// Adds Agent(s) to the battle.
-func (b *Battle) AddAgent(a ...*Agent) {
-	b.Agents = append(b.Agents, a...)
-}
 
 // Adds Parties to the battle.
 func (b *Battle) AddParty(p ...*Party) {
@@ -103,8 +85,8 @@ func (b *Battle) SimulateRound() {
 	turns := map[int]Turn{}
 	for i, ap := range active {
 		context.SetSelf(i)
-		agent := *b.Agents[ap.AgentIdx]
-		turn := agent.Act(&context)
+		party := *b.Parties[ap.PartyIdx]
+		turn := (*party.Agent).Act(&context)
 		turns[i] = turn
 	}
 
@@ -123,11 +105,10 @@ func (b *Battle) SimulateRound() {
 // Get references to all Pokemon that are active on the battlefield.
 func (b *Battle) getActivePokemon() []activePokemon {
 	active := []activePokemon{}
-	for a := range b.Agents {
-		party := b.Parties[b.agentParties[a]]
+	for p, party := range b.Parties {
 		for _, idx := range party.GetActive() {
 			ap := activePokemon{
-				AgentIdx:   a,
+				PartyIdx:   p,
 				PokemonIdx: idx,
 			}
 			active = append(active, ap)
@@ -138,7 +119,7 @@ func (b *Battle) getActivePokemon() []activePokemon {
 
 // Get a pointer to the actual Pokemon that `ap` is referencing.
 func (b *Battle) derefActivePokemon(ap activePokemon) *Pokemon {
-	return (*b.Parties[b.agentParties[ap.AgentIdx]]).Pokemon[ap.PokemonIdx]
+	return (*b.Parties[ap.PartyIdx]).Pokemon[ap.PokemonIdx]
 }
 
 // A type that is necessary in order to implement the `Interface` interface, which is used by the sort package to sort.
@@ -204,7 +185,7 @@ func sortTurns(battle *Battle, ap []activePokemon, turns map[int]Turn) []int {
 
 // References a Pokemon currently on the battlefield.
 type activePokemon struct {
-	AgentIdx   int
+	PartyIdx   int
 	PokemonIdx int
 }
 
@@ -224,10 +205,10 @@ type battleContext struct {
 }
 
 func (c *battleContext) getTeam() []int {
-	selfAgent := c.ActivePokemon[c.self].AgentIdx
+	selfParty := c.ActivePokemon[c.self].PartyIdx
 	var team []int
 	for _, t := range c.Context.teams {
-		if contains(t, selfAgent) {
+		if contains(t, selfParty) {
 			team = t
 			break
 		}
@@ -252,7 +233,7 @@ func (c *battleContext) Allies() []int {
 
 	allies := []int{}
 	for i, ap := range c.ActivePokemon {
-		if i != c.self && contains(team, ap.AgentIdx) {
+		if i != c.self && contains(team, ap.PartyIdx) {
 			allies = append(allies, i)
 		}
 	}
@@ -264,7 +245,7 @@ func (c *battleContext) Opponents() []int {
 
 	opponents := []int{}
 	for i, ap := range c.ActivePokemon {
-		if !contains(team, ap.AgentIdx) {
+		if !contains(team, ap.PartyIdx) {
 			opponents = append(opponents, i)
 		}
 	}
