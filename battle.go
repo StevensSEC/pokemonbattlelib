@@ -2,6 +2,8 @@ package pokemonbattlelib
 
 import (
 	"fmt"
+	"reflect"
+	"sort"
 )
 
 // A Pokemon battle. Enforces rules of the battle, and queries `Agent`s for turns.
@@ -106,7 +108,7 @@ func (b *Battle) SimulateRound() {
 		turns[i] = turn
 	}
 
-	turnOrder := sortTurns(active, turns)
+	turnOrder := sortTurns(b, active, turns)
 
 	for _, apIdx := range turnOrder {
 		switch t := turns[apIdx].(type) {
@@ -139,14 +141,65 @@ func (b *Battle) derefActivePokemon(ap activePokemon) *Pokemon {
 	return (*b.Parties[b.agentParties[ap.AgentIdx]]).Pokemon[ap.PokemonIdx]
 }
 
-// Returns the indexes of the active pokemon in the order that their turns should take place.
-func sortTurns(ap []activePokemon, turns map[int]Turn) []int {
-	// TODO: determine the correct order based on priority and other factors
-	var turnOrder []int
+// A type that is necessary in order to implement the `Interface` interface, which is used by the sort package to sort.
+type apTurnOrder struct {
+	battle *Battle
+	active []activePokemon
+	turns  map[int]Turn
+	order  []int
+}
+
+func newTurnOrder(battle *Battle, ap []activePokemon, turns map[int]Turn) apTurnOrder {
+	o := []int{}
 	for i := range ap {
-		turnOrder = append(turnOrder, i)
+		o = append(o, i)
 	}
-	return turnOrder
+
+	ord := apTurnOrder{
+		battle: battle,
+		order:  o,
+		active: ap,
+		turns:  turns,
+	}
+
+	return ord
+}
+
+func (t *apTurnOrder) GetOrder() []int {
+	return t.order
+}
+
+func (t *apTurnOrder) Len() int {
+	return len(t.order)
+}
+
+func (t *apTurnOrder) Swap(i, j int) {
+	t.order[i], t.order[j] = t.order[j], t.order[i]
+}
+
+// Determine if turn a should happen before turn b.
+func (t *apTurnOrder) Less(a, b int) bool {
+	pA, pB := t.battle.derefActivePokemon(t.active[a]), t.battle.derefActivePokemon(t.active[b])
+	tA, tB := t.turns[a], t.turns[b]
+	if reflect.TypeOf(tA) == reflect.TypeOf(tB) {
+		switch tA.(type) {
+		case FightTurn:
+			// speedy pokemon should go first
+			return pA.Stats[5] > pB.Stats[5]
+		}
+	} else {
+		// make higher priority turns go first
+		return tA.Priority() > tB.Priority()
+	}
+	// fallthrough
+	return false
+}
+
+// Returns the indexes of the active pokemon in the order that their turns should take place.
+func sortTurns(battle *Battle, ap []activePokemon, turns map[int]Turn) []int {
+	t := newTurnOrder(battle, ap, turns)
+	sort.Sort(&t)
+	return t.GetOrder()
 }
 
 // References a Pokemon currently on the battlefield.
