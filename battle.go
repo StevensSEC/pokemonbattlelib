@@ -106,11 +106,7 @@ func (b *Battle) SimulateRound() {
 		turns[i] = turn
 	}
 
-	turnOrder := []int{}
-	// TODO: determine the correct order based on priority and other factors
-	for i := range active {
-		turnOrder = append(turnOrder, i)
-	}
+	turnOrder := sortTurns(active, turns)
 
 	for _, apIdx := range turnOrder {
 		switch t := turns[apIdx].(type) {
@@ -141,6 +137,16 @@ func (b *Battle) getActivePokemon() []activePokemon {
 // Get a pointer to the actual Pokemon that `ap` is referencing.
 func (b *Battle) derefActivePokemon(ap activePokemon) *Pokemon {
 	return (*b.Parties[b.agentParties[ap.AgentIdx]]).Pokemon[ap.PokemonIdx]
+}
+
+// Returns the indexes of the active pokemon in the order that their turns should take place.
+func sortTurns(ap []activePokemon, turns map[int]Turn) []int {
+	// TODO: determine the correct order based on priority and other factors
+	var turnOrder []int
+	for i := range ap {
+		turnOrder = append(turnOrder, i)
+	}
+	return turnOrder
 }
 
 // References a Pokemon currently on the battlefield.
