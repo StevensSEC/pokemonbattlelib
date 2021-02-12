@@ -9,8 +9,10 @@ type Battle struct {
 	Weather      int  // one of the 6 in-battle weather conditions
 	ShiftSet     bool // shift or set battle style for NPC trainer battles
 	State        BattleState
+	RunSemantics RunSemantics // indicates what happens when an Agent tries to run
 	Parties      []*Party
 	Agents       []*Agent
+	Messages     []string    // messages for human Agents about the state of the battle
 	agentParties map[int]int // Maps agent indexes to party indexes
 	teams        [][]int     // An array of teams, which are arrays of Agents. Used to derive allies and opponents
 }
@@ -66,6 +68,15 @@ const (
 	BATTLE_END
 )
 
+// Indicates the meaning of attempting to take the 'Run' action during this battle.
+type RunSemantics int
+
+const (
+	DISALLOWED = iota
+	ESCAPABLE
+	FORFEITABLE
+)
+
 // Adds Agent(s) to the battle.
 func (b *Battle) AddAgent(a ...*Agent) {
 	b.Agents = append(b.Agents, a...)
@@ -116,6 +127,8 @@ func (b *Battle) SimulateRound() {
 		switch t := turns[apIdx].(type) {
 		case FightTurn:
 			fmt.Printf("TODO: Implement fight %v\n", t)
+		case RunTurn:
+			fmt.Printf("Still implementing")
 		default:
 			panic("Unknown turn")
 		}
@@ -141,6 +154,13 @@ func (b *Battle) getActivePokemon() []activePokemon {
 // Get a pointer to the actual Pokemon that `ap` is referencing.
 func (b *Battle) derefActivePokemon(ap activePokemon) *Pokemon {
 	return (*b.Parties[b.agentParties[ap.AgentIdx]]).Pokemon[ap.PokemonIdx]
+}
+
+func (b *Battle) getLastMessage() string {
+	if len(b.Messages) == 0 {
+		return ""
+	}
+	return b.Messages[len(b.Messages)-1]
 }
 
 // References a Pokemon currently on the battlefield.
@@ -227,4 +247,14 @@ type FightTurn struct {
 
 func (turn FightTurn) Priority() int {
 	return 0
+}
+
+// Indicates that:
+//      in a multibattle, the Team this Agent belongs to will forfeit.
+//      in a wild Pokemon battle, the Agent will attempt to escape.
+// Battles against NPC Trainers cannot be forfeit or escaped.
+type RunTurn struct{}
+
+func (turn RunTurn) Priority() int {
+	return 7 // outside the legal range for any FightTurn
 }
