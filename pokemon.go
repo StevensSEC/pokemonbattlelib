@@ -19,6 +19,26 @@ type Pokemon struct {
 	OriginalTrainerID uint16   // a number associated with the first Trainer who caught this Pokemon
 }
 
+// Constants for looking up Pokemon stats
+const (
+	STAT_HP = iota
+	STAT_ATK
+	STAT_DEF
+	STAT_SPATK
+	STAT_SPDEF
+	STAT_SPD
+)
+
+// Constants for status effects on a Pokemon
+const (
+	STATUS_BURN = 1 << iota
+	STATUS_FREEZE
+	STATUS_PARALYZE
+	STATUS_POISON
+	STATUS_BADLY_POISON
+	STATUS_SLEEP
+)
+
 func (p *Pokemon) GetName() string {
 	return PokemonNames[p.NatDex]
 }
