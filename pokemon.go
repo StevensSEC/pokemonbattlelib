@@ -102,6 +102,7 @@ func (p *Pokemon) CureStatusEffect(status uint) {
 }
 
 // Modifies one of the six base stats for a Pokemon
+// Takes a value between -6 and +6 for stages
 func (p *Pokemon) ModifyStat(stat, stages int) {
 	p.StatModifiers[stat] += stages
 	if p.StatModifiers[stat] > MAX_STAT_MODIFIER {
