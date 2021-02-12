@@ -3,7 +3,7 @@ package pokemonbattlelib
 import "testing"
 
 func TestItemUse(t *testing.T) {
-	i := NewItem(17) // potion
+	i := NewItem(ITEM_POTION)
 	if i.Name != "potion" {
 		t.Errorf("expected item to be named 'potion', received %v", i.Name)
 	}
@@ -12,13 +12,13 @@ func TestItemUse(t *testing.T) {
 	if p.CurrentHP != 70 {
 		t.Errorf("expected item to heal Pokemon by 20HP")
 	}
-	i = NewItem(18) // antidote
+	i = NewItem(ITEM_ANTIDOTE)
 	p.StatusEffects = STATUS_POISON
 	i.UseItem(&p)
 	if p.StatusEffects&STATUS_POISON != 0 {
 		t.Errorf("expected item to cure poison status effect")
 	}
-	i = NewItem(38) // ether
+	i = NewItem(ITEM_ETHER)
 	p.Moves[0] = &Move{CurrentPP: 15, MaxPP: 30}
 	i.UseMoveItem(&p, p.Moves[0])
 	if p.Moves[0].CurrentPP != 25 {
