@@ -23,6 +23,9 @@ func (c MoveCategory) String() string {
 	}
 }
 
+const MOVE_PRIORITY_MAX = 5
+const MOVE_PRIORITY_MIN = -7
+
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
 type Move struct {
 	ID       int
