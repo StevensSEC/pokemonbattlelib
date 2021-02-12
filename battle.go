@@ -121,7 +121,7 @@ func (b *Battle) SimulateRound() {
 			case ItemPPRecovery:
 				t.item.UseMoveItem(t.target, t.move)
 			default:
-				t.item.UseItem(t.target, nil)
+				t.item.UseItem(t.target)
 			}
 		default:
 			panic("Unknown turn")

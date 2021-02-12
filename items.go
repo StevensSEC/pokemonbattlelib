@@ -78,7 +78,7 @@ func NewItem(itemID int) *Item {
 	return &ALL_ITEMS[itemID-1]
 }
 
-func (i *Item) UseItem(target *Pokemon, params interface{}) {
+func (i *Item) UseItem(target *Pokemon) {
 	switch i.Category {
 	case ItemVitamins, ItemHealing, ItemRevival, ItemStatusCures:
 		i.UseMedicine(target)

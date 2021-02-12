@@ -75,7 +75,7 @@ func (p *Pokemon) String() string {
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
 func (p *Pokemon) RestoreHP(amount uint) {
-	if p.Stats[STAT_HP]-p.CurrentHP >= amount {
+	if p.Stats[STAT_HP]-p.CurrentHP <= amount {
 		p.CurrentHP = p.Stats[STAT_HP]
 	} else {
 		p.CurrentHP += amount
