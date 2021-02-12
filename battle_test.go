@@ -17,11 +17,6 @@ func (dumbAgent) Act(b BattleInfo) Turn {
 		targetIdx: opponent,
 	}
 }
-
-func (dumbAgent) GetAgentType() AgentType {
-	return AGENT_TRAINER
-}
-
 func TestBattleSetup(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})

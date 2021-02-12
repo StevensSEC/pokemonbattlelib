@@ -12,6 +12,7 @@ type Pokemon struct {
 	EVs               [6]uint8 // values from 0-255 that represents a Pokemon's training in a particular stat
 	Nature            *Nature  // represents a Pokemon's disposition and affects stats
 	Stats             [6]uint  // the actual stats of a Pokemon determined from the above data
+	StatModifiers     [6]int   // ranges from +6 (buffing) to -6 (debuffing) a stat
 	StatusEffects     uint     // the current status effects inflicted on a Pokemon
 	CurrentHP         uint     // the remaining HP of this Pokemon
 	HeldItem          *Item    // the item a Pokemon is holding
@@ -40,6 +41,16 @@ const (
 	STATUS_SLEEP
 )
 
+// Constants for IVs and EVs
+const (
+	MAX_FRIENDSHIP    = 255
+	MAX_EV            = 255
+	MAX_IV            = 31
+	MAX_STAT_MODIFIER = 6
+	MIN_STAT_MODIFIER = -6
+	TOTAL_EV          = 510
+)
+
 func (p *Pokemon) GetName() string {
 	return PokemonNames[p.NatDex]
 }
@@ -50,7 +61,7 @@ func (p *Pokemon) HasValidLevel() bool {
 
 func (p *Pokemon) HasValidIVs() bool {
 	for _, IV := range p.IVs {
-		if IV > 31 {
+		if IV > MAX_IV {
 			return false
 		}
 	}
@@ -60,9 +71,12 @@ func (p *Pokemon) HasValidIVs() bool {
 func (p *Pokemon) HasValidEVs() bool {
 	totalEVs := 0
 	for _, EV := range p.EVs {
+		if EV > MAX_EV {
+			return false
+		}
 		totalEVs += int(EV)
 	}
-	return totalEVs <= 510
+	return totalEVs <= TOTAL_EV
 }
 
 // implement Stringer
@@ -85,4 +99,33 @@ func (p *Pokemon) RestoreHP(amount uint) {
 // Cures a status ailment from a Pokemon.
 func (p *Pokemon) CureStatusEffect(status uint) {
 	p.StatusEffects &= ^status
+}
+
+// Modifies one of the six base stats for a Pokemon
+func (p *Pokemon) ModifyStat(stat, stages int) {
+	p.StatModifiers[stat] += stages
+	if p.StatModifiers[stat] > MAX_STAT_MODIFIER {
+		p.StatModifiers[stat] = MAX_STAT_MODIFIER
+	}
+	if p.StatModifiers[stat] < MIN_STAT_MODIFIER {
+		p.StatModifiers[stat] = MIN_STAT_MODIFIER
+	}
+}
+
+// Modifies the EVs of a Pokemon
+func (p *Pokemon) AddEVs(stat, amount uint8) {
+	if MAX_EV-p.EVs[stat] <= amount {
+		p.EVs[stat] = MAX_EV
+	} else {
+		p.EVs[stat] += amount
+	}
+}
+
+// Modifies the friendship level of a Pokemon
+func (p *Pokemon) AddFriendship(amount uint8) {
+	if MAX_FRIENDSHIP-p.Friendship <= amount {
+		p.Friendship = MAX_FRIENDSHIP
+	} else {
+		p.Friendship += amount
+	}
 }
