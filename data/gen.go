@@ -7,9 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"regexp"
 	"strconv"
-	"strings"
 )
 
 const ENGLISH_LANGUAGE_ID = 9
@@ -70,7 +68,7 @@ func parseInt(s string) (n int) {
 }
 
 func getCsvReader(path string) *csv.Reader {
-	log.Printf("Reading CSV: %s\n", path)
+	log.Printf("Reading csv: %s\n", path)
 	file, err := os.Open(path)
 	if err != nil {
 		log.Panicln(err)
@@ -93,27 +91,26 @@ func contains(s []int, e int) bool {
 	return false
 }
 
-func createCodeOutput(s string) {
+func createCodeOutput() *os.File {
 	file, err := os.Create("pokedex_GEN.go")
 	if err != nil {
 		log.Panicln(err)
 	}
 	_, err = file.WriteString("// Code generated - DO NOT EDIT.\n" +
 		"// Regenerate with `go generate`.\n\n" +
-		"package pokemonbattlelib\n\n" + s)
+		"package pokemonbattlelib\n\n")
 	if err != nil {
 		log.Panicln(err)
 	}
+	return file
 }
 
 func main() {
-	// path, err := os.Getwd()
-	// if err != nil {
-	// 	log.Panicln(err)
-	// }
-	// log.Printf("current directory: %s\n", path)
-	var err error
-	output := ""
+	path, err := os.Getwd()
+	if err != nil {
+		log.Panicln(err)
+	}
+	log.Printf("current directory: %s\n", path)
 
 	// get all valid version ids
 	valid_version_groups := []int{}
@@ -185,7 +182,7 @@ func main() {
 	}
 
 	// find all the pokemon names
-	log.Println("Getting Pokemon names")
+	log.Println("finding pokemon names")
 	pkmn_names_csv := getCsvReader("data/pokemon_species_names.csv")
 	for {
 		record, err := pkmn_names_csv.Read()
@@ -207,7 +204,7 @@ func main() {
 	}
 
 	// find national dex numbers
-	log.Println("Getting Pokemon dex numbers")
+	log.Println("finding pokemon dex numbers")
 	pkmn_dex_nums_csv := getCsvReader("data/pokemon_dex_numbers.csv")
 	for {
 		record, err := pkmn_dex_nums_csv.Read()
@@ -228,40 +225,60 @@ func main() {
 			break
 		}
 	}
-	output += "var ALL_POKEMON = []Pokemon{\n"
+
+	// print out pokemon
+	log.Println("generating code for pokemon")
+	output := createCodeOutput()
+	_, err = output.WriteString("var ALL_POKEMON = []Pokemon{\n")
+	if err != nil {
+		log.Panicln(err)
+	}
 	for _, p := range pokemon {
 		// fmt.Printf("%v\n", p)
-		output += "{\n" +
-			fmt.Sprintf("NatDex:%d,\n", p.NatDex) +
-			fmt.Sprintf("Level:%d,\n", uint8(1)) +
-			// fmt.Sprintf("Ability:%s,\n", "new(Ability)") +
-			// fmt.Sprintf("TotalExperience:%d,\n", uint(0)) +
-			fmt.Sprintf("Gender:%s,\n", "Genderless") +
-			fmt.Sprintf("IVs:%s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}") +
-			fmt.Sprintf("EVs:%s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}") +
-			// fmt.Sprintf("Nature:%s,\n", "new(Nature)") +
-			fmt.Sprintf("Stats:%s,\n", "[6]uint{0, 0, 0, 0, 0, 0}") +
-			// fmt.Sprintf("CurrentHP:%d,\n", uint(0)) +
-			// fmt.Sprintf("HeldItem:%v,\n", "new(Item)") +
-			fmt.Sprintf("Moves:%s,\n", "[4]*Move{}") +
-			// fmt.Sprintf("Friendship:%d,\n", uint8(0)) +
-			// fmt.Sprintf("OriginalTrainerID: %d,\n", uint16(0)) +
-			"},\n"
+		output.WriteString(fmt.Sprintf("{\n"))
+		output.WriteString(fmt.Sprintf("NatDex:%d,\n", p.NatDex))
+		output.WriteString(fmt.Sprintf("Level:%d,\n", uint8(1)))
+		output.WriteString(fmt.Sprintf("Ability:%s,\n", "new(Ability)"))
+		output.WriteString(fmt.Sprintf("TotalExperience:%d,\n", uint(0)))
+		output.WriteString(fmt.Sprintf("Gender:%s,\n", "Genderless"))
+		output.WriteString(fmt.Sprintf("IVs:%s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}"))
+		output.WriteString(fmt.Sprintf("EVs:%s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}"))
+		output.WriteString(fmt.Sprintf("Nature:%s,\n", "new(Nature)"))
+		output.WriteString(fmt.Sprintf("Stats:%s,\n", "[6]uint{0, 0, 0, 0, 0, 0}"))
+		output.WriteString(fmt.Sprintf("CurrentHP:%d,\n", uint(0)))
+		output.WriteString(fmt.Sprintf("HeldItem:%v,\n", "new(Item)"))
+		output.WriteString(fmt.Sprintf("Moves:%s,\n", "[4]*Move{}"))
+		output.WriteString(fmt.Sprintf("Friendship:%d,\n", uint8(0)))
+		output.WriteString(fmt.Sprintf("OriginalTrainerID: %d,\n", uint16(0)))
+		output.WriteString(fmt.Sprintf("},\n"))
 	}
-	output += "}\n\n" +
+
+	_, err = output.WriteString("}\n\n" +
 		"// A map of national pokedex numbers to pokemon names.\n" +
-		"var PokemonNames = map[uint16]string{\n"
+		"var PokemonNames = map[uint16]string{\n")
+	if err != nil {
+		log.Panicln(err)
+	}
+
 	for _, p := range pokemon {
+		// fmt.Printf("%v\n", p)
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("\t%d: \"%s\",\n", p.NatDex, p.Name)
+		_, err = output.WriteString(fmt.Sprintf("\t%d: \"%s\",\n", p.NatDex, p.Name))
+		if err != nil {
+			log.Panicln(err)
+		}
 	}
-	output += "}\n\n"
+	_, err = output.WriteString("}\n\n")
+	if err != nil {
+		log.Panicln(err)
+	}
 	// find all moves
 	moves := []data_move{}
-	log.Println("Getting all available moves")
+	log.Println("finding available moves")
 	moves_csv := getCsvReader("data/moves.csv")
+
 	moveMap := map[int]string{
 		1: "Status",
 		2: "Physical",
@@ -298,8 +315,9 @@ func main() {
 			Effect:      effect,
 		})
 	}
+
 	// find all the move names
-	log.Println("Getting move names")
+	log.Println("finding move names")
 	move_names_csv := getCsvReader("data/move_names.csv")
 	for {
 		record, err := move_names_csv.Read()
@@ -319,8 +337,9 @@ func main() {
 			break
 		}
 	}
+
 	// find all the move flags
-	log.Println("Getting move flags")
+	log.Println("finding move flags")
 	move_flag_map_csv := getCsvReader("data/move_flag_map.csv")
 	for {
 		record, err := move_flag_map_csv.Read()
@@ -337,71 +356,23 @@ func main() {
 			break
 		}
 	}
-	output += "var ALL_MOVES = []Move{\n"
+
+	log.Println("generating code for moves")
+	output.WriteString("var ALL_MOVES = []Move{\n")
 	for _, p := range moves {
-		output += fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, CurrentPP: %d, MaxPP: %d,"+
-			" Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Priority, p.Power, p.Accuracy)
+		output.WriteString(fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, Max_PP: %d,"+
+			" Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.Priority, p.Power, p.Accuracy))
 	}
-	output += "}\n\n"
+	output.WriteString("}\n\n")
+
 	// Generate hold item data
-	/* id,identifier (we only care about items with flag 4, 5, or 7)
-	1,countable
-	2,consumable
-	3,usable-overworld
-	4,usable-in-battle
-	5,holdable
-	6,holdable-passive
-	7,holdable-active
-	8,underground */
-	log.Println("Getting all items/item flags")
-	item_flags_csv := getCsvReader("data/item_flag_map.csv")
-	records, err := item_flags_csv.ReadAll()
-	if err != nil {
-		log.Panicln(err)
-	}
-	valid_items := make(map[string]bool)
-	for _, r := range records {
-		if r[1] == "4" || r[1] == "5" || r[1] == "7" {
-			valid_items[r[0]] = true
-		}
-	}
-	output += "// Create item constant enum for quick reference\nconst (\n"
-	item_names_csv := getCsvReader("data/item_names.csv")
-	item_names := make(map[string]string)
-	records, err = item_names_csv.ReadAll()
-	if err != nil {
-		log.Panicln(err)
-	}
-	// Add item names
-	for _, r := range records {
-		if _, ok := valid_items[r[0]]; !ok {
-			continue
-		}
-		if parseInt(r[1]) != ENGLISH_LANGUAGE_ID {
-			continue
-		}
-		item_names[r[0]] = r[2]
-		name := strings.ToUpper(r[2])
-		name = strings.ReplaceAll(name, "É", "E")
-		name = strings.ReplaceAll(name, " ", "_")
-		re, err := regexp.Compile(`[^a-zA-Z_0-9]`)
-		if err != nil {
-			log.Panicln(err)
-		}
-		name = re.ReplaceAllString(name, "")
-		output += fmt.Sprintf("\tITEM_%s = %v\n", name, r[0])
-	}
-	output += ")\n"
 	items := make([]data_item, 0)
 	items_csv := getCsvReader("data/items.csv")
-	records, err = items_csv.ReadAll()
+	records, err := items_csv.ReadAll()
 	if err != nil {
 		log.Panicln(err)
 	}
 	for _, r := range records {
-		if _, ok := valid_items[r[0]]; !ok {
-			continue
-		}
 		item := data_item{
 			ID:            r[0],
 			Identifier:    r[1],
@@ -411,14 +382,26 @@ func main() {
 		}
 		items = append(items, item)
 	}
-	// Add item data to generated output
-	output += "// A collection of all items in the game\n" + "var ALL_ITEMS = []Item{\n"
-	for _, item := range items {
-		output += fmt.Sprintf("\t{ID: %s, Name: \"%s\", Category: %d, FlingPower: %d, FlingEffect: %d},\n",
-			item.ID, item_names[item.ID], item.CategoryID, item.FlingPower, item.FlingEffectID)
+	// Write output to file
+	_, err = output.WriteString("// A collection of all items in the game\n" +
+		"var ALL_ITEMS = []Item{\n")
+	if err != nil {
+		log.Panicln(err)
 	}
-	output += "}\n\n"
-	createCodeOutput(output)
+	// Fix: add item name from `item_names.csv`
+	for _, item := range items {
+		s := fmt.Sprintf("\t{ID: %s, Name: \"%s\", Category: %d, FlingPower: %d, FlingEffect: %d},\n",
+			item.ID, item.Identifier, item.CategoryID, item.FlingPower, item.FlingEffectID)
+		_, err = output.WriteString(s)
+		if err != nil {
+			log.Panicln(err)
+		}
+	}
+	_, err = output.WriteString("}\n\n")
+	if err != nil {
+		log.Panicln(err)
+	}
+
 	// run gofmt on generated code
 	log.Println("Formatting generated code...")
 	cmd := exec.Command("gofmt", "-w", "pokedex_GEN.go")
