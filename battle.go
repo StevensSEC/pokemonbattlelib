@@ -11,40 +11,8 @@ type Battle struct {
 	Weather  int  // one of the 6 in-battle weather conditions
 	ShiftSet bool // shift or set battle style for NPC trainer battles
 	State    BattleState
-	Parties  []*Party
-	teams    [][]int // An array of teams, which are arrays of Party ids. Used to derive allies and opponents
-}
 
-// A Pokemon party. Can hold up to 6 Pokemon. Also manages how many pokemon are out on the battlefield.
-type Party struct {
-	Pokemon []*Pokemon
-	active  []int  // Which pokemon in the party are out on the battlefield
-	Agent   *Agent // The agent that has control over this party
-}
-
-func (p *Party) AddPokemon(pkmn ...*Pokemon) {
-	p.Pokemon = append(p.Pokemon, pkmn...)
-}
-
-// Set the indeces of which pokemon are on the battlefield.
-func (p *Party) SetActive(idx int) {
-	if len(p.active) == 0 {
-		p.active = append(p.active, idx)
-	} else {
-		p.active[0] = idx
-	}
-}
-
-// Get the indeces of which pokemon are on the battlefield.
-func (p *Party) GetActive() []int {
-	return p.active
-}
-
-// Set which agents have which allies. Not to be confused with `Party`.
-func (b *Battle) SetTeams(t [][]int) error {
-	// TODO: validate
-	b.teams = t
-	return nil
+	teams map[int][]*party // Teams are used to indicate allies/opponents
 }
 
 type BattleState int
@@ -55,9 +23,18 @@ const (
 	BATTLE_END
 )
 
-// Adds Parties to the battle.
-func (b *Battle) AddParty(p ...*Party) {
-	b.Parties = append(b.Parties, p...)
+// Creates a new battle instance, setting initial conditions
+func NewBattle() *Battle {
+	b := Battle{
+		State: BEFORE_START,
+		teams: make(map[int][]*party),
+	}
+	return &b
+}
+
+// Adds a party to a team in the battle
+func (b *Battle) AddParty(p *party, team int) {
+	b.teams[team] = append(b.teams[team], p)
 }
 
 func (b *Battle) Start() error {
@@ -65,8 +42,10 @@ func (b *Battle) Start() error {
 
 	// Initiate the battle! Send out the first pokemon in the parties.
 	b.State = BATTLE_IN_PROGRESS
-	for _, p := range b.Parties {
-		p.SetActive(0)
+	for _, teams := range b.teams {
+		for _, party := range teams {
+			party.SetActive(0)
+		}
 	}
 	return nil
 }
