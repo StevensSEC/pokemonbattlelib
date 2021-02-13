@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"log"
 	"reflect"
 	"sort"
 )
@@ -74,39 +75,42 @@ func (b *Battle) Start() error {
 // Simulates a single round of the battle.
 func (b *Battle) SimulateRound() {
 	// Collects all turn info from each active Pokemon
-	turns := make([]Turn, 0)
+	turns := make([]TurnContext, 0)
 	for _, party := range b.parties {
 		for _, pokemon := range party.activePokemon {
 			ctx := b.GetContext(party, pokemon)
 			turn := (*party.Agent).Act(ctx)
-			turns = append(turns, turn)
+			turns = append(turns, TurnContext{Turn: &turn, Context: ctx})
 		}
 	}
+	// Sort turns using an in-place stable sort
 	sort.SliceStable(turns, func(i, j int) bool {
-		tA := turns[i]
-		tB := turns[j]
-		if reflect.TypeOf(tA) == reflect.TypeOf(tB) {
-			switch tA.(type) {
+		turnA := turns[i].Turn
+		turnB := turns[j].Turn
+		ctxA := turns[i].Context
+		ctxB := turns[j].Context
+		if reflect.TypeOf(*turnA) == reflect.TypeOf(*turnB) {
+			switch (*turnA).(type) {
 			case FightTurn:
 				// speedy pokemon should go first
-				return pA.Stats[5] > pB.Stats[5]
+				return ctxA.Pokemon.Stats[STAT_SPD] > ctxB.Pokemon.Stats[STAT_SPD]
 			}
 		} else {
 			// make higher priority turns go first
-			return tA.Priority() > tB.Priority()
+			return (*turnA).Priority() > (*turnB).Priority()
 		}
 		// fallthrough
 		return false
 	})
-	// turnOrder := sortTurns(b, active, turns)
-	// for _, apIdx := range turnOrder {
-	// 	switch t := turns[apIdx].(type) {
-	// 	case FightTurn:
-	// 		fmt.Printf("TODO: Implement fight %v\n", t)
-	// 	default:
-	// 		panic("Unknown turn")
-	// 	}
-	// }
+	// Run turns in sorted order and update battle state
+	for _, turn := range turns {
+		switch t := (*turn.Turn).(type) {
+		case FightTurn:
+			log.Printf("TODO: Implement fight\n")
+		default:
+			log.Panicf("Unknown turn of type %v", t)
+		}
+	}
 }
 
 type Context struct {
@@ -126,76 +130,15 @@ func (b *Battle) GetContext(party *party, pokemon *Pokemon) *Context {
 	}
 }
 
-// A type that is necessary in order to implement the `Interface` interface, which is used by the sort package to sort.
-// type apTurnOrder struct {
-// 	battle *Battle
-// 	active []activePokemon
-// 	turns  map[int]Turn
-// 	order  []int
-// }
-
-/* func newTurnOrder(battle *Battle, ap []activePokemon, turns map[int]Turn) apTurnOrder {
-	o := []int{}
-	for i := range ap {
-		o = append(o, i)
-	}
-
-	ord := apTurnOrder{
-		battle: battle,
-		order:  o,
-		active: ap,
-		turns:  turns,
-	}
-
-	return ord
-}
-
-func (t *apTurnOrder) GetOrder() []int {
-	return t.order
-}
-
-func (t *apTurnOrder) Len() int {
-	return len(t.order)
-}
-
-func (t *apTurnOrder) Swap(i, j int) {
-	t.order[i], t.order[j] = t.order[j], t.order[i]
-}
-
-// Determine if turn a should happen before turn b.
-func (t *apTurnOrder) Less(a, b int) bool {
-	pA, pB := t.battle.derefActivePokemon(t.active[a]), t.battle.derefActivePokemon(t.active[b])
-	tA, tB := t.turns[a], t.turns[b]
-	if reflect.TypeOf(tA) == reflect.TypeOf(tB) {
-		switch tA.(type) {
-		case FightTurn:
-			// speedy pokemon should go first
-			return pA.Stats[5] > pB.Stats[5]
-		}
-	} else {
-		// make higher priority turns go first
-		return tA.Priority() > tB.Priority()
-	}
-	// fallthrough
-	return false
-}
-
-// Returns the indexes of the active pokemon in the order that their turns should take place.
-func sortTurns(battle *Battle, ap []activePokemon, turns map[int]Turn) []int {
-	t := newTurnOrder(battle, ap, turns)
-	sort.Sort(&t)
-	return t.GetOrder()
-}
-
-// References a Pokemon currently on the battlefield.
-type activePokemon struct {
-	PartyIdx   int
-	PokemonIdx int
-} */
-
 // An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
 type Turn interface {
 	Priority() int // Gets the turn's priority. Higher values go first.
+}
+
+// Wrapper used to determine turn order in a battle
+type TurnContext struct {
+	Turn    *Turn
+	Context *Context
 }
 
 type FightTurn struct {

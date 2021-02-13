@@ -47,7 +47,10 @@ func TestBattleOneRound(t *testing.T) {
 	party2.AddPokemon(pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
-	b.Start()
+	err := b.Start()
+	if err != nil {
+		t.Fatal("failed to start battle")
+	}
 	for p, party := range b.parties {
 		got := party.GetActivePokemon()
 		if !reflect.DeepEqual(got, map[int]Pokemon{0: *party.pokemon[0]}) {
@@ -74,7 +77,10 @@ func TestPokemonSpeed(t *testing.T) {
 	party2.AddPokemon(pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
-	b.Start()
+	err := b.Start()
+	if err != nil {
+		t.Fatal("failed to start battle")
+	}
 	b.SimulateRound()
 	b.SimulateRound()
 	// FIXME: ideally should check battle log/history
