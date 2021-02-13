@@ -166,7 +166,7 @@ func (t *apTurnOrder) Less(a, b int) bool {
 		switch tA.(type) {
 		case FightTurn:
 			// speedy pokemon should go first
-			return pA.Stats[5] > pB.Stats[5]
+			return pA.GetSpeed() > pB.GetSpeed()
 		}
 	} else {
 		// make higher priority turns go first

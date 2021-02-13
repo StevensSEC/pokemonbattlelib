@@ -43,6 +43,52 @@ func (p *Pokemon) GetName() string {
 	return PokemonNames[p.NatDex]
 }
 
+func (p *Pokemon) GetHP() uint {
+    return p.Stats[0]
+}
+
+func (p *Pokemon) GetAtk() uint {
+    return p.Stats[1]
+}
+
+func (p *Pokemon) GetDef() uint {
+    return p.Stats[2]
+}
+
+func (p *Pokemon) GetSpAtk() uint {
+    return p.Stats[3]
+}
+
+func (p *Pokemon) GetSpDef() uint {
+    return p.Stats[4]
+}
+
+func (p *Pokemon) GetSpeed() uint {
+    return p.Stats[5]
+}
+
+// the following 6 setter functions are primarily here for testing
+// typically a pokemon's stats are computed from their level, IVs, EVs, base stats and nature
+
+func (p *Pokemon) setHP(newHP uint) {
+    p.Stats[0] = newHP
+}
+func (p *Pokemon) setAtk(newAtk uint)  {
+    p.Stats[1] = newAtk
+}
+func (p *Pokemon) setDef(newDef uint) {
+    p.Stats[2] = newDef
+}
+func (p *Pokemon) setSpAtk(newSpAtk uint) {
+    p.Stats[3] = newSpAtk
+}
+func (p *Pokemon) setSpDef(newSpDef uint) {
+    p.Stats[4] = newSpDef
+}
+func (p *Pokemon) setSpeed(newSpeed uint) {
+    p.Stats[5] = newSpeed
+}
+
 func (p *Pokemon) HasValidLevel() bool {
 	return p.Level > 1 && p.Level <= 100
 }
@@ -69,5 +115,5 @@ func (p *Pokemon) HasValidEVs() bool {
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p *Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
-		p.Gender, p.Level, p.CurrentHP, p.Stats[0])
+		p.Gender, p.Level, p.CurrentHP, p.GetHP())
 }
