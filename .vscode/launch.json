@@ -5,6 +5,13 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "Launch playground",
+			"type": "go",
+			"request": "launch",
+			"mode": "debug",
+			"program": "${workspaceFolder}/playground/playground.go"
+		},
+		{
 			"name": "Launch test package",
 			"type": "go",
 			"request": "launch",
