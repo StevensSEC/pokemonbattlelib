@@ -6,47 +6,51 @@ import (
 	"testing"
 )
 
-// Blindly uses the first move on the first opponent pokemon.
 type dumbAgent struct{}
 
-func (dumbAgent) Act(b BattleInfo) Turn {
-	opponent := b.Opponents()[0]
-	return FightTurn{
-		moveIdx:   0,
-		targetIdx: opponent,
+// Blindly uses the first move on the first opponent pokemon.
+func (a dumbAgent) Act(ctx *Context) Turn {
+	// You can use `a` (reference to self) for self-targeting turns
+	for agent, party := range ctx.Opponents {
+		for i := range party {
+			return FightTurn{
+				agent:  agent,
+				move:   0,
+				target: i,
+			}
+		}
 	}
+	panic("no opponents found")
 }
 
 func TestBattleSetup(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
-	b := NewBattle()
-	party1 := NewParty(&a1)
+	party1 := NewParty(&a1, 0)
 	pkmn1 := NewPokemon(4)
 	party1.AddPokemon(pkmn1)
-	party2 := NewParty(&a2)
+	party2 := NewParty(&a2, 1)
 	pkmn2 := NewPokemon(7)
 	party2.AddPokemon(pkmn2)
-	b.AddParty(party1, 0)
-	b.AddParty(party2, 1)
+	b := NewBattle()
+	b.AddParty(party1, party2)
 }
 
 func TestBattleOneRound(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
-	b := NewBattle()
-	party1 := NewParty(&a1)
+	party1 := NewParty(&a1, 0)
 	pkmn1 := NewPokemon(4)
 	party1.AddPokemon(pkmn1)
-	party2 := NewParty(&a2)
+	party2 := NewParty(&a2, 1)
 	pkmn2 := NewPokemon(7)
 	party2.AddPokemon(pkmn2)
-	b.AddParty(party1, 0)
-	b.AddParty(party2, 0)
+	b := NewBattle()
+	b.AddParty(party1, party2)
 	b.Start()
-	for p, party := range b.Parties {
-		got := party.GetActive()
-		if !reflect.DeepEqual(got, []int{0}) {
+	for p, party := range b.parties {
+		got := party.GetActivePokemon()
+		if !reflect.DeepEqual(got, map[int]Pokemon{0: *party.pokemon[0]}) {
 			t.Fatalf("Must send out first pokemon in each at the beginning of the battle. Party %d gave: %v", p, got)
 		}
 	}
@@ -60,21 +64,16 @@ func TestBattleOneRound(t *testing.T) {
 func TestPokemonSpeed(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
-	b := Battle{}
-	b.AddAgent(&a1, &a2)
-	party1 := Party{}
-	pkmn1 := GetPokemon(4)
+	party1 := NewParty(&a1, 0)
+	pkmn1 := NewPokemon(4)
 	pkmn1.Stats[5] = 10
-	party1.AddPokemon(&pkmn1)
-	party2 := Party{}
-	pkmn2 := GetPokemon(4)
+	party1.AddPokemon(pkmn1)
+	party2 := NewParty(&a2, 1)
+	pkmn2 := NewPokemon(4)
 	pkmn2.Stats[5] = 12
-	party2.AddPokemon(&pkmn2)
-	b.AddParty(&party1, &party2)
-	b.LinkAgentParty(0, 0)
-	b.LinkAgentParty(1, 1)
-	b.SetTeams([][]int{{0}, {1}})
-
+	party2.AddPokemon(pkmn2)
+	b := NewBattle()
+	b.AddParty(party1, party2)
 	b.Start()
 	b.SimulateRound()
 	b.SimulateRound()

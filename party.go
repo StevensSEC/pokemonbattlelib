@@ -10,18 +10,20 @@ type party struct {
 	Agent         *Agent     // The agent that has control over this party
 	pokemon       []*Pokemon // The Pokemon in the party
 	activePokemon []*Pokemon // The pokemon in the party that are out on the battlefield
+	team          int        // The team that this party belongs to
 }
 
 const MAX_PARTY_SIZE = 6
 
 var PartyIndexError = errors.New("invalid index for party")
 
-// Creates a new party to store Pokemon
-func NewParty(agent *Agent) *party {
+// Creates a new party to store Pokemon and assigns them to a team
+func NewParty(agent *Agent, team int) *party {
 	return &party{
 		Agent:         agent,
 		pokemon:       make([]*Pokemon, 0),
 		activePokemon: make([]*Pokemon, 0),
+		team:          team,
 	}
 }
 
@@ -66,4 +68,17 @@ func (p *party) IsActivePokemon(i int) bool {
 		}
 	}
 	return false
+}
+
+// Creates a map of party index to active Pokemon
+func (p *party) GetActivePokemon() map[int]Pokemon {
+	allActive := make(map[int]Pokemon)
+	for i, pokemon := range p.pokemon {
+		for _, active := range p.activePokemon {
+			if pokemon == active {
+				allActive[i] = *pokemon
+			}
+		}
+	}
+	return allActive
 }

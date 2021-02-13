@@ -1,7 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
 	"reflect"
 	"sort"
 )
@@ -12,7 +11,7 @@ type Battle struct {
 	ShiftSet bool // shift or set battle style for NPC trainer battles
 	State    BattleState
 
-	teams map[int][]*party // Teams are used to indicate allies/opponents
+	parties []*party // All parties participating in the battle
 }
 
 type BattleState int
@@ -27,14 +26,38 @@ const (
 func NewBattle() *Battle {
 	b := Battle{
 		State: BEFORE_START,
-		teams: make(map[int][]*party),
 	}
 	return &b
 }
 
-// Adds a party to a team in the battle
-func (b *Battle) AddParty(p *party, team int) {
-	b.teams[team] = append(b.teams[team], p)
+// Maps agents to the indices of their Pokemon. Used for Allies and Opponents.
+type AgentParties map[*Agent]map[int]Pokemon
+
+// Adds one or more parties to a team in the battle
+func (b *Battle) AddParty(p ...*party) {
+	b.parties = append(b.parties, p...)
+}
+
+// Gets all active ally Pokemon for a party
+func (b *Battle) GetAllies(p *party) AgentParties {
+	allies := make(AgentParties)
+	for _, party := range b.parties {
+		if party.team == p.team {
+			allies[party.Agent] = party.GetActivePokemon()
+		}
+	}
+	return allies
+}
+
+// Gets all active opponent Pokemon for a party
+func (b *Battle) GetOpponents(p *party) AgentParties {
+	opponents := make(AgentParties)
+	for _, party := range b.parties {
+		if party.team != p.team {
+			opponents[party.Agent] = party.GetActivePokemon()
+		}
+	}
+	return opponents
 }
 
 func (b *Battle) Start() error {
@@ -42,74 +65,76 @@ func (b *Battle) Start() error {
 
 	// Initiate the battle! Send out the first pokemon in the parties.
 	b.State = BATTLE_IN_PROGRESS
-	for _, teams := range b.teams {
-		for _, party := range teams {
-			party.SetActive(0)
-		}
+	for _, party := range b.parties {
+		party.SetActive(0)
 	}
 	return nil
 }
 
 // Simulates a single round of the battle.
 func (b *Battle) SimulateRound() {
-	active := b.getActivePokemon()
-
-	context := battleContext{
-		Context:       *b,
-		ActivePokemon: active,
-	}
-
-	// get turns from agents
-	// map of active pokemon indexes to their turns
-	turns := map[int]Turn{}
-	for i, ap := range active {
-		context.SetSelf(i)
-		party := *b.Parties[ap.PartyIdx]
-		turn := (*party.Agent).Act(&context)
-		turns[i] = turn
-	}
-
-	turnOrder := sortTurns(b, active, turns)
-
-	for _, apIdx := range turnOrder {
-		switch t := turns[apIdx].(type) {
-		case FightTurn:
-			fmt.Printf("TODO: Implement fight %v\n", t)
-		default:
-			panic("Unknown turn")
+	// Collects all turn info from each active Pokemon
+	turns := make([]Turn, 0)
+	for _, party := range b.parties {
+		for _, pokemon := range party.activePokemon {
+			ctx := b.GetContext(party, pokemon)
+			turn := (*party.Agent).Act(ctx)
+			turns = append(turns, turn)
 		}
 	}
-}
-
-// Get references to all Pokemon that are active on the battlefield.
-func (b *Battle) getActivePokemon() []activePokemon {
-	active := []activePokemon{}
-	for p, party := range b.Parties {
-		for _, idx := range party.GetActive() {
-			ap := activePokemon{
-				PartyIdx:   p,
-				PokemonIdx: idx,
+	sort.SliceStable(turns, func(i, j int) bool {
+		tA := turns[i]
+		tB := turns[j]
+		if reflect.TypeOf(tA) == reflect.TypeOf(tB) {
+			switch tA.(type) {
+			case FightTurn:
+				// speedy pokemon should go first
+				return pA.Stats[5] > pB.Stats[5]
 			}
-			active = append(active, ap)
+		} else {
+			// make higher priority turns go first
+			return tA.Priority() > tB.Priority()
 		}
-	}
-	return active
+		// fallthrough
+		return false
+	})
+	// turnOrder := sortTurns(b, active, turns)
+	// for _, apIdx := range turnOrder {
+	// 	switch t := turns[apIdx].(type) {
+	// 	case FightTurn:
+	// 		fmt.Printf("TODO: Implement fight %v\n", t)
+	// 	default:
+	// 		panic("Unknown turn")
+	// 	}
+	// }
 }
 
-// Get a pointer to the actual Pokemon that `ap` is referencing.
-func (b *Battle) derefActivePokemon(ap activePokemon) *Pokemon {
-	return (*b.Parties[ap.PartyIdx]).Pokemon[ap.PokemonIdx]
+type Context struct {
+	Battle    Battle
+	Pokemon   Pokemon
+	Allies    AgentParties
+	Opponents AgentParties
+}
+
+// Gets the current context for a pokemon to act (perform a turn)
+func (b *Battle) GetContext(party *party, pokemon *Pokemon) *Context {
+	return &Context{
+		Battle:    *b,
+		Pokemon:   *pokemon,
+		Allies:    b.GetAllies(party),
+		Opponents: b.GetOpponents(party),
+	}
 }
 
 // A type that is necessary in order to implement the `Interface` interface, which is used by the sort package to sort.
-type apTurnOrder struct {
-	battle *Battle
-	active []activePokemon
-	turns  map[int]Turn
-	order  []int
-}
+// type apTurnOrder struct {
+// 	battle *Battle
+// 	active []activePokemon
+// 	turns  map[int]Turn
+// 	order  []int
+// }
 
-func newTurnOrder(battle *Battle, ap []activePokemon, turns map[int]Turn) apTurnOrder {
+/* func newTurnOrder(battle *Battle, ap []activePokemon, turns map[int]Turn) apTurnOrder {
 	o := []int{}
 	for i := range ap {
 		o = append(o, i)
@@ -166,82 +191,17 @@ func sortTurns(battle *Battle, ap []activePokemon, turns map[int]Turn) []int {
 type activePokemon struct {
 	PartyIdx   int
 	PokemonIdx int
-}
-
-// Used to provide data to Agents such that the Agent can't maliciously modify the state of the battle.
-type BattleInfo interface {
-	GetPokemon(int) Pokemon
-	Self() int
-	Allies() []int
-	Opponents() []int
-}
-
-// Implements the BattleInfo interface. Passed to Agents so they can decide a turn.
-type battleContext struct {
-	Context       Battle
-	ActivePokemon []activePokemon
-	self          int
-}
-
-func (c *battleContext) getTeam() []int {
-	selfParty := c.ActivePokemon[c.self].PartyIdx
-	var team []int
-	for _, t := range c.Context.teams {
-		if contains(t, selfParty) {
-			team = t
-			break
-		}
-	}
-	return team
-}
-func (c *battleContext) GetPokemon(idx int) Pokemon {
-	p := c.Context.derefActivePokemon(c.ActivePokemon[idx])
-	return *p
-}
-func (c *battleContext) SetSelf(idx int) {
-	c.self = idx
-}
-
-// Get the index of the active Pokemon that this battle context is referencing.
-// In other words, the Pokemon you are acting as.
-func (c *battleContext) Self() int {
-	return c.self
-}
-func (c *battleContext) Allies() []int {
-	team := c.getTeam()
-
-	allies := []int{}
-	for i, ap := range c.ActivePokemon {
-		if i != c.self && contains(team, ap.PartyIdx) {
-			allies = append(allies, i)
-		}
-	}
-
-	return allies
-}
-func (c *battleContext) Opponents() []int {
-	team := c.getTeam()
-
-	opponents := []int{}
-	for i, ap := range c.ActivePokemon {
-		if !contains(team, ap.PartyIdx) {
-			opponents = append(opponents, i)
-		}
-	}
-
-	return opponents
-}
+} */
 
 // An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
 type Turn interface {
 	Priority() int // Gets the turn's priority. Higher values go first.
 }
 
-// Indicates that the Pokemon will fight. The active Pokemon indicated by `Self()` in the battle context will use
-// the move at `moveIdx` on the active Pokemon indicated by `targetIdx`.
 type FightTurn struct {
-	moveIdx   int // Denotes which of the pokemon's moves to use.
-	targetIdx int // The active pokemon that on the receiving end of the move.
+	agent  *Agent // The agent which the move is targetting.
+	move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
+	target int    // The active pokemon of the agent on the receiving end of the move.
 }
 
 func (turn FightTurn) Priority() int {
