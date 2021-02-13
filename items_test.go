@@ -4,8 +4,8 @@ import "testing"
 
 func TestItemUse(t *testing.T) {
 	i := NewItem(ITEM_POTION)
-	if i.Name != "potion" {
-		t.Errorf("expected item to be named 'potion', received %v", i.Name)
+	if i.Name != "Potion" {
+		t.Errorf("expected item to be named 'Potion', received %v", i.Name)
 	}
 	p := Pokemon{CurrentHP: 50, Stats: [6]uint{100, 0, 0, 0, 0, 0}, HeldItem: i}
 	i.UseItem(&p)
