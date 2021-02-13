@@ -281,11 +281,11 @@ func (turn FightTurn) Priority() int {
 
 // An item turn has the a higher priority than any move.
 type ItemTurn struct {
-	item   *Item    // Which item is being consumed
-	target *Pokemon // The target Pokemon for the item
-	move   *Move    // Reference to a move for certain items
+	item   *Item // Which item is being consumed
+	target int   // The index of the target Pokemon for the item
+	move   int   // Index reference to a move for certain items
 }
 
 func (turn ItemTurn) Priority() int {
-	return PRIORITY_MAX
+	return 1
 }
