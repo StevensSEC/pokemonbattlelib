@@ -72,7 +72,7 @@ func TestBattleOneRound(t *testing.T) {
 func TestPokemonSpeed(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
-    
+
 	b := Battle{}
 	party1 := Party{
 		Agent: &a1,
@@ -80,14 +80,14 @@ func TestPokemonSpeed(t *testing.T) {
 	pound := GetMove(1)
 	pkmn1 := GetPokemon(4)
 	pkmn1.Moves[0] = &pound
-    pkmn1.setSpeed(10)
+	pkmn1.setSpeed(10)
 	party1.AddPokemon(&pkmn1)
 	party2 := Party{
 		Agent: &a2,
 	}
 	pkmn2 := GetPokemon(4)
 	pkmn2.Moves[0] = &pound
-    pkmn2.setSpeed(12)
+	pkmn2.setSpeed(12)
 	party2.AddPokemon(&pkmn2)
 	b.AddParty(&party1, &party2)
 	b.SetTeams([][]int{{0}, {1}})
