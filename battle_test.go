@@ -86,7 +86,6 @@ func TestPokemonSpeed(t *testing.T) {
 		Agent: &a2,
 	}
 	pkmn2 := GetPokemon(4)
-    pkmn2.setSpeed(12)
 	pkmn2.Moves[0] = &pound
     pkmn2.setSpeed(12)
 	party2.AddPokemon(&pkmn2)
