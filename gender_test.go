@@ -1,19 +1,39 @@
 package pokemonbattlelib
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestGenderString(t *testing.T) {
-	var g1, g2, g3 Gender = Genderless, Female, Male
-
-	if g1.String() != "" {
-		t.Fail()
+	tests := []struct {
+		name   string
+		gender Gender
+		want   string
+	}{
+		{
+			name:   "Genderless",
+			gender: Genderless,
+			want:   "",
+		},
+		{
+			name:   "Female",
+			gender: Female,
+			want:   "♀",
+		},
+		{
+			name:   "Male",
+			gender: Male,
+			want:   "♂",
+		},
 	}
-
-	if g2.String() != "\u2640" {
-		t.Fail()
-	}
-
-	if g3.String() != "\u2642" {
-		t.Fail()
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("Gender Stringer: %s", tt.name), func(t *testing.T) {
+			t.Parallel()
+			got := fmt.Sprintf("%s", tt.gender)
+			if got != tt.want {
+				t.Errorf("Gender Stringer %s got %v, want %v", tt.name, got, tt.want)
+			}
+		})
 	}
 }
