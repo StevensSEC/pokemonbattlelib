@@ -61,6 +61,10 @@ func TestBattleOneRound(t *testing.T) {
 		}
 	}
 	b.SimulateRound()
+	party1.SetInactive(0)
+	if len(b.parties[0].activePokemon) != 0 {
+		t.Error("expected party 1 to have no active Pokemon")
+	}
 	// output:
 	// TODO: Implement fight {0 1}
 	// TODO: Implement fight {0 0}
