@@ -12,3 +12,13 @@ func GetPokemon(natdex uint16) Pokemon {
 	// Not exactly the best way to handle this
 	return Pokemon{}
 }
+
+// Get a Pokemon Move by ID.
+func GetMove(id int) Move {
+	for _, m := range ALL_MOVES {
+		if m.ID == id {
+			return m
+		}
+	}
+	panic("move not found")
+}
