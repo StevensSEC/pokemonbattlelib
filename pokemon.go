@@ -44,49 +44,49 @@ func (p *Pokemon) GetName() string {
 }
 
 func (p *Pokemon) GetHP() uint {
-    return p.Stats[0]
+	return p.Stats[STAT_HP]
 }
 
 func (p *Pokemon) GetAtk() uint {
-    return p.Stats[1]
+	return p.Stats[STAT_ATK]
 }
 
 func (p *Pokemon) GetDef() uint {
-    return p.Stats[2]
+	return p.Stats[STAT_DEF]
 }
 
 func (p *Pokemon) GetSpAtk() uint {
-    return p.Stats[3]
+	return p.Stats[STAT_SPATK]
 }
 
 func (p *Pokemon) GetSpDef() uint {
-    return p.Stats[4]
+	return p.Stats[STAT_SPDEF]
 }
 
 func (p *Pokemon) GetSpeed() uint {
-    return p.Stats[5]
+	return p.Stats[STAT_SPD]
 }
 
 // the following 6 setter functions are primarily here for testing
 // typically a pokemon's stats are computed from their level, IVs, EVs, base stats and nature
 
 func (p *Pokemon) setHP(newHP uint) {
-    p.Stats[0] = newHP
+	p.Stats[STAT_HP] = newHP
 }
-func (p *Pokemon) setAtk(newAtk uint)  {
-    p.Stats[1] = newAtk
+func (p *Pokemon) setAtk(newAtk uint) {
+	p.Stats[STAT_ATK] = newAtk
 }
 func (p *Pokemon) setDef(newDef uint) {
-    p.Stats[2] = newDef
+	p.Stats[STAT_DEF] = newDef
 }
 func (p *Pokemon) setSpAtk(newSpAtk uint) {
-    p.Stats[3] = newSpAtk
+	p.Stats[STAT_SPATK] = newSpAtk
 }
 func (p *Pokemon) setSpDef(newSpDef uint) {
-    p.Stats[4] = newSpDef
+	p.Stats[STAT_SPDEF] = newSpDef
 }
 func (p *Pokemon) setSpeed(newSpeed uint) {
-    p.Stats[5] = newSpeed
+	p.Stats[STAT_SPD] = newSpeed
 }
 
 func (p *Pokemon) HasValidLevel() bool {
