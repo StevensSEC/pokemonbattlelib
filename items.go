@@ -73,5 +73,6 @@ const (
 // For item effects, see https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/item_prose.csv
 // Creates a new item from its ID
 func NewItem(itemID int) *Item {
-	return &ALL_ITEMS[itemID-1]
+	item := ALL_ITEMS[itemID-1]
+	return &item
 }

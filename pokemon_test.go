@@ -2,12 +2,13 @@ package pokemonbattlelib
 
 import "testing"
 
-func TestPokemonName(t *testing.T) {
-	p := Pokemon{
-		NatDex: 1,
+func TestNewPokemon(t *testing.T) {
+	p := NewPokemon(8)
+	if p.NatDex != 8 {
+		t.Errorf("expected Pokemon national dex to be 8, received %v", p.NatDex)
 	}
-	if p.GetName() != "Bulbasaur" {
-		t.Fail()
+	if p.GetName() != "Wartortle" {
+		t.Errorf("expected Pokemon name to be Wartortle, received %v", p.GetName())
 	}
 }
 

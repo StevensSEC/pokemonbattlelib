@@ -38,6 +38,16 @@ type Move struct {
 	Accuracy int
 }
 
+// Creates a new Pokemon move given its move ID
+func NewMove(id int) Move {
+	for _, m := range ALL_MOVES {
+		if m.ID == id {
+			return m
+		}
+	}
+	panic("move not found")
+}
+
 func (m Move) String() string {
 	return fmt.Sprintf("%v\nType: %v, Power: %v, Accuracy: %v\n", m.Name, m.Type, m.Power, m.Accuracy)
 }

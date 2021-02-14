@@ -1,6 +1,8 @@
 package pokemonbattlelib
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Pokemon struct {
 	NatDex            uint16   // National Pokedex Number
@@ -38,6 +40,17 @@ const (
 	STATUS_BADLY_POISON
 	STATUS_SLEEP
 )
+
+// Creates a new Pokemon given its national dex number
+func NewPokemon(natdex uint16) Pokemon {
+	for _, p := range ALL_POKEMON {
+		if p.NatDex == natdex {
+			return p
+		}
+	}
+	// Not exactly the best way to handle this
+	panic(fmt.Sprintf("unknown Pokedex number %v\n", natdex))
+}
 
 func (p *Pokemon) GetName() string {
 	return PokemonNames[p.NatDex]

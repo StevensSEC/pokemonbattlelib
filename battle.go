@@ -78,7 +78,7 @@ func (b *Battle) SimulateRound() {
 	turns := make([]TurnContext, 0)
 	for _, party := range b.parties {
 		for _, pokemon := range party.activePokemon {
-			ctx := b.GetContext(party, pokemon)
+			ctx := b.getContext(party, pokemon)
 			turn := (*party.Agent).Act(ctx)
 			turns = append(turns, TurnContext{Turn: &turn, Context: ctx})
 		}
@@ -113,16 +113,16 @@ func (b *Battle) SimulateRound() {
 	}
 }
 
-type Context struct {
-	Battle    Battle
-	Pokemon   Pokemon
-	Allies    AgentParties
-	Opponents AgentParties
+type BattleContext struct {
+	Battle    Battle       // A copy of the current Battle, including weather, state, etc.
+	Pokemon   Pokemon      // A copy of the Pokemon that is acting in this context
+	Allies    AgentParties // Map of acting Pokemon's allied agents to their parties
+	Opponents AgentParties // Map of acting Pokemon's opponent agents to their parties
 }
 
 // Gets the current context for a pokemon to act (perform a turn)
-func (b *Battle) GetContext(party *party, pokemon *Pokemon) *Context {
-	return &Context{
+func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
+	return &BattleContext{
 		Battle:    *b,
 		Pokemon:   *pokemon,
 		Allies:    b.GetAllies(party),
@@ -137,8 +137,8 @@ type Turn interface {
 
 // Wrapper used to determine turn order in a battle
 type TurnContext struct {
-	Turn    *Turn
-	Context *Context
+	Turn    *Turn          // A reference to the turn that a Pokemon made using an Agent
+	Context *BattleContext // The context in which the Pokemon took its turn
 }
 
 type FightTurn struct {

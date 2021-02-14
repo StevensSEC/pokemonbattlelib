@@ -9,7 +9,7 @@ import (
 type dumbAgent struct{}
 
 // Blindly uses the first move on the first opponent pokemon.
-func (a dumbAgent) Act(ctx *Context) Turn {
+func (a dumbAgent) Act(ctx *BattleContext) Turn {
 	// You can use `a` (reference to self) for self-targeting turns
 	for agent, party := range ctx.Opponents {
 		for i := range party {
@@ -28,10 +28,10 @@ func TestBattleSetup(t *testing.T) {
 	a2 := Agent(dumbAgent{})
 	party1 := NewParty(&a1, 0)
 	pkmn1 := NewPokemon(4)
-	party1.AddPokemon(pkmn1)
+	party1.AddPokemon(&pkmn1)
 	party2 := NewParty(&a2, 1)
 	pkmn2 := NewPokemon(7)
-	party2.AddPokemon(pkmn2)
+	party2.AddPokemon(&pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
 }
@@ -41,13 +41,13 @@ func TestBattleOneRound(t *testing.T) {
 	a2 := Agent(dumbAgent{})
 	party1 := NewParty(&a1, 0)
 	pkmn1 := NewPokemon(4)
-	pound := GetMove(1)
+	pound := NewMove(1)
 	pkmn1.Moves[0] = &pound
-	party1.AddPokemon(pkmn1)
+	party1.AddPokemon(&pkmn1)
 	party2 := NewParty(&a2, 1)
 	pkmn2 := NewPokemon(7)
 	pkmn2.Moves[0] = &pound
-	party2.AddPokemon(pkmn2)
+	party2.AddPokemon(&pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
 	err := b.Start()
@@ -72,15 +72,15 @@ func TestPokemonSpeed(t *testing.T) {
 	a2 := Agent(dumbAgent{})
 	party1 := NewParty(&a1, 0)
 	pkmn1 := NewPokemon(4)
-	pound := GetMove(1)
+	pound := NewMove(1)
 	pkmn1.Moves[0] = &pound
 	pkmn1.Stats[5] = 10
-	party1.AddPokemon(pkmn1)
+	party1.AddPokemon(&pkmn1)
 	party2 := NewParty(&a2, 1)
 	pkmn2 := NewPokemon(4)
 	pkmn2.Moves[0] = &pound
 	pkmn2.Stats[5] = 12
-	party2.AddPokemon(pkmn2)
+	party2.AddPokemon(&pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
 	err := b.Start()
