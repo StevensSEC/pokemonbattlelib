@@ -15,3 +15,13 @@ func NewPokemon(natdex uint16) *Pokemon {
 	log.Panicf("unknown Pokedex number %v\n", natdex)
 	return nil
 }
+
+// Get a Pokemon Move by ID.
+func GetMove(id int) Move {
+	for _, m := range ALL_MOVES {
+		if m.ID == id {
+			return m
+		}
+	}
+	panic("move not found")
+}
