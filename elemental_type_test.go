@@ -49,7 +49,7 @@ func TestGetEffect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Type Effectiveness: %v vs %v", tt.move, tt.def), func(t *testing.T) {
-			// t.Parallel()
+			t.Parallel()
 			got := GetEffect(tt.move, tt.def)
 			if got != tt.want {
 				t.Errorf("Type Effectiveness: %v vs %v should be %f, got %f", tt.move, tt.def, tt.want, got)
