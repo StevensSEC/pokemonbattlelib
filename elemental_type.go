@@ -26,7 +26,7 @@ const (
 	Dark
 )
 
-func GetEffect(move, def ElementalType) (int, error) {
+func GetEffect(move, def ElementalType) int {
 
 	noEffect := map[ElementalType]ElementalType{
 		Normal:   Ghost,
@@ -90,5 +90,5 @@ func GetEffect(move, def ElementalType) (int, error) {
 		fmt.Println("normal effect")
 	}
 
-	return effect, nil
+	return effect
 }
