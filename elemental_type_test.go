@@ -6,43 +6,53 @@ import (
 )
 
 func TestGetEffect(t *testing.T) {
-	move := Ice
-	def := Grass
-
-	expectedOutput := 200
-	actual := GetEffect(move, def)
-
-	if actual != expectedOutput {
-		t.Errorf("exepcted effect is %v, but got %v", expectedOutput, actual)
-	}
-
 	tests := []struct {
 		move ElementalType
 		def  ElementalType
-		want int
+		want Effectiveness
 	}{
 		{
 			move: Water,
 			def:  Fire,
-			want: 200,
+			want: SuperEffective,
 		},
 		{
 			move: Grass,
 			def:  Water,
-			want: 200,
+			want: SuperEffective,
 		},
 		{
 			move: Fire,
 			def:  Water,
-			want: 50,
+			want: Ineffective,
+		},
+		{
+			move: Ghost,
+			def:  Normal,
+			want: NoEffect,
+		},
+		{
+			move: Steel,
+			def:  Ground,
+			want: NormalEffect,
+		},
+		{
+			move: Fire,
+			def:  Fire | Water,
+			want: VeryIneffective,
+		},
+		{
+			move: Water,
+			def:  Ground | Rock,
+			want: VerySuperEffective,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Type Effectiveness: %v vs %v", tt.move, tt.def), func(t *testing.T) {
-			t.Parallel()
+			// t.Parallel()
 			got := GetEffect(tt.move, tt.def)
 			if got != tt.want {
-				t.Errorf("Type Effectiveness: %v vs %v should be %d, got %d", tt.move, tt.def, tt.want, got)
+				t.Errorf("Type Effectiveness: %v vs %v should be %f, got %f", tt.move, tt.def, tt.want, got)
 			}
 		})
 	}

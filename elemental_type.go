@@ -1,5 +1,10 @@
 package pokemonbattlelib
 
+import (
+	"math"
+	"math/bits"
+)
+
 type ElementalType uint32
 
 const (
@@ -20,6 +25,17 @@ const (
 	Ice
 	Dragon
 	Dark
+)
+
+type Effectiveness float64
+
+const (
+	VeryIneffective    Effectiveness = 0.25
+	Ineffective        Effectiveness = 0.5
+	NoEffect           Effectiveness = 0
+	NormalEffect       Effectiveness = 1
+	SuperEffective     Effectiveness = 2
+	VerySuperEffective Effectiveness = 4
 )
 
 var noEffect = map[ElementalType]ElementalType{
@@ -69,17 +85,20 @@ var doubleEffect = map[ElementalType]ElementalType{
 	Dark:     Ghost | Psychic,
 }
 
-func GetEffect(move, def ElementalType) int {
-	var effect int
-	if noEffect[move]&def == def {
-		effect = 0
-	} else if halfEffect[move]&def == def {
-		effect = 50
-	} else if doubleEffect[move]&def == def {
-		effect = 200
-	} else {
-		effect = 100
+func GetEffect(move, def ElementalType) Effectiveness {
+	if noEffect[move]&def > 0 {
+		return NoEffect
 	}
 
-	return effect
+	reduce := bits.OnesCount32(uint32(halfEffect[move] & def))
+	increase := bits.OnesCount32(uint32(doubleEffect[move] & def))
+	effect := (increase - reduce) * 2
+	if effect == 0 {
+		return NormalEffect
+	}
+	if effect > 0 {
+		return Effectiveness(effect)
+	} else {
+		return Effectiveness(1 / math.Abs(float64(effect)))
+	}
 }
