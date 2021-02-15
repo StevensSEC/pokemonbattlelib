@@ -61,13 +61,35 @@ func TestBattleOneRound(t *testing.T) {
 		}
 	}
 	b.SimulateRound()
+	// output:
+	// TODO: Implement fight {0 1}
+	// TODO: Implement fight {0 0}
+}
+
+func TestActivePokemon(t *testing.T) {
+	a1 := Agent(dumbAgent{})
+	a2 := Agent(dumbAgent{})
+	party1 := NewParty(&a1, 0)
+	pkmn1 := NewPokemon(4)
+	party1.AddPokemon(&pkmn1)
+	party2 := NewParty(&a2, 1)
+	pkmn2 := NewPokemon(7)
+	pkmn3 := NewPokemon(9)
+	party2.AddPokemon(&pkmn2, &pkmn3)
+	b := NewBattle()
+	b.AddParty(party1, party2)
+	party1.SetActive(0)
+	if len(b.parties[0].activePokemon) != 1 {
+		t.Error("expected party 1 to have 1 active Pokemon")
+	}
 	party1.SetInactive(0)
 	if len(b.parties[0].activePokemon) != 0 {
 		t.Error("expected party 1 to have no active Pokemon")
 	}
-	// output:
-	// TODO: Implement fight {0 1}
-	// TODO: Implement fight {0 0}
+	party2.SetActive(1)
+	if n := b.parties[1].activePokemon[0].NatDex; n != 9 {
+		t.Errorf("expected party 2 to have an active Pokemon with dex number 9, received %v", n)
+	}
 }
 
 // Faster pokemon should go first.

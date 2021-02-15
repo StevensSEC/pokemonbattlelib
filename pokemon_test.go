@@ -7,8 +7,12 @@ func TestNewPokemon(t *testing.T) {
 	if p.NatDex != 8 {
 		t.Errorf("expected Pokemon national dex to be 8, received %v", p.NatDex)
 	}
-	if p.GetName() != "Wartortle" {
-		t.Errorf("expected Pokemon name to be Wartortle, received %v", p.GetName())
+}
+
+func TestPokemonName(t *testing.T) {
+	p := NewPokemon(1)
+	if p.GetName() != "Bulbasaur" {
+		t.Errorf("expected Pokemon name to be Bulbasaur, received %v", p.GetName())
 	}
 }
 
