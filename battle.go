@@ -31,31 +31,30 @@ func NewBattle() *Battle {
 	return &b
 }
 
-// Maps agents to the indices of their Pokemon. Used for Allies and Opponents.
-type AgentParties map[*Agent]map[int]Pokemon
-
 // Adds one or more parties to a team in the battle
 func (b *Battle) AddParty(p ...*party) {
 	b.parties = append(b.parties, p...)
 }
 
 // Gets all active ally Pokemon for a party
-func (b *Battle) GetAllies(p *party) AgentParties {
-	allies := make(AgentParties)
-	for _, party := range b.parties {
-		if party.team == p.team {
-			allies[party.Agent] = party.GetActivePokemon()
+func (b *Battle) GetAllies(p *party) []target {
+	allies := make([]target, 0)
+	targets := b.GetTargets()
+	for _, target := range targets {
+		if target.Team == p.team {
+			allies = append(allies, target)
 		}
 	}
 	return allies
 }
 
 // Gets all active opponent Pokemon for a party
-func (b *Battle) GetOpponents(p *party) AgentParties {
-	opponents := make(AgentParties)
-	for _, party := range b.parties {
-		if party.team != p.team {
-			opponents[party.Agent] = party.GetActivePokemon()
+func (b *Battle) GetOpponents(p *party) []target {
+	opponents := make([]target, 0)
+	targets := b.GetTargets()
+	for _, target := range targets {
+		if target.Team == p.team {
+			opponents = append(opponents, target)
 		}
 	}
 	return opponents
@@ -113,20 +112,42 @@ func (b *Battle) SimulateRound() {
 	}
 }
 
+type target struct {
+	party     int     // Identifier for a party (index in battle parties, or "party ID")
+	partySlot int     // The slot of the active Pokemon
+	Team      int     // The team that the Pokemon belongs to
+	Pokemon   Pokemon // Pokemon that is a candidate target
+}
+
 type BattleContext struct {
-	Battle    Battle       // A copy of the current Battle, including weather, state, etc.
-	Pokemon   Pokemon      // A copy of the Pokemon that is acting in this context
-	Allies    AgentParties // Map of acting Pokemon's allied agents to their parties
-	Opponents AgentParties // Map of acting Pokemon's opponent agents to their parties
+	Battle  Battle   // A copy of the current Battle, including weather, state, etc.
+	Pokemon Pokemon  // A copy of the Pokemon that is acting in this context
+	Targets []target // An array of all possible targets that the Pokemon can act on
+}
+
+// Gets all the active Pokemon (targets) in the battle
+func (b *Battle) GetTargets() []target {
+	targets := make([]target, 0)
+	for partyID, party := range b.parties {
+		for slot, active := range party.activePokemon {
+			target := target{
+				party:     partyID,
+				partySlot: slot,
+				Team:      party.team,
+				Pokemon:   *active,
+			}
+			targets = append(targets, target)
+		}
+	}
+	return targets
 }
 
 // Gets the current context for a pokemon to act (perform a turn)
 func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 	return &BattleContext{
-		Battle:    *b,
-		Pokemon:   *pokemon,
-		Allies:    b.GetAllies(party),
-		Opponents: b.GetOpponents(party),
+		Battle:  *b,
+		Pokemon: *pokemon,
+		Targets: b.GetTargets(),
 	}
 }
 
@@ -142,9 +163,8 @@ type TurnContext struct {
 }
 
 type FightTurn struct {
-	agent  *Agent // The agent which the move is targetting.
-	move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
-	target int    // The active pokemon of the agent on the receiving end of the move.
+	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
+	Target target // Info containing data determining the target of
 }
 
 func (turn FightTurn) Priority() int {

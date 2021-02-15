@@ -11,13 +11,10 @@ type dumbAgent struct{}
 // Blindly uses the first move on the first opponent pokemon.
 func (a dumbAgent) Act(ctx *BattleContext) Turn {
 	// You can use `a` (reference to self) for self-targeting turns
-	for agent, party := range ctx.Opponents {
-		for i := range party {
-			return FightTurn{
-				agent:  agent,
-				move:   0,
-				target: i,
-			}
+	for _, target := range ctx.Targets {
+		return FightTurn{
+			Move:   0,
+			Target: target,
 		}
 	}
 	panic("no opponents found")
@@ -66,6 +63,7 @@ func TestBattleOneRound(t *testing.T) {
 	// TODO: Implement fight {0 0}
 }
 
+// Tests if active Pokemon are set correctly
 func TestActivePokemon(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
@@ -87,8 +85,56 @@ func TestActivePokemon(t *testing.T) {
 		t.Error("expected party 1 to have no active Pokemon")
 	}
 	party2.SetActive(1)
-	if n := b.parties[1].activePokemon[0].NatDex; n != 9 {
-		t.Errorf("expected party 2 to have an active Pokemon with dex number 9, received %v", n)
+	if n := b.parties[1].activePokemon[1].NatDex; n != 9 {
+		t.Errorf("expected party 2 to have an active Pokemon with dex number 9, received %v\n", n)
+	}
+}
+
+func TestGetAllies(t *testing.T) {
+	a1 := Agent(dumbAgent{})
+	a2 := Agent(dumbAgent{})
+	party1 := NewParty(&a1, 0)
+	pkmn1 := NewPokemon(4)
+	party1.AddPokemon(&pkmn1)
+	party2 := NewParty(&a2, 1)
+	pkmn2 := NewPokemon(7)
+	pkmn3 := NewPokemon(9)
+	party2.AddPokemon(&pkmn2, &pkmn3)
+	b := NewBattle()
+	b.AddParty(party1, party2)
+	err := b.Start()
+	if err != nil {
+		t.Fatal("failed to start battle")
+	}
+	if n := len(b.GetAllies(party1)); n != 1 {
+		t.Errorf("expected party 1 to have 1 active ally, received %v\n", n)
+	}
+	if n := len(b.GetAllies(party2)); n != 1 {
+		t.Errorf("expected party 2 to have 1 active ally, received %v\n", n)
+	}
+}
+
+func TestGetOpponents(t *testing.T) {
+	a1 := Agent(dumbAgent{})
+	a2 := Agent(dumbAgent{})
+	party1 := NewParty(&a1, 0)
+	pkmn1 := NewPokemon(4)
+	party1.AddPokemon(&pkmn1)
+	party2 := NewParty(&a2, 1)
+	pkmn2 := NewPokemon(7)
+	pkmn3 := NewPokemon(9)
+	party2.AddPokemon(&pkmn2, &pkmn3)
+	b := NewBattle()
+	b.AddParty(party1, party2)
+	err := b.Start()
+	if err != nil {
+		t.Fatal("failed to start battle")
+	}
+	if n := len(b.GetOpponents(party1)); n != 1 {
+		t.Errorf("expected party 1 to have 1 active opponents, received %v\n", n)
+	}
+	if n := len(b.GetOpponents(party2)); n != 1 {
+		t.Errorf("expected party 2 to have 1 active opponent, received %v\n", n)
 	}
 }
 
