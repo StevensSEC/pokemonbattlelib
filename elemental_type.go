@@ -69,7 +69,7 @@ func GetEffect(move, def ElementalType) (int,error) {
         Water: Ground| Rock| Fire,
         Grass: Ground| Rock| Water,
         Electric: Fight|Poison,
-        Psychic: Steel  | Psychic,
+        Psychic: Fight | Poison,
         Ice:  Flying| Ground| Grass| Dragon,
         Dragon: Dragon,
         Dark: Ghost | Psychic,
