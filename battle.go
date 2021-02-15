@@ -1,7 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
 	"reflect"
 	"sort"
 )
@@ -95,7 +94,12 @@ func (b *Battle) SimulateRound() {
 	for _, apIdx := range turnOrder {
 		switch t := turns[apIdx].(type) {
 		case FightTurn:
-			fmt.Printf("TODO: Implement fight %v\n", t)
+			user := b.derefActivePokemon(active[apIdx])
+			target := b.derefActivePokemon(active[apIdx])
+			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
+			modifier := uint(1) // TODO: damage multiplers
+			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.moveIdx].Power)*user.Stats[STAT_ATK]/target.Stats[STAT_DEF]/50 + 2) * modifier
+			(*target).CurrentHP -= damage
 		default:
 			panic("Unknown turn")
 		}

@@ -44,12 +44,16 @@ func TestBattleOneRound(t *testing.T) {
 	}
 	pound := GetMove(1)
 	pkmn1 := GetPokemon(4)
+	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 10}
+	pkmn1.CurrentHP = 30
 	pkmn1.Moves[0] = &pound
 	party1.AddPokemon(&pkmn1)
 	party2 := Party{
 		Agent: &a2,
 	}
 	pkmn2 := GetPokemon(7)
+	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 10}
+	pkmn2.CurrentHP = 30
 	pkmn2.Moves[0] = &pound
 	party2.AddPokemon(&pkmn2)
 	b.AddParty(&party1, &party2)
@@ -63,6 +67,14 @@ func TestBattleOneRound(t *testing.T) {
 		}
 	}
 	b.SimulateRound()
+	// functionally arbitrary value, will need to be adjusted when damage calculation becomes more accurate
+	expectedHp := uint(27)
+	for _, party := range b.Parties {
+		if party.Pokemon[0].CurrentHP != expectedHp {
+			t.Errorf("Expected %s to have %d HP, got %d", party.Pokemon[0].GetName(), expectedHp, party.Pokemon[0].CurrentHP)
+		}
+	}
+
 	// output:
 	// TODO: Implement fight {0 1}
 	// TODO: Implement fight {0 0}
@@ -79,14 +91,14 @@ func TestPokemonSpeed(t *testing.T) {
 	pound := GetMove(1)
 	pkmn1 := GetPokemon(4)
 	pkmn1.Moves[0] = &pound
-	pkmn1.Stats[5] = 10
+	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 10}
 	party1.AddPokemon(&pkmn1)
 	party2 := Party{
 		Agent: &a2,
 	}
 	pkmn2 := GetPokemon(4)
 	pkmn2.Moves[0] = &pound
-	pkmn2.Stats[5] = 12
+	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 12}
 	party2.AddPokemon(&pkmn2)
 	b.AddParty(&party1, &party2)
 	b.SetTeams([][]int{{0}, {1}})
