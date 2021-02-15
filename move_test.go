@@ -15,7 +15,7 @@ func TestMoveString(t *testing.T) {
 				Name:     "Shadow Ball",
 				Type:     8,
 				Category: Special,
-				Max_PP:   15,
+				MaxPP:    15,
 				Priority: 0,
 				Power:    80,
 				Accuracy: 100,
