@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 	"sort"
@@ -84,7 +85,7 @@ func (b *Battle) Start() error {
 }
 
 // Simulates a single round of the battle.
-func (b *Battle) SimulateRound() {
+func (b *Battle) SimulateRound() []Transaction {
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
 	for _, party := range b.parties {
@@ -114,6 +115,7 @@ func (b *Battle) SimulateRound() {
 		return false
 	})
 	// Run turns in sorted order and update battle state
+	transactions := []Transaction{}
 	for _, turn := range turns {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
@@ -123,11 +125,25 @@ func (b *Battle) SimulateRound() {
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
-			(*receiver).CurrentHP -= damage
+			transactions = append(transactions, DamageTransaction{
+				User:   &user,
+				Target: receiver,
+				Move:   user.Moves[t.Move],
+				Damage: damage,
+			})
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
 	}
+
+	// process transations
+	for _, transaction := range transactions {
+		switch t := transaction.(type) {
+		case DamageTransaction:
+			(*t.Target).CurrentHP -= t.Damage
+		}
+	}
+	return transactions
 }
 
 type target struct {
@@ -193,4 +209,26 @@ type FightTurn struct {
 
 func (turn FightTurn) Priority() int {
 	return 0
+}
+
+// Describes the result of a Turn in a Round.
+type Transaction interface {
+	BattleLog() string
+}
+
+type DamageTransaction struct {
+	User          *Pokemon
+	Target        *Pokemon
+	Move          *Move
+	Damage        uint
+	StatusEffects uint
+}
+
+func (t DamageTransaction) BattleLog() string {
+	return fmt.Sprintf("%s used %s on %s for %d damage.",
+		t.User.GetName(),
+		t.Move.Name,
+		t.Target.GetName(),
+		t.Damage,
+	)
 }

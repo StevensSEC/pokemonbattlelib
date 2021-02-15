@@ -61,7 +61,30 @@ func TestBattleOneRound(t *testing.T) {
 			t.Fatalf("Must send out first pokemon in each at the beginning of the battle. Party %d gave: %v", p, got)
 		}
 	}
-	b.SimulateRound()
+	transations := b.SimulateRound()
+	if len(transations) != 2 {
+		t.Fatal("Expected only 2 transations to occur in a round")
+	}
+	logtest := []struct {
+		turn Transaction
+		want string
+	}{
+		{
+			turn: transations[0],
+			want: "Charmander used Pound on Squirtle for 3 damage.",
+		},
+		{
+			turn: transations[1],
+			want: "Squirtle used Pound on Charmander for 3 damage.",
+		},
+	}
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
+	}
+
 	// functionally arbitrary value, will need to be adjusted when damage calculation becomes more accurate
 	expectedHp := uint(27)
 	for _, party := range b.parties {
