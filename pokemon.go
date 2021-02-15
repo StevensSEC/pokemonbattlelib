@@ -1,6 +1,9 @@
 package pokemonbattlelib
 
-import "fmt"
+import (
+    "fmt"
+    "reflect"
+)
 
 type Pokemon struct {
 	NatDex            uint16   // National Pokedex Number
@@ -38,6 +41,81 @@ const (
 	STATUS_BADLY_POISON
 	STATUS_SLEEP
 )
+
+
+// Creates a new Pokemon given its national dex number
+func NewPokemon(args ...interface{}) Pokemon {
+    // For david: http://changelog.ca/log/2015/01/30/golang
+
+    // Mandatory parameters
+    var natdex uint16
+    var level uint8  
+
+    // Optional parameters
+    var totalExp uint // used to compute level if provided
+    var ivs [6]uint8  = [6]uint8{0, 0, 0, 0, 0, 0}
+    var evs [6]uint8  = [6]uint8{0, 0, 0, 0, 0, 0}
+    var nature *Nature = Hardy // this nature provides no bonuses/debuffs
+
+    if len(args) < 2 {
+        panic("Not enough parameters.")
+    }
+
+    for i,p := range args {
+        switch i {
+        case 0: // natdex
+            param, ok := p.(uint16)
+            if !ok {
+                panic(fmt.Sprintf("Parameter %d: expected type uint16, got %v", i, reflect.TypeOf(p)))
+            }
+            natdex = param
+        case 1: // level or total exp gained
+            switch p.(type) {
+                case uint8: // level
+                    level = p.(uint8)
+                case uint: // total experience
+                    totalExp = p.(uint)
+                    level = computeLevelFromExp(totalExp)
+                default:
+                    panic(fmt.Sprintf("Parameter %d: expected type uint8 or uint, got %v", i, reflect.TypeOf(p)))
+            }        
+        case 2: // ivs
+            param, ok := p.([6]uint8)
+            if !ok {
+                panic(fmt.Sprintf("Parameter %d: expected type [6]uint8, got %v", i, reflect.TypeOf(p)))
+            }
+            ivs = param
+        case 3: //evs
+            param, ok := p.([6]uint8)
+            if !ok {
+                panic(fmt.Sprintf("Parameter %d: expected type [6]uint8, got %v", i, reflect.TypeOf(p)))
+            }
+            evs = param
+        case 4: // nature
+            param, ok := p.(*Nature)
+            if !ok {
+                panic(fmt.Sprintf("Parameter %d: expected type Nature, got %v", i, reflect.TypeOf(p)))
+            }
+            nature = param
+        }
+    }
+
+	for _, p := range ALL_POKEMON {
+		if p.NatDex == natdex {
+            p.Level = level
+            p.IVs = ivs
+            p.EVs = evs
+            p.Nature = nature
+			return p
+		}
+	}
+	// Not exactly the best way to handle this
+	panic(fmt.Sprintf("unknown Pokedex number %v\n", natdex))
+}
+
+func computeLevelFromExp(exp uint) uint8 {
+    return uint8(0)
+}
 
 func (p *Pokemon) GetName() string {
 	return PokemonNames[p.NatDex]
