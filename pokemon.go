@@ -67,7 +67,7 @@ func (p *Pokemon) HasValidEVs() bool {
 // implement Stringer
 
 // display a Pokemon close to how it would appear in a Pokemon battle
-func (p *Pokemon) String() string {
+func (p Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
 		p.Gender, p.Level, p.CurrentHP, p.Stats[0])
 }
