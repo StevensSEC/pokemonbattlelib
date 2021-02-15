@@ -66,7 +66,29 @@ func TestBattleOneRound(t *testing.T) {
 			t.Fatalf("Must send out first pokemon in each at the beginning of the battle. Party %d gave: %v", p, got)
 		}
 	}
-	b.SimulateRound()
+	turns := b.SimulateRound()
+	if len(turns) != 2 {
+		t.Fatal("Expected only 2 turns to occur in a round")
+	}
+	logtest := []struct {
+		turn Turn
+		want string
+	}{
+		{
+			turn: turns[0],
+			want: "Charmander used Pound on Squirtle for 3 damage.",
+		},
+		{
+			turn: turns[1],
+			want: "Squirtle used Pound on Charmander for 3 damage.",
+		},
+	}
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
+	}
 	// functionally arbitrary value, will need to be adjusted when damage calculation becomes more accurate
 	expectedHp := uint(27)
 	for _, party := range b.Parties {
@@ -74,10 +96,6 @@ func TestBattleOneRound(t *testing.T) {
 			t.Errorf("Expected %s to have %d HP, got %d", party.Pokemon[0].GetName(), expectedHp, party.Pokemon[0].CurrentHP)
 		}
 	}
-
-	// output:
-	// TODO: Implement fight {0 1}
-	// TODO: Implement fight {0 0}
 }
 
 // Faster pokemon should go first.

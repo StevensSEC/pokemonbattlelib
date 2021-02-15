@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
 	"reflect"
 	"sort"
 )
@@ -71,7 +72,7 @@ func (b *Battle) Start() error {
 }
 
 // Simulates a single round of the battle.
-func (b *Battle) SimulateRound() {
+func (b *Battle) SimulateRound() []Turn {
 	active := b.getActivePokemon()
 
 	context := battleContext{
@@ -91,19 +92,26 @@ func (b *Battle) SimulateRound() {
 
 	turnOrder := sortTurns(b, active, turns)
 
+	resultTurns := []Turn{}
 	for _, apIdx := range turnOrder {
 		switch t := turns[apIdx].(type) {
 		case FightTurn:
 			user := b.derefActivePokemon(active[apIdx])
-			target := b.derefActivePokemon(active[apIdx])
+			target := b.derefActivePokemon(active[t.targetIdx])
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.moveIdx].Power)*user.Stats[STAT_ATK]/target.Stats[STAT_DEF]/50 + 2) * modifier
 			(*target).CurrentHP -= damage
+			t.Result.User = user
+			t.Result.Target = target
+			t.Result.Move = user.Moves[t.moveIdx]
+			t.Result.Damage = damage
+			resultTurns = append(resultTurns, t)
 		default:
 			panic("Unknown turn")
 		}
 	}
+	return resultTurns
 }
 
 // Get references to all Pokemon that are active on the battlefield.
@@ -259,7 +267,8 @@ func (c *battleContext) Opponents() []int {
 
 // An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
 type Turn interface {
-	Priority() int // Gets the turn's priority. Higher values go first. Not to be confused with Move priority.
+	Priority() int     // Gets the turn's priority. Higher values go first. Not to be confused with Move priority.
+	BattleLog() string // Get a string representation of what happened in this turn. Intended to be shown to end users.
 }
 
 // Indicates that the Pokemon will fight. The active Pokemon indicated by `Self()` in the battle context will use
@@ -267,8 +276,23 @@ type Turn interface {
 type FightTurn struct {
 	moveIdx   int // Denotes which of the pokemon's moves to use.
 	targetIdx int // The active pokemon that on the receiving end of the move.
+	Result    struct {
+		User   *Pokemon
+		Move   *Move
+		Target *Pokemon
+		Damage uint
+	}
 }
 
 func (turn FightTurn) Priority() int {
 	return 0
+}
+
+func (turn FightTurn) BattleLog() string {
+	return fmt.Sprintf("%s used %s on %s for %d damage.",
+		turn.Result.User.GetName(),
+		turn.Result.Move.Name,
+		turn.Result.Target.GetName(),
+		turn.Result.Damage,
+	)
 }
