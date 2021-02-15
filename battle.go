@@ -95,7 +95,7 @@ func (b *Battle) SimulateRound() {
 		switch t := turns[apIdx].(type) {
 		case FightTurn:
 			user := b.derefActivePokemon(active[apIdx])
-			target := b.derefActivePokemon(active[apIdx])
+			target := b.derefActivePokemon(active[t.targetIdx])
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.moveIdx].Power)*user.Stats[STAT_ATK]/target.Stats[STAT_DEF]/50 + 2) * modifier
