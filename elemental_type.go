@@ -116,8 +116,7 @@ func GetEffect(move, def ElementalType) Effectiveness {
 	effect := (increase - reduce) * 2
 	if effect == 0 {
 		return NormalEffect
-	}
-	if effect > 0 {
+	} else if effect > 0 {
 		return Effectiveness(effect)
 	} else {
 		return Effectiveness(1 / math.Abs(float64(effect)))
