@@ -32,7 +32,7 @@ func GetEffect(move, def ElementalType) (int,error) {
         Poison: Steel,
         Ground: Flying,
         Ghost: Normal,
-        Electric: Rock,
+        Electric: Ground,
         Psychic: Dark,
     }
 
