@@ -2,8 +2,6 @@ package pokemonbattlelib
 
 type ElementalType uint32
 
-var effect int
-
 const (
 	Normal ElementalType = 1 << iota
 	Fight
@@ -72,6 +70,7 @@ var doubleEffect = map[ElementalType]ElementalType{
 }
 
 func GetEffect(move, def ElementalType) int {
+	var effect int
 	if noEffect[move]&def == def {
 		effect = 0
 	} else if halfEffect[move]&def == def {
