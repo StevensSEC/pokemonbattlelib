@@ -6,17 +6,31 @@ import (
 )
 
 func TestMoveString(t *testing.T) {
-	m := Move{
-		Name:     "Shadow Ball",
-		Type:     8,
-		Category: Special,
-		Max_PP:   15,
-		Priority: 0,
-		Power:    80,
-		Accuracy: 100,
+	tests := []struct {
+		move Move
+		want string
+	}{
+		{
+			move: Move{
+				Name:     "Shadow Ball",
+				Type:     8,
+				Category: Special,
+				Max_PP:   15,
+				Priority: 0,
+				Power:    80,
+				Accuracy: 100,
+			},
+			want: "Shadow Ball\nType: 8, Power: 80, Accuracy: 100\n",
+		},
 	}
-	if m.String() != "Shadow Ball\nType: 8, Power: 80, Accuracy: 100\n" {
-		t.Fail()
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("Move Stringer: %s", tt.move.Name), func(t *testing.T) {
+			t.Parallel()
+			got := fmt.Sprintf("%s", tt.move)
+			if got != tt.want {
+				t.Errorf("Move Stringer %s got %v, want %v", tt.move.Name, got, tt.want)
+			}
+		})
 	}
 }
 

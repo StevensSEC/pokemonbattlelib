@@ -1,6 +1,9 @@
 package pokemonbattlelib
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestPokemonName(t *testing.T) {
 	p := Pokemon{
@@ -11,16 +14,29 @@ func TestPokemonName(t *testing.T) {
 	}
 }
 
-func TestStringNoNickname(t *testing.T) {
-	p := Pokemon{
-		NatDex:    1,
-		Gender:    Female,
-		Level:     5,
-		CurrentHP: 11,
-		Stats:     [6]uint{11, 6, 5, 6, 5, 5},
+func TestPokemonStringer(t *testing.T) {
+	tests := []struct {
+		pkmn Pokemon
+		want string
+	}{
+		{
+			pkmn: Pokemon{
+				NatDex:    1,
+				Gender:    Female,
+				Level:     5,
+				CurrentHP: 11,
+				Stats:     [6]uint{11, 6, 5, 6, 5, 5},
+			},
+			want: "Bulbasaur♀\tLv5\nHP: 11/11\n",
+		},
 	}
-
-	if p.String() != "Bulbasaur\u2640\tLv5\nHP: 11/11\n" {
-		t.Fail()
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("Pokemon Stringer: %d", tt.pkmn.NatDex), func(t *testing.T) {
+			t.Parallel()
+			got := fmt.Sprintf("%s", tt.pkmn)
+			if got != tt.want {
+				t.Errorf("Pokemon Stringer %d got %v, want %v", tt.pkmn.NatDex, got, tt.want)
+			}
+		})
 	}
 }
