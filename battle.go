@@ -259,7 +259,7 @@ func (c *battleContext) Opponents() []int {
 
 // An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
 type Turn interface {
-	Priority() int // Gets the turn's priority. Higher values go first.
+	Priority() int // Gets the turn's priority. Higher values go first. Not to be confused with Move priority.
 }
 
 // Indicates that the Pokemon will fight. The active Pokemon indicated by `Self()` in the battle context will use
