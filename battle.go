@@ -120,9 +120,12 @@ type target struct {
 }
 
 type BattleContext struct {
-	Battle  Battle   // A copy of the current Battle, including weather, state, etc.
-	Pokemon Pokemon  // A copy of the Pokemon that is acting in this context
-	Targets []target // An array of all possible targets that the Pokemon can act on
+	Battle    Battle   // A copy of the current Battle, including weather, state, etc.
+	Pokemon   Pokemon  // A copy of the Pokemon that is acting in this context
+	Team      int      // The team of the acting Pokemon
+	Allies    []target // Targets that are allies of the acting Pokemon
+	Opponents []target // Targets that are opponents of the acting Pokemon
+	Targets   []target // An array of all possible targets that the Pokemon can act on
 }
 
 // Gets all the active Pokemon (targets) in the battle
@@ -145,9 +148,12 @@ func (b *Battle) GetTargets() []target {
 // Gets the current context for a pokemon to act (perform a turn)
 func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 	return &BattleContext{
-		Battle:  *b,
-		Pokemon: *pokemon,
-		Targets: b.GetTargets(),
+		Battle:    *b,
+		Pokemon:   *pokemon,
+		Team:      party.team,
+		Allies:    b.GetAllies(party),
+		Opponents: b.GetOpponents(party),
+		Targets:   b.GetTargets(),
 	}
 }
 
