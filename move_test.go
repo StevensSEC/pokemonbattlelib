@@ -13,14 +13,14 @@ func TestMoveString(t *testing.T) {
 		{
 			move: Move{
 				Name:     "Shadow Ball",
-				Type:     8,
+				Type:     Ghost,
 				Category: Special,
 				Max_PP:   15,
 				Priority: 0,
 				Power:    80,
 				Accuracy: 100,
 			},
-			want: "Shadow Ball\nType: 8, Power: 80, Accuracy: 100\n",
+			want: "Shadow Ball\nType: [Ghost], Power: 80, Accuracy: 100\n",
 		},
 	}
 	for _, tt := range tests {

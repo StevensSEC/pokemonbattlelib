@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
 	"math"
 	"math/bits"
 )
@@ -26,6 +27,26 @@ const (
 	Dragon
 	Dark
 )
+
+var elementalTypeStrings = map[ElementalType]string{
+	Normal:   "Normal",
+	Fight:    "Fight",
+	Flying:   "Flying",
+	Poison:   "Poison",
+	Ground:   "Ground",
+	Rock:     "Rock",
+	Bug:      "Bug",
+	Ghost:    "Ghost",
+	Steel:    "Steel",
+	Fire:     "Fire",
+	Water:    "Water",
+	Grass:    "Grass",
+	Electric: "Electric",
+	Psychic:  "Psychic",
+	Ice:      "Ice",
+	Dragon:   "Dragon",
+	Dark:     "Dark",
+}
 
 type Effectiveness float64
 
@@ -101,4 +122,14 @@ func GetEffect(move, def ElementalType) Effectiveness {
 	} else {
 		return Effectiveness(1 / math.Abs(float64(effect)))
 	}
+}
+
+func (e ElementalType) String() string {
+	result := ""
+	for i := Normal; i <= Dark; i <<= 1 {
+		if e&i > 0 {
+			result += fmt.Sprintf("[%s]", elementalTypeStrings[i])
+		}
+	}
+	return result
 }

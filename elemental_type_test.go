@@ -57,3 +57,36 @@ func TestGetEffect(t *testing.T) {
 		})
 	}
 }
+
+func TestElementalTypeString(t *testing.T) {
+	tests := []struct {
+		value ElementalType
+		want  string
+	}{
+		{
+			value: Water,
+			want:  "[Water]",
+		},
+		{
+			value: Normal,
+			want:  "[Normal]",
+		},
+		{
+			value: Fire,
+			want:  "[Fire]",
+		},
+		{
+			value: Fire | Grass,
+			want:  "[Fire][Grass]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("ElementalType Stringer: %s", tt.want), func(t *testing.T) {
+			t.Parallel()
+			got := fmt.Sprintf("%s", tt.value)
+			if got != tt.want {
+				t.Errorf("ElementalType (%d) got %v, want %v", tt.value, got, tt.want)
+			}
+		})
+	}
+}
