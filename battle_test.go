@@ -11,7 +11,7 @@ type dumbAgent struct{}
 // Blindly uses the first move on the first opponent pokemon.
 func (a dumbAgent) Act(ctx *BattleContext) Turn {
 	// You can use `a` (reference to self) for self-targeting turns
-	for _, target := range ctx.Targets {
+	for _, target := range ctx.Opponents {
 		return FightTurn{
 			Move:   0,
 			Target: target,
@@ -99,6 +99,21 @@ func TestActivePokemon(t *testing.T) {
 	party2.SetActive(1)
 	if n := b.parties[1].activePokemon[1].NatDex; n != 9 {
 		t.Errorf("expected party 2 to have an active Pokemon with dex number 9, received %v\n", n)
+	}
+}
+
+func TestGetPokemon(t *testing.T) {
+	a1 := Agent(dumbAgent{})
+	party1 := NewParty(&a1, 0)
+	pkmn1 := NewPokemon(4)
+	pkmn2 := NewPokemon(7)
+	pkmn3 := NewPokemon(11)
+	party1.AddPokemon(&pkmn1, &pkmn2, &pkmn3)
+	b := NewBattle()
+	b.AddParty(party1)
+	p := b.getPokemon(0, 1)
+	if p.NatDex != 7 {
+		t.Errorf("expected Pokemon with dex number 9, received %v\n", p.NatDex)
 	}
 }
 
