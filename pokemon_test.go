@@ -5,15 +5,15 @@ import (
 	"testing"
 )
 
-func TestNewPokemon(t *testing.T) {
-	p := NewPokemon(8)
+func TestGetPokemon(t *testing.T) {
+	p := GetPokemon(8)
 	if p.NatDex != 8 {
 		t.Errorf("expected Pokemon national dex to be 8, received %v", p.NatDex)
 	}
 }
 
 func TestPokemonName(t *testing.T) {
-	p := NewPokemon(1)
+	p := GetPokemon(1)
 	if p.GetName() != "Bulbasaur" {
 		t.Errorf("expected Pokemon name to be Bulbasaur, received %v", p.GetName())
 	}

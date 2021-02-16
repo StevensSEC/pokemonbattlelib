@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestNewMove(t *testing.T) {
-	m := NewMove(1)
+func TestGetMove(t *testing.T) {
+	m := GetMove(1)
 	if m.Name != "Pound" {
 		t.Errorf("expected move name to be Pound, got %v", m.Name)
 	}

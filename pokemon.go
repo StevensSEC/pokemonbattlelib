@@ -42,8 +42,8 @@ const (
 	STATUS_SLEEP
 )
 
-// Creates a new Pokemon given its national dex number
-func NewPokemon(natdex uint16) Pokemon {
+// Retrieves a Pokemon given its national dex number
+func GetPokemon(natdex uint16) Pokemon {
 	for _, p := range ALL_POKEMON {
 		if p.NatDex == natdex {
 			return p

@@ -38,8 +38,8 @@ type Move struct {
 	Accuracy int
 }
 
-// Creates a new Pokemon move given its move ID
-func NewMove(id int) Move {
+// Retrieves a Pokemon move given its move ID
+func GetMove(id int) Move {
 	for _, m := range ALL_MOVES {
 		if m.ID == id {
 			return m
