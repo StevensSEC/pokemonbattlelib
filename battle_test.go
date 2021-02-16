@@ -77,28 +77,22 @@ func TestBattleOneRound(t *testing.T) {
 
 // Tests if active Pokemon are set correctly
 func TestActivePokemon(t *testing.T) {
-	a1 := Agent(dumbAgent{})
-	a2 := Agent(dumbAgent{})
-	party1 := NewParty(&a1, 0)
-	pkmn1 := GetPokemon(4)
-	party1.AddPokemon(&pkmn1)
-	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(7)
-	pkmn3 := GetPokemon(9)
-	party2.AddPokemon(&pkmn2, &pkmn3)
-	b := NewBattle()
-	b.AddParty(party1, party2)
-	party1.SetActive(0)
-	if len(b.parties[0].activePokemon) != 1 {
-		t.Error("expected party 1 to have 1 active Pokemon")
+	a := Agent(dumbAgent{})
+	party := NewParty(&a, 0)
+	pkmn1 := GetPokemon(7)
+	pkmn2 := GetPokemon(9)
+	party.AddPokemon(&pkmn1, &pkmn2)
+	party.SetActive(0)
+	if len(party.activePokemon) != 1 {
+		t.Error("expected party to have 1 active Pokemon")
 	}
-	party1.SetInactive(0)
-	if len(b.parties[0].activePokemon) != 0 {
-		t.Error("expected party 1 to have no active Pokemon")
+	party.SetInactive(0)
+	if len(party.activePokemon) != 0 {
+		t.Error("expected party to have no active Pokemon")
 	}
-	party2.SetActive(1)
-	if n := b.parties[1].activePokemon[1].NatDex; n != 9 {
-		t.Errorf("expected party 2 to have an active Pokemon with dex number 9, received %v\n", n)
+	party.SetActive(1)
+	if n := party.activePokemon[1].NatDex; n != 9 {
+		t.Errorf("expected party to have an active Pokemon with dex number 9, received %v\n", n)
 	}
 }
 
@@ -113,7 +107,7 @@ func TestGetPartyPokemon(t *testing.T) {
 	b.AddParty(party1)
 	p := b.getPokemon(0, 1)
 	if p.NatDex != 7 {
-		t.Errorf("expected Pokemon with dex number 9, received %v\n", p.NatDex)
+		t.Errorf("expected Pokemon with dex number 7, received %v\n", p.NatDex)
 	}
 }
 
