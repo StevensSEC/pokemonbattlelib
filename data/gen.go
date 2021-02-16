@@ -107,12 +107,12 @@ func createCodeOutput(s string) {
 }
 
 func main() {
-	// path, err := os.Getwd()
-	// if err != nil {
-	// 	log.Panicln(err)
-	// }
-	// log.Printf("current directory: %s\n", path)
 	var err error
+	path, err := os.Getwd()
+	if err != nil {
+		log.Panicln(err)
+	}
+	log.Printf("Current directory: %s\n", path)
 	output := ""
 
 	// get all valid version ids
