@@ -14,9 +14,9 @@ func (g Gender) String() string {
 	if g == Genderless {
 		return ""
 	} else if g == Female {
-		return "\u2640"
+		return "♀"
 	} else if g == Male {
-		return "\u2642"
+		return "♂"
 	} else {
 		panic("Stringing gender reached unhandled condition")
 	}

@@ -36,6 +36,18 @@ func (b *Battle) AddParty(p ...*party) {
 	b.parties = append(b.parties, p...)
 }
 
+// Gets a reference to a Pokemon using party ID and party slot
+func (b *Battle) getPokemon(party, slot int) *Pokemon {
+	if party >= len(b.parties) {
+		panic(PartyIndexError)
+	}
+	p := b.parties[party].pokemon
+	if slot >= len(p) {
+		panic(PartyIndexError)
+	}
+	return p[slot]
+}
+
 // Gets all active ally Pokemon for a party
 func (b *Battle) GetAllies(p *party) []target {
 	allies := make([]target, 0)
@@ -79,7 +91,7 @@ func (b *Battle) SimulateRound() {
 		for _, pokemon := range party.activePokemon {
 			ctx := b.getContext(party, pokemon)
 			turn := (*party.Agent).Act(ctx)
-			turns = append(turns, TurnContext{Turn: &turn, Context: ctx})
+			turns = append(turns, TurnContext{Turn: turn, Context: ctx})
 		}
 	}
 	// Sort turns using an in-place stable sort
@@ -88,24 +100,30 @@ func (b *Battle) SimulateRound() {
 		turnB := turns[j].Turn
 		ctxA := turns[i].Context
 		ctxB := turns[j].Context
-		if reflect.TypeOf(*turnA) == reflect.TypeOf(*turnB) {
-			switch (*turnA).(type) {
+		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
+			switch turnA.(type) {
 			case FightTurn:
 				// speedy pokemon should go first
 				return ctxA.Pokemon.Stats[STAT_SPD] > ctxB.Pokemon.Stats[STAT_SPD]
 			}
 		} else {
 			// make higher priority turns go first
-			return (*turnA).Priority() > (*turnB).Priority()
+			return turnA.Priority() > turnB.Priority()
 		}
 		// fallthrough
 		return false
 	})
 	// Run turns in sorted order and update battle state
 	for _, turn := range turns {
-		switch t := (*turn.Turn).(type) {
+		switch t := turn.Turn.(type) {
 		case FightTurn:
-			log.Printf("TODO: Implement fight\n")
+			user := turn.Context.Pokemon
+			target := t.Target
+			receiver := b.getPokemon(target.party, target.partySlot)
+			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
+			modifier := uint(1) // TODO: damage multiplers
+			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
+			(*receiver).CurrentHP -= damage
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
@@ -164,7 +182,7 @@ type Turn interface {
 
 // Wrapper used to determine turn order in a battle
 type TurnContext struct {
-	Turn    *Turn          // A reference to the turn that a Pokemon made using an Agent
+	Turn    Turn           // A copy of the turn that a Pokemon made using an Agent
 	Context *BattleContext // The context in which the Pokemon took its turn
 }
 

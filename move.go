@@ -30,7 +30,7 @@ const MOVE_PRIORITY_MIN = -7
 type Move struct {
 	ID       int
 	Name     string
-	Type     int // update this to elementalType when PR #27 is complete
+	Type     ElementalType
 	Category MoveCategory
 	Max_PP   int
 	Priority int
