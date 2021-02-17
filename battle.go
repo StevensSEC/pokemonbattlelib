@@ -232,11 +232,10 @@ type Transaction interface {
 }
 
 type DamageTransaction struct {
-	User          *Pokemon
-	Target        *Pokemon
-	Move          *Move
-	Damage        uint
-	StatusEffects uint
+	User   *Pokemon
+	Target *Pokemon
+	Move   *Move
+	Damage uint
 }
 
 func (t DamageTransaction) BattleLog() string {
