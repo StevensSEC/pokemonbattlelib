@@ -200,7 +200,7 @@ func TestPokemonSpeed(t *testing.T) {
 	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 10}
 	party1.AddPokemon(&pkmn1)
 	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(4)
+	pkmn2 := GetPokemon(7)
 	pkmn2.Moves[0] = &pound
 	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 12}
 	party2.AddPokemon(&pkmn2)
