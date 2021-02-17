@@ -127,11 +127,17 @@ func TestGetAllies(t *testing.T) {
 	if err != nil {
 		t.Fatal("failed to start battle")
 	}
-	if n := len(b.GetAllies(party1)); n != 1 {
-		t.Errorf("expected party 1 to have 1 active ally, received %v\n", n)
-	}
-	if n := len(b.GetAllies(party2)); n != 1 {
-		t.Errorf("expected party 2 to have 1 active ally, received %v\n", n)
+
+	for _, party := range []*party{party1, party2} {
+		allies := b.GetAllies(party)
+		if n := len(allies); n != 1 {
+			t.Errorf("expected party to have 1 active ally, received %v\n", n)
+		}
+		for _, ally := range allies {
+			if party.team != ally.Team {
+				t.Errorf("expected party allies to match team, but %d != %d", party.team, ally.Team)
+			}
+		}
 	}
 }
 
@@ -151,11 +157,16 @@ func TestGetOpponents(t *testing.T) {
 	if err != nil {
 		t.Fatal("failed to start battle")
 	}
-	if n := len(b.GetOpponents(party1)); n != 1 {
-		t.Errorf("expected party 1 to have 1 active opponents, received %v\n", n)
-	}
-	if n := len(b.GetOpponents(party2)); n != 1 {
-		t.Errorf("expected party 2 to have 1 active opponent, received %v\n", n)
+	for _, party := range []*party{party1, party2} {
+		opponents := b.GetOpponents(party)
+		if n := len(opponents); n != 1 {
+			t.Errorf("expected party to have 1 active opponent, received %v\n", n)
+		}
+		for _, opponent := range opponents {
+			if party.team == opponent.Team {
+				t.Errorf("expected party opponents to not match team, but %d == %d", party.team, opponent.Team)
+			}
+		}
 	}
 }
 
