@@ -163,16 +163,25 @@ func (b *Battle) SimulateRound() []Transaction {
 				p := b.parties[t.TargetParty]
 				p.SetInactive(t.TargetPartySlot)
 				anyAlive := false
-				for _, pkmn := range p.pokemon {
+				for i, pkmn := range p.pokemon {
 					if pkmn.CurrentHP > 0 {
-						// TODO: auto send out next pokemon
 						anyAlive = true
+						// TODO: prompt Agent for which pokemon to send out next
+						// auto send out next pokemon
+						queue = append(queue, SendOutTransaction{
+							Target:          t.Target,
+							TargetParty:     t.TargetParty,
+							TargetPartySlot: i,
+						})
 						break
 					}
 				}
 				if !anyAlive {
 					// TODO: cause the battle to end by knockout
 				}
+			case SendOutTransaction:
+				p := b.parties[t.TargetParty]
+				p.SetActive(t.TargetPartySlot)
 			}
 			// add to the list of processed transactions
 			transactions = append(transactions, t)
@@ -279,6 +288,19 @@ type FaintTransaction struct {
 
 func (t FaintTransaction) BattleLog() string {
 	return fmt.Sprintf("%s fainted.",
+		t.Target.GetName(),
+	)
+}
+
+// A transaction that makes a party send out a pokemon.
+type SendOutTransaction struct {
+	Target          *Pokemon
+	TargetParty     int
+	TargetPartySlot int
+}
+
+func (t SendOutTransaction) BattleLog() string {
+	return fmt.Sprintf("%s was sent out.",
 		t.Target.GetName(),
 	)
 }
