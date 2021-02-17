@@ -61,7 +61,30 @@ func TestBattleOneRound(t *testing.T) {
 			t.Fatalf("Must send out first pokemon in each at the beginning of the battle. Party %d gave: %v", p, got)
 		}
 	}
-	b.SimulateRound()
+	transactions := b.SimulateRound()
+	if len(transactions) != 2 {
+		t.Fatal("Expected only 2 transactions to occur in a round")
+	}
+	logtest := []struct {
+		turn Transaction
+		want string
+	}{
+		{
+			turn: transactions[0],
+			want: "Charmander used Pound on Squirtle for 3 damage.",
+		},
+		{
+			turn: transactions[1],
+			want: "Squirtle used Pound on Charmander for 3 damage.",
+		},
+	}
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
+	}
+
 	// functionally arbitrary value, will need to be adjusted when damage calculation becomes more accurate
 	expectedHp := uint(27)
 	for _, party := range b.parties {
@@ -69,10 +92,6 @@ func TestBattleOneRound(t *testing.T) {
 			t.Errorf("Expected %s to have %d HP, got %d", party.pokemon[0].GetName(), expectedHp, party.pokemon[0].CurrentHP)
 		}
 	}
-
-	// output:
-	// TODO: Implement fight {0 1}
-	// TODO: Implement fight {0 0}
 }
 
 // Tests if active Pokemon are set correctly
@@ -181,7 +200,7 @@ func TestPokemonSpeed(t *testing.T) {
 	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 10}
 	party1.AddPokemon(&pkmn1)
 	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(4)
+	pkmn2 := GetPokemon(7)
 	pkmn2.Moves[0] = &pound
 	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 12}
 	party2.AddPokemon(&pkmn2)
@@ -191,13 +210,30 @@ func TestPokemonSpeed(t *testing.T) {
 	if err != nil {
 		t.Fatal("failed to start battle")
 	}
-	b.SimulateRound()
-	b.SimulateRound()
-	// FIXME: ideally should check battle log/history
-	// FIXME: For some reason, the output is not actually checked correctly, see #49
-	// Output:
-	// TODO: Implement fight {0 0}
-	// TODO: Implement fight {0 1}
+
+	transactions := b.SimulateRound()
+	if len(transactions) != 2 {
+		t.Fatal("Expected only 2 transactions to occur in a round")
+	}
+	logtest := []struct {
+		turn Transaction
+		want string
+	}{
+		{
+			turn: transactions[0],
+			want: "Squirtle used Pound on Charmander for 3 damage.",
+		},
+		{
+			turn: transactions[1],
+			want: "Charmander used Pound on Squirtle for 3 damage.",
+		},
+	}
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
+	}
 }
 
 func TestTurnPriority(t *testing.T) {
