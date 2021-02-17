@@ -1,5 +1,7 @@
 // Code generated - DO NOT EDIT.
 // Regenerate with `go generate`.
+
+// go:generate go run data/gen.go
 package pokemonbattlelib
 
 var ALL_POKEMON = []Pokemon{
