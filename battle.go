@@ -65,7 +65,7 @@ func (b *Battle) GetOpponents(p *party) []target {
 	opponents := make([]target, 0)
 	targets := b.GetTargets()
 	for _, target := range targets {
-		if target.Team == p.team {
+		if target.Team != p.team {
 			opponents = append(opponents, target)
 		}
 	}
