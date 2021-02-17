@@ -17,3 +17,5 @@ Use the library to write a program in `playground.go`. For example, you can easi
 # Don'ts
 - Don't commit `playground.go`.
 - Don't use external libraries.
+- Don't use multiple files.
+  - All your code should go in `playground.go`. If you can't do that, something is very wrong with your playground.
