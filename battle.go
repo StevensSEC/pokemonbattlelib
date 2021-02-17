@@ -211,7 +211,7 @@ func (turn FightTurn) Priority() int {
 	return 0
 }
 
-// Describes the result of a Turn in a Round.
+// Describes a change to battle state.
 type Transaction interface {
 	BattleLog() string
 }
