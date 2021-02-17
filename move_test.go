@@ -5,18 +5,39 @@ import (
 	"testing"
 )
 
-func TestMoveString(t *testing.T) {
-	m := Move{
-		Name:     "Shadow Ball",
-		Type:     8,
-		Category: Special,
-		MaxPP:    15,
-		Priority: 0,
-		Power:    80,
-		Accuracy: 100,
+func TestGetMove(t *testing.T) {
+	m := GetMove(1)
+	if m.Name != "Pound" {
+		t.Errorf("expected move name to be Pound, got %v", m.Name)
 	}
-	if m.String() != "Shadow Ball\nType: 8, Power: 80, Accuracy: 100\n" {
-		t.Fail()
+}
+
+func TestMoveString(t *testing.T) {
+	tests := []struct {
+		move Move
+		want string
+	}{
+		{
+			move: Move{
+				Name:     "Shadow Ball",
+				Type:     Ghost,
+				Category: Special,
+				MaxPP:    15,
+				Priority: 0,
+				Power:    80,
+				Accuracy: 100,
+			},
+			want: "Shadow Ball\nType: [Ghost], Power: 80, Accuracy: 100\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("Move Stringer: %s", tt.move.Name), func(t *testing.T) {
+			t.Parallel()
+			got := fmt.Sprintf("%s", tt.move)
+			if got != tt.want {
+				t.Errorf("Move Stringer %s got %v, want %v", tt.move.Name, got, tt.want)
+			}
+		})
 	}
 }
 

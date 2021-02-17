@@ -30,13 +30,23 @@ const MOVE_PRIORITY_MIN = -7
 type Move struct {
 	ID        int
 	Name      string
-	Type      int // update this to elementalType when PR #27 is complete
+	Type      ElementalType
 	Category  MoveCategory
 	CurrentPP int
 	MaxPP     int
 	Priority  int
 	Power     int
 	Accuracy  int
+}
+
+// Retrieves a Pokemon move given its move ID
+func GetMove(id int) Move {
+	for _, m := range ALL_MOVES {
+		if m.ID == id {
+			return m
+		}
+	}
+	panic("move not found")
 }
 
 // Restores PP for a move
