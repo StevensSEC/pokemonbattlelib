@@ -22,7 +22,7 @@ func TestMoveString(t *testing.T) {
 				Name:     "Shadow Ball",
 				Type:     Ghost,
 				Category: Special,
-				Max_PP:   15,
+				MaxPP:    15,
 				Priority: 0,
 				Power:    80,
 				Accuracy: 100,
