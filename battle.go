@@ -117,6 +117,7 @@ func (b *Battle) SimulateRound() []Transaction {
 	// Run turns in sorted order and update battle state
 	transactions := []Transaction{}
 	for _, turn := range turns {
+		queue := []Transaction{}
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
@@ -125,7 +126,7 @@ func (b *Battle) SimulateRound() []Transaction {
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
-			transactions = append(transactions, DamageTransaction{
+			queue = append(queue, DamageTransaction{
 				User:   &user,
 				Target: receiver,
 				Move:   user.Moves[t.Move],
@@ -134,15 +135,29 @@ func (b *Battle) SimulateRound() []Transaction {
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
-	}
 
-	// process transations
-	for _, transaction := range transactions {
-		switch t := transaction.(type) {
-		case DamageTransaction:
-			(*t.Target).CurrentHP -= t.Damage
+		// process transations for this turn
+		for len(queue) > 0 {
+			t := queue[0]
+			queue = queue[1:]
+			switch t := t.(type) {
+			case DamageTransaction:
+				if (*t.Target).CurrentHP >= t.Damage {
+					(*t.Target).CurrentHP -= t.Damage
+				} else {
+					// prevent underflow
+					(*t.Target).CurrentHP = 0
+				}
+
+				if (*t.Target).CurrentHP == 0 {
+					// pokemon has fainted
+				}
+			}
+			// add to the list of processed transactions
+			transactions = append(transactions, t)
 		}
 	}
+
 	return transactions
 }
 
