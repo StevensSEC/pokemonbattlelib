@@ -153,6 +153,25 @@ func (b *Battle) SimulateRound() []Transaction {
 
 				if (*t.Target).CurrentHP == 0 {
 					// pokemon has fainted
+					queue = append(queue, FaintTransaction{
+						Target:          t.Target,
+						TargetParty:     t.TargetParty,
+						TargetPartySlot: t.TargetPartySlot,
+					})
+				}
+			case FaintTransaction:
+				p := b.parties[t.TargetParty]
+				p.SetInactive(t.TargetPartySlot)
+				anyAlive := false
+				for _, pkmn := range p.pokemon {
+					if pkmn.CurrentHP > 0 {
+						// TODO: auto send out next pokemon
+						anyAlive = true
+						break
+					}
+				}
+				if !anyAlive {
+					// TODO: cause the battle to end by knockout
 				}
 			}
 			// add to the list of processed transactions
@@ -248,5 +267,18 @@ func (t DamageTransaction) BattleLog() string {
 		t.Move.Name,
 		t.Target.GetName(),
 		t.Damage,
+	)
+}
+
+// A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
+type FaintTransaction struct {
+	Target          *Pokemon
+	TargetParty     int
+	TargetPartySlot int
+}
+
+func (t FaintTransaction) BattleLog() string {
+	return fmt.Sprintf("%s fainted.",
+		t.Target.GetName(),
 	)
 }
