@@ -118,12 +118,14 @@ func (b *Battle) SimulateRound() {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
-			target := t.Target
-			receiver := b.getPokemon(target.party, target.partySlot)
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
 			(*receiver).CurrentHP -= damage
+		case ItemTurn:
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			t.Item.UseItem(receiver)
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
@@ -200,9 +202,9 @@ func (turn FightTurn) Priority() int {
 
 // An item turn has the a higher priority than any move.
 type ItemTurn struct {
-	item   *Item // Which item is being consumed
-	target int   // The index of the target Pokemon for the item
-	move   int   // Index reference to a move for certain items
+	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
+	Target target // Info containing data determining the target of
+	Item   *Item  // Which item is being consumed
 }
 
 func (turn ItemTurn) Priority() int {

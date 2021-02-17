@@ -51,7 +51,11 @@ func GetMove(id int) Move {
 
 // Restores PP for a move
 func (m *Move) RestorePP(amount int) {
-	// Todo: Implement PP restore
+	if m.MaxPP-m.CurrentPP <= amount {
+		m.CurrentPP = m.MaxPP
+	} else {
+		m.CurrentPP += amount
+	}
 }
 
 func (m Move) String() string {

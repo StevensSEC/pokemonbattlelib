@@ -1,5 +1,7 @@
 package pokemonbattlelib
 
+import "fmt"
+
 type Item struct {
 	ID          int
 	Name        string
@@ -73,10 +75,15 @@ const (
 )
 
 // For item effects, see https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/item_prose.csv
-// Creates a new item from its ID
-func NewItem(itemID int) *Item {
-	item := ALL_ITEMS[itemID-1]
-	return &item
+// Retrieves an item using its ID
+// Can also use constants like ITEM_POTION or ITEM_REVIVE
+func GetItem(itemID int) Item {
+	for _, item := range ALL_ITEMS {
+		if item.ID == itemID {
+			return item
+		}
+	}
+	panic(fmt.Sprintf("unknown item with ID %v\n", itemID))
 }
 
 // Dispatches the correct item handler based on its category
@@ -87,6 +94,11 @@ func (i *Item) UseItem(target *Pokemon) {
 	case ItemVitamins:
 		i.UseVitamins(target)
 	}
+}
+
+// Activates an held item's effect in battle
+func (i *Item) UseHeldItem(target *Pokemon) {
+
 }
 
 // Uses a medicine item which affects HP and status effects
@@ -130,4 +142,22 @@ func (i *Item) UseMoveItem(target *Pokemon, move *Move) {
 	case ITEM_MAX_ETHER:
 		move.RestorePP(move.MaxPP)
 	}
+}
+
+// Gets the damage multiplier for items during a turn
+func (i *Item) GetDamageMultiplier(pokemon *Pokemon, move *Move) float64 {
+	multiplier := 1.0
+	switch i.ID {
+	// Plates
+	case ITEM_DRACO_PLATE:
+		if move.Type == Dragon {
+			multiplier *= 1.20
+		}
+	// Species-specific
+	case ITEM_ADAMANT_ORB:
+		if pokemon.NatDex == 483 && (move.Type == Steel || move.Type == Dragon) {
+			multiplier *= 1.20
+		}
+	}
+	return multiplier
 }
