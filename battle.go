@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 	"sort"
@@ -65,7 +66,7 @@ func (b *Battle) GetOpponents(p *party) []target {
 	opponents := make([]target, 0)
 	targets := b.GetTargets()
 	for _, target := range targets {
-		if target.Team == p.team {
+		if target.Team != p.team {
 			opponents = append(opponents, target)
 		}
 	}
@@ -84,7 +85,10 @@ func (b *Battle) Start() error {
 }
 
 // Simulates a single round of the battle.
-func (b *Battle) SimulateRound() {
+func (b *Battle) SimulateRound() []Transaction {
+	if b.State != BATTLE_IN_PROGRESS {
+		log.Panic("battle is not currently in progress")
+	}
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
 	for _, party := range b.parties {
@@ -114,6 +118,7 @@ func (b *Battle) SimulateRound() {
 		return false
 	})
 	// Run turns in sorted order and update battle state
+	transactions := []Transaction{}
 	for _, turn := range turns {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
@@ -122,14 +127,38 @@ func (b *Battle) SimulateRound() {
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
-			(*receiver).CurrentHP -= damage
+			transactions = append(transactions, DamageTransaction{
+				User:   &user,
+				Target: receiver,
+				Move:   user.Moves[t.Move],
+				Damage: damage,
+			})
 		case ItemTurn:
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-			t.Item.UseItem(receiver)
+			move := receiver.Moves[t.Move]
+			transactions = append(transactions, ItemTransaction{
+				Target: receiver,
+				Item:   t.Item,
+				Move:   move,
+			})
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
 	}
+	// process transations
+	for _, transaction := range transactions {
+		switch t := transaction.(type) {
+		case DamageTransaction:
+			(*t.Target).CurrentHP -= t.Damage
+		case ItemTransaction:
+			if t.Item.Category == ItemPPRecovery {
+				t.Item.UseMoveItem(t.Target, t.Move)
+			} else {
+				t.Item.UseItem(t.Target)
+			}
+		}
+	}
+	return transactions
 }
 
 type target struct {
@@ -182,7 +211,7 @@ const PRIORITY_MAX = 5
 const PRIORITY_MIN = -7
 
 type Turn interface {
-	Priority() int // Gets the turn's priority. Higher values go first.
+	Priority() int // Gets the turn's priority. Higher values go first. Not to be confused with Move priority.
 }
 
 // Wrapper used to determine turn order in a battle
@@ -209,4 +238,36 @@ type ItemTurn struct {
 
 func (turn ItemTurn) Priority() int {
 	return 1
+}
+
+// Describes a change to battle state.
+type Transaction interface {
+	BattleLog() string
+}
+
+type DamageTransaction struct {
+	User          *Pokemon
+	Target        *Pokemon
+	Move          *Move
+	Damage        uint
+	StatusEffects uint
+}
+
+func (t DamageTransaction) BattleLog() string {
+	return fmt.Sprintf("%s used %s on %s for %d damage.",
+		t.User.GetName(),
+		t.Move.Name,
+		t.Target.GetName(),
+		t.Damage,
+	)
+}
+
+type ItemTransaction struct {
+	Target *Pokemon
+	Item   *Item
+	Move   *Move
+}
+
+func (t ItemTransaction) BattleLog() string {
+	return fmt.Sprintf("%s used on %s.", t.Item.Name, t.Target.GetName())
 }
