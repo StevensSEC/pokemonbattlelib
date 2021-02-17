@@ -102,45 +102,43 @@ func (p Pokemon) String() string {
 }
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
-func (p *Pokemon) RestoreHP(amount uint) {
-	if p.Stats[STAT_HP]-p.CurrentHP <= amount {
-		p.CurrentHP = p.Stats[STAT_HP]
-	} else {
-		p.CurrentHP += amount
+func (p *Pokemon) RestoreHP(amount uint) Transaction {
+	if diff := p.Stats[STAT_HP] - p.CurrentHP; diff <= amount {
+		amount = diff
 	}
+	return HealTransaction{Target: p, Amount: amount}
 }
 
 // Cures a status ailment from a Pokemon.
-func (p *Pokemon) CureStatusEffect(status uint) {
-	p.StatusEffects &= ^status
+func (p *Pokemon) CureStatusEffect(status uint) Transaction {
+	// p.StatusEffects &= ^status
+	return CureStatusTransaction{Target: p, StatusEffects: status}
 }
 
 // Modifies one of the six base stats for a Pokemon
 // Takes a value between -6 and +6 for stages
-func (p *Pokemon) ModifyStat(stat, stages int) {
-	p.StatModifiers[stat] += stages
-	if p.StatModifiers[stat] > MAX_STAT_MODIFIER {
-		p.StatModifiers[stat] = MAX_STAT_MODIFIER
+func (p *Pokemon) ModifyStat(stat, stages int) Transaction {
+	if p.StatModifiers[stat]+stages > MAX_STAT_MODIFIER {
+		stages = MAX_STAT_MODIFIER - p.StatModifiers[stat]
 	}
-	if p.StatModifiers[stat] < MIN_STAT_MODIFIER {
-		p.StatModifiers[stat] = MIN_STAT_MODIFIER
+	if p.StatModifiers[stat]+stages < MIN_STAT_MODIFIER {
+		stages = MIN_STAT_MODIFIER - p.StatModifiers[stat]
 	}
+	return ModifyStatTransaction{Target: p, Stat: stat, Stages: stages}
 }
 
 // Modifies the EVs of a Pokemon
-func (p *Pokemon) AddEVs(stat, amount uint8) {
-	if MAX_EV-p.EVs[stat] <= amount {
-		p.EVs[stat] = MAX_EV
-	} else {
-		p.EVs[stat] += amount
+func (p *Pokemon) AddEVs(stat, amount uint8) Transaction {
+	if diff := MAX_EV - p.EVs[stat]; diff <= amount {
+		amount = diff
 	}
+	return EVTransaction{Target: p, Amount: amount}
 }
 
 // Modifies the friendship level of a Pokemon
-func (p *Pokemon) AddFriendship(amount uint8) {
-	if MAX_FRIENDSHIP-p.Friendship <= amount {
-		p.Friendship = MAX_FRIENDSHIP
-	} else {
-		p.Friendship += amount
+func (p *Pokemon) AddFriendship(amount uint8) Transaction {
+	if diff := MAX_FRIENDSHIP - p.Friendship; diff <= amount {
+		amount = diff
 	}
+	return FriendshipTransaction{Target: p, Amount: amount}
 }

@@ -141,6 +141,11 @@ func (b *Battle) SimulateRound() []Transaction {
 				Item:   t.Item,
 				Move:   move,
 			})
+			if t.Item.Category == ItemPPRecovery {
+				transactions = append(transactions, receiver.UseMoveItem(t.Item, receiver.Moves[t.Move])...)
+			} else {
+				transactions = append(transactions, receiver.UseItem(t.Item)...)
+			}
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
@@ -149,13 +154,24 @@ func (b *Battle) SimulateRound() []Transaction {
 	for _, transaction := range transactions {
 		switch t := transaction.(type) {
 		case DamageTransaction:
-			(*t.Target).CurrentHP -= t.Damage
+			t.Target.CurrentHP -= t.Damage
 		case ItemTransaction:
-			if t.Item.Category == ItemPPRecovery {
-				t.Target.UseMoveItem(t.Item, t.Move)
-			} else {
-				t.Target.UseItem(t.Item)
+			// TODO: do not consume certain items
+			if t.Target.HeldItem == t.Item {
+				t.Target.HeldItem = nil
 			}
+		case HealTransaction:
+			t.Target.CurrentHP += t.Amount
+		case PPTransaction:
+			t.Move.CurrentPP += t.Amount
+		case CureStatusTransaction:
+			t.Target.StatusEffects &= ^t.StatusEffects
+		case EVTransaction:
+			t.Target.EVs[t.Stat] += t.Amount
+		case FriendshipTransaction:
+			t.Target.Friendship += t.Amount
+		case ModifyStatTransaction:
+			t.Target.StatModifiers[t.Stat] += t.Stages
 		}
 	}
 	return transactions
@@ -268,4 +284,75 @@ type ItemTransaction struct {
 
 func (t ItemTransaction) BattleLog() string {
 	return fmt.Sprintf("%s used on %s.", t.Item.Name, t.Target.GetName())
+}
+
+type HealTransaction struct {
+	Target *Pokemon
+	Amount uint
+}
+
+func (t HealTransaction) BattleLog() string {
+	return fmt.Sprintf("%s restored %d HP.", t.Target.GetName(), t.Amount)
+}
+
+type PPTransaction struct {
+	Move   *Move
+	Amount int
+}
+
+func (t PPTransaction) BattleLog() string {
+	return fmt.Sprintf("%s restored %d PP.", t.Move.Name, t.Amount)
+}
+
+type EVTransaction struct {
+	Target *Pokemon
+	Stat   int
+	Amount uint8
+}
+
+func (t EVTransaction) BattleLog() string {
+	// TODO: add stat string representation
+	return fmt.Sprintf("%s gained %d <STAT> effort.", t.Target.GetName(), t.Amount)
+}
+
+type FriendshipTransaction struct {
+	Target *Pokemon
+	Amount uint8
+}
+
+func (t FriendshipTransaction) BattleLog() string {
+	return fmt.Sprintf("%s gained %d friendship.", t.Target.GetName(), t.Amount)
+}
+
+type CureStatusTransaction struct {
+	Target        *Pokemon
+	StatusEffects uint
+}
+
+func (t CureStatusTransaction) BattleLog() string {
+	// TODO: add status string representation
+	return fmt.Sprintf("%s's <STATUS> was cured.", t.Target.GetName())
+}
+
+type ModifyStatTransaction struct {
+	Target *Pokemon
+	Stat   int
+	Stages int
+}
+
+func (t ModifyStatTransaction) BattleLog() string {
+	// TODO: add stat string representation
+	msg := "<STAT> "
+	if t.Stages == 1 {
+		msg += "rose!"
+	} else if t.Stages >= 2 {
+		msg += "sharply rose!"
+	} else if t.Stages == -1 {
+		msg += "fell!"
+	} else if t.Stages <= -2 {
+		msg += "harshly fell!"
+	} else {
+		msg += "???"
+	}
+	return fmt.Sprintf("%s's %s.", t.Target.GetName(), msg)
 }

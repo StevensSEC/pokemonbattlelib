@@ -13,14 +13,25 @@ func TestGetMove(t *testing.T) {
 }
 
 func TestMoveRestorePP(t *testing.T) {
-	m := Move{CurrentPP: 15, MaxPP: 25}
-	m.RestorePP(5)
-	if m.CurrentPP != 20 {
-		t.Errorf("expected move to have 20 PP, received %v\n", m.CurrentPP)
+	m := Move{Name: "Pound", CurrentPP: 15, MaxPP: 25}
+	logtest := []struct {
+		turn Transaction
+		want string
+	}{
+		{
+			turn: m.RestorePP(5),
+			want: "Pound restored 5 PP.",
+		},
+		{
+			turn: m.RestorePP(99),
+			want: "Pound restored 10 PP.",
+		},
 	}
-	m.RestorePP(99)
-	if m.CurrentPP != 25 {
-		t.Errorf("expected move to have 25 PP, received %v\n", m.CurrentPP)
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
 	}
 }
 

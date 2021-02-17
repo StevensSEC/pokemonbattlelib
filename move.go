@@ -50,12 +50,11 @@ func GetMove(id int) Move {
 }
 
 // Restores PP for a move
-func (m *Move) RestorePP(amount int) {
-	if m.MaxPP-m.CurrentPP <= amount {
-		m.CurrentPP = m.MaxPP
-	} else {
-		m.CurrentPP += amount
+func (m *Move) RestorePP(amount int) Transaction {
+	if diff := m.MaxPP - m.CurrentPP; diff <= amount {
+		amount = diff
 	}
+	return PPTransaction{Move: m, Amount: amount}
 }
 
 func (m Move) String() string {
