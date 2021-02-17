@@ -5,6 +5,13 @@ import (
 	"testing"
 )
 
+func TestGetMove(t *testing.T) {
+	m := GetMove(1)
+	if m.Name != "Pound" {
+		t.Errorf("expected move name to be Pound, got %v", m.Name)
+	}
+}
+
 func TestMoveString(t *testing.T) {
 	tests := []struct {
 		move Move
