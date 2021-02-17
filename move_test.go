@@ -12,6 +12,18 @@ func TestGetMove(t *testing.T) {
 	}
 }
 
+func TestMoveRestorePP(t *testing.T) {
+	m := Move{CurrentPP: 15, MaxPP: 25}
+	m.RestorePP(5)
+	if m.CurrentPP != 20 {
+		t.Errorf("expected move to have 20 PP, received %v\n", m.CurrentPP)
+	}
+	m.RestorePP(99)
+	if m.CurrentPP != 25 {
+		t.Errorf("expected move to have 25 PP, received %v\n", m.CurrentPP)
+	}
+}
+
 func TestMoveString(t *testing.T) {
 	tests := []struct {
 		move Move

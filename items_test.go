@@ -30,6 +30,27 @@ func TestUseMoveItem(t *testing.T) {
 	}
 }
 
+func TestUseVitamins(t *testing.T) {
+	p := GetPokemon(1)
+	i := GetItem(ITEM_CALCIUM)
+	i.UseVitamins(&p)
+	if p.Friendship != 5 {
+		t.Errorf("expected Pokemon to gain 5 friendship")
+	}
+	if p.EVs[STAT_ATK] != 10 {
+		t.Errorf("expected Pokemon to gain 10 ATK EVs")
+	}
+	p.Friendship = 200
+	p.EVs[STAT_ATK] = 200
+	i.UseVitamins(&p)
+	if p.Friendship != 202 {
+		t.Errorf("expected Pokemon to gain 2 friendship")
+	}
+	if p.EVs[STAT_ATK] != 200 {
+		t.Errorf("expected Pokemon to have 200 ATK EVs")
+	}
+}
+
 func TestHeldItemStatBoost(t *testing.T) {
 	p := GetPokemon(149)
 	outrage := GetMove(200)

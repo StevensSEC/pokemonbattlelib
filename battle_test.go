@@ -291,6 +291,10 @@ func TestTurnPriority(t *testing.T) {
 			turn: FightTurn{},
 			want: 0,
 		},
+		{
+			turn: ItemTurn{},
+			want: 1,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%T priority", tt.turn), func(t *testing.T) {
