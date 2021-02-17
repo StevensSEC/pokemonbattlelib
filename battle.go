@@ -127,10 +127,12 @@ func (b *Battle) SimulateRound() []Transaction {
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
 			queue = append(queue, DamageTransaction{
-				User:   &user,
-				Target: receiver,
-				Move:   user.Moves[t.Move],
-				Damage: damage,
+				User:            &user,
+				Target:          receiver,
+				TargetParty:     target.party,
+				TargetPartySlot: target.partySlot,
+				Move:            user.Moves[t.Move],
+				Damage:          damage,
 			})
 		default:
 			log.Panicf("Unknown turn of type %v", t)
@@ -232,10 +234,12 @@ type Transaction interface {
 }
 
 type DamageTransaction struct {
-	User   *Pokemon
-	Target *Pokemon
-	Move   *Move
-	Damage uint
+	User            *Pokemon
+	Target          *Pokemon
+	TargetParty     int
+	TargetPartySlot int
+	Move            *Move
+	Damage          uint
 }
 
 func (t DamageTransaction) BattleLog() string {
