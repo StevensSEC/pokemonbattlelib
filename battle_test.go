@@ -92,10 +92,6 @@ func TestBattleOneRound(t *testing.T) {
 			t.Errorf("Expected %s to have %d HP, got %d", party.pokemon[0].GetName(), expectedHp, party.pokemon[0].CurrentHP)
 		}
 	}
-
-	// output:
-	// TODO: Implement fight {0 1}
-	// TODO: Implement fight {0 0}
 }
 
 // Tests if active Pokemon are set correctly
@@ -214,13 +210,30 @@ func TestPokemonSpeed(t *testing.T) {
 	if err != nil {
 		t.Fatal("failed to start battle")
 	}
-	b.SimulateRound()
-	b.SimulateRound()
-	// FIXME: ideally should check battle log/history
-	// FIXME: For some reason, the output is not actually checked correctly, see #49
-	// Output:
-	// TODO: Implement fight {0 0}
-	// TODO: Implement fight {0 1}
+
+	transations := b.SimulateRound()
+	if len(transations) != 2 {
+		t.Fatal("Expected only 2 transations to occur in a round")
+	}
+	logtest := []struct {
+		turn Transaction
+		want string
+	}{
+		{
+			turn: transations[0],
+			want: "Squirtle used Pound on Charmander for 3 damage.",
+		},
+		{
+			turn: transations[1],
+			want: "Charmander used Pound on Squirtle for 3 damage.",
+		},
+	}
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
+	}
 }
 
 func TestTurnPriority(t *testing.T) {
