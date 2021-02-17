@@ -152,9 +152,9 @@ func (b *Battle) SimulateRound() []Transaction {
 			(*t.Target).CurrentHP -= t.Damage
 		case ItemTransaction:
 			if t.Item.Category == ItemPPRecovery {
-				t.Item.UseMoveItem(t.Target, t.Move)
+				t.Target.UseMoveItem(t.Item, t.Move)
 			} else {
-				t.Item.UseItem(t.Target)
+				t.Target.UseItem(t.Item)
 			}
 		}
 	}

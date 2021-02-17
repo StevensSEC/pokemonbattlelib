@@ -87,56 +87,58 @@ func GetItem(itemID int) Item {
 }
 
 // Dispatches the correct item handler based on its category
-func (i *Item) UseItem(target *Pokemon) {
+func (p *Pokemon) UseItem(i *Item) {
 	switch i.Category {
 	case ItemHealing, ItemRevival, ItemStatusCures:
-		i.UseMedicine(target)
+		p.UseMedicine(i)
 	case ItemVitamins:
-		i.UseVitamins(target)
+		p.UseVitamins(i)
 	}
 }
 
 // Activates an held item's effect in battle
-func (i *Item) UseHeldItem(target *Pokemon) {
-
+func (p *Pokemon) UseHeldItem() {
+	if p.HeldItem == nil {
+		return
+	}
 }
 
 // Uses a medicine item which affects HP and status effects
-func (i *Item) UseMedicine(target *Pokemon) {
+func (p *Pokemon) UseMedicine(i *Item) {
 	switch i.ID {
 	case ITEM_BERRY_JUICE, ITEM_POTION:
-		target.RestoreHP(20)
+		p.RestoreHP(20)
 	case ITEM_FRESH_WATER, ITEM_SUPER_POTION:
-		target.RestoreHP(50)
+		p.RestoreHP(50)
 	case ITEM_ANTIDOTE:
-		target.CureStatusEffect(STATUS_POISON)
+		p.CureStatusEffect(STATUS_POISON)
 	}
 }
 
 // Uses a vitamin which affects EVs and friendship
-func (i *Item) UseVitamins(target *Pokemon) {
+func (p *Pokemon) UseVitamins(i *Item) {
 	// https://bulbapedia.bulbagarden.net/wiki/Friendship#In_Generation_IV
 	friendAmounts := []uint8{5, 3, 2}
 	switch i.ID {
 	case ITEM_CALCIUM:
-		if target.EVs[STAT_ATK] < 100 {
-			target.AddEVs(STAT_ATK, 10)
+		if p.EVs[STAT_ATK] < 100 {
+			p.AddEVs(STAT_ATK, 10)
 		}
 	}
-	target.AddFriendship(friendAmounts[target.Friendship/100])
+	p.AddFriendship(friendAmounts[p.Friendship/100])
 }
 
 // Uses a move item which affects PP
-func (i *Item) UseMoveItem(target *Pokemon, move *Move) {
+func (p *Pokemon) UseMoveItem(i *Item, move *Move) {
 	switch i.ID {
 	case ITEM_ELIXIR:
-		for _, m := range target.Moves {
+		for _, m := range p.Moves {
 			m.RestorePP(10)
 		}
 	case ITEM_ETHER:
 		move.RestorePP(10)
 	case ITEM_MAX_ELIXIR:
-		for _, m := range target.Moves {
+		for _, m := range p.Moves {
 			m.RestorePP(m.MaxPP)
 		}
 	case ITEM_MAX_ETHER:
@@ -145,7 +147,7 @@ func (i *Item) UseMoveItem(target *Pokemon, move *Move) {
 }
 
 // Gets the damage multiplier for items during a turn
-func (i *Item) GetDamageMultiplier(pokemon *Pokemon, move *Move) float64 {
+func (p *Pokemon) GetDamageMultiplier(i *Item, move *Move) float64 {
 	multiplier := 1.0
 	switch i.ID {
 	// Plates
@@ -154,8 +156,8 @@ func (i *Item) GetDamageMultiplier(pokemon *Pokemon, move *Move) float64 {
 			multiplier *= 1.20
 		}
 	// Species-specific
-	case ITEM_ADAMANT_ORB:
-		if pokemon.NatDex == 483 && (move.Type == Steel || move.Type == Dragon) {
+	case ITEM_ADAMANT_ORB: // Affects Dialga
+		if p.NatDex == 483 && (move.Type == Steel || move.Type == Dragon) {
 			multiplier *= 1.20
 		}
 	}
