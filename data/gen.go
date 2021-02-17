@@ -100,6 +100,7 @@ func createCodeOutput(s string) {
 	}
 	_, err = file.WriteString("// Code generated - DO NOT EDIT.\n" +
 		"// Regenerate with `go generate`.\n\n" +
+		"// go:generate go run data/gen.go\n" +
 		"package pokemonbattlelib\n\n" + s)
 	if err != nil {
 		log.Panicln(err)
@@ -277,7 +278,7 @@ func main() {
 			continue
 		}
 		mid := parseInt(record[0])
-		moveType := parseInt(record[3])
+		moveType := 1 << (parseInt(record[3]) - 1)
 		power := parseInt(record[4])
 		pp := parseInt(record[5])
 		accuracy := parseInt(record[6])
