@@ -61,20 +61,20 @@ func TestBattleOneRound(t *testing.T) {
 			t.Fatalf("Must send out first pokemon in each at the beginning of the battle. Party %d gave: %v", p, got)
 		}
 	}
-	transations := b.SimulateRound()
-	if len(transations) != 2 {
-		t.Fatal("Expected only 2 transations to occur in a round")
+	transactions := b.SimulateRound()
+	if len(transactions) != 2 {
+		t.Fatal("Expected only 2 transactions to occur in a round")
 	}
 	logtest := []struct {
 		turn Transaction
 		want string
 	}{
 		{
-			turn: transations[0],
+			turn: transactions[0],
 			want: "Charmander used Pound on Squirtle for 3 damage.",
 		},
 		{
-			turn: transations[1],
+			turn: transactions[1],
 			want: "Squirtle used Pound on Charmander for 3 damage.",
 		},
 	}
@@ -211,20 +211,20 @@ func TestPokemonSpeed(t *testing.T) {
 		t.Fatal("failed to start battle")
 	}
 
-	transations := b.SimulateRound()
-	if len(transations) != 2 {
-		t.Fatal("Expected only 2 transations to occur in a round")
+	transactions := b.SimulateRound()
+	if len(transactions) != 2 {
+		t.Fatal("Expected only 2 transactions to occur in a round")
 	}
 	logtest := []struct {
 		turn Transaction
 		want string
 	}{
 		{
-			turn: transations[0],
+			turn: transactions[0],
 			want: "Squirtle used Pound on Charmander for 3 damage.",
 		},
 		{
-			turn: transations[1],
+			turn: transactions[1],
 			want: "Charmander used Pound on Squirtle for 3 damage.",
 		},
 	}
