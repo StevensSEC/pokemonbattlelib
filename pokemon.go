@@ -59,9 +59,9 @@ const (
 func NewPokemon(args ...interface{}) Pokemon {
 	// Mandatory parameters
 	var natdex uint16
-	var level uint8
 
 	// Optional parameters
+	var level uint8 = 1
 	var totalExp uint // used to compute level if provided
 	var ivs [6]uint8 = [6]uint8{0, 0, 0, 0, 0, 0}
 	var evs [6]uint8 = [6]uint8{0, 0, 0, 0, 0, 0}
