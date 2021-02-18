@@ -100,7 +100,6 @@ func createCodeOutput(s string) {
 	}
 	_, err = file.WriteString("// Code generated - DO NOT EDIT.\n" +
 		"// Regenerate with `go generate`.\n\n" +
-		"// go:generate go run data/gen.go\n" +
 		"package pokemonbattlelib\n\n" + s)
 	if err != nil {
 		log.Panicln(err)
