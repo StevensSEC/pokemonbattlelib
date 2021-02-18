@@ -248,7 +248,6 @@ func TestTurnPriority(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%T priority", tt.turn), func(t *testing.T) {
-			t.Parallel()
 			got := tt.turn.Priority()
 			if got != tt.want {
 				t.Errorf("TurnPriority(%T) got %v, want %v", tt.turn, got, tt.want)
