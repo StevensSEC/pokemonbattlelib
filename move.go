@@ -28,14 +28,25 @@ const MOVE_PRIORITY_MIN = -7
 
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
 type Move struct {
-	ID       int
-	Name     string
-	Type     int // update this to elementalType when PR #27 is complete
-	Category MoveCategory
-	Max_PP   int
-	Priority int
-	Power    int
-	Accuracy int
+	ID        int
+	Name      string
+	Type      ElementalType
+	Category  MoveCategory
+	CurrentPP int
+	MaxPP     int
+	Priority  int
+	Power     int
+	Accuracy  int
+}
+
+// Retrieves a Pokemon move given its move ID
+func GetMove(id int) Move {
+	for _, m := range ALL_MOVES {
+		if m.ID == id {
+			return m
+		}
+	}
+	panic("move not found")
 }
 
 func (m Move) String() string {

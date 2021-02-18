@@ -5,12 +5,17 @@ import (
 	"testing"
 )
 
-func TestPokemonName(t *testing.T) {
-	p := Pokemon{
-		NatDex: 1,
+func TestGetPokemon(t *testing.T) {
+	p := GetPokemon(8)
+	if p.NatDex != 8 {
+		t.Errorf("expected Pokemon national dex to be 8, received %v", p.NatDex)
 	}
+}
+
+func TestPokemonName(t *testing.T) {
+	p := GetPokemon(1)
 	if p.GetName() != "Bulbasaur" {
-		t.Fail()
+		t.Errorf("expected Pokemon name to be Bulbasaur, received %v", p.GetName())
 	}
 }
 
@@ -20,7 +25,7 @@ func TestPokemonConstructor(t *testing.T) {
 		want Pokemon
 	}{
 		{
-			pkmn: NewPokemon(uint16(393), uint8(5)), // constructor w/ dex number and level
+			pkmn: GeneratePokemon(uint16(393), uint8(5)), // constructor w/ dex number and level
 			want: Pokemon{
 				NatDex:          393, // piplup if you're curious
 				Level:           5,
@@ -33,7 +38,7 @@ func TestPokemonConstructor(t *testing.T) {
 			},
 		},
 		{
-			pkmn: NewPokemon(uint16(393), uint(135)), // constructor w/ dex number and total exp
+			pkmn: GeneratePokemon(uint16(393), uint(135)), // constructor w/ dex number and total exp
 			want: Pokemon{
 				NatDex:          393,
 				Level:           5,
@@ -46,7 +51,7 @@ func TestPokemonConstructor(t *testing.T) {
 			},
 		},
 		{
-			pkmn: NewPokemon(uint16(393), uint8(5), [6]uint8{31, 31, 31, 31, 31, 31}), // constructor w/ dex number, level, ivs
+			pkmn: GeneratePokemon(uint16(393), uint8(5), [6]uint8{31, 31, 31, 31, 31, 31}), // constructor w/ dex number, level, ivs
 			want: Pokemon{
 				NatDex:          393,
 				Level:           5,
@@ -59,7 +64,7 @@ func TestPokemonConstructor(t *testing.T) {
 			},
 		},
 		{
-			pkmn: NewPokemon(uint16(393), uint8(5), [6]uint8{0, 0, 0, 0, 0, 0}, [6]uint8{0, 252, 6, 0, 0, 252}), // constructor w/ dex number, level, ivs, evs
+			pkmn: GeneratePokemon(uint16(393), uint8(5), [6]uint8{0, 0, 0, 0, 0, 0}, [6]uint8{0, 252, 6, 0, 0, 252}), // constructor w/ dex number, level, ivs, evs
 			want: Pokemon{
 				NatDex:          393,
 				Level:           5,
@@ -72,7 +77,7 @@ func TestPokemonConstructor(t *testing.T) {
 			},
 		},
 		{
-			pkmn: NewPokemon(uint16(393), uint8(5), [6]uint8{0, 0, 0, 0, 0, 0}, [6]uint8{0, 0, 0, 0, 0, 0}, GetNatureTable()["adamant"]), // constructor w/ dex number, level, ivs, evs, nature
+			pkmn: GeneratePokemon(uint16(393), uint8(5), [6]uint8{0, 0, 0, 0, 0, 0}, [6]uint8{0, 0, 0, 0, 0, 0}, GetNatureTable()["adamant"]), // constructor w/ dex number, level, ivs, evs, nature
 			want: Pokemon{
 				NatDex:          393,
 				Level:           5,
@@ -103,7 +108,7 @@ func TestPokemonConstructorAccurateResult(t *testing.T) {
 		want Pokemon
 	}{
 		{
-			pkmn: NewPokemon(uint16(445), uint8(78), [6]uint8{24, 12, 30, 16, 23, 5}, [6]uint8{74, 190, 91, 48, 84, 23}, GetNatureTable()["adamant"]),
+			pkmn: GeneratePokemon(uint16(445), uint8(78), [6]uint8{24, 12, 30, 16, 23, 5}, [6]uint8{74, 190, 91, 48, 84, 23}, GetNatureTable()["adamant"]),
 			want: Pokemon{
 				NatDex:          445,
 				Level:           78,

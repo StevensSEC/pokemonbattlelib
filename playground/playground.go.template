@@ -13,7 +13,7 @@ func check(err error) {
 }
 
 func main() {
-	b := lib.Battle{}
+	b := lib.NewBattle()
 	err := b.Start()
 	check(err)
 }
