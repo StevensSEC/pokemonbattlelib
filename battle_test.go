@@ -136,7 +136,7 @@ func TestItemTurn(t *testing.T) {
 		}
 	}
 	if b.parties[0].pokemon[0].CurrentHP != 30 {
-		t.Errorf("expected potion to be used on first Pokemon")
+		t.Errorf("expected Pokemon's HP to be 30, got %d", b.parties[0].pokemon[0].CurrentHP)
 	}
 }
 
