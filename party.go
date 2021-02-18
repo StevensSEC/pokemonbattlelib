@@ -27,6 +27,27 @@ func NewParty(agent *Agent, team int) *party {
 	}
 }
 
+// Creates a new party and fills it out with the passed Pokemon
+func NewOccupiedParty(agent *Agent, team int, pkmn ...*Pokemon) *party {
+	party := NewParty(agent, team)
+	party.AddPokemon(pkmn...)
+	return party
+}
+
+// Creates a new party and fills it out with Pokemon corresponding the the dex number array passed
+// at the specified level
+func NewPartyFromDexNumbers(agent *Agent, team int, dexNums []int, level int) *party {
+	if len(dexNums) > MAX_PARTY_SIZE {
+		log.Panicf("party size cannot exceed max of %v Pokemon\n", MAX_PARTY_SIZE)
+	}
+	party := NewParty(agent, team)
+	for _, dexNum := range dexNums {
+		pkmn := GeneratePokemon(uint16(dexNum), uint8(level))
+		party.AddPokemon(&pkmn)
+	}
+	return party
+}
+
 // Adds 1 or more Pokemon to a Party
 func (p *party) AddPokemon(pkmn ...*Pokemon) {
 	if len(p.pokemon)+len(pkmn) > MAX_PARTY_SIZE {

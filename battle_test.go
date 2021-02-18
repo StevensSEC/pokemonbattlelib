@@ -23,12 +23,8 @@ func (a dumbAgent) Act(ctx *BattleContext) Turn {
 func TestBattleSetup(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
-	party1 := NewParty(&a1, 0)
-	pkmn1 := GetPokemon(4)
-	party1.AddPokemon(&pkmn1)
-	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(7)
-	party2.AddPokemon(&pkmn2)
+	party1 := NewPartyFromDexNumbers(&a1, 0, []int{4}, 5)
+	party2 := NewPartyFromDexNumbers(&a2, 1, []int{7}, 5)
 	b := NewBattle()
 	b.AddParty(party1, party2)
 }
