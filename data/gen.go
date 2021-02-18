@@ -238,18 +238,11 @@ func main() {
 		output.WriteString(fmt.Sprintf("{\n"))
 		output.WriteString(fmt.Sprintf("NatDex:%d,\n", p.NatDex))
 		output.WriteString(fmt.Sprintf("Level:%d,\n", uint8(1)))
-		output.WriteString(fmt.Sprintf("Ability:%s,\n", "new(Ability)"))
-		output.WriteString(fmt.Sprintf("TotalExperience:%d,\n", uint(0)))
 		output.WriteString(fmt.Sprintf("Gender:%s,\n", "Genderless"))
 		output.WriteString(fmt.Sprintf("IVs:%s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}"))
 		output.WriteString(fmt.Sprintf("EVs:%s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}"))
-		output.WriteString(fmt.Sprintf("Nature:%s,\n", "new(Nature)"))
 		output.WriteString(fmt.Sprintf("Stats:%s,\n", "[6]uint{0, 0, 0, 0, 0, 0}"))
-		output.WriteString(fmt.Sprintf("CurrentHP:%d,\n", uint(0)))
-		output.WriteString(fmt.Sprintf("HeldItem:%v,\n", "new(Item)"))
 		output.WriteString(fmt.Sprintf("Moves:%s,\n", "[4]*Move{}"))
-		output.WriteString(fmt.Sprintf("Friendship:%d,\n", uint8(0)))
-		output.WriteString(fmt.Sprintf("OriginalTrainerID: %d,\n", uint16(0)))
 		output.WriteString(fmt.Sprintf("},\n"))
 	}
 
