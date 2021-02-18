@@ -117,6 +117,7 @@ func (b *Battle) SimulateRound() []Transaction {
 	// Run turns in sorted order and update battle state
 	transactions := []Transaction{}
 	for _, turn := range turns {
+		queue := []Transaction{}
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
@@ -125,24 +126,68 @@ func (b *Battle) SimulateRound() []Transaction {
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
-			transactions = append(transactions, DamageTransaction{
-				User:   &user,
-				Target: receiver,
-				Move:   user.Moves[t.Move],
-				Damage: damage,
+			queue = append(queue, DamageTransaction{
+				User:            &user,
+				Target:          receiver,
+				TargetParty:     target.party,
+				TargetPartySlot: target.partySlot,
+				Move:            user.Moves[t.Move],
+				Damage:          damage,
 			})
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
-	}
 
-	// process transations
-	for _, transaction := range transactions {
-		switch t := transaction.(type) {
-		case DamageTransaction:
-			(*t.Target).CurrentHP -= t.Damage
+		// process transations for this turn
+		for len(queue) > 0 {
+			t := queue[0]
+			queue = queue[1:]
+			switch t := t.(type) {
+			case DamageTransaction:
+				if (*t.Target).CurrentHP >= t.Damage {
+					(*t.Target).CurrentHP -= t.Damage
+				} else {
+					// prevent underflow
+					(*t.Target).CurrentHP = 0
+				}
+
+				if (*t.Target).CurrentHP == 0 {
+					// pokemon has fainted
+					queue = append(queue, FaintTransaction{
+						Target:          t.Target,
+						TargetParty:     t.TargetParty,
+						TargetPartySlot: t.TargetPartySlot,
+					})
+				}
+			case FaintTransaction:
+				p := b.parties[t.TargetParty]
+				p.SetInactive(t.TargetPartySlot)
+				anyAlive := false
+				for i, pkmn := range p.pokemon {
+					if pkmn.CurrentHP > 0 {
+						anyAlive = true
+						// TODO: prompt Agent for which pokemon to send out next
+						// auto send out next pokemon
+						queue = append(queue, SendOutTransaction{
+							Target:          b.getPokemon(t.TargetParty, i),
+							TargetParty:     t.TargetParty,
+							TargetPartySlot: i,
+						})
+						break
+					}
+				}
+				if !anyAlive {
+					// TODO: cause the battle to end by knockout
+				}
+			case SendOutTransaction:
+				p := b.parties[t.TargetParty]
+				p.SetActive(t.TargetPartySlot)
+			}
+			// add to the list of processed transactions
+			transactions = append(transactions, t)
 		}
 	}
+
 	return transactions
 }
 
@@ -217,11 +262,12 @@ type Transaction interface {
 }
 
 type DamageTransaction struct {
-	User          *Pokemon
-	Target        *Pokemon
-	Move          *Move
-	Damage        uint
-	StatusEffects uint
+	User            *Pokemon
+	Target          *Pokemon
+	TargetParty     int
+	TargetPartySlot int
+	Move            *Move
+	Damage          uint
 }
 
 func (t DamageTransaction) BattleLog() string {
@@ -230,5 +276,31 @@ func (t DamageTransaction) BattleLog() string {
 		t.Move.Name,
 		t.Target.GetName(),
 		t.Damage,
+	)
+}
+
+// A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
+type FaintTransaction struct {
+	Target          *Pokemon
+	TargetParty     int
+	TargetPartySlot int
+}
+
+func (t FaintTransaction) BattleLog() string {
+	return fmt.Sprintf("%s fainted.",
+		t.Target.GetName(),
+	)
+}
+
+// A transaction that makes a party send out a pokemon.
+type SendOutTransaction struct {
+	Target          *Pokemon
+	TargetParty     int
+	TargetPartySlot int
+}
+
+func (t SendOutTransaction) BattleLog() string {
+	return fmt.Sprintf("%s was sent out.",
+		t.Target.GetName(),
 	)
 }
