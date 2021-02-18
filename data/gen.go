@@ -93,6 +93,15 @@ func contains(s []int, e int) bool {
 	return false
 }
 
+func createLevelTableStringFromArray(growth_rate_name string, level_array []int) string {
+	output := growth_rate_name + ": {\n"
+	for level, experience := range level_array {
+		output += fmt.Sprintf("%d: %d,\n", level, experience)
+	}
+	output += "}"
+	return output
+}
+
 func createCodeOutput(s string) {
 	file, err := os.Create("pokedex_GEN.go")
 	if err != nil {
@@ -417,7 +426,58 @@ func main() {
 			item.ID, item_names[item.ID], item.CategoryID, item.FlingPower, item.FlingEffectID)
 	}
 	output += "}\n\n"
+
+	// create table of levels to the exp at that level
+
+	log.Println("Getting experience table")
+	experience_csv := getCsvReader("data/experience.csv")
+
+	slow_leveling := make([]int, 101)
+	med_fast_leveling := make([]int, 101)
+	fast_leveling := make([]int, 101)
+	med_slow_leveling := make([]int, 101)
+	erratic_leveling := make([]int, 101)
+	fluctuating_leveling := make([]int, 101)
+
+	output += "//A table of levels mapped to the total experience at that level for each growth rate\n" +
+		"var EXP_TABLE = map[int]map[int]int{\n"
+
+	for {
+		record, err := experience_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		growth_rate_id := parseInt(record[0])
+		level := parseInt(record[1])
+		experience := parseInt(record[2])
+		switch growth_rate_id {
+		case 1:
+			slow_leveling[level] = experience
+		case 2:
+			med_fast_leveling[level] = experience
+		case 3:
+			fast_leveling[level] = experience
+		case 4:
+			med_slow_leveling[level] = experience
+		case 5:
+			erratic_leveling[level] = experience
+		case 6:
+			fluctuating_leveling[level] = experience
+		}
+	}
+
+	output += createLevelTableStringFromArray("SLOW", slow_leveling) + ","
+	output += createLevelTableStringFromArray("MEDIUM_FAST", med_fast_leveling) + ","
+	output += createLevelTableStringFromArray("FAST", fast_leveling) + ","
+	output += createLevelTableStringFromArray("MEDIUM_SLOW", med_slow_leveling) + ","
+	output += createLevelTableStringFromArray("ERRATIC", erratic_leveling) + ","
+	output += createLevelTableStringFromArray("FLUCTUATING", fluctuating_leveling) + ","
+	output += "}"
+
 	createCodeOutput(output)
+
 	// run gofmt on generated code
 	log.Println("Formatting generated code...")
 	cmd := exec.Command("gofmt", "-w", "pokedex_GEN.go")
