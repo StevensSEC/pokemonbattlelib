@@ -169,7 +169,7 @@ func (b *Battle) SimulateRound() []Transaction {
 						// TODO: prompt Agent for which pokemon to send out next
 						// auto send out next pokemon
 						queue = append(queue, SendOutTransaction{
-							Target:          t.Target,
+							Target:          b.getPokemon(t.TargetParty, i),
 							TargetParty:     t.TargetParty,
 							TargetPartySlot: i,
 						})
