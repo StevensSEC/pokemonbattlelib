@@ -56,7 +56,6 @@ const (
 	FLUCTUATING
 )
 
-
 // Retrieves a Pokemon given its national dex number
 func GetPokemon(natdex uint16) Pokemon {
 	for _, p := range ALL_POKEMON {
@@ -132,11 +131,11 @@ func GeneratePokemon(args ...interface{}) Pokemon {
 			p.EVs = evs
 			p.Nature = nature
 			p.computeStats()
-            return p
+			return p
 		}
 	}
-    
-    // Not exactly the best way to handle this
+
+	// Not exactly the best way to handle this
 	panic(fmt.Sprintf("unknown Pokedex number %v\n", natdex))
 }
 

@@ -108,7 +108,7 @@ func TestPokemonConstructorAccurateResult(t *testing.T) {
 		want Pokemon
 	}{
 		{
-            // see: https://bulbapedia.bulbagarden.net/wiki/Stat, scroll down to 'Example'
+			// see: https://bulbapedia.bulbagarden.net/wiki/Stat, scroll down to 'Example'
 			pkmn: GeneratePokemon(uint16(445), uint8(78), [6]uint8{24, 12, 30, 16, 23, 5}, [6]uint8{74, 190, 91, 48, 84, 23}, GetNatureTable()["adamant"]),
 			want: Pokemon{
 				NatDex:          445,
