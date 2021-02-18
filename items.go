@@ -91,79 +91,15 @@ func (p *Pokemon) UseItem(i *Item) []Transaction {
 	switch i.Category {
 	case ItemHealing, ItemRevival, ItemStatusCures:
 		return p.UseMedicine(i)
-	case ItemVitamins:
-		return p.UseVitamins(i)
 	}
 	return make([]Transaction, 0)
-}
-
-// Activates an held item's effect in battle
-func (p *Pokemon) UseHeldItem() {
-	if p.HeldItem == nil {
-		return
-	}
 }
 
 // Uses a medicine item which affects HP and status effects
 func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
 	switch i.ID {
-	case ITEM_BERRY_JUICE, ITEM_POTION:
+	case ITEM_POTION:
 		t = append(t, p.RestoreHP(20))
-	case ITEM_FRESH_WATER, ITEM_SUPER_POTION:
-		t = append(t, p.RestoreHP(50))
-	case ITEM_ANTIDOTE:
-		t = append(t, p.CureStatusEffect(STATUS_POISON))
 	}
 	return t
-}
-
-// Uses a vitamin which affects EVs and friendship
-func (p *Pokemon) UseVitamins(i *Item) (t []Transaction) {
-	// https://bulbapedia.bulbagarden.net/wiki/Friendship#In_Generation_IV
-	friendAmounts := []uint8{5, 3, 2}
-	switch i.ID {
-	case ITEM_CALCIUM:
-		if p.EVs[STAT_ATK] < 100 {
-			t = append(t, p.AddEVs(STAT_ATK, 10))
-		}
-	}
-	t = append(t, p.AddFriendship(friendAmounts[p.Friendship/100]))
-	return t
-}
-
-// Uses a move item which affects PP
-func (p *Pokemon) UseMoveItem(i *Item, move *Move) (t []Transaction) {
-	switch i.ID {
-	case ITEM_ELIXIR:
-		for _, m := range p.Moves {
-			t = append(t, m.RestorePP(10))
-		}
-	case ITEM_ETHER:
-		t = append(t, move.RestorePP(10))
-	case ITEM_MAX_ELIXIR:
-		for _, m := range p.Moves {
-			t = append(t, m.RestorePP(m.MaxPP))
-		}
-	case ITEM_MAX_ETHER:
-		t = append(t, move.RestorePP(move.MaxPP))
-	}
-	return t
-}
-
-// Gets the damage multiplier for items during a turn
-func (p *Pokemon) GetDamageMultiplier(i *Item, move *Move) float64 {
-	multiplier := 1.0
-	switch i.ID {
-	// Plates
-	case ITEM_DRACO_PLATE:
-		if move.Type == Dragon {
-			multiplier *= 1.20
-		}
-	// Species-specific
-	case ITEM_ADAMANT_ORB: // Affects Dialga
-		if p.NatDex == 483 && (move.Type == Steel || move.Type == Dragon) {
-			multiplier *= 1.20
-		}
-	}
-	return multiplier
 }

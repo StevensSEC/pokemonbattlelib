@@ -12,29 +12,6 @@ func TestGetMove(t *testing.T) {
 	}
 }
 
-func TestMoveRestorePP(t *testing.T) {
-	m := Move{Name: "Pound", CurrentPP: 15, MaxPP: 25}
-	logtest := []struct {
-		turn Transaction
-		want string
-	}{
-		{
-			turn: m.RestorePP(5),
-			want: "Pound restored 5 PP.",
-		},
-		{
-			turn: m.RestorePP(99),
-			want: "Pound restored 10 PP.",
-		},
-	}
-	for _, tt := range logtest {
-		got := tt.turn.BattleLog()
-		if got != tt.want {
-			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
-		}
-	}
-}
-
 func TestMoveString(t *testing.T) {
 	tests := []struct {
 		move Move

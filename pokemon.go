@@ -108,37 +108,3 @@ func (p *Pokemon) RestoreHP(amount uint) Transaction {
 	}
 	return HealTransaction{Target: p, Amount: amount}
 }
-
-// Cures a status ailment from a Pokemon.
-func (p *Pokemon) CureStatusEffect(status uint) Transaction {
-	// p.StatusEffects &= ^status
-	return CureStatusTransaction{Target: p, StatusEffects: status}
-}
-
-// Modifies one of the six base stats for a Pokemon
-// Takes a value between -6 and +6 for stages
-func (p *Pokemon) ModifyStat(stat, stages int) Transaction {
-	if p.StatModifiers[stat]+stages > MAX_STAT_MODIFIER {
-		stages = MAX_STAT_MODIFIER - p.StatModifiers[stat]
-	}
-	if p.StatModifiers[stat]+stages < MIN_STAT_MODIFIER {
-		stages = MIN_STAT_MODIFIER - p.StatModifiers[stat]
-	}
-	return ModifyStatTransaction{Target: p, Stat: stat, Stages: stages}
-}
-
-// Modifies the EVs of a Pokemon
-func (p *Pokemon) AddEVs(stat, amount uint8) Transaction {
-	if diff := MAX_EV - p.EVs[stat]; diff <= amount {
-		amount = diff
-	}
-	return EVTransaction{Target: p, Amount: amount}
-}
-
-// Modifies the friendship level of a Pokemon
-func (p *Pokemon) AddFriendship(amount uint8) Transaction {
-	if diff := MAX_FRIENDSHIP - p.Friendship; diff <= amount {
-		amount = diff
-	}
-	return FriendshipTransaction{Target: p, Amount: amount}
-}

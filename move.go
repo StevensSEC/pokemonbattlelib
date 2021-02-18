@@ -49,14 +49,6 @@ func GetMove(id int) Move {
 	panic("move not found")
 }
 
-// Restores PP for a move
-func (m *Move) RestorePP(amount int) Transaction {
-	if diff := m.MaxPP - m.CurrentPP; diff <= amount {
-		amount = diff
-	}
-	return PPTransaction{Move: m, Amount: amount}
-}
-
 func (m Move) String() string {
 	return fmt.Sprintf("%v\nType: %v, Power: %v, Accuracy: %v\n", m.Name, m.Type, m.Power, m.Accuracy)
 }
