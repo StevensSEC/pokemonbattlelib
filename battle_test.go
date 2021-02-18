@@ -61,7 +61,7 @@ func TestBattleOneRound(t *testing.T) {
 			t.Fatalf("Must send out first pokemon in each at the beginning of the battle. Party %d gave: %v", p, got)
 		}
 	}
-	transactions := b.SimulateRound()
+	transactions, _ := b.SimulateRound()
 	if len(transactions) != 2 {
 		t.Fatal("Expected only 2 transactions to occur in a round")
 	}
@@ -213,7 +213,7 @@ func TestPokemonSpeed(t *testing.T) {
 		t.Fatal("failed to start battle")
 	}
 
-	transactions := b.SimulateRound()
+	transactions, _ := b.SimulateRound()
 	if len(transactions) != 2 {
 		t.Fatal("Expected only 2 transactions to occur in a round")
 	}
@@ -286,7 +286,7 @@ func TestBattleFaintAutoSwitch(t *testing.T) {
 		t.Fatal("failed to start battle")
 	}
 
-	transactions := b.SimulateRound()
+	transactions, _ := b.SimulateRound()
 	if n := len(transactions); n != 4 {
 		t.Errorf("Expected 4 transactions to occur, got %d", n)
 	}
