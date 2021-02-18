@@ -258,3 +258,73 @@ func TestTurnPriority(t *testing.T) {
 		})
 	}
 }
+
+func TestBattleFaintAutoSwitch(t *testing.T) {
+	a1 := Agent(dumbAgent{})
+	a2 := Agent(dumbAgent{})
+	party1 := NewParty(&a1, 0)
+	pkmn1 := GetPokemon(4)
+	pkmn1.Stats = [6]uint{30, 1, 1, 10, 10, 200}
+	pkmn1.CurrentHP = 1
+	pkmn3 := GetPokemon(387)
+	pkmn3.Stats = [6]uint{30, 10, 10, 10, 10, 10}
+	pkmn3.CurrentHP = 30
+	pound := GetMove(1)
+	pkmn1.Moves[0] = &pound
+	pkmn3.Moves[0] = &pound
+	party1.AddPokemon(&pkmn1, &pkmn3)
+	party2 := NewParty(&a2, 1)
+	pkmn2 := GetPokemon(7)
+	pkmn2.Stats = [6]uint{30, 800, 800, 10, 10, 10}
+	pkmn2.CurrentHP = 30
+	pkmn2.Moves[0] = &pound
+	party2.AddPokemon(&pkmn2)
+	b := NewBattle()
+	b.AddParty(party1, party2)
+	err := b.Start()
+	if err != nil {
+		t.Fatal("failed to start battle")
+	}
+
+	transactions := b.SimulateRound()
+	if n := len(transactions); n != 4 {
+		t.Errorf("Expected 4 transactions to occur, got %d", n)
+	}
+	logtest := []struct {
+		turn Transaction
+		want string
+	}{
+		{
+			turn: transactions[0],
+			want: "Charmander used Pound on Squirtle for 2 damage.",
+			// Charmander smashed his nubby little fist into Squirtle as
+			// hard as he could. Spectators gasped and winced when the
+			// impact created a very audible crack. But it was not
+			// Squirtle's shell that broke, it was Charmanders knuckles.
+			// The Squirtle was unfazed.
+		},
+		{
+			turn: transactions[1],
+			want: "Squirtle used Pound on Charmander for 1282 damage.",
+			// Ash watched in horror as his Charmander was obliterated from the
+			// battlefield. "Critical hit!" echoed the automated announcer. The
+			// Squirtle snarled, now covered in the entrails of his previous
+			// opponent. "OH GOD, WHAT THE FUCK!?" sobbed Ash, "Is my friend
+			// really gone forever? Please tell me I'm dreaming, this can't be real!"
+		},
+		{
+			turn: transactions[2],
+			want: "Charmander fainted.",
+		},
+		{
+			turn: transactions[3],
+			want: "Turtwig was sent out.",
+		},
+	}
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
+	}
+}
