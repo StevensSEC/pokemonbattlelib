@@ -37,9 +37,9 @@ func (a healAgent) Act(ctx *BattleContext) Turn {
 func TestBattleSetup(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
-	party1 := NewPartyFromDexNumbers(&a1, 0, []int{4}, 5)
-	party2 := NewPartyFromDexNumbers(&a2, 1, []int{7}, 5)
-	b := NewBattle()
+	party1 := NewOccupiedParty(&a1, 0, GeneratePokemon(4))
+	party2 := NewOccupiedParty(&a2, 0, GeneratePokemon(7))
+    b := NewBattle()
 	b.AddParty(party1, party2)
 }
 

@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"math"
-	"reflect"
 )
 
 type Pokemon struct {
@@ -66,8 +65,8 @@ const (
 	MAX_STAT_MODIFIER = 6
 	MIN_STAT_MODIFIER = -6
 	TOTAL_EV          = 510
-    MIN_LEVEL = 1
-    MAX_LEVEL = 100
+	MIN_LEVEL         = 1
+	MAX_LEVEL         = 100
 )
 
 // Retrieves a Pokemon given its national dex number
@@ -81,81 +80,55 @@ func GetPokemon(natdex uint16) Pokemon {
 	panic(fmt.Sprintf("unknown Pokedex number %v\n", natdex))
 }
 
+type GeneratePokemonOption func(p *Pokemon)
+
 // Creates a new Pokemon given its national dex number
-func GeneratePokemon(args ...interface{}) Pokemon {
-	// Mandatory parameters
-	var natdex uint16
+func GeneratePokemon(natdex uint16, opts ...GeneratePokemonOption) *Pokemon {
+    p := &Pokemon{
+        NatDex: natdex,
+        Level: 1,
+        TotalExperience: 0,
+        IVs: [6]uint8{0, 0, 0, 0, 0, 0},
+        EVs: [6]uint8{0, 0, 0, 0, 0, 0},
+        Nature: GetNatureTable()["hardy"],
+    }
+    for _, opt := range opts {
+        opt(p)
+    }
+    p.computeStats()
+    return p
+}
 
-	// Optional parameters
-	var level uint8 = 1
-	var totalExp uint // used to compute level if provided
-	var ivs [6]uint8 = [6]uint8{0, 0, 0, 0, 0, 0}
-	var evs [6]uint8 = [6]uint8{0, 0, 0, 0, 0, 0}
-	var nature *Nature = GetNatureTable()["hardy"] // this nature provides no bonuses/debuffs
+func WithLevel(level uint8) GeneratePokemonOption {
+    return func(p *Pokemon) {
+        p.Level = level
+        p.TotalExperience = computeExpFromLevel(p.Level, p.GetGrowthRate())
+    }
+}
 
-	if len(args) < 2 {
-		panic("Not enough parameters.")
-	}
+func WithTotalExp(totalExp uint) GeneratePokemonOption {
+    return func(p *Pokemon) {
+        p.TotalExperience = totalExp
+        p.Level = computeLevelFromExp(p.TotalExperience, p.GetGrowthRate())
+    }
+}
 
-	var pkmn Pokemon
-	var pkmn_pointer *Pokemon
+func WithIVs(ivs [6]uint8) GeneratePokemonOption {
+    return func(p *Pokemon) {
+        p.IVs = ivs
+    }
+}
 
-	for i, p := range args {
-		switch i {
-		case 0: // natdex
-			param, ok := p.(uint16)
-			if !ok {
-				panic(fmt.Sprintf("Parameter %d: expected type uint16, got %v", i, reflect.TypeOf(p)))
-			}
-			natdex = param
-			pkmn = GetPokemon(natdex)
-			pkmn_pointer = &pkmn
-		case 1: // level or total exp gained
-			switch p.(type) {
-			case uint8: // level
-				level = p.(uint8)
-				totalExp = computeExpFromLevel(level, pkmn_pointer.GetGrowthRate())
-			case uint: // total experience
-				totalExp = p.(uint)
-				level = computeLevelFromExp(totalExp, pkmn_pointer.GetGrowthRate())
-			default:
-				panic(fmt.Sprintf("Parameter %d: expected type uint8 or uint, got %v", i, reflect.TypeOf(p)))
-			}
-		case 2: // ivs
-			param, ok := p.([6]uint8)
-			if !ok {
-				panic(fmt.Sprintf("Parameter %d: expected type [6]uint8, got %v", i, reflect.TypeOf(p)))
-			}
-			ivs = param
-		case 3: //evs
-			param, ok := p.([6]uint8)
-			if !ok {
-				panic(fmt.Sprintf("Parameter %d: expected type [6]uint8, got %v", i, reflect.TypeOf(p)))
-			}
-			evs = param
-		case 4: // nature
-			param, ok := p.(*Nature)
-			if !ok {
-				panic(fmt.Sprintf("Parameter %d: expected type Nature, got %v", i, reflect.TypeOf(p)))
-			}
-			nature = param
-		}
-	}
+func WithEVs(evs [6]uint8) GeneratePokemonOption {
+    return func(p *Pokemon) {
+        p.EVs = evs
+    }
+}
 
-	for _, p := range ALL_POKEMON {
-		if p.NatDex == natdex {
-			p.Level = level
-			p.TotalExperience = totalExp
-			p.IVs = ivs
-			p.EVs = evs
-			p.Nature = nature
-			p.computeStats()
-			return p
-		}
-	}
-
-	// Not exactly the best way to handle this
-	panic(fmt.Sprintf("unknown Pokedex number %v\n", natdex))
+func WithNature(nature *Nature) GeneratePokemonOption {
+    return func(p *Pokemon) {
+        p.Nature = nature
+    } 
 }
 
 func computeLevelFromExp(exp uint, growth_rate int) uint8 {
