@@ -257,26 +257,7 @@ func main() {
 			break
 		}
 	}
-	output += "var ALL_POKEMON = []Pokemon{\n"
-	for _, p := range pokemon {
-		output += "{\n" +
-			fmt.Sprintf("NatDex:%d,\n", p.NatDex) +
-			fmt.Sprintf("Level:%d,\n", uint8(1)) +
-			// fmt.Sprintf("Ability:%s,\n", "new(Ability)") +
-			// fmt.Sprintf("TotalExperience:%d,\n", uint(0)) +
-			fmt.Sprintf("Gender:%s,\n", "Genderless") +
-			fmt.Sprintf("IVs:%s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}") +
-			fmt.Sprintf("EVs:%s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}") +
-			// fmt.Sprintf("Nature:%s,\n", "new(Nature)") +
-			fmt.Sprintf("Stats:%s,\n", "[6]uint{0, 0, 0, 0, 0, 0}") +
-			// fmt.Sprintf("CurrentHP:%d,\n", uint(0)) +
-			// fmt.Sprintf("HeldItem:%v,\n", "new(Item)") +
-			fmt.Sprintf("Moves:%s,\n", "[4]*Move{}") +
-			// fmt.Sprintf("Friendship:%d,\n", uint8(0)) +
-			// fmt.Sprintf("OriginalTrainerID: %d,\n", uint16(0)) +
-			"},\n"
-	}
-	output += "}\n\n" +
+		output += "\n\n" +
 		"// A map of national pokedex numbers to pokemon names.\n" +
 		"var PokemonNames = map[uint16]string{\n"
 	for _, p := range pokemon {
