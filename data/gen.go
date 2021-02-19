@@ -138,14 +138,14 @@ func main() {
 	log.Printf("Current directory: %s\n", path)
 	output := ""
 
-    growth_rate_strings := map[int]string{
-        1: "SLOW",
-        2: "MEDIUM_FAST",
-        3: "FAST",
-        4: "MEDIUM_SLOW",
-        5: "ERRATIC",
-        6: "FLUCTUATING",
-    }
+	growth_rate_strings := map[int]string{
+		1: "SLOW",
+		2: "MEDIUM_FAST",
+		3: "FAST",
+		4: "MEDIUM_SLOW",
+		5: "ERRATIC",
+		6: "FLUCTUATING",
+	}
 
 	// get all valid version ids
 	valid_version_groups := []int{}
