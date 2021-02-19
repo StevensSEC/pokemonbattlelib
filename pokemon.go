@@ -90,15 +90,13 @@ func GeneratePokemon(natdex uint16, opts ...GeneratePokemonOption) *Pokemon {
 
 func WithLevel(level uint8) GeneratePokemonOption {
 	return func(p *Pokemon) {
-		p.Level = level
-		p.TotalExperience = computeExpFromLevel(p.Level, p.GetGrowthRate())
+        p.GainLevels(int(level - p.Level))
 	}
 }
 
 func WithTotalExp(totalExp uint) GeneratePokemonOption {
 	return func(p *Pokemon) {
-		p.TotalExperience = totalExp
-		p.Level = computeLevelFromExp(p.TotalExperience, p.GetGrowthRate())
+        p.GainExperience(int(totalExp))
 	}
 }
 
@@ -143,26 +141,6 @@ func computeLevelFromExp(exp uint, growth_rate int) uint8 {
 	panic("There was a problem computing the level.")
 }
 
-func computeExpFromLevel(level uint8, growth_rate int) uint {
-	experience_csv := getCsvReader("data/experience.csv")
-
-	for {
-		record, err := experience_csv.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		if parseInt(record[0]) == growth_rate {
-			record_level := uint8(parseInt(record[1]))
-			if level == record_level {
-				return uint(parseInt(record[2]))
-			}
-		}
-	}
-	panic("There was a problem computing the experience.")
-}
-
 func (p *Pokemon) GetName() string {
 	return PokemonNames[p.NatDex]
 }
@@ -193,6 +171,51 @@ func (p *Pokemon) HasValidEVs() bool {
 		totalEVs += int(EV)
 	}
 	return totalEVs <= TOTAL_EV
+}
+
+// Increases a Pokemon's level by `levels` and sets their total experience to
+// the minimum amount for that level.
+func (p *Pokemon) GainLevels(levels int) {
+    newLevel := int(p.Level) + levels
+    if newLevel > MAX_LEVEL {
+        panic(fmt.Sprintf("Level %d %s cannot level up to level %d!", p.Level, p.GetName(), newLevel))
+    }
+
+    if levels < 0 {
+        panic(fmt.Sprintf("%s's level tried to decrease by %d", p.GetName(), levels))
+    }
+
+    p.Level = uint8(newLevel)
+    p.TotalExperience = uint(EXP_TABLE[p.GetGrowthRate()][int(p.Level)])
+    p.computeStats()
+}
+
+// Increases a Pokemon's experience points by `exp` and levels up the Pokemon accordingly.
+func (p *Pokemon) GainExperience(exp int) {
+    
+    if exp < 0 {
+        panic(fmt.Sprintf("%s's experience tried to decrease by %d", p.GetName(), exp))
+    }
+
+    max_exp := EXP_TABLE[p.GetGrowthRate()][MAX_LEVEL]
+
+    // if would gain experience beyond leveling to 100, set level to 100
+    if int(p.TotalExperience) + exp > max_exp {
+        p.GainLevels(MAX_LEVEL - int(p.Level))
+    }
+
+    remaining_exp := exp
+    toNextLevel := EXP_TABLE[p.GetGrowthRate()][int(p.Level + 1)] - int(p.TotalExperience)
+
+    for remaining_exp > toNextLevel {
+        p.GainLevels(1)
+        remaining_exp -= toNextLevel
+        toNextLevel = EXP_TABLE[p.GetGrowthRate()][int(p.Level + 1)] - int(p.TotalExperience)
+    }
+
+    // add whats left
+    p.TotalExperience += uint(remaining_exp)
+
 }
 
 func (p *Pokemon) computeStats() {
