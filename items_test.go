@@ -18,6 +18,4 @@ func TestUseItem(t *testing.T) {
 	p.CurrentHP = 50
 	p.Stats = [6]uint{100, 0, 0, 0, 0, 0}
 	testLog(t, p.UseItem(&i)[0], "Bulbasaur restored 20 HP.")
-	p.CurrentHP = 99
-	testLog(t, p.UseItem(&i)[0], "Bulbasaur restored 1 HP.")
 }

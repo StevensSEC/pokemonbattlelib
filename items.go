@@ -99,7 +99,10 @@ func (p *Pokemon) UseItem(i *Item) []Transaction {
 func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
 	switch i.ID {
 	case ITEM_POTION:
-		t = append(t, p.RestoreHP(20))
+		t = append(t, HealTransaction{
+			Target: p,
+			Amount: 20,
+		})
 	}
 	return t
 }

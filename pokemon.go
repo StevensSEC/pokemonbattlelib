@@ -100,11 +100,3 @@ func (p Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
 		p.Gender, p.Level, p.CurrentHP, p.Stats[STAT_HP])
 }
-
-// Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
-func (p *Pokemon) RestoreHP(amount uint) Transaction {
-	if diff := p.Stats[STAT_HP] - p.CurrentHP; diff <= amount {
-		amount = diff
-	}
-	return HealTransaction{Target: p, Amount: amount}
-}

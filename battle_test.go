@@ -20,11 +20,13 @@ func (a dumbAgent) Act(ctx *BattleContext) Turn {
 	panic("no opponents found")
 }
 
-type healAgent struct{}
+type itemAgent struct {
+	item int
+}
 
-// Always uses a potion on first Pokemon
-func (a healAgent) Act(ctx *BattleContext) Turn {
-	item := GetItem(ITEM_POTION)
+// Always uses the given item on first Pokemon
+func (a itemAgent) Act(ctx *BattleContext) Turn {
+	item := GetItem(a.item)
 	for _, target := range ctx.Allies {
 		return ItemTurn{
 			Item:   &item,
@@ -108,8 +110,8 @@ func TestBattleOneRound(t *testing.T) {
 	}
 }
 
-func TestItemTurn(t *testing.T) {
-	a := Agent(healAgent{})
+func TestHealTransaction(t *testing.T) {
+	a := Agent(itemAgent{item: ITEM_POTION})
 	party := NewParty(&a, 0)
 	pkmn := Pokemon{NatDex: 1, CurrentHP: 10, Stats: [6]uint{75, 0, 0, 0, 0, 0}}
 	party.AddPokemon(&pkmn)
@@ -138,6 +140,12 @@ func TestItemTurn(t *testing.T) {
 	if b.parties[0].pokemon[0].CurrentHP != 30 {
 		t.Errorf("expected Pokemon's HP to be 30, got %d", b.parties[0].pokemon[0].CurrentHP)
 	}
+	b.parties[0].pokemon[0].CurrentHP = 70
+	b.SimulateRound()
+	if b.parties[0].pokemon[0].CurrentHP != 75 {
+		t.Errorf("expected Pokemon's HP to be 75, got %d", b.parties[0].pokemon[0].CurrentHP)
+	}
+
 }
 
 // Tests if active Pokemon are set correctly

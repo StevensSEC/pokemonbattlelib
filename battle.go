@@ -170,12 +170,13 @@ func (b *Battle) SimulateRound() []Transaction {
 					})
 				}
 			case ItemTransaction:
-				// TODO: do not consume certain items
-				if t.Target.HeldItem == t.Item {
-					t.Target.HeldItem = nil
-				}
+				// TODO: handle held items/consumables
 			case HealTransaction:
-				t.Target.CurrentHP += t.Amount
+				amount := t.Amount
+				if diff := t.Target.Stats[STAT_HP] - t.Target.CurrentHP; diff <= amount {
+					amount = diff
+				}
+				t.Target.CurrentHP += amount
 			case FaintTransaction:
 				p := b.parties[t.TargetParty]
 				p.SetInactive(t.TargetPartySlot)
