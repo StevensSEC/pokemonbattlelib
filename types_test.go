@@ -49,7 +49,7 @@ func TestGetEffect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Type Effectiveness: %v vs %v", tt.move, tt.def), func(t *testing.T) {
-			got := GetEffect(tt.move, tt.def)
+			got := GetElementalEffect(tt.move, tt.def)
 			if got != tt.want {
 				t.Errorf("Type Effectiveness: %v vs %v should be %f, got %f", tt.move, tt.def, tt.want, got)
 			}
@@ -84,6 +84,38 @@ func TestElementalTypeString(t *testing.T) {
 			got := fmt.Sprintf("%s", tt.value)
 			if got != tt.want {
 				t.Errorf("ElementalType (%d) got %v, want %v", tt.value, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGenderString(t *testing.T) {
+	tests := []struct {
+		name   string
+		gender Gender
+		want   string
+	}{
+		{
+			name:   "Genderless",
+			gender: Genderless,
+			want:   "",
+		},
+		{
+			name:   "Female",
+			gender: Female,
+			want:   "♀",
+		},
+		{
+			name:   "Male",
+			gender: Male,
+			want:   "♂",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("Gender Stringer: %s", tt.name), func(t *testing.T) {
+			got := fmt.Sprintf("%s", tt.gender)
+			if got != tt.want {
+				t.Errorf("Gender Stringer %s got %v, want %v", tt.name, got, tt.want)
 			}
 		})
 	}

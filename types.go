@@ -6,6 +6,49 @@ import (
 	"math/bits"
 )
 
+// Constants for looking up Pokemon stats
+const (
+	STAT_HP = iota
+	STAT_ATK
+	STAT_DEF
+	STAT_SPATK
+	STAT_SPDEF
+	STAT_SPD
+)
+
+// Constants for status effects on a Pokemon
+const (
+	STATUS_BURN = 1 << iota
+	STATUS_FREEZE
+	STATUS_PARALYZE
+	STATUS_POISON
+	STATUS_BADLY_POISON
+	STATUS_SLEEP
+)
+
+// Constants for IVs and EVs
+const (
+	MAX_FRIENDSHIP    = 255
+	MAX_EV            = 255
+	MAX_IV            = 31
+	MAX_STAT_MODIFIER = 6
+	MIN_STAT_MODIFIER = -6
+	TOTAL_EV          = 510
+)
+
+type ExpGroup int
+
+const (
+	InvalidGroup ExpGroup = iota
+	Erratic
+	Fast
+	MediumFast
+	MediumSlow
+	Slow
+	Fluctuating
+)
+
+// Represents a bit mask of all elemental types
 type ElementalType uint32
 
 const (
@@ -48,12 +91,13 @@ var elementalTypeStrings = map[ElementalType]string{
 	Dark:     "Dark",
 }
 
+// Represents effectiveness of an elemental type matchup.
 type Effectiveness float64
 
 const (
+	NoEffect           Effectiveness = 0
 	VeryIneffective    Effectiveness = 0.25
 	Ineffective        Effectiveness = 0.5
-	NoEffect           Effectiveness = 0
 	NormalEffect       Effectiveness = 1
 	SuperEffective     Effectiveness = 2
 	VerySuperEffective Effectiveness = 4
@@ -68,6 +112,7 @@ var noEffect = map[ElementalType]ElementalType{
 	Electric: Ground,
 	Psychic:  Dark,
 }
+
 var halfEffect = map[ElementalType]ElementalType{
 	Normal:   Rock | Steel,
 	Fighting: Flying | Poison | Bug | Psychic,
@@ -87,6 +132,7 @@ var halfEffect = map[ElementalType]ElementalType{
 	Dragon:   Steel,
 	Dark:     Fighting | Steel | Dark,
 }
+
 var doubleEffect = map[ElementalType]ElementalType{
 	Fighting: Normal | Rock | Steel | Ice | Dark,
 	Flying:   Fighting | Bug | Grass,
@@ -106,7 +152,8 @@ var doubleEffect = map[ElementalType]ElementalType{
 	Dark:     Ghost | Psychic,
 }
 
-func GetEffect(move, def ElementalType) Effectiveness {
+// Get effectiveness of a given elemental type matchup.
+func GetElementalEffect(move, def ElementalType) Effectiveness {
 	if noEffect[move]&def > 0 {
 		return NoEffect
 	}
@@ -131,4 +178,33 @@ func (e ElementalType) String() string {
 		}
 	}
 	return result
+}
+
+type Gender int
+
+const (
+	Genderless Gender = iota
+	Female
+	Male
+)
+
+func (g Gender) String() string {
+	if g == Genderless {
+		return ""
+	} else if g == Female {
+		return "♀"
+	} else if g == Male {
+		return "♂"
+	} else {
+		panic("Stringing gender reached unhandled condition")
+	}
+}
+
+type Nature struct {
+	StatUp   string
+	StatDown string
+}
+
+type Ability struct {
+	//TODO
 }
