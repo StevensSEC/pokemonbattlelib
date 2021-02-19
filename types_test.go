@@ -206,3 +206,46 @@ func TestStatusConditionApply(t *testing.T) {
 		})
 	}
 }
+
+func TestStatusConditionClear(t *testing.T) {
+	tests := []struct {
+		name  string
+		from  StatusCondition
+		clear StatusCondition
+		want  StatusCondition
+	}{
+		{
+			name:  "Should clear burn",
+			from:  StatusBurn,
+			clear: StatusBurn,
+			want:  StatusNone,
+		},
+		{
+			name:  "Should preserve bound, clear sleep",
+			from:  StatusSleep | StatusBound,
+			clear: StatusSleep,
+			want:  StatusBound,
+		},
+		{
+			name:  "Should preserve bound, apply bound",
+			from:  StatusSleep | StatusBound,
+			clear: StatusBound,
+			want:  StatusSleep,
+		},
+		{
+			name:  "Should preserve sleep, leech seed, clear bound",
+			from:  StatusSleep | StatusLeechSeed | StatusBound,
+			clear: StatusBound,
+			want:  StatusSleep | StatusLeechSeed,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("Status Condition clear: %s", tt.name), func(t *testing.T) {
+			got := tt.from
+			got.clear(tt.clear)
+			if got != tt.want {
+				t.Errorf("Status Condition clear %s got %b, want %b", tt.name, got, tt.want)
+			}
+		})
+	}
+}

@@ -223,7 +223,7 @@ func (s *StatusCondition) apply(c StatusCondition) {
 }
 
 func (s *StatusCondition) clear(c StatusCondition) {
-
+	*s ^= c
 }
 
 type Nature struct {
