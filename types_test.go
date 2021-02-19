@@ -120,3 +120,52 @@ func TestGenderString(t *testing.T) {
 		})
 	}
 }
+
+func TestStatusConditionApply(t *testing.T) {
+	tests := []struct {
+		name  string
+		from  StatusCondition
+		apply StatusCondition
+		want  StatusCondition
+	}{
+		{
+			name:  "Should apply burn",
+			from:  StatusNone,
+			apply: StatusBurn,
+			want:  StatusBurn,
+		},
+		{
+			name:  "Should apply burn and remove poison",
+			from:  StatusPoison,
+			apply: StatusBurn,
+			want:  StatusBurn,
+		},
+		{
+			name:  "Should apply freeze and remove sleep",
+			from:  StatusSleep,
+			apply: StatusFreeze,
+			want:  StatusFreeze,
+		},
+		{
+			name:  "Should preserve bound, replace sleep with poison",
+			from:  StatusSleep | StatusBound,
+			apply: StatusPoison,
+			want:  StatusPoison | StatusBound,
+		},
+		{
+			name:  "Should preserve sleep, apply bound",
+			from:  StatusSleep,
+			apply: StatusBound,
+			want:  StatusSleep | StatusBound,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("Status Condition check: %s", tt.name), func(t *testing.T) {
+			got := tt.from
+			got.apply(tt.apply)
+			if got != tt.want {
+				t.Errorf("Status Condition check %s got %v, want %v", tt.name, got, tt.want)
+			}
+		})
+	}
+}
