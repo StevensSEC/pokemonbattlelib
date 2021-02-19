@@ -29,7 +29,6 @@ func TestGenderString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Gender Stringer: %s", tt.name), func(t *testing.T) {
-			t.Parallel()
 			got := fmt.Sprintf("%s", tt.gender)
 			if got != tt.want {
 				t.Errorf("Gender Stringer %s got %v, want %v", tt.name, got, tt.want)
