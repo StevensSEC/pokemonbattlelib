@@ -32,7 +32,6 @@ func TestMoveString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Move Stringer: %s", tt.move.Name), func(t *testing.T) {
-			t.Parallel()
 			got := fmt.Sprintf("%s", tt.move)
 			if got != tt.want {
 				t.Errorf("Move Stringer %s got %v, want %v", tt.move.Name, got, tt.want)
@@ -61,7 +60,6 @@ func TestMoveCategoryString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("MoveCategory Stringer: %s", tt.want), func(t *testing.T) {
-			t.Parallel()
 			got := tt.value.String()
 			if got != tt.want {
 				t.Errorf("Move Category (%d) got %v, want %v", tt.value, got, tt.want)

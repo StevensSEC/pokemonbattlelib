@@ -20,6 +20,20 @@ func (a dumbAgent) Act(ctx *BattleContext) Turn {
 	panic("no opponents found")
 }
 
+type healAgent struct{}
+
+// Always uses a potion on first Pokemon
+func (a healAgent) Act(ctx *BattleContext) Turn {
+	item := GetItem(ITEM_POTION)
+	for _, target := range ctx.Allies {
+		return ItemTurn{
+			Item:   &item,
+			Target: target,
+		}
+	}
+	panic("no allies found")
+}
+
 func TestBattleSetup(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
@@ -91,6 +105,38 @@ func TestBattleOneRound(t *testing.T) {
 		if party.pokemon[0].CurrentHP != expectedHp {
 			t.Errorf("Expected %s to have %d HP, got %d", party.pokemon[0].GetName(), expectedHp, party.pokemon[0].CurrentHP)
 		}
+	}
+}
+
+func TestItemTurn(t *testing.T) {
+	a := Agent(healAgent{})
+	party := NewParty(&a, 0)
+	pkmn := Pokemon{NatDex: 1, CurrentHP: 10, Stats: [6]uint{75, 0, 0, 0, 0, 0}}
+	party.AddPokemon(&pkmn)
+	b := NewBattle()
+	b.AddParty(party)
+	err := b.Start()
+	if err != nil {
+		panic(err)
+	}
+	transactions, _ := b.SimulateRound()
+	logtest := []struct {
+		turn Transaction
+		want string
+	}{
+		{
+			turn: transactions[0],
+			want: "Potion used on Bulbasaur.",
+		},
+	}
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
+	}
+	if b.parties[0].pokemon[0].CurrentHP != 30 {
+		t.Errorf("expected Pokemon's HP to be 30, got %d", b.parties[0].pokemon[0].CurrentHP)
 	}
 }
 
@@ -247,10 +293,13 @@ func TestTurnPriority(t *testing.T) {
 			turn: FightTurn{},
 			want: 0,
 		},
+		{
+			turn: ItemTurn{},
+			want: 1,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%T priority", tt.turn), func(t *testing.T) {
-			t.Parallel()
 			got := tt.turn.Priority()
 			if got != tt.want {
 				t.Errorf("TurnPriority(%T) got %v, want %v", tt.turn, got, tt.want)

@@ -86,6 +86,9 @@ func (b *Battle) Start() error {
 
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
 func (b *Battle) SimulateRound() ([]Transaction, bool) {
+	if b.State != BATTLE_IN_PROGRESS {
+		log.Panic("battle is not currently in progress")
+	}
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
 	for _, party := range b.parties {
@@ -122,7 +125,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		case FightTurn:
 			user := turn.Context.Pokemon
 			target := t.Target
-			receiver := b.getPokemon(target.party, target.partySlot)
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
@@ -134,24 +137,31 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Move:            user.Moves[t.Move],
 				Damage:          damage,
 			})
+		case ItemTurn:
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			move := receiver.Moves[t.Move]
+			queue = append(queue, ItemTransaction{
+				Target: receiver,
+				Item:   t.Item,
+				Move:   move,
+			})
+			queue = append(queue, receiver.UseItem(t.Item)...)
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
-
 		// process transations for this turn
 		for len(queue) > 0 {
-			t := queue[0]
+			next := queue[0]
 			queue = queue[1:]
-			switch t := t.(type) {
+			switch t := next.(type) {
 			case DamageTransaction:
-				if (*t.Target).CurrentHP >= t.Damage {
-					(*t.Target).CurrentHP -= t.Damage
+				if t.Target.CurrentHP >= t.Damage {
+					t.Target.CurrentHP -= t.Damage
 				} else {
 					// prevent underflow
-					(*t.Target).CurrentHP = 0
+					t.Target.CurrentHP = 0
 				}
-
-				if (*t.Target).CurrentHP == 0 {
+				if t.Target.CurrentHP == 0 {
 					// pokemon has fainted
 					queue = append(queue, FaintTransaction{
 						Target:          t.Target,
@@ -159,6 +169,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						TargetPartySlot: t.TargetPartySlot,
 					})
 				}
+			case ItemTransaction:
+				// TODO: do not consume certain items
+				if t.Target.HeldItem == t.Item {
+					t.Target.HeldItem = nil
+				}
+			case HealTransaction:
+				t.Target.CurrentHP += t.Amount
 			case FaintTransaction:
 				p := b.parties[t.TargetParty]
 				p.SetInactive(t.TargetPartySlot)
@@ -187,7 +204,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				b.State = BATTLE_END
 			}
 			// add to the list of processed transactions
-			transactions = append(transactions, t)
+			transactions = append(transactions, next)
 			if b.State == BATTLE_END {
 				break
 			}
@@ -243,6 +260,7 @@ func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 }
 
 // An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
+
 type Turn interface {
 	Priority() int // Gets the turn's priority. Higher values go first. Not to be confused with Move priority.
 }
@@ -262,11 +280,23 @@ func (turn FightTurn) Priority() int {
 	return 0
 }
 
+// An item turn has the a higher priority than any move.
+type ItemTurn struct {
+	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
+	Target target // Info containing data determining the target of
+	Item   *Item  // Which item is being consumed
+}
+
+func (turn ItemTurn) Priority() int {
+	return 1
+}
+
 // Describes a change to battle state.
 type Transaction interface {
 	BattleLog() string
 }
 
+// A transaction to deal damage to an opponent Pokemon.
 type DamageTransaction struct {
 	User            *Pokemon
 	Target          *Pokemon
@@ -283,6 +313,27 @@ func (t DamageTransaction) BattleLog() string {
 		t.Target.GetName(),
 		t.Damage,
 	)
+}
+
+// A transaction to use and possibly consume an item.
+type ItemTransaction struct {
+	Target *Pokemon
+	Item   *Item
+	Move   *Move
+}
+
+func (t ItemTransaction) BattleLog() string {
+	return fmt.Sprintf("%s used on %s.", t.Item.Name, t.Target.GetName())
+}
+
+// A transaction to restore HP to a Pokemon.
+type HealTransaction struct {
+	Target *Pokemon
+	Amount uint
+}
+
+func (t HealTransaction) BattleLog() string {
+	return fmt.Sprintf("%s restored %d HP.", t.Target.GetName(), t.Amount)
 }
 
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
