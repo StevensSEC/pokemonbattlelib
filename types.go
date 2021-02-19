@@ -36,17 +36,6 @@ const (
 	TOTAL_EV          = 510
 )
 
-type ExpGroup int
-
-const (
-	InvalidGroup ExpGroup = iota
-	Erratic
-	Fast
-	MediumFast
-	MediumSlow
-	Slow
-	Fluctuating
-)
 
 // Represents a bit mask of all elemental types
 type ElementalType uint32
