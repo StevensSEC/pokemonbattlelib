@@ -2,6 +2,7 @@ package pokemonbattlelib
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -93,9 +94,8 @@ func TestPokemonConstructor(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Pokemon constructor test"), func(t *testing.T) {
-			t.Parallel()
 			got := tt.pkmn
-			if !got.Equals(tt.want) {
+			if !reflect.DeepEqual(got, tt.pkmn) {
 				t.Errorf("Pokemon constructor got %v, want %v", got.VerboseString(), tt.want.VerboseString())
 			}
 		})
@@ -111,7 +111,7 @@ func TestPokemonConstructorAccurateResult(t *testing.T) {
 			// see: https://bulbapedia.bulbagarden.net/wiki/Stat, scroll down to 'Example'
 			pkmn: GeneratePokemon(uint16(445), uint8(78), [6]uint8{24, 12, 30, 16, 23, 5}, [6]uint8{74, 190, 91, 48, 84, 23}, GetNatureTable()["adamant"]),
 			want: Pokemon{
-				NatDex:          445,
+				NatDex:          445, // garchomp
 				Level:           78,
 				TotalExperience: 593190,
 				CurrentHP:       289,
@@ -124,10 +124,13 @@ func TestPokemonConstructorAccurateResult(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Pokemon accurate constructor test"), func(t *testing.T) {
-			t.Parallel()
 			got := tt.pkmn
-			if !got.Equals(tt.want) {
-				t.Errorf("Pokemon constructor got %v, want %v", got.VerboseString(), tt.want.VerboseString())
+			if got.TotalExperience != tt.want.TotalExperience {
+				t.Errorf("Pokemon constructor produced %v for experience, want %v", got.TotalExperience, tt.want.TotalExperience)
+			}
+
+			if !reflect.DeepEqual(got.Stats, tt.want.Stats) {
+				t.Errorf("Pokemon constructor produced %v for stats, want %v", got.Stats, tt.want.Stats)
 			}
 		})
 	}

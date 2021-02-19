@@ -83,6 +83,9 @@ func GeneratePokemon(args ...interface{}) Pokemon {
 		panic("Not enough parameters.")
 	}
 
+	var pkmn Pokemon
+	var pkmn_pointer *Pokemon
+
 	for i, p := range args {
 		switch i {
 		case 0: // natdex
@@ -91,14 +94,16 @@ func GeneratePokemon(args ...interface{}) Pokemon {
 				panic(fmt.Sprintf("Parameter %d: expected type uint16, got %v", i, reflect.TypeOf(p)))
 			}
 			natdex = param
+			pkmn = GetPokemon(natdex)
+			pkmn_pointer = &pkmn
 		case 1: // level or total exp gained
 			switch p.(type) {
 			case uint8: // level
 				level = p.(uint8)
-				totalExp = computeExpFromLevel(level, getGrowthRateFromDexNumber(natdex))
+				totalExp = computeExpFromLevel(level, pkmn_pointer.GetGrowthRate())
 			case uint: // total experience
 				totalExp = p.(uint)
-				level = computeLevelFromExp(totalExp, getGrowthRateFromDexNumber(natdex))
+				level = computeLevelFromExp(totalExp, pkmn_pointer.GetGrowthRate())
 			default:
 				panic(fmt.Sprintf("Parameter %d: expected type uint8 or uint, got %v", i, reflect.TypeOf(p)))
 			}
@@ -182,24 +187,12 @@ func computeExpFromLevel(level uint8, growth_rate int) uint {
 	panic("There was a problem computing the experience.")
 }
 
-func getGrowthRateFromDexNumber(natdex uint16) int {
-	pokemon_species_csv := getCsvReader("data/pokemon_species.csv")
-	for {
-		record, err := pokemon_species_csv.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		if uint16(parseInt(record[0])) == natdex {
-			return parseInt(record[14])
-		}
-	}
-	panic(fmt.Sprintf("Unknown national dex number %d", natdex))
-}
-
 func (p *Pokemon) GetName() string {
 	return PokemonNames[p.NatDex]
+}
+
+func (p *Pokemon) GetGrowthRate() int {
+	return PokemonGrowthRates[int(p.NatDex)]
 }
 
 func (p *Pokemon) HasValidLevel() bool {
@@ -272,18 +265,6 @@ func (p *Pokemon) computeStats() {
 		nature_term := float64(floor_term+5) * natureModifiers[stat]
 		p.Stats[stat] = uint(math.Floor(nature_term))
 	}
-}
-
-func (p *Pokemon) Equals(other Pokemon) bool {
-	return p.NatDex == other.NatDex &&
-		p.Level == other.Level &&
-		p.TotalExperience == other.TotalExperience &&
-		p.Gender == other.Gender &&
-		p.IVs == other.IVs &&
-		p.EVs == other.EVs &&
-		p.Nature.Equals(other.Nature) &&
-		p.Stats == other.Stats &&
-		p.CurrentHP == other.CurrentHP
 }
 
 func (p *Pokemon) VerboseString() string {
