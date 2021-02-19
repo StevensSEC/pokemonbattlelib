@@ -10,7 +10,7 @@ type ElementalType uint32
 
 const (
 	Normal ElementalType = 1 << iota
-	Fight
+	Fighting
 	Flying
 	Poison
 	Ground
@@ -30,7 +30,7 @@ const (
 
 var elementalTypeStrings = map[ElementalType]string{
 	Normal:   "Normal",
-	Fight:    "Fight",
+	Fighting: "Fighting",
 	Flying:   "Flying",
 	Poison:   "Poison",
 	Ground:   "Ground",
@@ -61,7 +61,7 @@ const (
 
 var noEffect = map[ElementalType]ElementalType{
 	Normal:   Ghost,
-	Fight:    Ghost,
+	Fighting: Ghost,
 	Poison:   Steel,
 	Ground:   Flying,
 	Ghost:    Normal,
@@ -70,12 +70,12 @@ var noEffect = map[ElementalType]ElementalType{
 }
 var halfEffect = map[ElementalType]ElementalType{
 	Normal:   Rock | Steel,
-	Fight:    Flying | Poison | Bug | Psychic,
+	Fighting: Flying | Poison | Bug | Psychic,
 	Flying:   Rock | Steel | Electric,
 	Poison:   Poison | Ground | Rock | Ghost,
 	Ground:   Bug | Grass,
-	Rock:     Fight | Ground | Steel,
-	Bug:      Fight | Flying | Poison | Ghost | Steel | Fire,
+	Rock:     Fighting | Ground | Steel,
+	Bug:      Fighting | Flying | Poison | Ghost | Steel | Fire,
 	Ghost:    Steel | Dark,
 	Steel:    Steel | Fire | Water | Electric,
 	Fire:     Rock | Fire | Water | Dragon,
@@ -85,11 +85,11 @@ var halfEffect = map[ElementalType]ElementalType{
 	Psychic:  Steel | Psychic,
 	Ice:      Steel | Fire | Water | Ice,
 	Dragon:   Steel,
-	Dark:     Fight | Steel | Dark,
+	Dark:     Fighting | Steel | Dark,
 }
 var doubleEffect = map[ElementalType]ElementalType{
-	Fight:    Normal | Rock | Steel | Ice | Dark,
-	Flying:   Fight | Bug | Grass,
+	Fighting: Normal | Rock | Steel | Ice | Dark,
+	Flying:   Fighting | Bug | Grass,
 	Poison:   Grass,
 	Ground:   Poison | Rock | Steel | Fire | Electric,
 	Rock:     Flying | Bug | Fire | Ice,
@@ -100,7 +100,7 @@ var doubleEffect = map[ElementalType]ElementalType{
 	Water:    Ground | Rock | Fire,
 	Grass:    Ground | Rock | Water,
 	Electric: Flying | Water,
-	Psychic:  Fight | Poison,
+	Psychic:  Fighting | Poison,
 	Ice:      Flying | Ground | Grass | Dragon,
 	Dragon:   Dragon,
 	Dark:     Ghost | Psychic,
