@@ -24,34 +24,12 @@ type Pokemon struct {
 	Elemental         ElementalType // Indicates what type(s) (up to 2 simultaneously) this pokemon has
 }
 
-// Constants for looking up Pokemon stats
-const (
-	STAT_HP = iota
-	STAT_ATK
-	STAT_DEF
-	STAT_SPATK
-	STAT_SPDEF
-	STAT_SPD
-)
-
-// Constants for status effects on a Pokemon
-const (
-	STATUS_BURN = 1 << iota
-	STATUS_FREEZE
-	STATUS_PARALYZE
-	STATUS_POISON
-	STATUS_BADLY_POISON
-	STATUS_SLEEP
-)
-
 // Constants for IVs and EVs
 const (
-	MAX_FRIENDSHIP    = 255
-	MAX_EV            = 255
-	MAX_IV            = 31
-	MAX_STAT_MODIFIER = 6
-	MIN_STAT_MODIFIER = -6
-	TOTAL_EV          = 510
+	MAX_FRIENDSHIP = 255
+	MAX_EV         = 255
+	MAX_IV         = 31
+	TOTAL_EV       = 510
 )
 
 // Retrieves a Pokemon given its national dex number
