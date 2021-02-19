@@ -84,7 +84,7 @@ func (b *Battle) Start() error {
 	return nil
 }
 
-// Simulates a single round of the battle.
+// Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
 func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
