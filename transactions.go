@@ -10,19 +10,17 @@ type Transaction interface {
 
 // A transaction to deal damage to an opponent Pokemon.
 type DamageTransaction struct {
-	User            *Pokemon
-	Target          *Pokemon
-	TargetParty     int
-	TargetPartySlot int
-	Move            *Move
-	Damage          uint
+	User   *Pokemon
+	Target target
+	Move   *Move
+	Damage uint
 }
 
 func (t DamageTransaction) BattleLog() string {
 	return fmt.Sprintf("%s used %s on %s for %d damage.",
 		t.User.GetName(),
 		t.Move.Name,
-		t.Target.GetName(),
+		t.Target.Pokemon.GetName(),
 		t.Damage,
 	)
 }
@@ -50,27 +48,23 @@ func (t HealTransaction) BattleLog() string {
 
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
 type FaintTransaction struct {
-	Target          *Pokemon
-	TargetParty     int
-	TargetPartySlot int
+	Target target
 }
 
 func (t FaintTransaction) BattleLog() string {
 	return fmt.Sprintf("%s fainted.",
-		t.Target.GetName(),
+		t.Target.Pokemon.GetName(),
 	)
 }
 
 // A transaction that makes a party send out a pokemon.
 type SendOutTransaction struct {
-	Target          *Pokemon
-	TargetParty     int
-	TargetPartySlot int
+	Target target
 }
 
 func (t SendOutTransaction) BattleLog() string {
 	return fmt.Sprintf("%s was sent out.",
-		t.Target.GetName(),
+		t.Target.Pokemon.GetName(),
 	)
 }
 

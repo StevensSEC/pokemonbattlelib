@@ -123,18 +123,15 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
-			target := t.Target
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
 			queue = append(queue, DamageTransaction{
-				User:            &user,
-				Target:          receiver,
-				TargetParty:     target.party,
-				TargetPartySlot: target.partySlot,
-				Move:            user.Moves[t.Move],
-				Damage:          damage,
+				User:   &user,
+				Target: t.Target,
+				Move:   user.Moves[t.Move],
+				Damage: damage,
 			})
 		case ItemTurn:
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
@@ -154,18 +151,17 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			queue = queue[1:]
 			switch t := next.(type) {
 			case DamageTransaction:
-				if t.Target.CurrentHP >= t.Damage {
-					t.Target.CurrentHP -= t.Damage
+				receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+				if receiver.CurrentHP >= t.Damage {
+					receiver.CurrentHP -= t.Damage
 				} else {
 					// prevent underflow
-					t.Target.CurrentHP = 0
+					receiver.CurrentHP = 0
 				}
-				if t.Target.CurrentHP == 0 {
+				if receiver.CurrentHP == 0 {
 					// pokemon has fainted
 					queue = append(queue, FaintTransaction{
-						Target:          t.Target,
-						TargetParty:     t.TargetParty,
-						TargetPartySlot: t.TargetPartySlot,
+						Target: t.Target,
 					})
 				}
 			case ItemTransaction:
@@ -176,18 +172,22 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			case HealTransaction:
 				t.Target.CurrentHP += t.Amount
 			case FaintTransaction:
-				p := b.parties[t.TargetParty]
-				p.SetInactive(t.TargetPartySlot)
+				p := b.parties[t.Target.party]
+				p.SetInactive(t.Target.partySlot)
 				anyAlive := false
 				for i, pkmn := range p.pokemon {
 					if pkmn.CurrentHP > 0 {
 						anyAlive = true
 						// TODO: prompt Agent for which pokemon to send out next
 						// auto send out next pokemon
+						nextPokemon := target{
+							Team:      p.team,
+							Pokemon:   *b.getPokemon(t.Target.party, i),
+							party:     t.Target.party,
+							partySlot: t.Target.partySlot,
+						}
 						queue = append(queue, SendOutTransaction{
-							Target:          b.getPokemon(t.TargetParty, i),
-							TargetParty:     t.TargetParty,
-							TargetPartySlot: i,
+							Target: nextPokemon,
 						})
 						break
 					}
@@ -197,8 +197,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					queue = append(queue, EndBattleTransaction{})
 				}
 			case SendOutTransaction:
-				p := b.parties[t.TargetParty]
-				p.SetActive(t.TargetPartySlot)
+				p := b.parties[t.Target.party]
+				p.SetActive(t.Target.partySlot)
 			case EndBattleTransaction:
 				b.State = BATTLE_END
 			}
@@ -209,7 +209,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 		}
 	}
-
 	return transactions, b.State == BATTLE_END
 }
 
