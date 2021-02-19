@@ -31,7 +31,6 @@ const (
 	MIN_STAT_MODIFIER = -6
 )
 
-
 // Represents a bit mask of all elemental types
 type ElementalType uint32
 
