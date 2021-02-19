@@ -24,6 +24,14 @@ type Pokemon struct {
 	Elemental         ElementalType // Indicates what type(s) (up to 2 simultaneously) this pokemon has
 }
 
+// Constants for IVs and EVs
+const (
+	MAX_FRIENDSHIP = 255
+	MAX_EV         = 255
+	MAX_IV         = 31
+	TOTAL_EV       = 510
+)
+
 // Retrieves a Pokemon given its national dex number
 func GetPokemon(natdex uint16) Pokemon {
 	for _, p := range ALL_POKEMON {
