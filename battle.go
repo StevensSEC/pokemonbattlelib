@@ -84,8 +84,8 @@ func (b *Battle) Start() error {
 	return nil
 }
 
-// Simulates a single round of the battle.
-func (b *Battle) SimulateRound() []Transaction {
+// Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
+func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	if b.State != BATTLE_IN_PROGRESS {
 		log.Panic("battle is not currently in progress")
 	}
@@ -194,17 +194,24 @@ func (b *Battle) SimulateRound() []Transaction {
 					}
 				}
 				if !anyAlive {
-					// TODO: cause the battle to end by knockout
+					// cause the battle to end by knockout
+					queue = append(queue, EndBattleTransaction{})
 				}
 			case SendOutTransaction:
 				p := b.parties[t.TargetParty]
 				p.SetActive(t.TargetPartySlot)
+			case EndBattleTransaction:
+				b.State = BATTLE_END
 			}
 			// add to the list of processed transactions
 			transactions = append(transactions, next)
+			if b.State == BATTLE_END {
+				break
+			}
 		}
 	}
-	return transactions
+
+	return transactions, b.State == BATTLE_END
 }
 
 type target struct {
@@ -353,4 +360,11 @@ func (t SendOutTransaction) BattleLog() string {
 	return fmt.Sprintf("%s was sent out.",
 		t.Target.GetName(),
 	)
+}
+
+type EndBattleTransaction struct{}
+
+func (t EndBattleTransaction) BattleLog() string {
+	// TODO: include reason the battle ended
+	return "The battle has ended."
 }
