@@ -15,6 +15,7 @@ import (
 const ENGLISH_LANGUAGE_ID = 9
 const NATIONAL_DEX_ID = 1
 const HIGHEST_GEN = 4
+const HIGHEST_DEX_NUM = 493
 
 type data_pokemon struct {
 	Identifier     string
@@ -100,6 +101,25 @@ func createLevelTableStringFromArray(growth_rate_name string, level_array []int)
 	}
 	output += "}"
 	return output
+}
+
+func growthRateIdToConstName(growth_rate_id int) string {
+	switch growth_rate_id {
+	case 1:
+		return "SLOW"
+	case 2:
+		return "MEDIUM_FAST"
+	case 3:
+		return "FAST"
+	case 4:
+		return "MEDIUM_SLOW"
+	case 5:
+		return "ERRATIC"
+	case 6:
+		return "FLUCTUATING"
+	default:
+		panic(fmt.Sprintf("Could not find growth rate id %d", growth_rate_id))
+	}
 }
 
 func createCodeOutput(s string) {
@@ -474,7 +494,46 @@ func main() {
 	output += createLevelTableStringFromArray("MEDIUM_SLOW", med_slow_leveling) + ","
 	output += createLevelTableStringFromArray("ERRATIC", erratic_leveling) + ","
 	output += createLevelTableStringFromArray("FLUCTUATING", fluctuating_leveling) + ","
-	output += "}"
+	output += "}\n\n"
+
+	log.Println("Mapping growth rates to dex numbers")
+	// map growth rates to pokemon national dex numbers
+	pokemon_species_csv := getCsvReader("data/pokemon_species.csv")
+	growth_rates := make([]int, HIGHEST_DEX_NUM+1)
+
+	for {
+		record, err := pokemon_species_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		growth_rate_id := parseInt(record[14])
+		dex_num := parseInt(record[0])
+
+		if dex_num == 0 {
+			continue
+		}
+
+		if dex_num > HIGHEST_DEX_NUM {
+			break
+		}
+
+		growth_rates[dex_num] = growth_rate_id
+	}
+
+	output += "// A map of national pokedex numbers to Pokemon growth rates\n"
+	output += "var PokemonGrowthRates = map[int]int{\n"
+
+	for dex_num, growth_rate := range growth_rates {
+
+		if dex_num == 0 {
+			continue
+		}
+
+		output += fmt.Sprintf("%d: %s,\n", dex_num, growthRateIdToConstName(growth_rate))
+	}
+	output += "}\n\n"
 
 	createCodeOutput(output)
 
