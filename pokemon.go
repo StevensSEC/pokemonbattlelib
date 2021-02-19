@@ -149,6 +149,10 @@ func (p *Pokemon) GetGrowthRate() int {
 	return pokemonGrowthRates[int(p.NatDex)]
 }
 
+func (p *Pokemon) GetBaseStats()[6]int {
+    return pokemonBaseStats[int(p.NatDex)]
+}
+
 func (p *Pokemon) HasValidLevel() bool {
 	return p.Level >= MIN_LEVEL && p.Level <= MAX_LEVEL
 }
@@ -232,28 +236,11 @@ func (p *Pokemon) computeStats() {
 	}
 
 	// get base stats
-	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
-	var base_stats [6]uint
-	already_read_stats := 0
-	for {
-		record, err := pokemon_stats_csv.Read()
-		if p.NatDex == uint16(parseInt(record[0])) {
-			base_stats[parseInt(record[1])-1] = uint(parseInt(record[2]))
-			already_read_stats++
-		}
-
-		if already_read_stats == 6 {
-			break
-		}
-
-		if err == io.EOF {
-			break
-		}
-	}
+    base_stats := p.GetBaseStats()	
 
 	// compute HP
 	hp_ev_term := math.Floor(float64(p.EVs[STAT_HP]) / 4)
-	base_iv_ev_level_hp_term := (2*base_stats[STAT_HP] + uint(p.IVs[STAT_HP]) + uint(hp_ev_term)) * uint(p.Level)
+	base_iv_ev_level_hp_term := (2*uint(base_stats[STAT_HP]) + uint(p.IVs[STAT_HP]) + uint(hp_ev_term)) * uint(p.Level)
 	hp_floor_term := math.Floor(float64(base_iv_ev_level_hp_term) / 100)
 	p.Stats[STAT_HP] = uint(hp_floor_term + float64(p.Level) + 10)
 	p.CurrentHP = p.Stats[STAT_HP]
@@ -262,7 +249,7 @@ func (p *Pokemon) computeStats() {
 	natureModifiers := p.Nature.getNatureModifers()
 	for _, stat := range [5]int{STAT_ATK, STAT_DEF, STAT_SPATK, STAT_SPDEF, STAT_SPD} {
 		ev_term := math.Floor(float64(p.EVs[stat]) / 4)
-		base_iv_ev_level_term := (2*base_stats[stat] + uint(p.IVs[stat]) + uint(ev_term)) * uint(p.Level)
+		base_iv_ev_level_term := (2*uint(base_stats[stat]) + uint(p.IVs[stat]) + uint(ev_term)) * uint(p.Level)
 		floor_term := math.Floor(float64(base_iv_ev_level_term) / 100)
 		nature_term := float64(floor_term+5) * natureModifiers[stat]
 		p.Stats[stat] = uint(math.Floor(nature_term))
