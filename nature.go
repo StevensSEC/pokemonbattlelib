@@ -6,20 +6,50 @@ type Nature struct {
 	name     string
 }
 
-func GetNatureTable() map[string]*Nature {
-	//TODO: add all natures
-	return map[string]*Nature{
-		"adamant": {
-			StatUp:   STAT_ATK,
-			StatDown: STAT_SPATK,
-			name:     "Adamant",
-		},
-		"hardy": {
+// Constants for looking up natures
+const (
+	HARDY = iota + 1
+	LONELY
+	ADAMANT
+	NAUGHTY
+	BRAVE
+	BOLD
+	DOCILE
+	IMPISH
+	LAX
+	RELAXED
+	MODEST
+	MILD
+	BASHFUL
+	RASH
+	QUIET
+	CALM
+	GENTLE
+	CAREFUL
+	QUIRKY
+	SASSY
+	TIMID
+	HASTY
+	JOLLY
+	NAIVE
+	SERIOUS
+)
+
+func GetNature(nature int) *Nature {
+	natures := map[int]*Nature{
+		//TODO: add all natures
+		HARDY: {
 			StatUp:   STAT_ATK,
 			StatDown: STAT_ATK,
 			name:     "Hardy",
 		},
+		ADAMANT: {
+			StatUp:   STAT_ATK,
+			StatDown: STAT_SPATK,
+			name:     "Adamant",
+		},
 	}
+	return natures[nature]
 }
 
 func (n Nature) getNatureModifers() [6]float64 {
@@ -33,11 +63,6 @@ func (n Nature) getNatureModifers() [6]float64 {
 	}
 
 	return natureModifiers
-}
-
-func (n Nature) Equals(other *Nature) bool {
-	return n.StatUp == other.StatUp &&
-		n.StatDown == other.StatDown
 }
 
 // implement Stringer

@@ -77,7 +77,7 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		TotalExperience: 0,
 		IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 		EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-		Nature:          GetNatureTable()["hardy"], // this nature is neutral and has no effect
+		Nature:          GetNature(HARDY), // this nature is neutral and has no effect
 	}
 	for _, opt := range opts {
 		opt(p)

@@ -34,7 +34,7 @@ func TestPokemonConstructor(t *testing.T) {
 				CurrentHP:       20,
 				IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 				EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				Nature:          GetNatureTable()["hardy"],
+				Nature:          GetNature(HARDY),
 				Stats:           [6]uint{20, 10, 10, 10, 10, 10},
 			},
 		},
@@ -47,7 +47,7 @@ func TestPokemonConstructor(t *testing.T) {
 				CurrentHP:       20,
 				IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 				EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				Nature:          GetNatureTable()["hardy"],
+				Nature:          GetNature(HARDY),
 				Stats:           [6]uint{20, 10, 10, 10, 10, 10},
 			},
 		},
@@ -60,7 +60,7 @@ func TestPokemonConstructor(t *testing.T) {
 				CurrentHP:       20,
 				IVs:             [6]uint8{31, 31, 31, 31, 31, 31},
 				EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				Nature:          GetNatureTable()["hardy"],
+				Nature:          GetNature(HARDY),
 				Stats:           [6]uint{21, 11, 11, 11, 11, 11},
 			},
 		},
@@ -73,12 +73,12 @@ func TestPokemonConstructor(t *testing.T) {
 				CurrentHP:       20,
 				IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 				EVs:             [6]uint8{0, 252, 6, 0, 0, 252},
-				Nature:          GetNatureTable()["hardy"],
+				Nature:          GetNature(HARDY),
 				Stats:           [6]uint{20, 13, 10, 10, 10, 13},
 			},
 		},
 		{
-			pkmn: GeneratePokemon(393, WithLevel(5), WithIVs([6]uint8{0, 0, 0, 0, 0, 0}), WithEVs([6]uint8{0, 0, 0, 0, 0, 0}), WithNature(GetNatureTable()["adamant"])), // constructor w/ dex number, level, ivs, evs, nature
+			pkmn: GeneratePokemon(393, WithLevel(5), WithIVs([6]uint8{0, 0, 0, 0, 0, 0}), WithEVs([6]uint8{0, 0, 0, 0, 0, 0}), WithNature(GetNature(ADAMANT))), // constructor w/ dex number, level, ivs, evs, nature
 			want: &Pokemon{
 				NatDex:          393,
 				Level:           5,
@@ -86,7 +86,7 @@ func TestPokemonConstructor(t *testing.T) {
 				CurrentHP:       20,
 				IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 				EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				Nature:          GetNatureTable()["adamant"],
+				Nature:          GetNature(ADAMANT),
 				Stats:           [6]uint{20, 11, 10, 9, 10, 9},
 			},
 		},
@@ -109,7 +109,7 @@ func TestPokemonConstructorAccurateResult(t *testing.T) {
 	}{
 		{
 			// see: https://bulbapedia.bulbagarden.net/wiki/Stat, scroll down to 'Example'
-			pkmn: GeneratePokemon(445, WithLevel(78), WithIVs([6]uint8{24, 12, 30, 16, 23, 5}), WithEVs([6]uint8{74, 190, 91, 48, 84, 23}), WithNature(GetNatureTable()["adamant"])),
+			pkmn: GeneratePokemon(445, WithLevel(78), WithIVs([6]uint8{24, 12, 30, 16, 23, 5}), WithEVs([6]uint8{74, 190, 91, 48, 84, 23}), WithNature(GetNature(ADAMANT))),
 			want: &Pokemon{
 				NatDex:          445, // garchomp
 				Level:           78,
@@ -117,7 +117,7 @@ func TestPokemonConstructorAccurateResult(t *testing.T) {
 				CurrentHP:       289,
 				IVs:             [6]uint8{24, 12, 30, 16, 23, 5},
 				EVs:             [6]uint8{74, 190, 91, 48, 84, 23},
-				Nature:          GetNatureTable()["adamant"],
+				Nature:          GetNature(ADAMANT),
 				Stats:           [6]uint{289, 278, 193, 135, 171, 171},
 			},
 		},
