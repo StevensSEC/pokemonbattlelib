@@ -305,7 +305,7 @@ func main() {
 			continue
 		}
 		mid := parseInt(record[0])
-		moveType := parseInt(record[3])
+		moveType := 1 << (parseInt(record[3]) - 1)
 		power := parseInt(record[4])
 		pp := parseInt(record[5])
 		accuracy := parseInt(record[6])

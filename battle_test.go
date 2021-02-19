@@ -20,6 +20,20 @@ func (a dumbAgent) Act(ctx *BattleContext) Turn {
 	panic("no opponents found")
 }
 
+type healAgent struct{}
+
+// Always uses a potion on first Pokemon
+func (a healAgent) Act(ctx *BattleContext) Turn {
+	item := GetItem(ITEM_POTION)
+	for _, target := range ctx.Allies {
+		return ItemTurn{
+			Item:   &item,
+			Target: target,
+		}
+	}
+	panic("no allies found")
+}
+
 func TestBattleSetup(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
@@ -57,7 +71,7 @@ func TestBattleOneRound(t *testing.T) {
 			t.Fatalf("Must send out first pokemon in each at the beginning of the battle. Party %d gave: %v", p, got)
 		}
 	}
-	transactions := b.SimulateRound()
+	transactions, _ := b.SimulateRound()
 	if len(transactions) != 2 {
 		t.Fatal("Expected only 2 transactions to occur in a round")
 	}
@@ -87,6 +101,38 @@ func TestBattleOneRound(t *testing.T) {
 		if party.pokemon[0].CurrentHP != expectedHp {
 			t.Errorf("Expected %s to have %d HP, got %d", party.pokemon[0].GetName(), expectedHp, party.pokemon[0].CurrentHP)
 		}
+	}
+}
+
+func TestItemTurn(t *testing.T) {
+	a := Agent(healAgent{})
+	party := NewParty(&a, 0)
+	pkmn := Pokemon{NatDex: 1, CurrentHP: 10, Stats: [6]uint{75, 0, 0, 0, 0, 0}}
+	party.AddPokemon(&pkmn)
+	b := NewBattle()
+	b.AddParty(party)
+	err := b.Start()
+	if err != nil {
+		panic(err)
+	}
+	transactions, _ := b.SimulateRound()
+	logtest := []struct {
+		turn Transaction
+		want string
+	}{
+		{
+			turn: transactions[0],
+			want: "Potion used on Bulbasaur.",
+		},
+	}
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
+	}
+	if b.parties[0].pokemon[0].CurrentHP != 30 {
+		t.Errorf("expected Pokemon's HP to be 30, got %d", b.parties[0].pokemon[0].CurrentHP)
 	}
 }
 
@@ -194,11 +240,13 @@ func TestPokemonSpeed(t *testing.T) {
 	pound := GetMove(1)
 	pkmn1.Moves[0] = &pound
 	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 10}
+	pkmn1.CurrentHP = 30
 	party1.AddPokemon(&pkmn1)
 	party2 := NewParty(&a2, 1)
 	pkmn2 := GetPokemon(7)
 	pkmn2.Moves[0] = &pound
 	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 12}
+	pkmn2.CurrentHP = 30
 	party2.AddPokemon(&pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
@@ -207,7 +255,7 @@ func TestPokemonSpeed(t *testing.T) {
 		t.Fatal("failed to start battle")
 	}
 
-	transactions := b.SimulateRound()
+	transactions, _ := b.SimulateRound()
 	if len(transactions) != 2 {
 		t.Fatal("Expected only 2 transactions to occur in a round")
 	}
@@ -241,14 +289,146 @@ func TestTurnPriority(t *testing.T) {
 			turn: FightTurn{},
 			want: 0,
 		},
+		{
+			turn: ItemTurn{},
+			want: 1,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%T priority", tt.turn), func(t *testing.T) {
-			t.Parallel()
 			got := tt.turn.Priority()
 			if got != tt.want {
 				t.Errorf("TurnPriority(%T) got %v, want %v", tt.turn, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestBattleFaintAutoSwitch(t *testing.T) {
+	a1 := Agent(dumbAgent{})
+	a2 := Agent(dumbAgent{})
+	party1 := NewParty(&a1, 0)
+	pkmn1 := GetPokemon(4)
+	pkmn1.Stats = [6]uint{30, 1, 1, 10, 10, 200}
+	pkmn1.CurrentHP = 1
+	pkmn3 := GetPokemon(387)
+	pkmn3.Stats = [6]uint{30, 10, 10, 10, 10, 10}
+	pkmn3.CurrentHP = 30
+	pound := GetMove(1)
+	pkmn1.Moves[0] = &pound
+	pkmn3.Moves[0] = &pound
+	party1.AddPokemon(&pkmn1, &pkmn3)
+	party2 := NewParty(&a2, 1)
+	pkmn2 := GetPokemon(7)
+	pkmn2.Stats = [6]uint{30, 800, 800, 10, 10, 10}
+	pkmn2.CurrentHP = 30
+	pkmn2.Moves[0] = &pound
+	party2.AddPokemon(&pkmn2)
+	b := NewBattle()
+	b.AddParty(party1, party2)
+	err := b.Start()
+	if err != nil {
+		t.Fatal("failed to start battle")
+	}
+
+	transactions, _ := b.SimulateRound()
+	if n := len(transactions); n != 4 {
+		t.Errorf("Expected 4 transactions to occur, got %d", n)
+	}
+	logtest := []struct {
+		turn Transaction
+		want string
+	}{
+		{
+			turn: transactions[0],
+			want: "Charmander used Pound on Squirtle for 2 damage.",
+			// Charmander smashed his nubby little fist into Squirtle as
+			// hard as he could. Spectators gasped and winced when the
+			// impact created a very audible crack. But it was not
+			// Squirtle's shell that broke, it was Charmanders knuckles.
+			// The Squirtle was unfazed.
+		},
+		{
+			turn: transactions[1],
+			want: "Squirtle used Pound on Charmander for 1282 damage.",
+			// Ash watched in horror as his Charmander was obliterated from the
+			// battlefield. "Critical hit!" echoed the automated announcer. The
+			// Squirtle snarled, now covered in the entrails of his previous
+			// opponent. "OH GOD, WHAT THE FUCK!?" sobbed Ash, "Is my friend
+			// really gone forever? Please tell me I'm dreaming, this can't be real!"
+		},
+		{
+			turn: transactions[2],
+			want: "Charmander fainted.",
+		},
+		{
+			turn: transactions[3],
+			want: "Turtwig was sent out.",
+		},
+	}
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
+	}
+}
+
+func TestBattleEndByKnockout(t *testing.T) {
+	a1 := Agent(dumbAgent{})
+	a2 := Agent(dumbAgent{})
+	party1 := NewParty(&a1, 0)
+	pkmn1 := GetPokemon(4)
+	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 100}
+	pkmn1.CurrentHP = 1
+	pound := GetMove(1)
+	pkmn1.Moves[0] = &pound
+	party1.AddPokemon(&pkmn1)
+	party2 := NewParty(&a2, 1)
+	pkmn2 := GetPokemon(7)
+	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 10}
+	pkmn2.CurrentHP = 30
+	pkmn2.Moves[0] = &pound
+	party2.AddPokemon(&pkmn2)
+	b := NewBattle()
+	b.AddParty(party1, party2)
+	err := b.Start()
+	if err != nil {
+		t.Fatal("failed to start battle")
+	}
+
+	transactions, ended := b.SimulateRound()
+	if !ended {
+		t.Error("Expected SimulateRound to indicate that the battle has ended, but it did not.")
+	}
+	if n := len(transactions); n != 4 {
+		t.Errorf("Expected 4 transactions to occur, got %d", n)
+	}
+	logtest := []struct {
+		turn Transaction
+		want string
+	}{
+		{
+			turn: transactions[0],
+			want: "Charmander used Pound on Squirtle for 3 damage.",
+		},
+		{
+			turn: transactions[1],
+			want: "Squirtle used Pound on Charmander for 3 damage.",
+		},
+		{
+			turn: transactions[2],
+			want: "Charmander fainted.",
+		},
+		{
+			turn: transactions[3],
+			want: "The battle has ended.",
+		},
+	}
+	for _, tt := range logtest {
+		got := tt.turn.BattleLog()
+		if got != tt.want {
+			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
+		}
 	}
 }

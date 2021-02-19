@@ -154,7 +154,6 @@ func TestPokemonStringer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Pokemon Stringer: %d", tt.pkmn.NatDex), func(t *testing.T) {
-			t.Parallel()
 			got := fmt.Sprintf("%s", tt.pkmn)
 			if got != tt.want {
 				t.Errorf("Pokemon Stringer %d got %v, want %v", tt.pkmn.NatDex, got, tt.want)

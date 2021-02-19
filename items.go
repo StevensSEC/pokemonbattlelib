@@ -1,5 +1,7 @@
 package pokemonbattlelib
 
+import "fmt"
+
 type Item struct {
 	ID          int
 	Name        string
@@ -36,11 +38,13 @@ const (
 	ItemUnused
 	ItemLoot
 	ItemAllMail
+	// Medicine
 	ItemVitamins
 	ItemHealing
 	ItemPPRecovery
 	ItemRevival
 	ItemStatusCures
+
 	ItemMulch
 	ItemSpecialBalls
 	ItemStandardBalls
@@ -71,8 +75,31 @@ const (
 )
 
 // For item effects, see https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/item_prose.csv
-// Creates a new item from its ID
-func NewItem(itemID int) *Item {
-	item := ALL_ITEMS[itemID-1]
-	return &item
+// Retrieves an item using its ID
+// Can also use constants like ITEM_POTION or ITEM_REVIVE
+func GetItem(itemID int) Item {
+	for _, item := range ALL_ITEMS {
+		if item.ID == itemID {
+			return item
+		}
+	}
+	panic(fmt.Sprintf("unknown item with ID %v\n", itemID))
+}
+
+// Dispatches the correct item handler based on its category
+func (p *Pokemon) UseItem(i *Item) []Transaction {
+	switch i.Category {
+	case ItemHealing, ItemRevival, ItemStatusCures:
+		return p.UseMedicine(i)
+	}
+	return make([]Transaction, 0)
+}
+
+// Uses a medicine item which affects HP and status effects
+func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
+	switch i.ID {
+	case ITEM_POTION:
+		t = append(t, p.RestoreHP(20))
+	}
+	return t
 }

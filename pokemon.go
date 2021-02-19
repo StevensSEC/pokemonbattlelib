@@ -18,6 +18,8 @@ type Pokemon struct {
 	EVs               [6]uint8      // values from 0-255 that represents a Pokemon's training in a particular stat
 	Nature            *Nature       // represents a Pokemon's disposition and affects stats
 	Stats             [6]uint       // the actual stats of a Pokemon determined from the above data
+	StatModifiers     [6]int        // ranges from +6 (buffing) to -6 (debuffing) a stat
+	StatusEffects     uint          // the current status effects inflicted on a Pokemon
 	CurrentHP         uint          // the remaining HP of this Pokemon
 	HeldItem          *Item         // the item a Pokemon is holding
 	Moves             [4]*Move      // the moves the Pokemon currenly knows
@@ -54,6 +56,18 @@ const (
 	MEDIUM_SLOW
 	ERRATIC
 	FLUCTUATING
+)
+
+// Constants for IVs and EVs
+const (
+	MAX_FRIENDSHIP    = 255
+	MAX_EV            = 255
+	MAX_IV            = 31
+	MAX_STAT_MODIFIER = 6
+	MIN_STAT_MODIFIER = -6
+	TOTAL_EV          = 510
+    MIN_LEVEL = 1
+    MAX_LEVEL = 100
 )
 
 // Retrieves a Pokemon given its national dex number
@@ -196,12 +210,12 @@ func (p *Pokemon) GetGrowthRate() int {
 }
 
 func (p *Pokemon) HasValidLevel() bool {
-	return p.Level > 1 && p.Level <= 100
+	return p.Level > MIN_LEVEL && p.Level <= MAX_LEVEL
 }
 
 func (p *Pokemon) HasValidIVs() bool {
 	for _, IV := range p.IVs {
-		if IV > 31 {
+		if IV > MAX_IV {
 			return false
 		}
 	}
@@ -211,9 +225,12 @@ func (p *Pokemon) HasValidIVs() bool {
 func (p *Pokemon) HasValidEVs() bool {
 	totalEVs := 0
 	for _, EV := range p.EVs {
+		if EV > MAX_EV {
+			return false
+		}
 		totalEVs += int(EV)
 	}
-	return totalEVs <= 510
+	return totalEVs <= TOTAL_EV
 }
 
 func (p *Pokemon) computeStats() {
@@ -294,4 +311,12 @@ func (p *Pokemon) VerboseString() string {
 func (p Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
 		p.Gender, p.Level, p.CurrentHP, p.Stats[STAT_HP])
+}
+
+// Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
+func (p *Pokemon) RestoreHP(amount uint) Transaction {
+	if diff := p.Stats[STAT_HP] - p.CurrentHP; diff <= amount {
+		amount = diff
+	}
+	return HealTransaction{Target: p, Amount: amount}
 }
