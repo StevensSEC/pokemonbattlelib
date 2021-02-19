@@ -69,66 +69,55 @@ const (
 	MAX_LEVEL         = 100
 )
 
-// Retrieves a Pokemon given its national dex number
-func GetPokemon(natdex uint16) Pokemon {
-	for _, p := range ALL_POKEMON {
-		if p.NatDex == natdex {
-			return p
-		}
-	}
-	// Not exactly the best way to handle this
-	panic(fmt.Sprintf("unknown Pokedex number %v\n", natdex))
-}
-
 type GeneratePokemonOption func(p *Pokemon)
 
 // Creates a new Pokemon given its national dex number
 func GeneratePokemon(natdex uint16, opts ...GeneratePokemonOption) *Pokemon {
-    p := &Pokemon{
-        NatDex: natdex,
-        Level: 1,
-        TotalExperience: 0,
-        IVs: [6]uint8{0, 0, 0, 0, 0, 0},
-        EVs: [6]uint8{0, 0, 0, 0, 0, 0},
-        Nature: GetNatureTable()["hardy"],
-    }
-    for _, opt := range opts {
-        opt(p)
-    }
-    p.computeStats()
-    return p
+	p := &Pokemon{
+		NatDex:          natdex,
+		Level:           1,
+		TotalExperience: 0,
+		IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+		EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+		Nature:          GetNatureTable()["hardy"],
+	}
+	for _, opt := range opts {
+		opt(p)
+	}
+	p.computeStats()
+	return p
 }
 
 func WithLevel(level uint8) GeneratePokemonOption {
-    return func(p *Pokemon) {
-        p.Level = level
-        p.TotalExperience = computeExpFromLevel(p.Level, p.GetGrowthRate())
-    }
+	return func(p *Pokemon) {
+		p.Level = level
+		p.TotalExperience = computeExpFromLevel(p.Level, p.GetGrowthRate())
+	}
 }
 
 func WithTotalExp(totalExp uint) GeneratePokemonOption {
-    return func(p *Pokemon) {
-        p.TotalExperience = totalExp
-        p.Level = computeLevelFromExp(p.TotalExperience, p.GetGrowthRate())
-    }
+	return func(p *Pokemon) {
+		p.TotalExperience = totalExp
+		p.Level = computeLevelFromExp(p.TotalExperience, p.GetGrowthRate())
+	}
 }
 
 func WithIVs(ivs [6]uint8) GeneratePokemonOption {
-    return func(p *Pokemon) {
-        p.IVs = ivs
-    }
+	return func(p *Pokemon) {
+		p.IVs = ivs
+	}
 }
 
 func WithEVs(evs [6]uint8) GeneratePokemonOption {
-    return func(p *Pokemon) {
-        p.EVs = evs
-    }
+	return func(p *Pokemon) {
+		p.EVs = evs
+	}
 }
 
 func WithNature(nature *Nature) GeneratePokemonOption {
-    return func(p *Pokemon) {
-        p.Nature = nature
-    } 
+	return func(p *Pokemon) {
+		p.Nature = nature
+	}
 }
 
 func computeLevelFromExp(exp uint, growth_rate int) uint8 {
@@ -183,7 +172,7 @@ func (p *Pokemon) GetGrowthRate() int {
 }
 
 func (p *Pokemon) HasValidLevel() bool {
-	return p.Level > MIN_LEVEL && p.Level <= MAX_LEVEL
+	return p.Level >= MIN_LEVEL && p.Level <= MAX_LEVEL
 }
 
 func (p *Pokemon) HasValidIVs() bool {
@@ -208,15 +197,15 @@ func (p *Pokemon) HasValidEVs() bool {
 
 func (p *Pokemon) computeStats() {
 	if !p.HasValidLevel() {
-		log.Println(fmt.Printf("Failed to compute stats for %d, level %d invalid", p.NatDex, p.Level))
+		log.Println(fmt.Sprintf("Failed to compute stats for %s, level %d invalid", p.GetName(), p.Level))
 	}
 
 	if !p.HasValidIVs() {
-		log.Println(fmt.Printf("Failed to compute stats for %d, ivs %d invalid", p.NatDex, p.IVs))
+		log.Println(fmt.Sprintf("Failed to compute stats for %s, ivs %d invalid", p.GetName(), p.IVs))
 	}
 
 	if !p.HasValidEVs() {
-		log.Println(fmt.Printf("Failed to compute stats for %d, evs %d invalid", p.NatDex, p.EVs))
+		log.Println(fmt.Sprintf("Failed to compute stats for %s, evs %d invalid", p.GetName(), p.EVs))
 	}
 
 	// get base stats
