@@ -103,44 +103,6 @@ func createLevelTableStringFromArray(growth_rate_name string, level_array []int)
 	return output
 }
 
-func growthRateIdToConstName(growth_rate_id int) string {
-	switch growth_rate_id {
-	case 1:
-		return "SLOW"
-	case 2:
-		return "MEDIUM_FAST"
-	case 3:
-		return "FAST"
-	case 4:
-		return "MEDIUM_SLOW"
-	case 5:
-		return "ERRATIC"
-	case 6:
-		return "FLUCTUATING"
-	default:
-		panic(fmt.Sprintf("Could not find growth rate id %d", growth_rate_id))
-	}
-}
-
-func statIdToConstName(stat_id int) string {
-	switch stat_id {
-	case 0:
-		return "STAT_HP"
-	case 1:
-		return "STAT_ATK"
-	case 2:
-		return "STAT_DEF"
-	case 3:
-		return "STAT_SPATK"
-	case 4:
-		return "STAT_SPDEF"
-	case 5:
-		return "STAT_SPD"
-	default:
-		panic(fmt.Sprintf("Could not find stat %d", stat_id))
-	}
-}
-
 func getIntArrayCodeOutput(arr []int) string {
 	output := "{"
 
@@ -175,6 +137,15 @@ func main() {
 	}
 	log.Printf("Current directory: %s\n", path)
 	output := ""
+
+    growth_rate_strings := map[int]string{
+        1: "SLOW",
+        2: "MEDIUM_FAST",
+        3: "FAST",
+        4: "MEDIUM_SLOW",
+        5: "ERRATIC",
+        6: "FLUCTUATING",
+    }
 
 	// get all valid version ids
 	valid_version_groups := []int{}
@@ -544,7 +515,7 @@ func main() {
 			continue
 		}
 
-		output += fmt.Sprintf("%d: %s,\n", dex_num, growthRateIdToConstName(growth_rate))
+		output += fmt.Sprintf("%d: %s,\n", dex_num, growth_rate_strings[growth_rate])
 	}
 	output += "}\n\n"
 
