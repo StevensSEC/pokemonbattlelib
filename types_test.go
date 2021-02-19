@@ -121,6 +121,37 @@ func TestGenderString(t *testing.T) {
 	}
 }
 
+func TestStatusConditionCheck(t *testing.T) {
+	tests := []struct {
+		status StatusCondition
+		check  StatusCondition
+	}{
+		{
+			status: StatusNone,
+			check:  StatusNone,
+		},
+		{
+			status: StatusBurn,
+			check:  StatusBurn,
+		},
+		{
+			status: StatusSleep | StatusCursed,
+			check:  StatusSleep,
+		},
+		{
+			status: StatusSleep | StatusCursed,
+			check:  StatusCursed,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("Status Condition check: %b", tt.status), func(t *testing.T) {
+			if !tt.status.check(tt.check) {
+				t.Errorf("Status Condition check failed %b, should have %b", tt.status, tt.check)
+			}
+		})
+	}
+}
+
 func TestStatusConditionApply(t *testing.T) {
 	tests := []struct {
 		name  string

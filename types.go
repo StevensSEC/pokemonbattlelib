@@ -180,7 +180,7 @@ const (
 	StatusNone StatusCondition = 0
 
 	// Non volatile - first 3 bits
-	StatusBurn StatusCondition = iota + 1
+	StatusBurn StatusCondition = iota
 	StatusFreeze
 	StatusParalyze
 	StatusPoison
