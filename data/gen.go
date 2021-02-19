@@ -122,6 +122,39 @@ func growthRateIdToConstName(growth_rate_id int) string {
 	}
 }
 
+func statIdToConstName(stat_id int) string {
+	switch stat_id {
+	case 0:
+		return "STAT_HP"
+	case 1:
+		return "STAT_ATK"
+	case 2:
+		return "STAT_DEF"
+	case 3:
+		return "STAT_SPATK"
+	case 4:
+		return "STAT_SPDEF"
+	case 5:
+		return "STAT_SPD"
+	default:
+		panic(fmt.Sprintf("Could not find stat %d", stat_id))
+	}
+}
+
+func getIntArrayCodeOutput(arr []int) string {
+	output := ""
+	output += fmt.Sprintf("[%d]int{", len(arr))
+
+	// loop excluding last value
+	for _, value := range arr[0 : len(arr)-1] {
+		output += fmt.Sprintf("%d, ", value)
+	}
+
+	// add last value
+	output += fmt.Sprintf("%d}", arr[len(arr)-1])
+	return output
+}
+
 func createCodeOutput(s string) {
 	file, err := os.Create("pokedex_GEN.go")
 	if err != nil {
@@ -257,9 +290,9 @@ func main() {
 			break
 		}
 	}
-		output += "\n\n" +
+	output += "\n\n" +
 		"// A map of national pokedex numbers to pokemon names.\n" +
-		"var PokemonNames = map[uint16]string{\n"
+		"var pokemonNames = map[uint16]string{\n"
 	for _, p := range pokemon {
 		if p.NatDex == 0 {
 			continue
@@ -504,7 +537,7 @@ func main() {
 	}
 
 	output += "// A map of national pokedex numbers to Pokemon growth rates\n"
-	output += "var PokemonGrowthRates = map[int]int{\n"
+	output += "var pokemonGrowthRates = map[int]int{\n"
 
 	for dex_num, growth_rate := range growth_rates {
 
@@ -513,6 +546,47 @@ func main() {
 		}
 
 		output += fmt.Sprintf("%d: %s,\n", dex_num, growthRateIdToConstName(growth_rate))
+	}
+	output += "}\n\n"
+
+	// pokemon base stat
+	log.Println("Creating base stat table")
+	output += "// A map of national pokedex numbers to Pokemon base stats\n"
+	output += "var pokemonBaseStats = map[int][6]int{\n"
+
+	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
+	base_stat_array := make([][]int, HIGHEST_DEX_NUM+1)
+	for i := range base_stat_array {
+		number_of_stats := 6
+		base_stat_array[i] = make([]int, number_of_stats)
+	}
+
+	for {
+		record, err := pokemon_stats_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		dex_num := parseInt(record[0])
+
+		if dex_num > HIGHEST_DEX_NUM {
+			break
+		}
+
+		stat_id := parseInt(record[1]) - 1
+		stat_value := parseInt(record[2])
+
+		base_stat_array[dex_num][stat_id] = stat_value
+	}
+
+	for dex_num, stats := range base_stat_array {
+
+        if dex_num == 0 {
+            continue
+        }
+
+		output += fmt.Sprintf("%d: %s,\n", dex_num, getIntArrayCodeOutput(stats))
 	}
 	output += "}\n\n"
 
