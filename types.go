@@ -179,7 +179,7 @@ type StatusCondition uint32
 const (
 	StatusNone StatusCondition = 0
 
-	// Non volatile
+	// Non volatile - first 3 bits
 	StatusBurn StatusCondition = iota + 1
 	StatusFreeze
 	StatusParalyze
@@ -187,8 +187,21 @@ const (
 	StatusBadlyPoison
 	StatusSleep
 
-	// TODO: volatile
+	// TODO: volatile - the rest of the bits
 	StatusBound StatusCondition = 1 << (iota + 3)
+	StatusCantEscape
+	StatusConfusion
+	StatusCursed
+	StatusEmbargo
+	StatusFlinch
+	StatusHealBlock
+	StatusIdentified
+	StatusInfatuation
+	StatusLeechSeed
+	StatusNightmare
+	StatusPerishSong
+	StatusTaunt
+	StatusTorment
 )
 
 const (
@@ -205,10 +218,7 @@ func (s *StatusCondition) apply(c StatusCondition) {
 	if nv == 0 {
 		nv = *s & NONVOLATILE_STATUS_MASK
 	}
-	v := VOLATILE_STATUS_MASK & c
-	if v == 0 {
-		v = *s & VOLATILE_STATUS_MASK
-	}
+	v := VOLATILE_STATUS_MASK & (*s | c)
 	*s = nv | v
 }
 

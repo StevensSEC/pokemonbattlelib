@@ -158,13 +158,19 @@ func TestStatusConditionApply(t *testing.T) {
 			apply: StatusBound,
 			want:  StatusSleep | StatusBound,
 		},
+		{
+			name:  "Should preserve sleep, leech seed, apply bound",
+			from:  StatusSleep | StatusLeechSeed,
+			apply: StatusBound,
+			want:  StatusSleep | StatusLeechSeed | StatusBound,
+		},
 	}
 	for _, tt := range tests {
-		t.Run(fmt.Sprintf("Status Condition check: %s", tt.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf("Status Condition apply: %s", tt.name), func(t *testing.T) {
 			got := tt.from
 			got.apply(tt.apply)
 			if got != tt.want {
-				t.Errorf("Status Condition check %s got %v, want %v", tt.name, got, tt.want)
+				t.Errorf("Status Condition apply %s got %b, want %b", tt.name, got, tt.want)
 			}
 		})
 	}
