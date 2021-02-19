@@ -152,7 +152,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			switch t := next.(type) {
 			case DamageTransaction:
 				receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-				receiver.Damage(t.Damage)
+				receiver.damage(t.Damage)
 				if receiver.CurrentHP == 0 {
 					// pokemon has fainted
 					queue = append(queue, FaintTransaction{
@@ -165,7 +165,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					t.Target.HeldItem = nil
 				}
 			case HealTransaction:
-				t.Target.Heal(t.Amount)
+				t.Target.heal(t.Amount)
 			case FaintTransaction:
 				p := b.parties[t.Target.party]
 				p.SetInactive(t.Target.partySlot)

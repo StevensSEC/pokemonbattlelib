@@ -80,7 +80,7 @@ func (p Pokemon) String() string {
 }
 
 // Applies damage to a Pokemon. May cause Pokemon to faint.
-func (p *Pokemon) Damage(amount uint) {
+func (p *Pokemon) damage(amount uint) {
 	if p.CurrentHP >= amount {
 		p.CurrentHP -= amount
 	} else {
@@ -90,7 +90,7 @@ func (p *Pokemon) Damage(amount uint) {
 }
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
-func (p *Pokemon) Heal(amount uint) {
+func (p *Pokemon) heal(amount uint) {
 	if diff := p.Stats[STAT_HP] - p.CurrentHP; diff <= amount {
 		amount = diff
 	}

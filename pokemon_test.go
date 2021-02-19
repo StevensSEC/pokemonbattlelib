@@ -19,6 +19,34 @@ func TestPokemonName(t *testing.T) {
 	}
 }
 
+func TestHealPokemon(t *testing.T) {
+	p := GetPokemon(1)
+	p.Stats[0] = 100
+	p.CurrentHP = 0
+	p.heal(25)
+	if p.CurrentHP != 25 {
+		t.Errorf("expected Pokemon to have 25 HP, received %v", p.CurrentHP)
+	}
+	p.heal(100)
+	if p.CurrentHP != 100 {
+		t.Errorf("expected Pokemon to have 100 HP, received %v", p.CurrentHP)
+	}
+}
+
+func TestDamagePokemon(t *testing.T) {
+	p := GetPokemon(1)
+	p.Stats[0] = 100
+	p.CurrentHP = 100
+	p.damage(25)
+	if p.CurrentHP != 75 {
+		t.Errorf("expected Pokemon to have 75 HP, received %v", p.CurrentHP)
+	}
+	p.damage(100)
+	if p.CurrentHP != 0 {
+		t.Errorf("expected Pokemon to have 0 HP, received %v", p.CurrentHP)
+	}
+}
+
 func TestPokemonStringer(t *testing.T) {
 	tests := []struct {
 		pkmn Pokemon
