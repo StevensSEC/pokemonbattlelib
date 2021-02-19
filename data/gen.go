@@ -142,8 +142,7 @@ func statIdToConstName(stat_id int) string {
 }
 
 func getIntArrayCodeOutput(arr []int) string {
-	output := ""
-	output += fmt.Sprintf("[%d]int{", len(arr))
+	output := "{"
 
 	// loop excluding last value
 	for _, value := range arr[0 : len(arr)-1] {
@@ -582,9 +581,9 @@ func main() {
 
 	for dex_num, stats := range base_stat_array {
 
-        if dex_num == 0 {
-            continue
-        }
+		if dex_num == 0 {
+			continue
+		}
 
 		output += fmt.Sprintf("%d: %s,\n", dex_num, getIntArrayCodeOutput(stats))
 	}

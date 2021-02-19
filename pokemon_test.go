@@ -26,7 +26,7 @@ func TestPokemonConstructor(t *testing.T) {
 		want *Pokemon
 	}{
 		{
-			pkmn: GeneratePokemon(uint16(393), WithLevel(5)), // constructor w/ dex number and level
+			pkmn: GeneratePokemon(393, WithLevel(5)), // constructor w/ dex number and level
 			want: &Pokemon{
 				NatDex:          393, // piplup if you're curious
 				Level:           5,
@@ -39,7 +39,7 @@ func TestPokemonConstructor(t *testing.T) {
 			},
 		},
 		{
-			pkmn: GeneratePokemon(uint16(393), WithTotalExp(135)), // constructor w/ dex number and total exp
+			pkmn: GeneratePokemon(393, WithTotalExp(135)), // constructor w/ dex number and total exp
 			want: &Pokemon{
 				NatDex:          393,
 				Level:           5,
@@ -52,7 +52,7 @@ func TestPokemonConstructor(t *testing.T) {
 			},
 		},
 		{
-			pkmn: GeneratePokemon(uint16(393), WithLevel(5), WithIVs([6]uint8{31, 31, 31, 31, 31, 31})), // constructor w/ dex number, level, ivs
+			pkmn: GeneratePokemon(393, WithLevel(5), WithIVs([6]uint8{31, 31, 31, 31, 31, 31})), // constructor w/ dex number, level, ivs
 			want: &Pokemon{
 				NatDex:          393,
 				Level:           5,
@@ -65,7 +65,7 @@ func TestPokemonConstructor(t *testing.T) {
 			},
 		},
 		{
-			pkmn: GeneratePokemon(uint16(393), WithLevel(5), WithIVs([6]uint8{0, 0, 0, 0, 0, 0}), WithEVs([6]uint8{0, 252, 6, 0, 0, 252})), // constructor w/ dex number, level, ivs, evs
+			pkmn: GeneratePokemon(393, WithLevel(5), WithIVs([6]uint8{0, 0, 0, 0, 0, 0}), WithEVs([6]uint8{0, 252, 6, 0, 0, 252})), // constructor w/ dex number, level, ivs, evs
 			want: &Pokemon{
 				NatDex:          393,
 				Level:           5,
@@ -78,7 +78,7 @@ func TestPokemonConstructor(t *testing.T) {
 			},
 		},
 		{
-			pkmn: GeneratePokemon(uint16(393), WithLevel(5), WithIVs([6]uint8{0, 0, 0, 0, 0, 0}), WithEVs([6]uint8{0, 0, 0, 0, 0, 0}), WithNature(GetNatureTable()["adamant"])), // constructor w/ dex number, level, ivs, evs, nature
+			pkmn: GeneratePokemon(393, WithLevel(5), WithIVs([6]uint8{0, 0, 0, 0, 0, 0}), WithEVs([6]uint8{0, 0, 0, 0, 0, 0}), WithNature(GetNatureTable()["adamant"])), // constructor w/ dex number, level, ivs, evs, nature
 			want: &Pokemon{
 				NatDex:          393,
 				Level:           5,
@@ -109,7 +109,7 @@ func TestPokemonConstructorAccurateResult(t *testing.T) {
 	}{
 		{
 			// see: https://bulbapedia.bulbagarden.net/wiki/Stat, scroll down to 'Example'
-			pkmn: GeneratePokemon(uint16(445), WithLevel(78), WithIVs([6]uint8{24, 12, 30, 16, 23, 5}), WithEVs([6]uint8{74, 190, 91, 48, 84, 23}), WithNature(GetNatureTable()["adamant"])),
+			pkmn: GeneratePokemon(445, WithLevel(78), WithIVs([6]uint8{24, 12, 30, 16, 23, 5}), WithEVs([6]uint8{74, 190, 91, 48, 84, 23}), WithNature(GetNatureTable()["adamant"])),
 			want: &Pokemon{
 				NatDex:          445, // garchomp
 				Level:           78,
@@ -134,6 +134,52 @@ func TestPokemonConstructorAccurateResult(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPokemonCannotLevelBeyondMax(t *testing.T) {
+	pkmn := GeneratePokemon(6, WithLevel(MAX_LEVEL))
+	defer func() { recover() }()
+	pkmn.GainLevels(1)
+	t.Errorf("GainLevels did not panic when leveling past max")
+}
+
+func TestPokemonCannotDecreaseLevel(t *testing.T) {
+	pkmn := GeneratePokemon(393, WithLevel(5))
+	defer func() { recover() }()
+	pkmn.GainLevels(-1)
+	t.Errorf("GainLevels did not panic when attempting to remove levels")
+}
+
+func TestPokemonCannotDecreaseExperience(t *testing.T) {
+	pkmn := GeneratePokemon(393, WithLevel(5))
+	defer func() { recover() }()
+	pkmn.GainExperience(-135)
+	t.Errorf("GainExperience did not panic when attempting to remove experience points")
+}
+
+func TestPokemonLevelsToMaxWhenGainingExpBeyondMax(t *testing.T) {
+	pkmn := GeneratePokemon(493, WithLevel(MAX_LEVEL))
+	pkmn.GainExperience(100000000000)
+	if pkmn.Level != MAX_LEVEL {
+		t.Errorf("Expected level to be %d, got %d", MAX_LEVEL, pkmn.Level)
+	}
+}
+
+func TestPokemonCannotHaveHigherThanMaxLevel(t *testing.T) {
+	defer func() { recover() }()
+	GeneratePokemon(396, WithLevel(MAX_LEVEL+1))
+	t.Errorf("GeneratePokemon did not panic when making a Pokemon with an invalid level")
+}
+
+func TestPokemonCannotHaveHigherThanMaxIVs(t *testing.T) {
+	defer func() { recover() }()
+	GeneratePokemon(396, WithIVs([6]uint8{32, 32, 32, 32, 32, 32}))
+	t.Errorf("GeneratePokemon did not panic when making a Pokemon with invalid IVs")
+}
+func TestPokemonCannotHaveHigherThanTotalEVs(t *testing.T) {
+	defer func() { recover() }()
+	GeneratePokemon(396, WithEVs([6]uint8{255, 255, 255, 255, 255, 255}))
+	t.Errorf("GeneratePokemon did not panic when making a Pokemon with an invalid EVs")
 }
 
 func TestPokemonStringer(t *testing.T) {

@@ -2,8 +2,6 @@ package pokemonbattlelib
 
 import (
 	"fmt"
-	"io"
-	"log"
 	"math"
 )
 
@@ -72,14 +70,14 @@ const (
 type GeneratePokemonOption func(p *Pokemon)
 
 // Creates a new Pokemon given its national dex number
-func GeneratePokemon(natdex uint16, opts ...GeneratePokemonOption) *Pokemon {
+func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 	p := &Pokemon{
-		NatDex:          natdex,
+		NatDex:          uint16(natdex),
 		Level:           1,
 		TotalExperience: 0,
 		IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 		EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-		Nature:          GetNatureTable()["hardy"],
+		Nature:          GetNatureTable()["hardy"], // this nature is neutral and has no effect
 	}
 	for _, opt := range opts {
 		opt(p)
@@ -118,29 +116,6 @@ func WithNature(nature *Nature) GeneratePokemonOption {
 	}
 }
 
-func computeLevelFromExp(exp uint, growth_rate int) uint8 {
-	experience_csv := getCsvReader("data/experience.csv")
-
-	var lastExp uint = 0
-	for {
-		record, err := experience_csv.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		nextExp := uint(parseInt(record[2]))
-		if parseInt(record[0]) == growth_rate {
-			if exp > lastExp && exp <= nextExp {
-				return uint8(parseInt(record[1]))
-			}
-		}
-
-		lastExp = nextExp
-	}
-	panic("There was a problem computing the level.")
-}
-
 func (p *Pokemon) GetName() string {
 	return pokemonNames[p.NatDex]
 }
@@ -149,8 +124,8 @@ func (p *Pokemon) GetGrowthRate() int {
 	return pokemonGrowthRates[int(p.NatDex)]
 }
 
-func (p *Pokemon) GetBaseStats()[6]int {
-    return pokemonBaseStats[int(p.NatDex)]
+func (p *Pokemon) GetBaseStats() [6]int {
+	return pokemonBaseStats[int(p.NatDex)]
 }
 
 func (p *Pokemon) HasValidLevel() bool {
@@ -189,6 +164,10 @@ func (p *Pokemon) GainLevels(levels int) {
 		panic(fmt.Sprintf("%s's level tried to decrease by %d", p.GetName(), levels))
 	}
 
+	if levels == 0 {
+		return
+	}
+
 	p.Level = uint8(newLevel)
 	p.TotalExperience = uint(EXP_TABLE[p.GetGrowthRate()][int(p.Level)])
 	p.computeStats()
@@ -201,11 +180,16 @@ func (p *Pokemon) GainExperience(exp int) {
 		panic(fmt.Sprintf("%s's experience tried to decrease by %d", p.GetName(), exp))
 	}
 
+	if exp == 0 {
+		return
+	}
+
 	max_exp := EXP_TABLE[p.GetGrowthRate()][MAX_LEVEL]
 
 	// if would gain experience beyond leveling to 100, set level to 100
 	if int(p.TotalExperience)+exp > max_exp {
 		p.GainLevels(MAX_LEVEL - int(p.Level))
+		return
 	}
 
 	remaining_exp := exp
@@ -224,19 +208,19 @@ func (p *Pokemon) GainExperience(exp int) {
 
 func (p *Pokemon) computeStats() {
 	if !p.HasValidLevel() {
-		log.Println(fmt.Sprintf("Failed to compute stats for %s, level %d invalid", p.GetName(), p.Level))
+		panic(fmt.Sprintf("Failed to compute stats for %s, level %d invalid", p.GetName(), p.Level))
 	}
 
 	if !p.HasValidIVs() {
-		log.Println(fmt.Sprintf("Failed to compute stats for %s, ivs %d invalid", p.GetName(), p.IVs))
+		panic(fmt.Sprintf("Failed to compute stats for %s, ivs %d invalid", p.GetName(), p.IVs))
 	}
 
 	if !p.HasValidEVs() {
-		log.Println(fmt.Sprintf("Failed to compute stats for %s, evs %d invalid", p.GetName(), p.EVs))
+		panic(fmt.Sprintf("Failed to compute stats for %s, evs %d invalid", p.GetName(), p.EVs))
 	}
 
 	// get base stats
-    base_stats := p.GetBaseStats()	
+	base_stats := p.GetBaseStats()
 
 	// compute HP
 	hp_ev_term := math.Floor(float64(p.EVs[STAT_HP]) / 4)
