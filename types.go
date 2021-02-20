@@ -16,16 +16,6 @@ const (
 	STAT_SPD
 )
 
-// Constants for status effects on a Pokemon
-const (
-	STATUS_BURN = 1 << iota
-	STATUS_FREEZE
-	STATUS_PARALYZE
-	STATUS_POISON
-	STATUS_BADLY_POISON
-	STATUS_SLEEP
-)
-
 const (
 	MAX_STAT_MODIFIER = 6
 	MIN_STAT_MODIFIER = -6
@@ -181,6 +171,59 @@ func (g Gender) String() string {
 	} else {
 		panic("Stringing gender reached unhandled condition")
 	}
+}
+
+// Represents volatile and non-volatile status conditions on a pokemon.
+type StatusCondition uint32
+
+const (
+	StatusNone StatusCondition = 0
+
+	// Non volatile - first 3 bits
+	StatusBurn StatusCondition = iota
+	StatusFreeze
+	StatusParalyze
+	StatusPoison
+	StatusBadlyPoison
+	StatusSleep
+
+	// TODO: volatile - the rest of the bits
+	StatusBound StatusCondition = 1 << (iota + 3)
+	StatusCantEscape
+	StatusConfusion
+	StatusCursed
+	StatusEmbargo
+	StatusFlinch
+	StatusHealBlock
+	StatusIdentified
+	StatusInfatuation
+	StatusLeechSeed
+	StatusNightmare
+	StatusPerishSong
+	StatusTaunt
+	StatusTorment
+)
+
+const (
+	NONVOLATILE_STATUS_MASK StatusCondition = 0b111111
+	VOLATILE_STATUS_MASK    StatusCondition = math.MaxUint32 ^ NONVOLATILE_STATUS_MASK
+)
+
+func (s *StatusCondition) check(c StatusCondition) bool {
+	return *s&c == c
+}
+
+func (s *StatusCondition) apply(c StatusCondition) {
+	nv := c & NONVOLATILE_STATUS_MASK
+	if nv == 0 {
+		nv = *s & NONVOLATILE_STATUS_MASK
+	}
+	v := VOLATILE_STATUS_MASK & (*s | c)
+	*s = nv | v
+}
+
+func (s *StatusCondition) clear(c StatusCondition) {
+	*s ^= c
 }
 
 type Ability struct {
