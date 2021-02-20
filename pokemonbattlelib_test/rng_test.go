@@ -1,14 +1,9 @@
 package pokemonbattlelib_test
 
-import ( 
+import (
 	"testing"
-    . "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
- 
-    ".."
 
-	"fmt"
-	"reflect"
+	. "github.com/StevensSEC/pokemonbattlelib"
 )
 
 func TestLCRNGSeed(t *testing.T) {

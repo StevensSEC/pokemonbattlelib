@@ -1,11 +1,9 @@
 package pokemonbattlelib_test
 
-import ( 
+import (
 	"testing"
-    . "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
- 
-    ".."
+
+	. "github.com/StevensSEC/pokemonbattlelib"
 
 	"fmt"
 	"reflect"

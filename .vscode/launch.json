@@ -16,7 +16,7 @@
 			"type": "go",
 			"request": "launch",
 			"mode": "test",
-			"program": "${workspaceFolder}"
+			"program": "${workspaceFolder}/pokemonbattlelib_test"
 		},
 		{
 			"name": "Debug code generator",

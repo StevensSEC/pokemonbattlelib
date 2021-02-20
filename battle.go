@@ -13,7 +13,7 @@ type Battle struct {
 	ShiftSet bool // shift or set battle style for NPC trainer battles
 	State    BattleState
 
-	parties []*party // All parties participating in the battle
+	parties []*Party // All parties participating in the battle
 
 	tQueue     []Transaction
 	tProcessed []Transaction
@@ -36,12 +36,12 @@ func NewBattle() *Battle {
 }
 
 // Adds one or more parties to a team in the battle
-func (b *Battle) AddParty(p ...*party) {
+func (b *Battle) AddParty(p ...*Party) {
 	b.parties = append(b.parties, p...)
 }
 
 // Gets a reference to a Pokemon using party ID and party slot
-func (b *Battle) getPokemon(party, slot int) *Pokemon {
+func (b *Battle) GetPokemon(party, slot int) *Pokemon {
 	if party >= len(b.parties) {
 		panic(PartyIndexError)
 	}
@@ -53,7 +53,7 @@ func (b *Battle) getPokemon(party, slot int) *Pokemon {
 }
 
 // Gets all active ally Pokemon for a party
-func (b *Battle) GetAllies(p *party) []target {
+func (b *Battle) GetAllies(p *Party) []target {
 	allies := make([]target, 0)
 	targets := b.GetTargets()
 	for _, target := range targets {
@@ -65,7 +65,7 @@ func (b *Battle) GetAllies(p *party) []target {
 }
 
 // Gets all active opponent Pokemon for a party
-func (b *Battle) GetOpponents(p *party) []target {
+func (b *Battle) GetOpponents(p *Party) []target {
 	opponents := make([]target, 0)
 	targets := b.GetTargets()
 	for _, target := range targets {
@@ -126,7 +126,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		case FightTurn:
 			user := turn.Context.Pokemon
 			target := t.Target
-			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			receiver := b.GetPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
@@ -139,7 +139,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Damage:          damage,
 			})
 		case ItemTurn:
-			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			receiver := b.GetPokemon(t.Target.party, t.Target.partySlot)
 			move := receiver.Moves[t.Move]
 			b.QueueTransaction(ItemTransaction{
 				Target: receiver,
@@ -205,7 +205,7 @@ func (b *Battle) ProcessQueue() {
 					// TODO: prompt Agent for which pokemon to send out next
 					// auto send out next pokemon
 					b.QueueTransaction(SendOutTransaction{
-						Target:          b.getPokemon(t.TargetParty, i),
+						Target:          b.GetPokemon(t.TargetParty, i),
 						TargetParty:     t.TargetParty,
 						TargetPartySlot: i,
 					})
@@ -264,7 +264,7 @@ func (b *Battle) GetTargets() []target {
 }
 
 // Gets the current context for a pokemon to act (perform a turn)
-func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
+func (b *Battle) getContext(party *Party, pokemon *Pokemon) *BattleContext {
 	return &BattleContext{
 		Battle:    *b,
 		Pokemon:   *pokemon,
