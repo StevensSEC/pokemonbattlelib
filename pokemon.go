@@ -225,21 +225,3 @@ func (p Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
 		p.Gender, p.Level, p.CurrentHP, p.Stats[STAT_HP])
 }
-
-// Applies damage to a Pokemon. May cause Pokemon to faint.
-func (p *Pokemon) damage(amount uint) {
-	if p.CurrentHP >= amount {
-		p.CurrentHP -= amount
-	} else {
-		// prevent underflow
-		p.CurrentHP = 0
-	}
-}
-
-// Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
-func (p *Pokemon) heal(amount uint) {
-	if diff := p.Stats[STAT_HP] - p.CurrentHP; diff <= amount {
-		amount = diff
-	}
-	p.CurrentHP += amount
-}
