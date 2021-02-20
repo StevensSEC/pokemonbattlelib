@@ -218,27 +218,6 @@ func (p *Pokemon) computeStats() {
 	}
 }
 
-func (p *Pokemon) VerboseString() string {
-	outputString := ""
-	outputString += "{\n" +
-		fmt.Sprintf("\tNational dex number: %d\n", p.NatDex) +
-		fmt.Sprintf("\tLevel: %d\n", p.Level) +
-		fmt.Sprintf("\tAbility: %s\n", p.Ability) +
-		fmt.Sprintf("\tTotal experience: %d\n", p.TotalExperience) +
-		fmt.Sprintf("\tGender: %s\n", p.Gender) +
-		fmt.Sprintf("\tIVs: %v\n", p.IVs) +
-		fmt.Sprintf("\tEVs: %v\n", p.EVs) +
-		fmt.Sprintf("\tNature: %s\n", p.Nature) +
-		fmt.Sprintf("\tStats: %v\n", p.Stats) +
-		fmt.Sprintf("\tCurrent HP: %d\n", p.CurrentHP) +
-		fmt.Sprintf("\tHeld item: %v\n", p.HeldItem) +
-		fmt.Sprintf("\tMoves: %v\n", p.Moves) +
-		fmt.Sprintf("\tFriendship: %d\n", p.Friendship) +
-		fmt.Sprintf("\tOriginal trainer ID: %d\n", p.OriginalTrainerID) +
-		"}"
-	return outputString
-}
-
 // implement Stringer
 
 // display a Pokemon close to how it would appear in a Pokemon battle

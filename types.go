@@ -251,9 +251,3 @@ func (n Nature) getNatureModifers() [6]float64 {
 
 	return natureModifiers
 }
-
-// implement Stringer
-
-func (n Nature) String() string {
-	return n.name
-}

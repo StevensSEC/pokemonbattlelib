@@ -96,7 +96,7 @@ func TestPokemonConstructor(t *testing.T) {
 		t.Run(fmt.Sprintf("Pokemon constructor test"), func(t *testing.T) {
 			got := tt.pkmn
 			if !reflect.DeepEqual(got, tt.pkmn) {
-				t.Errorf("Pokemon constructor got %v, want %v", got.VerboseString(), tt.want.VerboseString())
+				t.Errorf("Pokemon constructor got %v, want %v", got, tt.want)
 			}
 		})
 	}
