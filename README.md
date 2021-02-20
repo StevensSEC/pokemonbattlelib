@@ -28,7 +28,7 @@ gh pr create
 
 ## Running Tests
 
-Ensure you have the ginkgo testing framewokr installed:
+Ensure you have the ginkgo testing framework installed:
 ```bash
 go install github.com/onsi/ginkgo/ginkgo
 ```
