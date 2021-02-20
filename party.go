@@ -27,6 +27,13 @@ func NewParty(agent *Agent, team int) *party {
 	}
 }
 
+// Creates a new party and fills it out with the passed Pokemon
+func NewOccupiedParty(agent *Agent, team int, pkmn ...*Pokemon) *party {
+	party := NewParty(agent, team)
+	party.AddPokemon(pkmn...)
+	return party
+}
+
 // Adds 1 or more Pokemon to a Party
 func (p *party) AddPokemon(pkmn ...*Pokemon) {
 	if len(p.pokemon)+len(pkmn) > MAX_PARTY_SIZE {

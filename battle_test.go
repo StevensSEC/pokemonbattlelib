@@ -37,12 +37,8 @@ func (a healAgent) Act(ctx *BattleContext) Turn {
 func TestBattleSetup(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
-	party1 := NewParty(&a1, 0)
-	pkmn1 := GetPokemon(4)
-	party1.AddPokemon(&pkmn1)
-	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(7)
-	party2.AddPokemon(&pkmn2)
+	party1 := NewOccupiedParty(&a1, 0, GeneratePokemon(4))
+	party2 := NewOccupiedParty(&a2, 0, GeneratePokemon(7))
 	b := NewBattle()
 	b.AddParty(party1, party2)
 }
@@ -51,18 +47,18 @@ func TestBattleOneRound(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
 	party1 := NewParty(&a1, 0)
-	pkmn1 := GetPokemon(4)
+	pkmn1 := GeneratePokemon(4)
 	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 10}
 	pkmn1.CurrentHP = 30
 	pound := GetMove(1)
 	pkmn1.Moves[0] = &pound
-	party1.AddPokemon(&pkmn1)
+	party1.AddPokemon(pkmn1)
 	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(7)
+	pkmn2 := GeneratePokemon(7)
 	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 10}
 	pkmn2.CurrentHP = 30
 	pkmn2.Moves[0] = &pound
-	party2.AddPokemon(&pkmn2)
+	party2.AddPokemon(pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
 	err := b.Start()
@@ -143,10 +139,7 @@ func TestItemTurn(t *testing.T) {
 // Tests if active Pokemon are set correctly
 func TestActivePokemon(t *testing.T) {
 	a := Agent(dumbAgent{})
-	party := NewParty(&a, 0)
-	pkmn1 := GetPokemon(7)
-	pkmn2 := GetPokemon(9)
-	party.AddPokemon(&pkmn1, &pkmn2)
+	party := NewOccupiedParty(&a, 0, GeneratePokemon(7), GeneratePokemon(9))
 	party.SetActive(0)
 	if len(party.activePokemon) != 1 {
 		t.Error("expected party to have 1 active Pokemon")
@@ -163,11 +156,7 @@ func TestActivePokemon(t *testing.T) {
 
 func TestGetPartyPokemon(t *testing.T) {
 	a1 := Agent(dumbAgent{})
-	party1 := NewParty(&a1, 0)
-	pkmn1 := GetPokemon(4)
-	pkmn2 := GetPokemon(7)
-	pkmn3 := GetPokemon(11)
-	party1.AddPokemon(&pkmn1, &pkmn2, &pkmn3)
+	party1 := NewOccupiedParty(&a1, 0, GeneratePokemon(4), GeneratePokemon(7), GeneratePokemon(11))
 	b := NewBattle()
 	b.AddParty(party1)
 	p := b.getPokemon(0, 1)
@@ -179,13 +168,8 @@ func TestGetPartyPokemon(t *testing.T) {
 func TestGetAllies(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
-	party1 := NewParty(&a1, 0)
-	pkmn1 := GetPokemon(4)
-	party1.AddPokemon(&pkmn1)
-	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(7)
-	pkmn3 := GetPokemon(9)
-	party2.AddPokemon(&pkmn2, &pkmn3)
+	party1 := NewOccupiedParty(&a1, 0, GeneratePokemon(4))
+	party2 := NewOccupiedParty(&a2, 1, GeneratePokemon(7), GeneratePokemon(9))
 	b := NewBattle()
 	b.AddParty(party1, party2)
 	err := b.Start()
@@ -209,13 +193,8 @@ func TestGetAllies(t *testing.T) {
 func TestGetOpponents(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
-	party1 := NewParty(&a1, 0)
-	pkmn1 := GetPokemon(4)
-	party1.AddPokemon(&pkmn1)
-	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(7)
-	pkmn3 := GetPokemon(9)
-	party2.AddPokemon(&pkmn2, &pkmn3)
+	party1 := NewOccupiedParty(&a1, 0, GeneratePokemon(4))
+	party2 := NewOccupiedParty(&a2, 1, GeneratePokemon(7), GeneratePokemon(9))
 	b := NewBattle()
 	b.AddParty(party1, party2)
 	err := b.Start()
@@ -240,18 +219,18 @@ func TestPokemonSpeed(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
 	party1 := NewParty(&a1, 0)
-	pkmn1 := GetPokemon(4)
+	pkmn1 := GeneratePokemon(4)
 	pound := GetMove(1)
 	pkmn1.Moves[0] = &pound
 	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 10}
 	pkmn1.CurrentHP = 30
-	party1.AddPokemon(&pkmn1)
+	party1.AddPokemon(pkmn1)
 	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(7)
+	pkmn2 := GeneratePokemon(7)
 	pkmn2.Moves[0] = &pound
 	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 12}
 	pkmn2.CurrentHP = 30
-	party2.AddPokemon(&pkmn2)
+	party2.AddPokemon(pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
 	err := b.Start()
@@ -312,22 +291,22 @@ func TestBattleFaintAutoSwitch(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
 	party1 := NewParty(&a1, 0)
-	pkmn1 := GetPokemon(4)
+	pkmn1 := GeneratePokemon(4)
 	pkmn1.Stats = [6]uint{30, 1, 1, 10, 10, 200}
 	pkmn1.CurrentHP = 1
-	pkmn3 := GetPokemon(387)
+	pkmn3 := GeneratePokemon(387)
 	pkmn3.Stats = [6]uint{30, 10, 10, 10, 10, 10}
 	pkmn3.CurrentHP = 30
 	pound := GetMove(1)
 	pkmn1.Moves[0] = &pound
 	pkmn3.Moves[0] = &pound
-	party1.AddPokemon(&pkmn1, &pkmn3)
+	party1.AddPokemon(pkmn1, pkmn3)
 	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(7)
+	pkmn2 := GeneratePokemon(7)
 	pkmn2.Stats = [6]uint{30, 800, 800, 10, 10, 10}
 	pkmn2.CurrentHP = 30
 	pkmn2.Moves[0] = &pound
-	party2.AddPokemon(&pkmn2)
+	party2.AddPokemon(pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
 	err := b.Start()
@@ -382,18 +361,18 @@ func TestBattleEndByKnockout(t *testing.T) {
 	a1 := Agent(dumbAgent{})
 	a2 := Agent(dumbAgent{})
 	party1 := NewParty(&a1, 0)
-	pkmn1 := GetPokemon(4)
+	pkmn1 := GeneratePokemon(4)
 	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 100}
 	pkmn1.CurrentHP = 1
 	pound := GetMove(1)
 	pkmn1.Moves[0] = &pound
-	party1.AddPokemon(&pkmn1)
+	party1.AddPokemon(pkmn1)
 	party2 := NewParty(&a2, 1)
-	pkmn2 := GetPokemon(7)
+	pkmn2 := GeneratePokemon(7)
 	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 10}
 	pkmn2.CurrentHP = 30
 	pkmn2.Moves[0] = &pound
-	party2.AddPokemon(&pkmn2)
+	party2.AddPokemon(pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
 	err := b.Start()

@@ -15,6 +15,7 @@ import (
 const ENGLISH_LANGUAGE_ID = 9
 const NATIONAL_DEX_ID = 1
 const HIGHEST_GEN = 4
+const HIGHEST_DEX_NUM = 493
 
 type data_pokemon struct {
 	Identifier     string
@@ -93,6 +94,28 @@ func contains(s []int, e int) bool {
 	return false
 }
 
+func createLevelTableStringFromArray(growth_rate_name string, level_array []int) string {
+	output := growth_rate_name + ": {\n"
+	for level, experience := range level_array {
+		output += fmt.Sprintf("%d: %d,\n", level, experience)
+	}
+	output += "}"
+	return output
+}
+
+func getIntArrayCodeOutput(arr []int) string {
+	output := "{"
+
+	// loop excluding last value
+	for _, value := range arr[0 : len(arr)-1] {
+		output += fmt.Sprintf("%d, ", value)
+	}
+
+	// add last value
+	output += fmt.Sprintf("%d}", arr[len(arr)-1])
+	return output
+}
+
 func createCodeOutput(s string) {
 	file, err := os.Create("pokedex_GEN.go")
 	if err != nil {
@@ -114,6 +137,15 @@ func main() {
 	}
 	log.Printf("Current directory: %s\n", path)
 	output := ""
+
+	growth_rate_strings := map[int]string{
+		1: "SLOW",
+		2: "MEDIUM_FAST",
+		3: "FAST",
+		4: "MEDIUM_SLOW",
+		5: "ERRATIC",
+		6: "FLUCTUATING",
+	}
 
 	// get all valid version ids
 	valid_version_groups := []int{}
@@ -228,29 +260,9 @@ func main() {
 			break
 		}
 	}
-	output += "var ALL_POKEMON = []Pokemon{\n"
-	for _, p := range pokemon {
-		// fmt.Printf("%v\n", p)
-		output += "{\n" +
-			fmt.Sprintf("NatDex:%d,\n", p.NatDex) +
-			fmt.Sprintf("Level:%d,\n", uint8(1)) +
-			// fmt.Sprintf("Ability:%s,\n", "new(Ability)") +
-			// fmt.Sprintf("TotalExperience:%d,\n", uint(0)) +
-			fmt.Sprintf("Gender:%s,\n", "Genderless") +
-			fmt.Sprintf("IVs:%s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}") +
-			fmt.Sprintf("EVs:%s,\n", "[6]uint8{0, 0, 0, 0, 0, 0}") +
-			// fmt.Sprintf("Nature:%s,\n", "new(Nature)") +
-			fmt.Sprintf("Stats:%s,\n", "[6]uint{0, 0, 0, 0, 0, 0}") +
-			// fmt.Sprintf("CurrentHP:%d,\n", uint(0)) +
-			// fmt.Sprintf("HeldItem:%v,\n", "new(Item)") +
-			fmt.Sprintf("Moves:%s,\n", "[4]*Move{}") +
-			// fmt.Sprintf("Friendship:%d,\n", uint8(0)) +
-			// fmt.Sprintf("OriginalTrainerID: %d,\n", uint16(0)) +
-			"},\n"
-	}
-	output += "}\n\n" +
+	output += "\n\n" +
 		"// A map of national pokedex numbers to pokemon names.\n" +
-		"var PokemonNames = map[uint16]string{\n"
+		"var pokemonNames = map[uint16]string{\n"
 	for _, p := range pokemon {
 		if p.NatDex == 0 {
 			continue
@@ -418,7 +430,138 @@ func main() {
 			item.ID, item_names[item.ID], item.CategoryID, item.FlingPower, item.FlingEffectID)
 	}
 	output += "}\n\n"
+
+	// create table of levels to the exp at that level
+
+	log.Println("Getting experience table")
+	experience_csv := getCsvReader("data/experience.csv")
+
+	slow_leveling := make([]int, 101)
+	med_fast_leveling := make([]int, 101)
+	fast_leveling := make([]int, 101)
+	med_slow_leveling := make([]int, 101)
+	erratic_leveling := make([]int, 101)
+	fluctuating_leveling := make([]int, 101)
+
+	output += "//A table of levels mapped to the total experience at that level for each growth rate\n" +
+		"var EXP_TABLE = map[int]map[int]int{\n"
+
+	for {
+		record, err := experience_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		growth_rate_id := parseInt(record[0])
+		level := parseInt(record[1])
+		experience := parseInt(record[2])
+		switch growth_rate_id {
+		case 1:
+			slow_leveling[level] = experience
+		case 2:
+			med_fast_leveling[level] = experience
+		case 3:
+			fast_leveling[level] = experience
+		case 4:
+			med_slow_leveling[level] = experience
+		case 5:
+			erratic_leveling[level] = experience
+		case 6:
+			fluctuating_leveling[level] = experience
+		}
+	}
+
+	output += createLevelTableStringFromArray("SLOW", slow_leveling) + ","
+	output += createLevelTableStringFromArray("MEDIUM_FAST", med_fast_leveling) + ","
+	output += createLevelTableStringFromArray("FAST", fast_leveling) + ","
+	output += createLevelTableStringFromArray("MEDIUM_SLOW", med_slow_leveling) + ","
+	output += createLevelTableStringFromArray("ERRATIC", erratic_leveling) + ","
+	output += createLevelTableStringFromArray("FLUCTUATING", fluctuating_leveling) + ","
+	output += "}\n\n"
+
+	log.Println("Mapping growth rates to dex numbers")
+	// map growth rates to pokemon national dex numbers
+	pokemon_species_csv := getCsvReader("data/pokemon_species.csv")
+	growth_rates := make([]int, HIGHEST_DEX_NUM+1)
+
+	for {
+		record, err := pokemon_species_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		growth_rate_id := parseInt(record[14])
+		dex_num := parseInt(record[0])
+
+		if dex_num == 0 {
+			continue
+		}
+
+		if dex_num > HIGHEST_DEX_NUM {
+			break
+		}
+
+		growth_rates[dex_num] = growth_rate_id
+	}
+
+	output += "// A map of national pokedex numbers to Pokemon growth rates\n"
+	output += "var pokemonGrowthRates = map[int]int{\n"
+
+	for dex_num, growth_rate := range growth_rates {
+
+		if dex_num == 0 {
+			continue
+		}
+
+		output += fmt.Sprintf("%d: %s,\n", dex_num, growth_rate_strings[growth_rate])
+	}
+	output += "}\n\n"
+
+	// pokemon base stat
+	log.Println("Creating base stat table")
+	output += "// A map of national pokedex numbers to Pokemon base stats\n"
+	output += "var pokemonBaseStats = map[int][6]int{\n"
+
+	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
+	base_stat_array := make([][]int, HIGHEST_DEX_NUM+1)
+	for i := range base_stat_array {
+		number_of_stats := 6
+		base_stat_array[i] = make([]int, number_of_stats)
+	}
+
+	for {
+		record, err := pokemon_stats_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		dex_num := parseInt(record[0])
+
+		if dex_num > HIGHEST_DEX_NUM {
+			break
+		}
+
+		stat_id := parseInt(record[1]) - 1
+		stat_value := parseInt(record[2])
+
+		base_stat_array[dex_num][stat_id] = stat_value
+	}
+
+	for dex_num, stats := range base_stat_array {
+
+		if dex_num == 0 {
+			continue
+		}
+
+		output += fmt.Sprintf("%d: %s,\n", dex_num, getIntArrayCodeOutput(stats))
+	}
+	output += "}\n\n"
+
 	createCodeOutput(output)
+
 	// run gofmt on generated code
 	log.Println("Formatting generated code...")
 	cmd := exec.Command("gofmt", "-w", "pokedex_GEN.go")

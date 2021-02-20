@@ -13,6 +13,9 @@ type Battle struct {
 	State    BattleState
 
 	parties []*party // All parties participating in the battle
+
+	tQueue     []Transaction
+	tProcessed []Transaction
 }
 
 type BattleState int
@@ -117,9 +120,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		return false
 	})
 	// Run turns in sorted order and update battle state
-	transactions := []Transaction{}
 	for _, turn := range turns {
-		queue := []Transaction{}
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
@@ -127,7 +128,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
 			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
-			queue = append(queue, DamageTransaction{
+			b.QueueTransaction(DamageTransaction{
 				User:   &user,
 				Target: t.Target,
 				Move:   user.Moves[t.Move],
@@ -136,75 +137,96 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		case ItemTurn:
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			move := receiver.Moves[t.Move]
-			queue = append(queue, ItemTransaction{
+			b.QueueTransaction(ItemTransaction{
 				Target: receiver,
 				Item:   t.Item,
 				Move:   move,
 			})
-			queue = append(queue, receiver.UseItem(t.Item)...)
+			b.QueueTransaction(receiver.UseItem(t.Item)...)
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
-		// process transations for this turn
-		for len(queue) > 0 {
-			next := queue[0]
-			queue = queue[1:]
-			switch t := next.(type) {
-			case DamageTransaction:
-				receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-				receiver.damage(t.Damage)
-				if receiver.CurrentHP == 0 {
-					// pokemon has fainted
-					queue = append(queue, FaintTransaction{
-						Target: t.Target,
-					})
-				}
-			case ItemTransaction:
-				// TODO: do not consume certain items
-				if t.Target.HeldItem == t.Item {
-					t.Target.HeldItem = nil
-				}
-			case HealTransaction:
-				t.Target.heal(t.Amount)
-			case FaintTransaction:
-				p := b.parties[t.Target.party]
-				p.SetInactive(t.Target.partySlot)
-				anyAlive := false
-				for i, pkmn := range p.pokemon {
-					if pkmn.CurrentHP > 0 {
-						anyAlive = true
-						// TODO: prompt Agent for which pokemon to send out next
-						// auto send out next pokemon
-						nextPokemon := target{
-							Team:      p.team,
-							Pokemon:   *b.getPokemon(t.Target.party, i),
-							party:     t.Target.party,
-							partySlot: t.Target.partySlot,
-						}
-						queue = append(queue, SendOutTransaction{
-							Target: nextPokemon,
-						})
-						break
+
+		b.ProcessQueue()
+	}
+
+	if len(b.tQueue) > 0 {
+		log.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
+	}
+	transactions := b.tProcessed
+	b.tProcessed = []Transaction{}
+	return transactions, b.State == BATTLE_END
+}
+
+// Add Transactions to the queue.
+func (b *Battle) QueueTransaction(t ...Transaction) {
+	b.tQueue = append(b.tQueue, t...)
+}
+
+// Process Transactions that are in the queue until the queue is empty.
+func (b *Battle) ProcessQueue() {
+	for len(b.tQueue) > 0 {
+		next := b.tQueue[0]
+		b.tQueue = b.tQueue[1:]
+		switch t := next.(type) {
+		case DamageTransaction:
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			if receiver.CurrentHP >= t.Damage {
+				receiver.CurrentHP -= t.Damage
+			} else {
+				// prevent underflow
+				receiver.CurrentHP = 0
+			}
+			if receiver.CurrentHP == 0 {
+				// pokemon has fainted
+				b.QueueTransaction(FaintTransaction{
+					Target: t.Target,
+				})
+			}
+		case ItemTransaction:
+			// TODO: do not consume certain items
+			if t.Target.HeldItem == t.Item {
+				t.Target.HeldItem = nil
+			}
+		case HealTransaction:
+			t.Target.CurrentHP += t.Amount
+		case FaintTransaction:
+			p := b.parties[t.Target.party]
+			p.SetInactive(t.Target.partySlot)
+			anyAlive := false
+			for i, pkmn := range p.pokemon {
+				if pkmn.CurrentHP > 0 {
+					anyAlive = true
+					// TODO: prompt Agent for which pokemon to send out next
+					// auto send out next pokemon
+					target := target{
+						Pokemon:   *b.getPokemon(t.Target.party, i),
+						Team:      p.team,
+						party:     t.Target.party,
+						partySlot: t.Target.partySlot,
 					}
+					b.QueueTransaction(SendOutTransaction{
+						Target: target,
+					})
+					break
 				}
-				if !anyAlive {
-					// cause the battle to end by knockout
-					queue = append(queue, EndBattleTransaction{})
-				}
-			case SendOutTransaction:
-				p := b.parties[t.Target.party]
-				p.SetActive(t.Target.partySlot)
-			case EndBattleTransaction:
-				b.State = BATTLE_END
 			}
-			// add to the list of processed transactions
-			transactions = append(transactions, next)
-			if b.State == BATTLE_END {
-				break
+			if !anyAlive {
+				// cause the battle to end by knockout
+				b.QueueTransaction(EndBattleTransaction{})
 			}
+		case SendOutTransaction:
+			p := b.parties[t.Target.party]
+			p.SetActive(t.Target.partySlot)
+		case EndBattleTransaction:
+			b.State = BATTLE_END
+		}
+		// add to the list of processed transactions
+		b.tProcessed = append(b.tProcessed, next)
+		if b.State == BATTLE_END {
+			break
 		}
 	}
-	return transactions, b.State == BATTLE_END
 }
 
 type target struct {
