@@ -1,9 +1,14 @@
-package pokemonbattlelib
+package pokemonbattlelib_test
 
-import (
+import ( 
+	"testing"
+    . "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+ 
+    ".."
+
 	"fmt"
 	"reflect"
-	"testing"
 )
 
 type dumbAgent struct{}

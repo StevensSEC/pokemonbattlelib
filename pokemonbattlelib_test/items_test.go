@@ -1,7 +1,15 @@
-package pokemonbattlelib
+package pokemonbattlelib_test
 
-import "testing"
+import ( 
+	"testing"
+    . "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+ 
+    ".."
 
+	"fmt"
+	"reflect"
+)
 func testLog(t *testing.T, tt Transaction, want string) {
 	// TODO: generalize more testing functions
 	if got := tt.BattleLog(); got != want {

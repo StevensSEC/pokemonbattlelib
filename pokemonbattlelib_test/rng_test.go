@@ -1,6 +1,15 @@
-package pokemonbattlelib
+package pokemonbattlelib_test
 
-import "testing"
+import ( 
+	"testing"
+    . "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+ 
+    ".."
+
+	"fmt"
+	"reflect"
+)
 
 func TestLCRNGSeed(t *testing.T) {
 	gen := LCRNG(0)

@@ -1,8 +1,14 @@
-package pokemonbattlelib
+package pokemonbattlelib_test
 
-import (
-	"fmt"
+import ( 
 	"testing"
+    . "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+ 
+    ".."
+
+	"fmt"
+	"reflect"
 )
 
 func TestGetEffect(t *testing.T) {
