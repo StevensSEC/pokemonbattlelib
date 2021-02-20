@@ -268,3 +268,50 @@ func TestStatusConditionClear(t *testing.T) {
 		})
 	}
 }
+
+func TestStatusConditionString(t *testing.T) {
+	tests := []struct {
+		name string
+		cond StatusCondition
+		want string
+	}{
+		{
+			name: "None",
+			cond: StatusNone,
+			want: "",
+		},
+		{
+			name: "Burn",
+			cond: StatusBurn,
+			want: "burned",
+		},
+		{
+			name: "Poison",
+			cond: StatusPoison,
+			want: "poisoned",
+		},
+		{
+			name: "Sleep",
+			cond: StatusSleep,
+			want: "asleep",
+		},
+		{
+			name: "Freeze, Bound",
+			cond: StatusFreeze | StatusBound,
+			want: "frozen, bound",
+		},
+		{
+			name: "Paralyzed, Bound, Confusion, Torment",
+			cond: StatusParalyze | StatusBound | StatusConfusion | StatusTorment,
+			want: "paralyzed, bound, confused, tormented",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("Status Condition Stringer: %s", tt.name), func(t *testing.T) {
+			got := fmt.Sprintf("%s", tt.cond)
+			if got != tt.want {
+				t.Errorf("Status Condition %s got %v, want %v", tt.name, got, tt.want)
+			}
+		})
+	}
+}
