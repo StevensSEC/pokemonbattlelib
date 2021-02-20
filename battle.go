@@ -124,10 +124,17 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
+			move := user.Moves[t.Move]
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			modifier := uint(1) // TODO: damage multiplers
-			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
+			levelEffect := (2 * uint(user.Level) / 5) + 2
+			movePower := uint(move.Power)
+			statRatio := user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF]
+			if move.Category == Special {
+				statRatio = user.Stats[STAT_SPATK] / receiver.Stats[STAT_SPDEF]
+			}
+			damage := (((levelEffect * movePower * statRatio) / 50) + 2) * modifier
 			b.QueueTransaction(DamageTransaction{
 				User:   &user,
 				Target: t.Target,
