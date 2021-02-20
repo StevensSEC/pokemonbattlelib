@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/bits"
+	"strings"
 )
 
 // Constants for looking up Pokemon stats
@@ -205,6 +206,31 @@ const (
 	StatusTorment
 )
 
+// Status effect strings in past tense. Mostly for use in battle log.
+var statusStrings = map[StatusCondition]string{
+	StatusNone:        "",
+	StatusBurn:        "burned",
+	StatusFreeze:      "frozen",
+	StatusParalyze:    "paralyzed",
+	StatusPoison:      "poisoned",
+	StatusBadlyPoison: "badly poisoned",
+	StatusSleep:       "asleep",
+	StatusBound:       "bound",
+	StatusCantEscape:  "can't escape",
+	StatusConfusion:   "confused",
+	StatusCursed:      "cursed",
+	StatusEmbargo:     "embargoed",
+	StatusFlinch:      "flinched",
+	StatusHealBlock:   "heal blocked",
+	StatusInfatuation: "infatuated",
+	StatusIdentified:  "identified",
+	StatusLeechSeed:   "leeched",
+	StatusNightmare:   "nightmared",
+	StatusPerishSong:  "perished",
+	StatusTaunt:       "taunted",
+	StatusTorment:     "tormented",
+}
+
 const (
 	NONVOLATILE_STATUS_MASK StatusCondition = 0b111
 	VOLATILE_STATUS_MASK    StatusCondition = math.MaxUint32 ^ NONVOLATILE_STATUS_MASK
@@ -231,6 +257,27 @@ func (s *StatusCondition) apply(c StatusCondition) {
 
 func (s *StatusCondition) clear(c StatusCondition) {
 	*s ^= c
+}
+
+func (s StatusCondition) String() string {
+	// fast path
+	if val, ok := statusStrings[s]; ok {
+		return val
+	}
+
+	// slower path
+	result := []string{}
+	for c := StatusBurn; c <= StatusSleep; c++ {
+		if s.check(c) {
+			result = append(result, statusStrings[c])
+		}
+	}
+	for c := StatusBound; c <= StatusTorment; c <<= 1 {
+		if s.check(c) {
+			result = append(result, statusStrings[c])
+		}
+	}
+	return strings.Join(result, ", ")
 }
 
 type Ability struct {
