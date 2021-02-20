@@ -329,7 +329,7 @@ var _ = Describe("Fainting", func() {
 			// Squirtle's shell that broke, it was Charmanders knuckles.
 			// The Squirtle was unfazed.
 			log1 := transactions[1].BattleLog()
-			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 680 damage."))
+			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 674 damage."))
 			// Ash watched in horror as his Charmander was obliterated from the
 			// battlefield. "Critical hit!" echoed the automated announcer. The
 			// Squirtle snarled, now covered in the entrails of his previous

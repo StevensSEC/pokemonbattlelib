@@ -1,212 +1,165 @@
 package pokemonbattlelib_test
 
 import (
-	"testing"
-
 	. "github.com/StevensSEC/pokemonbattlelib"
-
-	"fmt"
-	"reflect"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestGeneratePokemon(t *testing.T) {
-	p := GeneratePokemon(8)
-	if p.NatDex != 8 {
-		t.Errorf("expected Pokemon national dex to be 8, received %v", p.NatDex)
-	}
-}
+var _ = Describe("Pokemon generation", func() {
+	It("generates a Pokemon given just a dex number", func() {
+		p := GeneratePokemon(8)
+		Expect(int(p.NatDex)).To(Equal(8))
+	})
 
-func TestPokemonName(t *testing.T) {
-	p := GeneratePokemon(1)
-	if p.GetName() != "Bulbasaur" {
-		t.Errorf("expected Pokemon name to be Bulbasaur, received %v", p.GetName())
-	}
-}
+	It("gets the name of a generated Pokemon", func() {
+		p := GeneratePokemon(1)
+		Expect(p.GetName()).To(Equal("Bulbasaur"))
+	})
 
-func TestPokemonConstructor(t *testing.T) {
-	tests := []struct {
+	It("generates a Pokemon with a given level", func() {
+		p := GeneratePokemon(393, WithLevel(5))
+		want := &Pokemon{
+			NatDex:          393, // piplup if you're curious
+			Level:           5,
+			TotalExperience: 135,
+			CurrentHP:       20,
+			IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+			EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+			Nature:          GetNature(HARDY),
+			Stats:           [6]uint{20, 10, 10, 11, 10, 9},
+		}
+		Expect(p).To(Equal(want))
+	})
+
+	It("generates a Pokemon with a given total experience", func() {
+		p := GeneratePokemon(393, WithTotalExp(135))
+		want := &Pokemon{
+			NatDex:          393,
+			Level:           5,
+			TotalExperience: 135,
+			CurrentHP:       20,
+			IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+			EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+			Nature:          GetNature(HARDY),
+			Stats:           [6]uint{20, 10, 10, 11, 10, 9},
+		}
+		Expect(p).To(Equal(want))
+	})
+
+	It("generates a Pokemon with a given set of IVs", func() {
+		pkmn := GeneratePokemon(393, WithLevel(5), WithIVs([6]uint8{31, 31, 31, 31, 31, 31}))
+		want := &Pokemon{
+			NatDex:          393,
+			Level:           5,
+			TotalExperience: 135,
+			CurrentHP:       21,
+			IVs:             [6]uint8{31, 31, 31, 31, 31, 31},
+			EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+			Nature:          GetNature(HARDY),
+			Stats:           [6]uint{21, 11, 11, 12, 12, 10},
+		}
+		Expect(pkmn).To(Equal(want))
+	})
+
+	It("generates a Pokemon with a given set of EVs", func() {
+		pkmn := GeneratePokemon(393, WithLevel(5), WithEVs([6]uint8{0, 252, 6, 0, 0, 252}))
+		want := &Pokemon{
+			NatDex:          393,
+			Level:           5,
+			TotalExperience: 135,
+			CurrentHP:       20,
+			IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+			EVs:             [6]uint8{0, 252, 6, 0, 0, 252},
+			Nature:          GetNature(HARDY),
+			Stats:           [6]uint{20, 13, 10, 11, 10, 12},
+		}
+		Expect(pkmn).To(Equal(want))
+	})
+
+	It("generates a Pokemon with a given Nature", func() {
+		pkmn := GeneratePokemon(393, WithLevel(5), WithNature(GetNature(ADAMANT)))
+		want := &Pokemon{
+			NatDex:          393,
+			Level:           5,
+			TotalExperience: 135,
+			CurrentHP:       20,
+			IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+			EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+			Nature:          GetNature(ADAMANT),
+			Stats:           [6]uint{20, 11, 10, 9, 10, 9},
+		}
+		Expect(pkmn).To(Equal(want))
+	})
+
+	It("creates Pokemon with accurate stats reflecting its given values", func() {
+		// see: https://bulbapedia.bulbagarden.net/wiki/Stat, scroll down to 'Example'
+		pkmn := GeneratePokemon(
+			445,
+			WithLevel(78),
+			WithIVs([6]uint8{24, 12, 30, 16, 23, 5}),
+			WithEVs([6]uint8{74, 190, 91, 48, 84, 23}),
+			WithNature(GetNature(ADAMANT)))
+		want := &Pokemon{
+			NatDex:          445, // garchomp
+			Level:           78,
+			TotalExperience: 593190,
+			CurrentHP:       289,
+			IVs:             [6]uint8{24, 12, 30, 16, 23, 5},
+			EVs:             [6]uint8{74, 190, 91, 48, 84, 23},
+			Nature:          GetNature(ADAMANT),
+			Stats:           [6]uint{289, 278, 193, 135, 171, 171},
+		}
+		Expect(pkmn).To(Equal(want))
+	})
+
+	It("panics when trying to create a Pokemon with higher than max level", func() {
+		Expect(func() { GeneratePokemon(396, WithLevel(MAX_LEVEL+1)) }).To(Panic())
+	})
+
+	It("panics when creating a Pokemon with higher than max IVs", func() {
+		Expect(func() { GeneratePokemon(396, WithIVs([6]uint8{32, 32, 32, 32, 32, 32})) }).To(Panic())
+	})
+
+	It("panics when creating a Pokemon with higher than max EVs", func() {
+		Expect(func() { GeneratePokemon(396, WithEVs([6]uint8{255, 255, 255, 255, 255, 255})) }).To(Panic())
+	})
+
+})
+
+var _ = Describe("Test leveling methods", func() {
+	It("panics when leveling beyond the max level", func() {
+		pkmn := GeneratePokemon(6, WithLevel(MAX_LEVEL))
+		Expect(func() { pkmn.GainLevels(1) }).To(Panic())
+	})
+
+	It("panics when trying to level down", func() {
+		pkmn := GeneratePokemon(393, WithLevel(5))
+		Expect(func() { pkmn.GainLevels(-1) }).To(Panic())
+	})
+
+	It("panics when trying to lose experience", func() {
+		pkmn := GeneratePokemon(393, WithLevel(5))
+		Expect(func() { pkmn.GainExperience(-135) }).To(Panic())
+	})
+
+	It("prevents a Pokemon from gaining experience beyond the max", func() {
+		pkmn := GeneratePokemon(493, WithLevel(MAX_LEVEL))
+		pkmn.GainExperience(100000000000)
+		Expect(int(pkmn.Level)).To(Equal(MAX_LEVEL))
+	})
+})
+
+var _ = Describe("Stringer interface", func() {
+	var (
 		pkmn *Pokemon
-		want *Pokemon
-	}{
-		{
-			pkmn: GeneratePokemon(393, WithLevel(5)), // constructor w/ dex number and level
-			want: &Pokemon{
-				NatDex:          393, // piplup if you're curious
-				Level:           5,
-				TotalExperience: 135,
-				CurrentHP:       20,
-				IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				Nature:          GetNature(HARDY),
-				Stats:           [6]uint{20, 10, 10, 10, 10, 10},
-			},
-		},
-		{
-			pkmn: GeneratePokemon(393, WithTotalExp(135)), // constructor w/ dex number and total exp
-			want: &Pokemon{
-				NatDex:          393,
-				Level:           5,
-				TotalExperience: 135,
-				CurrentHP:       20,
-				IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				Nature:          GetNature(HARDY),
-				Stats:           [6]uint{20, 10, 10, 10, 10, 10},
-			},
-		},
-		{
-			pkmn: GeneratePokemon(393, WithLevel(5), WithIVs([6]uint8{31, 31, 31, 31, 31, 31})), // constructor w/ dex number, level, ivs
-			want: &Pokemon{
-				NatDex:          393,
-				Level:           5,
-				TotalExperience: 135,
-				CurrentHP:       20,
-				IVs:             [6]uint8{31, 31, 31, 31, 31, 31},
-				EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				Nature:          GetNature(HARDY),
-				Stats:           [6]uint{21, 11, 11, 11, 11, 11},
-			},
-		},
-		{
-			pkmn: GeneratePokemon(393, WithLevel(5), WithIVs([6]uint8{0, 0, 0, 0, 0, 0}), WithEVs([6]uint8{0, 252, 6, 0, 0, 252})), // constructor w/ dex number, level, ivs, evs
-			want: &Pokemon{
-				NatDex:          393,
-				Level:           5,
-				TotalExperience: 135,
-				CurrentHP:       20,
-				IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				EVs:             [6]uint8{0, 252, 6, 0, 0, 252},
-				Nature:          GetNature(HARDY),
-				Stats:           [6]uint{20, 13, 10, 10, 10, 13},
-			},
-		},
-		{
-			pkmn: GeneratePokemon(393, WithLevel(5), WithIVs([6]uint8{0, 0, 0, 0, 0, 0}), WithEVs([6]uint8{0, 0, 0, 0, 0, 0}), WithNature(GetNature(ADAMANT))), // constructor w/ dex number, level, ivs, evs, nature
-			want: &Pokemon{
-				NatDex:          393,
-				Level:           5,
-				TotalExperience: 135,
-				CurrentHP:       20,
-				IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-				Nature:          GetNature(ADAMANT),
-				Stats:           [6]uint{20, 11, 10, 9, 10, 9},
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("Pokemon constructor test"), func(t *testing.T) {
-			got := tt.pkmn
-			if !reflect.DeepEqual(got, tt.pkmn) {
-				t.Errorf("Pokemon constructor got %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestPokemonConstructorAccurateResult(t *testing.T) {
-	tests := []struct {
-		pkmn *Pokemon
-		want *Pokemon
-	}{
-		{
-			// see: https://bulbapedia.bulbagarden.net/wiki/Stat, scroll down to 'Example'
-			pkmn: GeneratePokemon(445, WithLevel(78), WithIVs([6]uint8{24, 12, 30, 16, 23, 5}), WithEVs([6]uint8{74, 190, 91, 48, 84, 23}), WithNature(GetNature(ADAMANT))),
-			want: &Pokemon{
-				NatDex:          445, // garchomp
-				Level:           78,
-				TotalExperience: 593190,
-				CurrentHP:       289,
-				IVs:             [6]uint8{24, 12, 30, 16, 23, 5},
-				EVs:             [6]uint8{74, 190, 91, 48, 84, 23},
-				Nature:          GetNature(ADAMANT),
-				Stats:           [6]uint{289, 278, 193, 135, 171, 171},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("Pokemon accurate constructor test"), func(t *testing.T) {
-			got := tt.pkmn
-			if got.TotalExperience != tt.want.TotalExperience {
-				t.Errorf("Pokemon constructor produced %v for experience, want %v", got.TotalExperience, tt.want.TotalExperience)
-			}
-
-			if !reflect.DeepEqual(got.Stats, tt.want.Stats) {
-				t.Errorf("Pokemon constructor produced %v for stats, want %v", got.Stats, tt.want.Stats)
-			}
-		})
-	}
-}
-
-func TestPokemonCannotLevelBeyondMax(t *testing.T) {
-	pkmn := GeneratePokemon(6, WithLevel(MAX_LEVEL))
-	defer func() { recover() }()
-	pkmn.GainLevels(1)
-	t.Errorf("GainLevels did not panic when leveling past max")
-}
-
-func TestPokemonCannotDecreaseLevel(t *testing.T) {
-	pkmn := GeneratePokemon(393, WithLevel(5))
-	defer func() { recover() }()
-	pkmn.GainLevels(-1)
-	t.Errorf("GainLevels did not panic when attempting to remove levels")
-}
-
-func TestPokemonCannotDecreaseExperience(t *testing.T) {
-	pkmn := GeneratePokemon(393, WithLevel(5))
-	defer func() { recover() }()
-	pkmn.GainExperience(-135)
-	t.Errorf("GainExperience did not panic when attempting to remove experience points")
-}
-
-func TestPokemonLevelsToMaxWhenGainingExpBeyondMax(t *testing.T) {
-	pkmn := GeneratePokemon(493, WithLevel(MAX_LEVEL))
-	pkmn.GainExperience(100000000000)
-	if pkmn.Level != MAX_LEVEL {
-		t.Errorf("Expected level to be %d, got %d", MAX_LEVEL, pkmn.Level)
-	}
-}
-
-func TestPokemonCannotHaveHigherThanMaxLevel(t *testing.T) {
-	defer func() { recover() }()
-	GeneratePokemon(396, WithLevel(MAX_LEVEL+1))
-	t.Errorf("GeneratePokemon did not panic when making a Pokemon with an invalid level")
-}
-
-func TestPokemonCannotHaveHigherThanMaxIVs(t *testing.T) {
-	defer func() { recover() }()
-	GeneratePokemon(396, WithIVs([6]uint8{32, 32, 32, 32, 32, 32}))
-	t.Errorf("GeneratePokemon did not panic when making a Pokemon with invalid IVs")
-}
-func TestPokemonCannotHaveHigherThanTotalEVs(t *testing.T) {
-	defer func() { recover() }()
-	GeneratePokemon(396, WithEVs([6]uint8{255, 255, 255, 255, 255, 255}))
-	t.Errorf("GeneratePokemon did not panic when making a Pokemon with an invalid EVs")
-}
-
-func TestPokemonStringer(t *testing.T) {
-	tests := []struct {
-		pkmn Pokemon
 		want string
-	}{
-		{
-			pkmn: Pokemon{
-				NatDex:    1,
-				Gender:    Female,
-				Level:     5,
-				CurrentHP: 11,
-				Stats:     [6]uint{11, 6, 5, 6, 5, 5},
-			},
-			want: "Bulbasaur♀\tLv5\nHP: 11/11\n",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("Pokemon Stringer: %d", tt.pkmn.NatDex), func(t *testing.T) {
-			got := fmt.Sprintf("%s", tt.pkmn)
-			if got != tt.want {
-				t.Errorf("Pokemon Stringer %d got %v, want %v", tt.pkmn.NatDex, got, tt.want)
-			}
-		})
-	}
-}
+	)
+
+	It("prints as expected", func() {
+		pkmn = GeneratePokemon(1, WithLevel(5))
+		pkmn.Gender = Female
+		want = "Bulbasaur♀\tLv5\nHP: 19/19\n"
+		Expect(pkmn.String()).To(Equal(want))
+	})
+})

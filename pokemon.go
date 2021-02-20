@@ -188,9 +188,9 @@ func (p *Pokemon) GainExperience(exp int) {
 	remaining_exp := exp
 	toNextLevel := EXP_TABLE[p.GetGrowthRate()][int(p.Level+1)] - int(p.TotalExperience)
 
-	for remaining_exp > toNextLevel {
-		p.GainLevels(1)
+	for remaining_exp >= toNextLevel {
 		remaining_exp -= toNextLevel
+		p.GainLevels(1)
 		toNextLevel = EXP_TABLE[p.GetGrowthRate()][int(p.Level+1)] - int(p.TotalExperience)
 	}
 
