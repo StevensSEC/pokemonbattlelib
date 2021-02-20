@@ -136,6 +136,31 @@ func TestItemTurn(t *testing.T) {
 	}
 }
 
+func TestInflictStatus(t *testing.T) {
+	a1 := Agent(dumbAgent{})
+	a2 := Agent(dumbAgent{})
+	p1 := GeneratePokemon(1)
+	stunSpore := GetMove(78)
+	p1.Moves[0] = &stunSpore
+	party1 := NewOccupiedParty(&a1, 0, p1)
+	p2 := GeneratePokemon(2)
+	pound := GetMove(1)
+	p2.Moves[0] = &pound
+	party2 := NewOccupiedParty(&a2, 1, p2)
+	b := NewBattle()
+	b.AddParty(party1, party2)
+	b.Start()
+	transactions, _ := b.SimulateRound()
+	if len(transactions) != 2 {
+		t.Errorf("expected 1 inflict status, 1 damage transaction")
+	}
+	want := "Ivysaur now has <STATUS: 3>!"
+	got := transactions[1].BattleLog()
+	if want != got {
+		t.Errorf("expected battle log to be %v, got %v\n", want, got)
+	}
+}
+
 // Tests if active Pokemon are set correctly
 func TestActivePokemon(t *testing.T) {
 	a := Agent(dumbAgent{})
