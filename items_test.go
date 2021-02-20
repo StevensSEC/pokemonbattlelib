@@ -14,7 +14,7 @@ func TestUseItem(t *testing.T) {
 	if i.Name != "Potion" {
 		t.Errorf("expected item to be named 'Potion', received %v", i.Name)
 	}
-	p := GetPokemon(1)
+	p := GeneratePokemon(1)
 	p.CurrentHP = 50
 	p.Stats = [6]uint{100, 0, 0, 0, 0, 0}
 	testLog(t, p.UseItem(&i)[0], "Bulbasaur restored 20 HP.")
