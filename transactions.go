@@ -10,19 +10,30 @@ type Transaction interface {
 
 // A transaction to deal damage to an opponent Pokemon.
 type DamageTransaction struct {
-	User   *Pokemon
-	Target target
-	Move   *Move
-	Damage uint
+	User         *Pokemon
+	Target       target
+	Move         *Move
+	Damage       uint
+	StatusEffect StatusCondition
 }
 
 func (t DamageTransaction) BattleLog() string {
-	return fmt.Sprintf("%s used %s on %s for %d damage.",
-		t.User.GetName(),
-		t.Move.Name,
-		t.Target.Pokemon.GetName(),
-		t.Damage,
-	)
+	if t.User != nil && t.Move != nil {
+		return fmt.Sprintf("%s used %s on %s for %d damage.",
+			t.User.GetName(),
+			t.Move.Name,
+			t.Target.Pokemon.GetName(),
+			t.Damage,
+		)
+	} else if t.StatusEffect != StatusNone {
+		return fmt.Sprintf("%s took %d damage from being %s.",
+			t.Target.Pokemon.GetName(),
+			t.Damage,
+			t.StatusEffect,
+		)
+	} else {
+		panic("I don't know how to log this DamageTransaction.")
+	}
 }
 
 // A transaction to use and possibly consume an item.
