@@ -38,7 +38,7 @@ const (
 // Constants for IVs and EVs
 const (
 	MAX_FRIENDSHIP = 255
-	MAX_EV         = 255
+	MAX_EV         = 252
 	MAX_IV         = 31
 	TOTAL_EV       = 510
 	MIN_LEVEL      = 1
