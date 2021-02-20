@@ -186,8 +186,9 @@ const (
 	StatusPoison
 	StatusBadlyPoison
 	StatusSleep
-
-	// TODO: volatile - the rest of the bits
+)
+const (
+	// volatile - the rest of the bits
 	StatusBound StatusCondition = 1 << (iota + 3)
 	StatusCantEscape
 	StatusConfusion
@@ -205,12 +206,18 @@ const (
 )
 
 const (
-	NONVOLATILE_STATUS_MASK StatusCondition = 0b111111
+	NONVOLATILE_STATUS_MASK StatusCondition = 0b111
 	VOLATILE_STATUS_MASK    StatusCondition = math.MaxUint32 ^ NONVOLATILE_STATUS_MASK
 )
 
 func (s *StatusCondition) check(c StatusCondition) bool {
-	return *s&c == c
+	vCheck := (*s&VOLATILE_STATUS_MASK)&(c&VOLATILE_STATUS_MASK) == c&VOLATILE_STATUS_MASK
+	if c&NONVOLATILE_STATUS_MASK > 0 {
+		nvCheck := (*s&NONVOLATILE_STATUS_MASK)^(c&NONVOLATILE_STATUS_MASK) == 0
+		return nvCheck && vCheck
+	} else {
+		return vCheck
+	}
 }
 
 func (s *StatusCondition) apply(c StatusCondition) {

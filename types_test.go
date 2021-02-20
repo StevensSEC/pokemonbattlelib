@@ -125,28 +125,47 @@ func TestStatusConditionCheck(t *testing.T) {
 	tests := []struct {
 		status StatusCondition
 		check  StatusCondition
+		want   bool
 	}{
 		{
 			status: StatusNone,
 			check:  StatusNone,
+			want:   true,
 		},
 		{
 			status: StatusBurn,
 			check:  StatusBurn,
+			want:   true,
 		},
 		{
 			status: StatusSleep | StatusCursed,
 			check:  StatusSleep,
+			want:   true,
 		},
 		{
 			status: StatusSleep | StatusCursed,
 			check:  StatusCursed,
+			want:   true,
+		},
+		{
+			status: StatusParalyze,
+			check:  StatusBurn,
+			want:   false,
+		},
+		{
+			status: StatusParalyze | StatusConfusion,
+			check:  StatusBurn,
+			want:   false,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("Status Condition check: %b", tt.status), func(t *testing.T) {
-			if !tt.status.check(tt.check) {
-				t.Errorf("Status Condition check failed %b, should have %b", tt.status, tt.check)
+	for ti, tt := range tests {
+		t.Run(fmt.Sprintf("Status Condition check: #%d", ti), func(t *testing.T) {
+			if tt.status.check(tt.check) != tt.want {
+				w := ""
+				if !tt.want {
+					w = " NOT"
+				}
+				t.Errorf("Status Condition check failed %b, should%s match %b", tt.status, w, tt.check)
 			}
 		})
 	}
