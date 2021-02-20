@@ -48,6 +48,17 @@ func (t HealTransaction) BattleLog() string {
 	return fmt.Sprintf("%s restored %d HP.", t.Target.GetName(), t.Amount)
 }
 
+// A transaction to apply a status effect to a Pokemon.
+type InflictStatusTransaction struct {
+	Target *Pokemon
+	Status StatusCondition
+}
+
+func (t InflictStatusTransaction) BattleLog() string {
+	// TODO: add status string representation
+	return fmt.Sprintf("%s now has <STATUS: %d>!", t.Target.GetName(), t.Status)
+}
+
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
 type FaintTransaction struct {
 	Target          *Pokemon

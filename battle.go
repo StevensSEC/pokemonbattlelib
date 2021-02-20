@@ -128,22 +128,31 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			target := t.Target
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
-			modifier := uint(1) // TODO: damage multiplers
-			levelEffect := (2 * uint(user.Level) / 5) + 2
-			movePower := uint(move.Power)
-			statRatio := user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF]
-			if move.Category == Special {
-				statRatio = user.Stats[STAT_SPATK] / receiver.Stats[STAT_SPDEF]
+			if move.Category == Status {
+				if move.ID == 78 { // Stun spore
+					b.QueueTransaction(InflictStatusTransaction{
+						Target: receiver,
+						Status: StatusParalyze,
+					})
+				}
+			} else {
+				modifier := uint(1) // TODO: damage multiplers
+				levelEffect := (2 * uint(user.Level) / 5) + 2
+				movePower := uint(move.Power)
+				statRatio := user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF]
+				if move.Category == Special {
+					statRatio = user.Stats[STAT_SPATK] / receiver.Stats[STAT_SPDEF]
+				}
+				damage := (((levelEffect * movePower * statRatio) / 50) + 2) * modifier
+				b.QueueTransaction(DamageTransaction{
+					User:            &user,
+					Target:          receiver,
+					TargetParty:     target.party,
+					TargetPartySlot: target.partySlot,
+					Move:            user.Moves[t.Move],
+					Damage:          damage,
+				})
 			}
-			damage := (((levelEffect * movePower * statRatio) / 50) + 2) * modifier
-			b.QueueTransaction(DamageTransaction{
-				User:            &user,
-				Target:          receiver,
-				TargetParty:     target.party,
-				TargetPartySlot: target.partySlot,
-				Move:            user.Moves[t.Move],
-				Damage:          damage,
-			})
 		case ItemTurn:
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			move := receiver.Moves[t.Move]
@@ -201,6 +210,8 @@ func (b *Battle) ProcessQueue() {
 			}
 		case HealTransaction:
 			t.Target.CurrentHP += t.Amount
+		case InflictStatusTransaction:
+			t.Target.StatusEffects.apply(t.Status)
 		case FaintTransaction:
 			p := b.parties[t.TargetParty]
 			p.SetInactive(t.TargetPartySlot)
