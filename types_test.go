@@ -161,11 +161,11 @@ func TestStatusConditionCheck(t *testing.T) {
 	for ti, tt := range tests {
 		t.Run(fmt.Sprintf("Status Condition check: #%d", ti), func(t *testing.T) {
 			if tt.status.check(tt.check) != tt.want {
-				w := ""
+				messageMod := ""
 				if !tt.want {
-					w = " NOT"
+					messageMod = " NOT"
 				}
-				t.Errorf("Status Condition check failed %b, should%s match %b", tt.status, w, tt.check)
+				t.Errorf("Status Condition check failed %b, should%s match %b", tt.status, messageMod, tt.check)
 			}
 		})
 	}
