@@ -14,8 +14,8 @@ type Battle struct {
 
 	parties []*party // All parties participating in the battle
 
-	tQueue     []Transaction
-	tProcessed []Transaction
+	transactionQueue      []Transaction // Transactions that are not yet processed by the battle
+	transactionsProcessed []Transaction // Transactions that were processed and are stored for reference
 }
 
 type BattleState int
@@ -150,24 +150,24 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		b.ProcessQueue()
 	}
 
-	if len(b.tQueue) > 0 {
+	if len(b.transactionQueue) > 0 {
 		log.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
 	}
-	transactions := b.tProcessed
-	b.tProcessed = []Transaction{}
+	transactions := b.transactionsProcessed
+	b.transactionsProcessed = []Transaction{}
 	return transactions, b.State == BATTLE_END
 }
 
 // Add Transactions to the queue.
 func (b *Battle) QueueTransaction(t ...Transaction) {
-	b.tQueue = append(b.tQueue, t...)
+	b.transactionQueue = append(b.transactionQueue, t...)
 }
 
 // Process Transactions that are in the queue until the queue is empty.
 func (b *Battle) ProcessQueue() {
-	for len(b.tQueue) > 0 {
-		next := b.tQueue[0]
-		b.tQueue = b.tQueue[1:]
+	for len(b.transactionQueue) > 0 {
+		next := b.transactionQueue[0]
+		b.transactionQueue = b.transactionQueue[1:]
 		switch t := next.(type) {
 		case DamageTransaction:
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
@@ -222,7 +222,7 @@ func (b *Battle) ProcessQueue() {
 			b.State = BATTLE_END
 		}
 		// add to the list of processed transactions
-		b.tProcessed = append(b.tProcessed, next)
+		b.transactionsProcessed = append(b.transactionsProcessed, next)
 		if b.State == BATTLE_END {
 			break
 		}
