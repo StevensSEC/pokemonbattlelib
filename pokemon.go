@@ -18,7 +18,7 @@ type Pokemon struct {
 	Nature            *Nature          // represents a Pokemon's disposition and affects stats
 	Stats             [6]uint          // the actual stats of a Pokemon determined from the above data
 	StatModifiers     [6]int           // ranges from +6 (buffing) to -6 (debuffing) a stat
-	StatusEffects     uint             // the current status effects inflicted on a Pokemon
+	StatusEffects     StatusCondition  // the current status effects inflicted on a Pokemon
 	CurrentHP         uint             // the remaining HP of this Pokemon
 	HeldItem          *Item            // the item a Pokemon is holding
 	Moves             [MAX_MOVES]*Move // the moves the Pokemon currenly knows
@@ -40,7 +40,7 @@ const (
 // Constants for IVs and EVs
 const (
 	MAX_FRIENDSHIP = 255
-	MAX_EV         = 255
+	MAX_EV         = 252
 	MAX_IV         = 31
 	TOTAL_EV       = 510
 	MIN_LEVEL      = 1

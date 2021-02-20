@@ -1,7 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
 	"log"
 	"reflect"
 	"sort"
@@ -125,19 +124,35 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
+			move := user.Moves[t.Move]
 			target := t.Target
 			receiver := b.GetPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
-			modifier := uint(1) // TODO: damage multiplers
-			damage := (((2*uint(user.Level)/5)+2)*uint(user.Moves[t.Move].Power)*user.Stats[STAT_ATK]/receiver.Stats[STAT_DEF]/50 + 2) * modifier
-			b.QueueTransaction(DamageTransaction{
-				User:            &user,
-				Target:          receiver,
-				TargetParty:     target.party,
-				TargetPartySlot: target.partySlot,
-				Move:            user.Moves[t.Move],
-				Damage:          damage,
-			})
+			if move.Category == Status {
+				if move.ID == 78 { // Stun spore
+					b.QueueTransaction(InflictStatusTransaction{
+						Target: receiver,
+						Status: StatusParalyze,
+					})
+				}
+			} else {
+				modifier := uint(1) // TODO: damage multiplers
+				levelEffect := (2 * uint(user.Level) / 5) + 2
+				movePower := uint(move.Power)
+				statRatio := user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF]
+				if move.Category == Special {
+					statRatio = user.Stats[STAT_SPATK] / receiver.Stats[STAT_SPDEF]
+				}
+				damage := (((levelEffect * movePower * statRatio) / 50) + 2) * modifier
+				b.QueueTransaction(DamageTransaction{
+					User:            &user,
+					Target:          receiver,
+					TargetParty:     target.party,
+					TargetPartySlot: target.partySlot,
+					Move:            user.Moves[t.Move],
+					Damage:          damage,
+				})
+			}
 		case ItemTurn:
 			receiver := b.GetPokemon(t.Target.party, t.Target.partySlot)
 			move := receiver.Moves[t.Move]
@@ -195,6 +210,8 @@ func (b *Battle) ProcessQueue() {
 			}
 		case HealTransaction:
 			t.Target.CurrentHP += t.Amount
+		case InflictStatusTransaction:
+			t.Target.StatusEffects.apply(t.Status)
 		case FaintTransaction:
 			p := b.parties[t.TargetParty]
 			p.SetInactive(t.TargetPartySlot)
@@ -305,82 +322,4 @@ type ItemTurn struct {
 
 func (turn ItemTurn) Priority() int {
 	return 1
-}
-
-// Describes a change to battle state.
-type Transaction interface {
-	BattleLog() string
-}
-
-// A transaction to deal damage to an opponent Pokemon.
-type DamageTransaction struct {
-	User            *Pokemon
-	Target          *Pokemon
-	TargetParty     int
-	TargetPartySlot int
-	Move            *Move
-	Damage          uint
-}
-
-func (t DamageTransaction) BattleLog() string {
-	return fmt.Sprintf("%s used %s on %s for %d damage.",
-		t.User.GetName(),
-		t.Move.Name,
-		t.Target.GetName(),
-		t.Damage,
-	)
-}
-
-// A transaction to use and possibly consume an item.
-type ItemTransaction struct {
-	Target *Pokemon
-	Item   *Item
-	Move   *Move
-}
-
-func (t ItemTransaction) BattleLog() string {
-	return fmt.Sprintf("%s used on %s.", t.Item.Name, t.Target.GetName())
-}
-
-// A transaction to restore HP to a Pokemon.
-type HealTransaction struct {
-	Target *Pokemon
-	Amount uint
-}
-
-func (t HealTransaction) BattleLog() string {
-	return fmt.Sprintf("%s restored %d HP.", t.Target.GetName(), t.Amount)
-}
-
-// A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
-type FaintTransaction struct {
-	Target          *Pokemon
-	TargetParty     int
-	TargetPartySlot int
-}
-
-func (t FaintTransaction) BattleLog() string {
-	return fmt.Sprintf("%s fainted.",
-		t.Target.GetName(),
-	)
-}
-
-// A transaction that makes a party send out a pokemon.
-type SendOutTransaction struct {
-	Target          *Pokemon
-	TargetParty     int
-	TargetPartySlot int
-}
-
-func (t SendOutTransaction) BattleLog() string {
-	return fmt.Sprintf("%s was sent out.",
-		t.Target.GetName(),
-	)
-}
-
-type EndBattleTransaction struct{}
-
-func (t EndBattleTransaction) BattleLog() string {
-	// TODO: include reason the battle ended
-	return "The battle has ended."
 }
