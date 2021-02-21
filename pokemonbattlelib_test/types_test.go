@@ -1,11 +1,10 @@
 package pokemonbattlelib_test
 
 import (
+	"fmt"
 	"testing"
 
 	. "github.com/StevensSEC/pokemonbattlelib"
-
-	"fmt"
 )
 
 func TestGetEffect(t *testing.T) {
