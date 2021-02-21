@@ -221,7 +221,7 @@ func (b *Battle) ProcessQueue() {
 						Target: target{
 							Pokemon:   *b.getPokemon(t.Target.party, i),
 							party:     t.Target.party,
-							partySlot: t.Target.partySlot,
+							partySlot: i,
 							Team:      t.Target.Team,
 						},
 					})
