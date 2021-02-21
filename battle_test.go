@@ -441,4 +441,33 @@ var _ = Describe("Status Conditions", func() {
 			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
 		}
 	})
+
+	It("should inflict badly poisoned damage", func() {
+		p1 := GeneratePokemon(1, WithLevel(8))
+		pound := GetMove(1)
+		p1.Moves[0] = &pound
+		p1.StatusEffects = StatusBadlyPoison
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		p2 := GeneratePokemon(2)
+		p2.Moves[0] = &pound
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.Start()
+		transactions, _ := b.SimulateRound()
+		Expect(len(transactions)).To(Equal(3), "Expected only 3 transactions to occur in a round")
+
+		logtest := []struct {
+			turn Transaction
+			want string
+		}{
+			{
+				turn: transactions[2],
+				want: "Bulbasaur took 1 damage from being badly poisoned.",
+			},
+		}
+		for _, tt := range logtest {
+			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
+		}
+	})
 })
