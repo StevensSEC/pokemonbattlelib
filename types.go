@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/bits"
+	"strings"
 )
 
 // Constants for looking up Pokemon stats
@@ -186,8 +187,9 @@ const (
 	StatusPoison
 	StatusBadlyPoison
 	StatusSleep
-
-	// TODO: volatile - the rest of the bits
+)
+const (
+	// volatile - the rest of the bits
 	StatusBound StatusCondition = 1 << (iota + 3)
 	StatusCantEscape
 	StatusConfusion
@@ -204,13 +206,44 @@ const (
 	StatusTorment
 )
 
+// Status effect strings in past tense. Mostly for use in battle log.
+var statusStrings = map[StatusCondition]string{
+	StatusNone:        "",
+	StatusBurn:        "burned",
+	StatusFreeze:      "frozen",
+	StatusParalyze:    "paralyzed",
+	StatusPoison:      "poisoned",
+	StatusBadlyPoison: "badly poisoned",
+	StatusSleep:       "asleep",
+	StatusBound:       "bound",
+	StatusCantEscape:  "can't escape",
+	StatusConfusion:   "confused",
+	StatusCursed:      "cursed",
+	StatusEmbargo:     "embargoed",
+	StatusFlinch:      "flinched",
+	StatusHealBlock:   "heal blocked",
+	StatusInfatuation: "infatuated",
+	StatusIdentified:  "identified",
+	StatusLeechSeed:   "leeched",
+	StatusNightmare:   "nightmared",
+	StatusPerishSong:  "perished",
+	StatusTaunt:       "taunted",
+	StatusTorment:     "tormented",
+}
+
 const (
-	NONVOLATILE_STATUS_MASK StatusCondition = 0b111111
+	NONVOLATILE_STATUS_MASK StatusCondition = 0b111
 	VOLATILE_STATUS_MASK    StatusCondition = math.MaxUint32 ^ NONVOLATILE_STATUS_MASK
 )
 
 func (s *StatusCondition) check(c StatusCondition) bool {
-	return *s&c == c
+	vCheck := (*s&VOLATILE_STATUS_MASK)&(c&VOLATILE_STATUS_MASK) == c&VOLATILE_STATUS_MASK
+	if c&NONVOLATILE_STATUS_MASK > 0 {
+		nvCheck := (*s&NONVOLATILE_STATUS_MASK)^(c&NONVOLATILE_STATUS_MASK) == 0
+		return nvCheck && vCheck
+	} else {
+		return vCheck
+	}
 }
 
 func (s *StatusCondition) apply(c StatusCondition) {
@@ -224,6 +257,27 @@ func (s *StatusCondition) apply(c StatusCondition) {
 
 func (s *StatusCondition) clear(c StatusCondition) {
 	*s ^= c
+}
+
+func (s StatusCondition) String() string {
+	// fast path
+	if val, ok := statusStrings[s]; ok {
+		return val
+	}
+
+	// slower path
+	result := []string{}
+	for c := StatusBurn; c <= StatusSleep; c++ {
+		if s.check(c) {
+			result = append(result, statusStrings[c])
+		}
+	}
+	for c := StatusBound; c <= StatusTorment; c <<= 1 {
+		if s.check(c) {
+			result = append(result, statusStrings[c])
+		}
+	}
+	return strings.Join(result, ", ")
 }
 
 type Ability struct {

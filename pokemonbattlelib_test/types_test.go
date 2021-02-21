@@ -123,36 +123,59 @@ func TestGenderString(t *testing.T) {
 	}
 }
 
+// TODO: test w/o an internal method
+
 // func TestStatusConditionCheck(t *testing.T) {
 // 	tests := []struct {
 // 		status StatusCondition
 // 		check  StatusCondition
+// 		want   bool
 // 	}{
 // 		{
 // 			status: StatusNone,
 // 			check:  StatusNone,
+// 			want:   true,
 // 		},
 // 		{
 // 			status: StatusBurn,
 // 			check:  StatusBurn,
+// 			want:   true,
 // 		},
 // 		{
 // 			status: StatusSleep | StatusCursed,
 // 			check:  StatusSleep,
+// 			want:   true,
 // 		},
 // 		{
 // 			status: StatusSleep | StatusCursed,
 // 			check:  StatusCursed,
+// 			want:   true,
+// 		},
+// 		{
+// 			status: StatusParalyze,
+// 			check:  StatusBurn,
+// 			want:   false,
+// 		},
+// 		{
+// 			status: StatusParalyze | StatusConfusion,
+// 			check:  StatusBurn,
+// 			want:   false,
 // 		},
 // 	}
-// 	for _, tt := range tests {
-// 		t.Run(fmt.Sprintf("Status Condition check: %b", tt.status), func(t *testing.T) {
-// 			if !tt.status.check(tt.check) {
-// 				t.Errorf("Status Condition check failed %b, should have %b", tt.status, tt.check)
+// 	for ti, tt := range tests {
+// 		t.Run(fmt.Sprintf("Status Condition check: #%d", ti), func(t *testing.T) {
+// 			if tt.status.check(tt.check) != tt.want {
+// 				messageMod := ""
+// 				if !tt.want {
+// 					messageMod = " NOT"
+// 				}
+// 				t.Errorf("Status Condition check failed %b, should%s match %b", tt.status, messageMod, tt.check)
 // 			}
 // 		})
 // 	}
 // }
+
+// TODO: test w/o an internal method
 
 // func TestStatusConditionApply(t *testing.T) {
 // 	tests := []struct {
@@ -209,6 +232,8 @@ func TestGenderString(t *testing.T) {
 // 	}
 // }
 
+// TODO: test w/o an internal method
+
 // func TestStatusConditionClear(t *testing.T) {
 // 	tests := []struct {
 // 		name  string
@@ -251,3 +276,50 @@ func TestGenderString(t *testing.T) {
 // 		})
 // 	}
 // }
+
+func TestStatusConditionString(t *testing.T) {
+	tests := []struct {
+		name string
+		cond StatusCondition
+		want string
+	}{
+		{
+			name: "None",
+			cond: StatusNone,
+			want: "",
+		},
+		{
+			name: "Burn",
+			cond: StatusBurn,
+			want: "burned",
+		},
+		{
+			name: "Poison",
+			cond: StatusPoison,
+			want: "poisoned",
+		},
+		{
+			name: "Sleep",
+			cond: StatusSleep,
+			want: "asleep",
+		},
+		{
+			name: "Freeze, Bound",
+			cond: StatusFreeze | StatusBound,
+			want: "frozen, bound",
+		},
+		{
+			name: "Paralyzed, Bound, Confusion, Torment",
+			cond: StatusParalyze | StatusBound | StatusConfusion | StatusTorment,
+			want: "paralyzed, bound, confused, tormented",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("Status Condition Stringer: %s", tt.name), func(t *testing.T) {
+			got := fmt.Sprintf("%s", tt.cond)
+			if got != tt.want {
+				t.Errorf("Status Condition %s got %v, want %v", tt.name, got, tt.want)
+			}
+		})
+	}
+}
