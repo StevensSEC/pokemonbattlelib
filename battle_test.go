@@ -50,6 +50,7 @@ var _ = Describe("Battle", func() {
 			party2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(7))
 			b := NewBattle()
 			b.AddParty(party1, party2)
+			b.SetSeed(849823)
 		})
 	})
 })

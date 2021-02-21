@@ -2,6 +2,7 @@ package pokemonbattlelib
 
 import (
 	"log"
+	"math/rand"
 	"reflect"
 	"sort"
 )
@@ -11,6 +12,7 @@ type Battle struct {
 	Weather  int  // one of the 6 in-battle weather conditions
 	ShiftSet bool // shift or set battle style for NPC trainer battles
 	State    BattleState
+	rng      RNG
 
 	parties []*party // All parties participating in the battle
 
@@ -28,10 +30,17 @@ const (
 
 // Creates a new battle instance, setting initial conditions
 func NewBattle() *Battle {
+	rng := LCRNG(rand.Uint32())
 	b := Battle{
 		State: BEFORE_START,
+		rng:   RNG(&rng),
 	}
 	return &b
+}
+
+// Sets the seed of the underlying random number generator used for the battle.
+func (b *Battle) SetSeed(seed uint) {
+	b.rng.SetSeed(seed)
 }
 
 // Adds one or more parties to a team in the battle
