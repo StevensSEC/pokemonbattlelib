@@ -5,6 +5,8 @@ import (
 	"math"
 )
 
+const MAX_MOVES = 4
+
 type Pokemon struct {
 	NatDex            uint16          // National Pokedex Number
 	Level             uint8           // value from 1-100 influencing stats
@@ -91,6 +93,19 @@ func WithEVs(evs [6]uint8) GeneratePokemonOption {
 func WithNature(nature *Nature) GeneratePokemonOption {
 	return func(p *Pokemon) {
 		p.Nature = nature
+	}
+}
+
+func WithMoves(moves ...*Move) GeneratePokemonOption {
+	if len(moves) > MAX_MOVES {
+		panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MAX_MOVES))
+	}
+
+	var limited_moves [4]*Move
+	copy(limited_moves[:], moves)
+
+	return func(p *Pokemon) {
+		p.Moves = limited_moves
 	}
 }
 
