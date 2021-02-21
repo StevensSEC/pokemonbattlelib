@@ -1,6 +1,9 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
+	"testing"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -31,6 +34,54 @@ func (a healAgent) Act(ctx *BattleContext) Turn {
 		}
 	}
 	panic("no allies found")
+}
+
+// An agent that can be given turns to take via a channel.
+type rcAgent chan Turn
+
+func (a rcAgent) Act(ctx *BattleContext) Turn {
+	return <-a
+}
+
+func newRcAgent() rcAgent {
+	return rcAgent(make(chan Turn, 1))
+}
+
+// Example usage for rcAgent
+func TestRcAgent(t *testing.T) {
+	a1 := newRcAgent()
+	a2 := newRcAgent()
+	_a1 := Agent(a1)
+	_a2 := Agent(a2)
+	pound := GetMove(1)
+	pkmn1 := GeneratePokemon(4)
+	pkmn1.Moves[0] = &pound
+	pkmn2 := GeneratePokemon(7)
+	pkmn2.Moves[0] = &pound
+	party1 := NewOccupiedParty(&_a1, 0, pkmn1)
+	party2 := NewOccupiedParty(&_a2, 1, pkmn2)
+	b := NewBattle()
+	b.AddParty(party1, party2)
+
+	b.Start()
+	a1 <- FightTurn{
+		Move: 0,
+		Target: target{
+			party:     1,
+			partySlot: 0,
+		},
+	}
+	a2 <- FightTurn{
+		Move: 0,
+		Target: target{
+			party:     0,
+			partySlot: 0,
+		},
+	}
+	transactions, _ := b.SimulateRound()
+	for _, t := range transactions {
+		fmt.Printf("%s\n", t.BattleLog())
+	}
 }
 
 var _ = Describe("Battle", func() {
