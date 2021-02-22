@@ -40,7 +40,7 @@ func (b *Battle) AddParty(p ...*Party) {
 }
 
 // Gets a reference to a Pokemon using party ID and party slot
-func (b *Battle) GetPokemon(party, slot int) *Pokemon {
+func (b *Battle) getPokemon(party, slot int) *Pokemon {
 	if party >= len(b.parties) {
 		panic(PartyIndexError)
 	}
@@ -125,7 +125,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		case FightTurn:
 			user := turn.Context.Pokemon
 			move := user.Moves[t.Move]
-			receiver := b.GetPokemon(t.Target.party, t.Target.partySlot)
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			if move.Category == Status {
 				if move.ID == 78 { // Stun spore
@@ -151,7 +151,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				})
 			}
 		case ItemTurn:
-			receiver := b.GetPokemon(t.Target.party, t.Target.partySlot)
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			move := receiver.Moves[t.Move]
 			b.QueueTransaction(ItemTransaction{
 				Target: receiver,
@@ -186,7 +186,7 @@ func (b *Battle) ProcessQueue() {
 		b.tQueue = b.tQueue[1:]
 		switch t := next.(type) {
 		case DamageTransaction:
-			receiver := b.GetPokemon(t.Target.party, t.Target.partySlot)
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			if receiver.CurrentHP >= t.Damage {
 				receiver.CurrentHP -= t.Damage
 			} else {
@@ -219,7 +219,7 @@ func (b *Battle) ProcessQueue() {
 					// auto send out next pokemon
 					b.QueueTransaction(SendOutTransaction{
 						Target: target{
-							Pokemon:   *b.GetPokemon(t.Target.party, i),
+							Pokemon:   *b.getPokemon(t.Target.party, i),
 							party:     t.Target.party,
 							partySlot: t.Target.partySlot,
 							Team:      t.Target.Team,

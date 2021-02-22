@@ -191,7 +191,7 @@ var _ = Describe("Getting party Pokemon", func() {
 
 	Context("Calling GetPokemon()", func() {
 		It("should get the Pokemon the user expects", func() {
-			pkmn := battle.GetPokemon(0, 1)
+			pkmn := battle.getPokemon(0, 1)
 			Expect(int(pkmn.NatDex)).To(Equal(7))
 		})
 	})
