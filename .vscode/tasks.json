@@ -6,9 +6,9 @@
 		{
 			"label": "Run Tests with Coverage",
 			"type": "shell",
-			"command": "ginkgo -r --coverpkg=github.com/StevensSEC/pokemonbattlelib --coverprofile=coverage.out --outputdir=. && go tool cover -html=coverage.out",
+			"command": "go test -coverprofile=\"coverage.out\" && go tool cover -html=\"coverage.out\"",
 			"windows": {
-				"command": "ginkgo -r --coverpkg=github.com/StevensSEC/pokemonbattlelib --coverprofile=\"coverage.out\" --outputdir=\".\" & go tool cover -html=\"coverage.out\""
+				"command": "go test -coverprofile=\"coverage.out\" & go tool cover -html=\"coverage.out\""
 			},
 			"problemMatcher": [
 				"$go"
