@@ -58,8 +58,8 @@ var _ = Describe("One round of battle", func() {
 	var (
 		agent1     Agent
 		agent2     Agent
-		party1     *Party
-		party2     *Party
+		party1     *party
+		party2     *party
 		battle     *Battle
 		charmander *Pokemon
 		squirtle   *Pokemon
@@ -110,7 +110,7 @@ var _ = Describe("Using items in battle", func() {
 	var (
 		agent  Agent
 		pkmn   *Pokemon
-		party  *Party
+		party  *party
 		battle *Battle
 	)
 
@@ -145,7 +145,7 @@ var _ = Describe("Using items in battle", func() {
 var _ = Describe("Active pokemon in battle", func() {
 	var (
 		agent Agent
-		party *Party
+		party *party
 	)
 
 	BeforeEach(func() {
@@ -175,8 +175,8 @@ var _ = Describe("Getting party Pokemon", func() {
 	var (
 		agent1 Agent
 		agent2 Agent
-		party1 *Party
-		party2 *Party
+		party1 *party
+		party2 *party
 		battle *Battle
 	)
 
@@ -203,7 +203,7 @@ var _ = Describe("Getting party Pokemon", func() {
 		})
 		It("should return targets whose team matches the passed party ", func() {
 			battle.Start()
-			for _, party := range []*Party{party1, party2} {
+			for _, party := range []*party{party1, party2} {
 				allies := battle.GetAllies(party)
 				Expect(allies).To(HaveLen(1))
 			}
@@ -217,7 +217,7 @@ var _ = Describe("Getting party Pokemon", func() {
 		})
 		It("should return targets whose team does not match the passed party ", func() {
 			battle.Start()
-			for _, party := range []*Party{party1, party2} {
+			for _, party := range []*party{party1, party2} {
 				opponents := battle.GetOpponents(party)
 				Expect(opponents).To(HaveLen(1))
 			}
@@ -229,8 +229,8 @@ var _ = Describe("Pokemon speed", func() {
 	var (
 		agent1 Agent
 		agent2 Agent
-		party1 *Party
-		party2 *Party
+		party1 *party
+		party2 *party
 		pound  Move
 		battle *Battle
 	)
@@ -288,8 +288,8 @@ var _ = Describe("Fainting", func() {
 	var (
 		agent1 Agent
 		agent2 Agent
-		party1 *Party
-		party2 *Party
+		party1 *party
+		party2 *party
 		battle *Battle
 		pound  Move
 	)
@@ -346,8 +346,8 @@ var _ = Describe("Ending a battle", func() {
 	var (
 		agent1 Agent
 		agent2 Agent
-		party1 *Party
-		party2 *Party
+		party1 *party
+		party2 *party
 		battle *Battle
 		pound  Move
 	)

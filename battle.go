@@ -12,7 +12,7 @@ type Battle struct {
 	ShiftSet bool // shift or set battle style for NPC trainer battles
 	State    BattleState
 
-	parties []*Party // All parties participating in the battle
+	parties []*party // All parties participating in the battle
 
 	tQueue     []Transaction
 	tProcessed []Transaction
@@ -35,7 +35,7 @@ func NewBattle() *Battle {
 }
 
 // Adds one or more parties to a team in the battle
-func (b *Battle) AddParty(p ...*Party) {
+func (b *Battle) AddParty(p ...*party) {
 	b.parties = append(b.parties, p...)
 }
 
@@ -52,7 +52,7 @@ func (b *Battle) getPokemon(party, slot int) *Pokemon {
 }
 
 // Gets all active ally Pokemon for a party
-func (b *Battle) GetAllies(p *Party) []target {
+func (b *Battle) GetAllies(p *party) []target {
 	allies := make([]target, 0)
 	targets := b.GetTargets()
 	for _, target := range targets {
@@ -64,7 +64,7 @@ func (b *Battle) GetAllies(p *Party) []target {
 }
 
 // Gets all active opponent Pokemon for a party
-func (b *Battle) GetOpponents(p *Party) []target {
+func (b *Battle) GetOpponents(p *party) []target {
 	opponents := make([]target, 0)
 	targets := b.GetTargets()
 	for _, target := range targets {
@@ -280,7 +280,7 @@ func (b *Battle) GetTargets() []target {
 }
 
 // Gets the current context for a pokemon to act (perform a turn)
-func (b *Battle) getContext(party *Party, pokemon *Pokemon) *BattleContext {
+func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 	return &BattleContext{
 		Battle:    *b,
 		Pokemon:   *pokemon,
