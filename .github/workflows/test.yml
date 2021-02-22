@@ -37,14 +37,8 @@ jobs:
     - name: Build
       run: go build -v ./...
 
-    - name: Get ginkgo
-      run: go get -v github.com/onsi/ginkgo/ginkgo
-
-    - name: Get gomega
-      run: go get -v github.com/onsi/gomega
-    
     - name: Test
-      run: ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --coverpkg=github.com/StevensSEC/pokemonbattlelib --trace --race --progress --coverprofile=coverage.out --outputdir=.
+      run: go test -v -covermode=atomic -coverprofile=coverage.out ./...
 
     - name: Upload test coverage
       run: bash <(curl -s https://codecov.io/bash)
