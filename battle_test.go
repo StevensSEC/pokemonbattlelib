@@ -396,3 +396,49 @@ var _ = Describe("Ending a battle", func() {
 		})
 	})
 })
+
+var _ = Describe("Status Conditions", func() {
+	var (
+		a1 Agent
+		a2 Agent
+	)
+
+	BeforeEach(func() {
+		a1 = Agent(dumbAgent{})
+		a2 = Agent(dumbAgent{})
+	})
+
+	It("should inflict burn and poison damage", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1)
+		p1.Moves[0] = &pound
+		p1.StatusEffects = StatusPoison
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		p2 := GeneratePokemon(2)
+		p2.Moves[0] = &pound
+		p2.StatusEffects = StatusBurn
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.Start()
+		transactions, _ := b.SimulateRound()
+		Expect(len(transactions)).To(Equal(4), "Expected only 4 transactions to occur in a round")
+
+		logtest := []struct {
+			turn Transaction
+			want string
+		}{
+			{
+				turn: transactions[2],
+				want: "Bulbasaur took 1 damage from being poisoned.",
+			},
+			{
+				turn: transactions[3],
+				want: "Ivysaur took 1 damage from being burned.",
+			},
+		}
+		for _, tt := range logtest {
+			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
+		}
+	})
+})
