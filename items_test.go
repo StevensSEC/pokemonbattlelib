@@ -1,9 +1,7 @@
-package pokemonbattlelib_test
+package pokemonbattlelib
 
 import (
 	"testing"
-
-	. "github.com/StevensSEC/pokemonbattlelib"
 )
 
 func testLog(t *testing.T, tt Transaction, want string) {

@@ -1,7 +1,6 @@
-package pokemonbattlelib_test
+package pokemonbattlelib
 
 import (
-	. "github.com/StevensSEC/pokemonbattlelib"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

@@ -1,4 +1,4 @@
-package pokemonbattlelib_test
+package pokemonbattlelib
 
 import (
 	"testing"

@@ -1,10 +1,8 @@
-package pokemonbattlelib_test
+package pokemonbattlelib
 
 import (
 	"fmt"
 	"testing"
-
-	. "github.com/StevensSEC/pokemonbattlelib"
 )
 
 func TestGetMove(t *testing.T) {
