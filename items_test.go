@@ -1,6 +1,8 @@
 package pokemonbattlelib
 
-import "testing"
+import (
+	"testing"
+)
 
 func testLog(t *testing.T, tt Transaction, want string) {
 	// TODO: generalize more testing functions

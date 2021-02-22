@@ -6,7 +6,7 @@
 		{
 			"label": "Run Tests with Coverage",
 			"type": "shell",
-			"command": "go test -coverprofile=coverage.out -covermode=count && go tool cover -html=coverage.out",
+			"command": "go test -coverprofile=\"coverage.out\" && go tool cover -html=\"coverage.out\"",
 			"windows": {
 				"command": "go test -coverprofile=\"coverage.out\" & go tool cover -html=\"coverage.out\""
 			},

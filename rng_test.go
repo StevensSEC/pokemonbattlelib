@@ -1,19 +1,25 @@
 package pokemonbattlelib
 
-import "testing"
+import (
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+)
 
-func TestLCRNGSeed(t *testing.T) {
-	gen := LCRNG(0)
-	gen.SetSeed(1234)
-	if int(gen) != 1234 {
-		t.Fail()
-	}
-}
+var _ = Describe("LCRNG type", func() {
+	var (
+		gen LCRNG
+	)
 
-func TestLCRNGGet(t *testing.T) {
-	gen := LCRNG(678576)
-	value := gen.Get(1, 10)
-	if value > 10 || value < 1 {
-		t.Fail()
-	}
-}
+	It("should allow a user to set the seed", func() {
+		gen = LCRNG(0)
+		gen.SetSeed(1234)
+		Expect(int(gen)).To(Equal(1234))
+	})
+
+	It("should generate a value in bounds", func() {
+		gen = LCRNG(678576)
+		got := gen.Get(1, 10)
+		Expect(got <= 10).To(BeTrue())
+		Expect(got >= 1).To(BeTrue())
+	})
+})

@@ -1,9 +1,8 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
-	"reflect"
-	"testing"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 type dumbAgent struct{}
@@ -34,409 +33,366 @@ func (a healAgent) Act(ctx *BattleContext) Turn {
 	panic("no allies found")
 }
 
-func TestBattleSetup(t *testing.T) {
-	a1 := Agent(dumbAgent{})
-	a2 := Agent(dumbAgent{})
-	party1 := NewOccupiedParty(&a1, 0, GeneratePokemon(4))
-	party2 := NewOccupiedParty(&a2, 0, GeneratePokemon(7))
-	b := NewBattle()
-	b.AddParty(party1, party2)
-}
+var _ = Describe("Battle", func() {
+	var (
+		agent1 Agent
+		agent2 Agent
+	)
 
-func TestBattleOneRound(t *testing.T) {
-	a1 := Agent(dumbAgent{})
-	a2 := Agent(dumbAgent{})
-	party1 := NewParty(&a1, 0)
-	pkmn1 := GeneratePokemon(4)
-	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 10}
-	pkmn1.CurrentHP = 30
-	pound := GetMove(1)
-	pkmn1.Moves[0] = &pound
-	party1.AddPokemon(pkmn1)
-	party2 := NewParty(&a2, 1)
-	pkmn2 := GeneratePokemon(7)
-	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 10}
-	pkmn2.CurrentHP = 30
-	pkmn2.Moves[0] = &pound
-	party2.AddPokemon(pkmn2)
-	b := NewBattle()
-	b.AddParty(party1, party2)
-	err := b.Start()
-	if err != nil {
-		t.Fatal("failed to start battle")
-	}
-	for p, party := range b.parties {
-		got := party.GetActivePokemon()
-		if !reflect.DeepEqual(got, map[int]Pokemon{0: *party.pokemon[0]}) {
-			t.Fatalf("Must send out first pokemon in each at the beginning of the battle. Party %d gave: %v", p, got)
-		}
-	}
-	transactions, _ := b.SimulateRound()
-	if len(transactions) != 2 {
-		t.Fatal("Expected only 2 transactions to occur in a round")
-	}
-	logtest := []struct {
-		turn Transaction
-		want string
-	}{
-		{
-			turn: transactions[0],
-			want: "Charmander used Pound on Squirtle for 3 damage.",
-		},
-		{
-			turn: transactions[1],
-			want: "Squirtle used Pound on Charmander for 3 damage.",
-		},
-	}
-	for _, tt := range logtest {
-		got := tt.turn.BattleLog()
-		if got != tt.want {
-			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
-		}
-	}
+	BeforeEach(func() {
+		agent1 = Agent(dumbAgent{})
+		agent2 = Agent(dumbAgent{})
+	})
 
-	// functionally arbitrary value, will need to be adjusted when damage calculation becomes more accurate
-	expectedHp := uint(27)
-	for _, party := range b.parties {
-		if party.pokemon[0].CurrentHP != expectedHp {
-			t.Errorf("Expected %s to have %d HP, got %d", party.pokemon[0].GetName(), expectedHp, party.pokemon[0].CurrentHP)
-		}
-	}
-}
+	Context("Battle setup", func() {
+		It("runs without panicking", func() {
+			party1 := NewOccupiedParty(&agent1, 0, GeneratePokemon(4))
+			party2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(7))
+			b := NewBattle()
+			b.AddParty(party1, party2)
+		})
+	})
+})
 
-func TestItemTurn(t *testing.T) {
-	a := Agent(healAgent{})
-	party := NewParty(&a, 0)
-	pkmn := Pokemon{NatDex: 1, CurrentHP: 10, Stats: [6]uint{75, 0, 0, 0, 0, 0}}
-	party.AddPokemon(&pkmn)
-	b := NewBattle()
-	b.AddParty(party)
-	err := b.Start()
-	if err != nil {
-		panic(err)
-	}
-	transactions, _ := b.SimulateRound()
-	logtest := []struct {
-		turn Transaction
-		want string
-	}{
-		{
-			turn: transactions[0],
-			want: "Potion used on Bulbasaur.",
-		},
-	}
-	for _, tt := range logtest {
-		got := tt.turn.BattleLog()
-		if got != tt.want {
-			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
-		}
-	}
-	if b.parties[0].pokemon[0].CurrentHP != 30 {
-		t.Errorf("expected Pokemon's HP to be 30, got %d", b.parties[0].pokemon[0].CurrentHP)
-	}
-}
+var _ = Describe("One round of battle", func() {
+	var (
+		agent1     Agent
+		agent2     Agent
+		party1     *party
+		party2     *party
+		battle     *Battle
+		charmander *Pokemon
+		squirtle   *Pokemon
+		pound      Move
+	)
 
-func TestInflictStatus(t *testing.T) {
-	a1 := Agent(dumbAgent{})
-	a2 := Agent(dumbAgent{})
-	p1 := GeneratePokemon(1)
-	stunSpore := GetMove(78)
-	p1.Moves[0] = &stunSpore
-	party1 := NewOccupiedParty(&a1, 0, p1)
-	p2 := GeneratePokemon(2)
-	pound := GetMove(1)
-	p2.Moves[0] = &pound
-	party2 := NewOccupiedParty(&a2, 1, p2)
-	b := NewBattle()
-	b.AddParty(party1, party2)
-	b.Start()
-	transactions, _ := b.SimulateRound()
-	if len(transactions) != 2 {
-		t.Errorf("expected 1 inflict status, 1 damage transaction")
-	}
-	want := "Ivysaur now has <STATUS: 3>!"
-	got := transactions[1].BattleLog()
-	if want != got {
-		t.Errorf("expected battle log to be %v, got %v\n", want, got)
-	}
-}
+	BeforeEach(func() {
+		agent1 = Agent(dumbAgent{})
+		agent2 = Agent(dumbAgent{})
+		pound = GetMove(1)
+		charmander = GeneratePokemon(4, WithMoves(&pound))
+		party1 = NewOccupiedParty(&agent1, 0, charmander)
+		squirtle = GeneratePokemon(7, WithMoves(&pound))
+		party2 = NewOccupiedParty(&agent2, 1, squirtle)
+		battle = NewBattle()
+		battle.AddParty(party1, party2)
+	})
 
-// Tests if active Pokemon are set correctly
-func TestActivePokemon(t *testing.T) {
-	a := Agent(dumbAgent{})
-	party := NewOccupiedParty(&a, 0, GeneratePokemon(7), GeneratePokemon(9))
-	party.SetActive(0)
-	if len(party.activePokemon) != 1 {
-		t.Error("expected party to have 1 active Pokemon")
-	}
-	party.SetInactive(0)
-	if len(party.activePokemon) != 0 {
-		t.Error("expected party to have no active Pokemon")
-	}
-	party.SetActive(1)
-	if n := party.activePokemon[1].NatDex; n != 9 {
-		t.Errorf("expected party to have an active Pokemon with dex number 9, received %v\n", n)
-	}
-}
+	It("starts without error", func() {
+		err := battle.Start()
+		Expect(err).ShouldNot(HaveOccurred())
+	})
 
-func TestGetPartyPokemon(t *testing.T) {
-	a1 := Agent(dumbAgent{})
-	party1 := NewOccupiedParty(&a1, 0, GeneratePokemon(4), GeneratePokemon(7), GeneratePokemon(11))
-	b := NewBattle()
-	b.AddParty(party1)
-	p := b.getPokemon(0, 1)
-	if p.NatDex != 7 {
-		t.Errorf("expected Pokemon with dex number 7, received %v\n", p.NatDex)
-	}
-}
+	Context("when simulating a round between two agents", func() {
+		It("should return two transactions", func() {
+			battle.Start()
+			transactions, _ := battle.SimulateRound()
+			Expect(transactions).To(HaveLen(2))
+		})
+		It("should log FightTurns correctly", func() {
+			battle.Start()
+			transactions, _ := battle.SimulateRound()
+			log0 := transactions[0].BattleLog()
+			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
+			log1 := transactions[1].BattleLog()
+			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 3 damage."))
+		})
+		It("should cause Pokemon to have reduced HP", func() {
+			battle.Start()
+			battle.SimulateRound()
+			Expect(charmander.CurrentHP < charmander.Stats[STAT_HP]).To(BeTrue())
+			Expect(squirtle.CurrentHP < squirtle.Stats[STAT_HP]).To(BeTrue())
+		})
+	})
+})
 
-func TestGetAllies(t *testing.T) {
-	a1 := Agent(dumbAgent{})
-	a2 := Agent(dumbAgent{})
-	party1 := NewOccupiedParty(&a1, 0, GeneratePokemon(4))
-	party2 := NewOccupiedParty(&a2, 1, GeneratePokemon(7), GeneratePokemon(9))
-	b := NewBattle()
-	b.AddParty(party1, party2)
-	err := b.Start()
-	if err != nil {
-		t.Fatal("failed to start battle")
-	}
+var _ = Describe("Using items in battle", func() {
+	var (
+		agent  Agent
+		pkmn   *Pokemon
+		party  *party
+		battle *Battle
+	)
 
-	for _, party := range []*party{party1, party2} {
-		allies := b.GetAllies(party)
-		if n := len(allies); n != 1 {
-			t.Errorf("expected party to have 1 active ally, received %v\n", n)
-		}
-		for _, ally := range allies {
-			if party.team != ally.Team {
-				t.Errorf("expected party allies to match team, but %d != %d", party.team, ally.Team)
-			}
-		}
-	}
-}
+	BeforeEach(func() {
+		agent = Agent(healAgent{})
+		pkmn = GeneratePokemon(3, WithLevel(50))
+		pkmn.CurrentHP = 10
+		party = NewOccupiedParty(&agent, 0, pkmn)
+		battle = NewBattle()
+		battle.AddParty(party)
+	})
 
-func TestGetOpponents(t *testing.T) {
-	a1 := Agent(dumbAgent{})
-	a2 := Agent(dumbAgent{})
-	party1 := NewOccupiedParty(&a1, 0, GeneratePokemon(4))
-	party2 := NewOccupiedParty(&a2, 1, GeneratePokemon(7), GeneratePokemon(9))
-	b := NewBattle()
-	b.AddParty(party1, party2)
-	err := b.Start()
-	if err != nil {
-		t.Fatal("failed to start battle")
-	}
-	for _, party := range []*party{party1, party2} {
-		opponents := b.GetOpponents(party)
-		if n := len(opponents); n != 1 {
-			t.Errorf("expected party to have 1 active opponent, received %v\n", n)
-		}
-		for _, opponent := range opponents {
-			if party.team == opponent.Team {
-				t.Errorf("expected party opponents to not match team, but %d == %d", party.team, opponent.Team)
-			}
-		}
-	}
-}
+	Context("an Agent uses an ItemTurn to use a Potion on a Pokemon", func() {
+		It("should run without error", func() {
+			err := battle.Start()
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+		It("should log ItemTurns correctly", func() {
+			battle.Start()
+			transactions, _ := battle.SimulateRound()
+			log0 := transactions[0].BattleLog()
+			Expect(log0).To(Equal("Potion used on Venusaur."))
+		})
+		It("should heal the Pokemon by 20 HP", func() {
+			battle.Start()
+			battle.SimulateRound()
+			Expect(int(pkmn.CurrentHP)).To(Equal(30))
+		})
+	})
+})
 
-// Faster pokemon should go first.
-func TestPokemonSpeed(t *testing.T) {
-	a1 := Agent(dumbAgent{})
-	a2 := Agent(dumbAgent{})
-	party1 := NewParty(&a1, 0)
-	pkmn1 := GeneratePokemon(4)
-	pound := GetMove(1)
-	pkmn1.Moves[0] = &pound
-	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 10}
-	pkmn1.CurrentHP = 30
-	party1.AddPokemon(pkmn1)
-	party2 := NewParty(&a2, 1)
-	pkmn2 := GeneratePokemon(7)
-	pkmn2.Moves[0] = &pound
-	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 12}
-	pkmn2.CurrentHP = 30
-	party2.AddPokemon(pkmn2)
-	b := NewBattle()
-	b.AddParty(party1, party2)
-	err := b.Start()
-	if err != nil {
-		t.Fatal("failed to start battle")
-	}
+var _ = Describe("Active pokemon in battle", func() {
+	var (
+		agent Agent
+		party *party
+	)
 
-	transactions, _ := b.SimulateRound()
-	if len(transactions) != 2 {
-		t.Fatal("Expected only 2 transactions to occur in a round")
-	}
-	logtest := []struct {
-		turn Transaction
-		want string
-	}{
-		{
-			turn: transactions[0],
-			want: "Squirtle used Pound on Charmander for 3 damage.",
-		},
-		{
-			turn: transactions[1],
-			want: "Charmander used Pound on Squirtle for 3 damage.",
-		},
-	}
-	for _, tt := range logtest {
-		got := tt.turn.BattleLog()
-		if got != tt.want {
-			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
-		}
-	}
-}
+	BeforeEach(func() {
+		agent = Agent(dumbAgent{})
+		party = NewOccupiedParty(&agent, 0, GeneratePokemon(7), GeneratePokemon(9))
+	})
 
-func TestTurnPriority(t *testing.T) {
-	tests := []struct {
-		turn Turn
-		want int
-	}{
-		{
-			turn: FightTurn{},
-			want: 0,
-		},
-		{
-			turn: ItemTurn{},
-			want: 1,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("%T priority", tt.turn), func(t *testing.T) {
-			got := tt.turn.Priority()
-			if got != tt.want {
-				t.Errorf("TurnPriority(%T) got %v, want %v", tt.turn, got, tt.want)
+	It("should add an active Pokemon when SetActive is called", func() {
+		party.SetActive(0)
+		Expect(party.GetActivePokemon()).To(HaveLen(1))
+	})
+
+	It("should remove an active Pokemon when SetInactive is called", func() {
+		party.SetActive(0)
+		party.SetInactive(0)
+		Expect(party.GetActivePokemon()).To(HaveLen(0))
+	})
+
+	It("should add the active Pokemon the user expects", func() {
+		party.SetActive(1)
+		pkmn := party.GetActivePokemon()[1]
+		Expect(int(pkmn.NatDex)).To(Equal(9))
+	})
+})
+
+var _ = Describe("Getting party Pokemon", func() {
+	var (
+		agent1 Agent
+		agent2 Agent
+		party1 *party
+		party2 *party
+		battle *Battle
+	)
+
+	BeforeEach(func() {
+		agent1 = Agent(dumbAgent{})
+		agent2 = Agent(dumbAgent{})
+		party1 = NewOccupiedParty(&agent1, 0, GeneratePokemon(4), GeneratePokemon(7), GeneratePokemon(11))
+		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(15))
+		battle = NewBattle()
+		battle.AddParty(party1, party2)
+	})
+
+	Context("Calling GetPokemon()", func() {
+		It("should get the Pokemon the user expects", func() {
+			pkmn := battle.getPokemon(0, 1)
+			Expect(int(pkmn.NatDex)).To(Equal(7))
+		})
+	})
+
+	Context("Getting ally Pokemon", func() {
+		It("should start the battle without error", func() {
+			err := battle.Start()
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+		It("should return targets whose team matches the passed party ", func() {
+			battle.Start()
+			for _, party := range []*party{party1, party2} {
+				allies := battle.GetAllies(party)
+				Expect(allies).To(HaveLen(1))
 			}
 		})
-	}
-}
+	})
 
-func TestBattleFaintAutoSwitch(t *testing.T) {
-	a1 := Agent(dumbAgent{})
-	a2 := Agent(dumbAgent{})
-	party1 := NewParty(&a1, 0)
-	pkmn1 := GeneratePokemon(4)
-	pkmn1.Stats = [6]uint{30, 1, 1, 10, 10, 200}
-	pkmn1.CurrentHP = 1
-	pkmn3 := GeneratePokemon(387)
-	pkmn3.Stats = [6]uint{30, 10, 10, 10, 10, 10}
-	pkmn3.CurrentHP = 30
-	pound := GetMove(1)
-	pkmn1.Moves[0] = &pound
-	pkmn3.Moves[0] = &pound
-	party1.AddPokemon(pkmn1, pkmn3)
-	party2 := NewParty(&a2, 1)
-	pkmn2 := GeneratePokemon(7)
-	pkmn2.Stats = [6]uint{30, 800, 800, 10, 10, 10}
-	pkmn2.CurrentHP = 30
-	pkmn2.Moves[0] = &pound
-	party2.AddPokemon(pkmn2)
-	b := NewBattle()
-	b.AddParty(party1, party2)
-	err := b.Start()
-	if err != nil {
-		t.Fatal("failed to start battle")
-	}
+	Context("Getting opposing Pokemon", func() {
+		It("should start the battle without error", func() {
+			err := battle.Start()
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+		It("should return targets whose team does not match the passed party ", func() {
+			battle.Start()
+			for _, party := range []*party{party1, party2} {
+				opponents := battle.GetOpponents(party)
+				Expect(opponents).To(HaveLen(1))
+			}
+		})
+	})
+})
 
-	transactions, _ := b.SimulateRound()
-	if n := len(transactions); n != 4 {
-		t.Errorf("Expected 4 transactions to occur, got %d", n)
-	}
-	logtest := []struct {
-		turn Transaction
-		want string
-	}{
-		{
-			turn: transactions[0],
-			want: "Charmander used Pound on Squirtle for 2 damage.",
+var _ = Describe("Pokemon speed", func() {
+	var (
+		agent1 Agent
+		agent2 Agent
+		party1 *party
+		party2 *party
+		pound  Move
+		battle *Battle
+	)
+
+	BeforeEach(func() {
+		agent1 = Agent(dumbAgent{})
+		agent2 = Agent(dumbAgent{})
+		pound = GetMove(1)
+		party1 = NewOccupiedParty(&agent1, 0, GeneratePokemon(4, WithMoves(&pound)))
+		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(291, WithMoves(&pound))) // ninjask is faster than charmander
+		battle = NewBattle()
+		battle.AddParty(party1, party2)
+	})
+
+	Context("A faster Pokemon is fighting a slower one", func() {
+		It("should not error when starting", func() {
+			err := battle.Start()
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should create two transactions when simulating a round", func() {
+			battle.Start()
+			transactions, _ := battle.SimulateRound()
+			Expect(transactions).To(HaveLen(2))
+		})
+
+		Specify("faster Pokemon should go first", func() {
+			battle.Start()
+			transactions, _ := battle.SimulateRound()
+			log0 := transactions[0].BattleLog()
+			Expect(log0).To(Equal("Ninjask used Pound on Charmander for 3 damage."))
+			log1 := transactions[1].BattleLog()
+			Expect(log1).To(Equal("Charmander used Pound on Ninjask for 3 damage."))
+		})
+	})
+})
+
+var _ = Describe("Turn priority", func() {
+	Context("Fight turns", func() {
+		It("should have a priority of 0", func() {
+			turn := FightTurn{}
+			Expect(turn.Priority()).To(Equal(0))
+		})
+	})
+
+	Context("Item turns", func() {
+		It("should have a priority of 1", func() {
+			turn := ItemTurn{}
+			Expect(turn.Priority()).To(Equal(1))
+		})
+	})
+})
+
+var _ = Describe("Fainting", func() {
+	var (
+		agent1 Agent
+		agent2 Agent
+		party1 *party
+		party2 *party
+		battle *Battle
+		pound  Move
+	)
+
+	BeforeEach(func() {
+		agent1 = Agent(dumbAgent{})
+		agent2 = Agent(dumbAgent{})
+		pound = GetMove(1)
+		scary_monster := GeneratePokemon(7, WithLevel(100), WithMoves(&pound))
+		scary_monster.Stats[STAT_SPD] = 1
+		party1 = NewOccupiedParty(&agent1, 0, GeneratePokemon(4, WithMoves(&pound)), GeneratePokemon(387, WithMoves(&pound)))
+		party2 = NewOccupiedParty(&agent2, 1, scary_monster)
+		battle = NewBattle()
+		battle.AddParty(party1, party2)
+	})
+
+	Context("Switch is forced after a Pokemon faints", func() {
+		It("should start without error", func() {
+			err := battle.Start()
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+
+		It("causes 4 transactions to occur", func() {
+			battle.Start()
+			transactions, _ := battle.SimulateRound()
+			Expect(transactions).To(HaveLen(4))
+		})
+		It("should log all transactions as expected", func() {
+			battle.Start()
+			transactions, _ := battle.SimulateRound()
+			log0 := transactions[0].BattleLog()
+			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 2 damage."))
 			// Charmander smashed his nubby little fist into Squirtle as
 			// hard as he could. Spectators gasped and winced when the
 			// impact created a very audible crack. But it was not
 			// Squirtle's shell that broke, it was Charmanders knuckles.
 			// The Squirtle was unfazed.
-		},
-		{
-			turn: transactions[1],
-			want: "Squirtle used Pound on Charmander for 1282 damage.",
+			log1 := transactions[1].BattleLog()
+			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 674 damage."))
 			// Ash watched in horror as his Charmander was obliterated from the
 			// battlefield. "Critical hit!" echoed the automated announcer. The
 			// Squirtle snarled, now covered in the entrails of his previous
 			// opponent. "OH GOD, WHAT THE FUCK!?" sobbed Ash, "Is my friend
 			// really gone forever? Please tell me I'm dreaming, this can't be real!"
-		},
-		{
-			turn: transactions[2],
-			want: "Charmander fainted.",
-		},
-		{
-			turn: transactions[3],
-			want: "Turtwig was sent out.",
-		},
-	}
-	for _, tt := range logtest {
-		got := tt.turn.BattleLog()
-		if got != tt.want {
-			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
-		}
-	}
-}
+			log2 := transactions[2].BattleLog()
+			Expect(log2).To(Equal("Charmander fainted."))
+			log3 := transactions[3].BattleLog()
+			Expect(log3).To(Equal("Turtwig was sent out."))
+		})
+	})
+})
 
-func TestBattleEndByKnockout(t *testing.T) {
-	a1 := Agent(dumbAgent{})
-	a2 := Agent(dumbAgent{})
-	party1 := NewParty(&a1, 0)
-	pkmn1 := GeneratePokemon(4)
-	pkmn1.Stats = [6]uint{30, 10, 10, 10, 10, 100}
-	pkmn1.CurrentHP = 1
-	pound := GetMove(1)
-	pkmn1.Moves[0] = &pound
-	party1.AddPokemon(pkmn1)
-	party2 := NewParty(&a2, 1)
-	pkmn2 := GeneratePokemon(7)
-	pkmn2.Stats = [6]uint{30, 10, 10, 10, 10, 10}
-	pkmn2.CurrentHP = 30
-	pkmn2.Moves[0] = &pound
-	party2.AddPokemon(pkmn2)
-	b := NewBattle()
-	b.AddParty(party1, party2)
-	err := b.Start()
-	if err != nil {
-		t.Fatal("failed to start battle")
-	}
+var _ = Describe("Ending a battle", func() {
+	var (
+		agent1 Agent
+		agent2 Agent
+		party1 *party
+		party2 *party
+		battle *Battle
+		pound  Move
+	)
 
-	transactions, ended := b.SimulateRound()
-	if !ended {
-		t.Error("Expected SimulateRound to indicate that the battle has ended, but it did not.")
-	}
-	if n := len(transactions); n != 4 {
-		t.Errorf("Expected 4 transactions to occur, got %d", n)
-	}
-	logtest := []struct {
-		turn Transaction
-		want string
-	}{
-		{
-			turn: transactions[0],
-			want: "Charmander used Pound on Squirtle for 3 damage.",
-		},
-		{
-			turn: transactions[1],
-			want: "Squirtle used Pound on Charmander for 3 damage.",
-		},
-		{
-			turn: transactions[2],
-			want: "Charmander fainted.",
-		},
-		{
-			turn: transactions[3],
-			want: "The battle has ended.",
-		},
-	}
-	for _, tt := range logtest {
-		got := tt.turn.BattleLog()
-		if got != tt.want {
-			t.Errorf("Expected battle log to be %s, got %s", tt.want, got)
-		}
-	}
-}
+	BeforeEach(func() {
+		agent1 = Agent(dumbAgent{})
+		agent2 = Agent(dumbAgent{})
+		pound = GetMove(1)
+		low_health_pkmn := GeneratePokemon(4, WithMoves(&pound))
+		low_health_pkmn.CurrentHP = 1
+		party1 = NewOccupiedParty(&agent1, 0, low_health_pkmn)
+		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(7, WithMoves(&pound)))
+		battle = NewBattle()
+		battle.AddParty(party1, party2)
+	})
+
+	Context("Battle ends by knockout", func() {
+		It("should start without error", func() {
+			err := battle.Start()
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+
+		It("should end", func() {
+			battle.Start()
+			_, ended := battle.SimulateRound()
+			Expect(ended).To(BeTrue())
+		})
+
+		It("should have 4 transactions occur", func() {
+			battle.Start()
+			transactions, _ := battle.SimulateRound()
+			Expect(transactions).To(HaveLen(4))
+		})
+
+		It("should log all transaction correctly", func() {
+			battle.Start()
+			transactions, _ := battle.SimulateRound()
+			log0 := transactions[0].BattleLog()
+			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
+			log1 := transactions[1].BattleLog()
+			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 3 damage."))
+			log2 := transactions[2].BattleLog()
+			Expect(log2).To(Equal("Charmander fainted."))
+			log3 := transactions[3].BattleLog()
+			Expect(log3).To(Equal("The battle has ended."))
+		})
+	})
+})
