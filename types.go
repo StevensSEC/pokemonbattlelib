@@ -348,3 +348,15 @@ func (n Nature) getNatureModifers() [6]float64 {
 
 	return natureModifiers
 }
+
+// Weather effects
+type Weather int
+
+const (
+	WEATHER_CLEAR_SKIES Weather = iota
+	WEATHER_HARSH_SUNLIGHT
+	WEATHER_RAIN
+	WEATHER_SANDSTORM
+	WEATHER_HAIL
+	WEATHER_FOG
+)

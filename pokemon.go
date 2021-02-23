@@ -145,6 +145,16 @@ func (p *Pokemon) HasValidEVs() bool {
 	return totalEVs <= TOTAL_EV
 }
 
+// Check if a Pokemon has any of the given types
+func (p *Pokemon) HasType(types ...ElementalType) bool {
+	for _, t := range types {
+		if p.Elemental&t != 0 {
+			return true
+		}
+	}
+	return false
+}
+
 // Increases a Pokemon's level by `levels` and sets their total experience to
 // the minimum amount for that level.
 func (p *Pokemon) GainLevels(levels int) {
