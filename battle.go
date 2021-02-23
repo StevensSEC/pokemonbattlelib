@@ -93,11 +93,20 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	}
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
-	for _, party := range b.parties {
-		for _, pokemon := range party.activePokemon {
+	for i, party := range b.parties {
+		for j, pokemon := range party.activePokemon {
 			ctx := b.getContext(party, pokemon)
 			turn := (*party.Agent).Act(ctx)
-			turns = append(turns, TurnContext{Turn: turn, Context: ctx})
+			turns = append(turns, TurnContext{
+				User: target{
+					Pokemon:   *pokemon,
+					party:     i,
+					partySlot: j,
+					Team:      party.team,
+				},
+				Turn:    turn,
+				Context: ctx,
+			})
 		}
 	}
 	// Sort turns using an in-place stable sort
@@ -120,7 +129,14 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		return false
 	})
 	// Run turns in sorted order and update battle state
-	for _, turn := range turns {
+	for len(turns) > 0 {
+		turn := turns[0]
+		turns = turns[1:]
+		// here, we can't use the turn context's reference to the pokemon, because it is a copy of the ground truth pokemon
+		user := b.getPokemon(turn.User.party, turn.User.partySlot)
+		if user.CurrentHP == 0 {
+			continue
+		}
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
@@ -164,6 +180,9 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		}
 
 		b.ProcessQueue()
+		if b.State == BATTLE_END {
+			break
+		}
 	}
 
 	if len(b.tQueue) > 0 {
@@ -299,6 +318,7 @@ type Turn interface {
 
 // Wrapper used to determine turn order in a battle
 type TurnContext struct {
+	User    target         // The pokemon that made this turn.
 	Turn    Turn           // A copy of the turn that a Pokemon made using an Agent
 	Context *BattleContext // The context in which the Pokemon took its turn
 }

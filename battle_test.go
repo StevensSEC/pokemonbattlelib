@@ -340,6 +340,96 @@ var _ = Describe("Fainting", func() {
 			Expect(log3).To(Equal("Turtwig was sent out."))
 		})
 	})
+
+	Specify("Dead pokemon should not take turns", func() {
+		a1 := Agent(dumbAgent{})
+		a2 := Agent(dumbAgent{})
+		party1 := NewParty(&a1, 0)
+		pkmn1 := GeneratePokemon(4, WithLevel(3))
+		pkmn1.CurrentHP = 1
+		pound := GetMove(1)
+		pkmn1.Moves[0] = &pound
+		party1.AddPokemon(pkmn1)
+		party2 := NewParty(&a2, 1)
+		pkmn2 := GeneratePokemon(7, WithLevel(10))
+		pkmn2.Stats[STAT_SPD] = 255
+		pkmn2.Moves[0] = &pound
+		party2.AddPokemon(pkmn2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		err := b.Start()
+		Expect(err).To(BeNil())
+
+		transactions, ended := b.SimulateRound()
+		Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
+		Expect(len(transactions)).To(Equal(3), "Expected 3 transactions to occur")
+		logtest := []struct {
+			turn Transaction
+			want string
+		}{
+			{
+				turn: transactions[0],
+				want: "Squirtle used Pound on Charmander for 11 damage.",
+			},
+			{
+				turn: transactions[1],
+				want: "Charmander fainted.",
+			},
+			{
+				turn: transactions[2],
+				want: "The battle has ended.",
+			},
+		}
+		for _, tt := range logtest {
+			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
+		}
+	})
+
+	Specify("Dead pokemon should not take turns", func() {
+		a1 := Agent(dumbAgent{})
+		a2 := Agent(dumbAgent{})
+		party1 := NewParty(&a1, 0)
+		pkmn1 := GeneratePokemon(4, WithLevel(3))
+		pkmn3 := GeneratePokemon(387, WithLevel(3))
+		pkmn1.CurrentHP = 1
+		pound := GetMove(1)
+		pkmn1.Moves[0] = &pound
+		pkmn3.Moves[0] = &pound
+		party1.AddPokemon(pkmn1, pkmn3)
+		party2 := NewParty(&a2, 1)
+		pkmn2 := GeneratePokemon(7, WithLevel(10))
+		pkmn2.Stats[STAT_SPD] = 255
+		pkmn2.Moves[0] = &pound
+		party2.AddPokemon(pkmn2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		err := b.Start()
+		Expect(err).To(BeNil())
+
+		transactions, ended := b.SimulateRound()
+		Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
+		Expect(len(transactions)).To(Equal(3), "Expected 3 transactions to occur")
+		logtest := []struct {
+			turn Transaction
+			want string
+		}{
+			{
+				turn: transactions[0],
+				want: "Squirtle used Pound on Charmander for 11 damage.",
+			},
+			{
+				turn: transactions[1],
+				want: "Charmander fainted.",
+			},
+			{
+				turn: transactions[2],
+				want: "Turtwig was sent out.",
+			},
+		}
+		for _, tt := range logtest {
+			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
+		}
+	})
 })
 
 var _ = Describe("Ending a battle", func() {
