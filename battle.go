@@ -153,7 +153,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			if move.Category == Status {
-				if move.ID == 78 { // Stun spore
+				if move.ID == MOVE_STUN_SPORE {
 					b.QueueTransaction(InflictStatusTransaction{
 						Target: receiver,
 						Status: StatusParalyze,

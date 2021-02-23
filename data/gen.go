@@ -71,6 +71,17 @@ func parseInt(s string) (n int) {
 	return n
 }
 
+func cleanName(s string) string {
+	name := strings.ToUpper(s)
+	name = strings.ReplaceAll(name, "É", "E")
+	name = strings.ReplaceAll(name, " ", "_")
+	re, err := regexp.Compile(`[^a-zA-Z_0-9]`)
+	if err != nil {
+		log.Panicln(err)
+	}
+	return re.ReplaceAllString(name, "")
+}
+
 func getCsvReader(path string) *csv.Reader {
 	log.Printf("Reading CSV: %s\n", path)
 	file, err := os.Open(path)
@@ -353,9 +364,16 @@ func main() {
 	output += "var ALL_MOVES = []Move{\n"
 	for _, p := range moves {
 		output += fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, CurrentPP: %d, MaxPP: %d,"+
-			" Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Priority, p.Power, p.Accuracy)
+			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Targets, p.Priority, p.Power, p.Accuracy)
 	}
 	output += "}\n\n"
+	// Add move constants
+	output += "// Create move constant enum for quick reference\nconst (\n"
+	for _, m := range moves {
+		name := cleanName(m.Name)
+		output += fmt.Sprintf("\tMOVE_%s = %v\n", name, m.Id)
+	}
+	output += ")\n\n"
 	// Generate hold item data
 	/* id,identifier (we only care about items with flag 4, 5, or 7)
 	1,countable
@@ -402,14 +420,7 @@ func main() {
 			continue
 		}
 		item_names[r[0]] = r[2]
-		name := strings.ToUpper(r[2])
-		name = strings.ReplaceAll(name, "É", "E")
-		name = strings.ReplaceAll(name, " ", "_")
-		re, err := regexp.Compile(`[^a-zA-Z_0-9]`)
-		if err != nil {
-			log.Panicln(err)
-		}
-		name = re.ReplaceAllString(name, "")
+		name := cleanName(r[2])
 		output += fmt.Sprintf("\tITEM_%s = %v\n", name, r[0])
 	}
 	output += ")\n"

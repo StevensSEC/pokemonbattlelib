@@ -501,492 +501,981 @@ var pokemonNames = map[uint16]string{
 }
 
 var ALL_MOVES = []Move{
-	{ID: 1, Name: "Pound", Type: 1, Category: Physical, CurrentPP: 35, MaxPP: 35, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 2, Name: "Karate Chop", Type: 2, Category: Physical, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 3, Name: "Double Slap", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 15, Accuracy: 85},
-	{ID: 4, Name: "Comet Punch", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 18, Accuracy: 85},
-	{ID: 5, Name: "Mega Punch", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 80, Accuracy: 85},
-	{ID: 6, Name: "Pay Day", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 7, Name: "Fire Punch", Type: 512, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 8, Name: "Ice Punch", Type: 16384, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 9, Name: "Thunder Punch", Type: 4096, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 10, Name: "Scratch", Type: 1, Category: Physical, CurrentPP: 35, MaxPP: 35, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 11, Name: "Vice Grip", Type: 1, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 55, Accuracy: 100},
-	{ID: 12, Name: "Guillotine", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 30},
-	{ID: 13, Name: "Razor Wind", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 14, Name: "Swords Dance", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 15, Name: "Cut", Type: 1, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 50, Accuracy: 95},
-	{ID: 16, Name: "Gust", Type: 4, Category: Special, CurrentPP: 35, MaxPP: 35, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 17, Name: "Wing Attack", Type: 4, Category: Physical, CurrentPP: 35, MaxPP: 35, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 18, Name: "Whirlwind", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: -6, Power: 0, Accuracy: 0},
-	{ID: 19, Name: "Fly", Type: 4, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 90, Accuracy: 95},
-	{ID: 20, Name: "Bind", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 15, Accuracy: 85},
-	{ID: 21, Name: "Slam", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 80, Accuracy: 75},
-	{ID: 22, Name: "Vine Whip", Type: 2048, Category: Physical, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 45, Accuracy: 100},
-	{ID: 23, Name: "Stomp", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 24, Name: "Double Kick", Type: 2, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 30, Accuracy: 100},
-	{ID: 25, Name: "Mega Kick", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 120, Accuracy: 75},
-	{ID: 26, Name: "Jump Kick", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 100, Accuracy: 95},
-	{ID: 27, Name: "Rolling Kick", Type: 2, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 60, Accuracy: 85},
-	{ID: 28, Name: "Sand Attack", Type: 16, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 29, Name: "Headbutt", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 30, Name: "Horn Attack", Type: 1, Category: Physical, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 31, Name: "Fury Attack", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 15, Accuracy: 85},
-	{ID: 32, Name: "Horn Drill", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 30},
-	{ID: 33, Name: "Tackle", Type: 1, Category: Physical, CurrentPP: 35, MaxPP: 35, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 34, Name: "Body Slam", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 85, Accuracy: 100},
-	{ID: 35, Name: "Wrap", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 15, Accuracy: 90},
-	{ID: 36, Name: "Take Down", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 90, Accuracy: 85},
-	{ID: 37, Name: "Thrash", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 38, Name: "Double-Edge", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 39, Name: "Tail Whip", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 40, Name: "Poison Sting", Type: 8, Category: Physical, CurrentPP: 35, MaxPP: 35, Priority: 0, Power: 15, Accuracy: 100},
-	{ID: 41, Name: "Twineedle", Type: 64, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 25, Accuracy: 100},
-	{ID: 42, Name: "Pin Missile", Type: 64, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 25, Accuracy: 95},
-	{ID: 43, Name: "Leer", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 44, Name: "Bite", Type: 65536, Category: Physical, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 45, Name: "Growl", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 46, Name: "Roar", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: -6, Power: 0, Accuracy: 0},
-	{ID: 47, Name: "Sing", Type: 1, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 55},
-	{ID: 48, Name: "Supersonic", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 55},
-	{ID: 49, Name: "Sonic Boom", Type: 1, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 50, Name: "Disable", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 51, Name: "Acid", Type: 8, Category: Special, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 52, Name: "Ember", Type: 512, Category: Special, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 53, Name: "Flamethrower", Type: 512, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 54, Name: "Mist", Type: 16384, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 55, Name: "Water Gun", Type: 1024, Category: Special, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 56, Name: "Hydro Pump", Type: 1024, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 110, Accuracy: 80},
-	{ID: 57, Name: "Surf", Type: 1024, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 58, Name: "Ice Beam", Type: 16384, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 59, Name: "Blizzard", Type: 16384, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 110, Accuracy: 70},
-	{ID: 60, Name: "Psybeam", Type: 8192, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 61, Name: "Bubble Beam", Type: 1024, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 62, Name: "Aurora Beam", Type: 16384, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 63, Name: "Hyper Beam", Type: 1, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 64, Name: "Peck", Type: 4, Category: Physical, CurrentPP: 35, MaxPP: 35, Priority: 0, Power: 35, Accuracy: 100},
-	{ID: 65, Name: "Drill Peck", Type: 4, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 66, Name: "Submission", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 80, Accuracy: 80},
-	{ID: 67, Name: "Low Kick", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 68, Name: "Counter", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: -5, Power: 0, Accuracy: 100},
-	{ID: 69, Name: "Seismic Toss", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 70, Name: "Strength", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 71, Name: "Absorb", Type: 2048, Category: Special, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 20, Accuracy: 100},
-	{ID: 72, Name: "Mega Drain", Type: 2048, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 73, Name: "Leech Seed", Type: 2048, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 74, Name: "Growth", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 75, Name: "Razor Leaf", Type: 2048, Category: Physical, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 55, Accuracy: 95},
-	{ID: 76, Name: "Solar Beam", Type: 2048, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 77, Name: "Poison Powder", Type: 8, Category: Status, CurrentPP: 35, MaxPP: 35, Priority: 0, Power: 0, Accuracy: 75},
-	{ID: 78, Name: "Stun Spore", Type: 2048, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 75},
-	{ID: 79, Name: "Sleep Powder", Type: 2048, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 75},
-	{ID: 80, Name: "Petal Dance", Type: 2048, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 81, Name: "String Shot", Type: 64, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 95},
-	{ID: 82, Name: "Dragon Rage", Type: 32768, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 83, Name: "Fire Spin", Type: 512, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 35, Accuracy: 85},
-	{ID: 84, Name: "Thunder Shock", Type: 4096, Category: Special, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 85, Name: "Thunderbolt", Type: 4096, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 86, Name: "Thunder Wave", Type: 4096, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 87, Name: "Thunder", Type: 4096, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 110, Accuracy: 70},
-	{ID: 88, Name: "Rock Throw", Type: 32, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 50, Accuracy: 90},
-	{ID: 89, Name: "Earthquake", Type: 16, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 100, Accuracy: 100},
-	{ID: 90, Name: "Fissure", Type: 16, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 30},
-	{ID: 91, Name: "Dig", Type: 16, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 92, Name: "Toxic", Type: 8, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 93, Name: "Confusion", Type: 8192, Category: Special, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 94, Name: "Psychic", Type: 8192, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 95, Name: "Hypnosis", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 60},
-	{ID: 96, Name: "Meditate", Type: 8192, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 97, Name: "Agility", Type: 8192, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 98, Name: "Quick Attack", Type: 1, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 99, Name: "Rage", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 20, Accuracy: 100},
-	{ID: 100, Name: "Teleport", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 101, Name: "Night Shade", Type: 128, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 102, Name: "Mimic", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 103, Name: "Screech", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 85},
-	{ID: 104, Name: "Double Team", Type: 1, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 105, Name: "Recover", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 106, Name: "Harden", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 107, Name: "Minimize", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 108, Name: "Smokescreen", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 109, Name: "Confuse Ray", Type: 128, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 110, Name: "Withdraw", Type: 1024, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 111, Name: "Defense Curl", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 112, Name: "Barrier", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 113, Name: "Light Screen", Type: 8192, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 114, Name: "Haze", Type: 16384, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 115, Name: "Reflect", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 116, Name: "Focus Energy", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 117, Name: "Bide", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 1, Power: 0, Accuracy: 0},
-	{ID: 118, Name: "Metronome", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 119, Name: "Mirror Move", Type: 4, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 120, Name: "Self-Destruct", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 200, Accuracy: 100},
-	{ID: 121, Name: "Egg Bomb", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 100, Accuracy: 75},
-	{ID: 122, Name: "Lick", Type: 128, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 30, Accuracy: 100},
-	{ID: 123, Name: "Smog", Type: 8, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 30, Accuracy: 70},
-	{ID: 124, Name: "Sludge", Type: 8, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 125, Name: "Bone Club", Type: 16, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 65, Accuracy: 85},
-	{ID: 126, Name: "Fire Blast", Type: 512, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 110, Accuracy: 85},
-	{ID: 127, Name: "Waterfall", Type: 1024, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 128, Name: "Clamp", Type: 1024, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 35, Accuracy: 85},
-	{ID: 129, Name: "Swift", Type: 1, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 130, Name: "Skull Bash", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 130, Accuracy: 100},
-	{ID: 131, Name: "Spike Cannon", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 20, Accuracy: 100},
-	{ID: 132, Name: "Constrict", Type: 1, Category: Physical, CurrentPP: 35, MaxPP: 35, Priority: 0, Power: 10, Accuracy: 100},
-	{ID: 133, Name: "Amnesia", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 134, Name: "Kinesis", Type: 8192, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 80},
-	{ID: 135, Name: "Soft-Boiled", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 136, Name: "High Jump Kick", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 130, Accuracy: 90},
-	{ID: 137, Name: "Glare", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 138, Name: "Dream Eater", Type: 8192, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 100, Accuracy: 100},
-	{ID: 139, Name: "Poison Gas", Type: 8, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 140, Name: "Barrage", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 15, Accuracy: 85},
-	{ID: 141, Name: "Leech Life", Type: 64, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 142, Name: "Lovely Kiss", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 75},
-	{ID: 143, Name: "Sky Attack", Type: 4, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 140, Accuracy: 90},
-	{ID: 144, Name: "Transform", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 145, Name: "Bubble", Type: 1024, Category: Special, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 146, Name: "Dizzy Punch", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 147, Name: "Spore", Type: 2048, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 148, Name: "Flash", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 149, Name: "Psywave", Type: 8192, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 150, Name: "Splash", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 151, Name: "Acid Armor", Type: 8, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 152, Name: "Crabhammer", Type: 1024, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 100, Accuracy: 90},
-	{ID: 153, Name: "Explosion", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 250, Accuracy: 100},
-	{ID: 154, Name: "Fury Swipes", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 18, Accuracy: 80},
-	{ID: 155, Name: "Bonemerang", Type: 16, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 50, Accuracy: 90},
-	{ID: 156, Name: "Rest", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 157, Name: "Rock Slide", Type: 32, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 75, Accuracy: 90},
-	{ID: 158, Name: "Hyper Fang", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 90},
-	{ID: 159, Name: "Sharpen", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 160, Name: "Conversion", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 161, Name: "Tri Attack", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 162, Name: "Super Fang", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 163, Name: "Slash", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 164, Name: "Substitute", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 165, Name: "Struggle", Type: 1, Category: Physical, CurrentPP: 1, MaxPP: 1, Priority: 0, Power: 50, Accuracy: 0},
-	{ID: 166, Name: "Sketch", Type: 1, Category: Status, CurrentPP: 1, MaxPP: 1, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 167, Name: "Triple Kick", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 10, Accuracy: 90},
-	{ID: 168, Name: "Thief", Type: 65536, Category: Physical, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 169, Name: "Spider Web", Type: 64, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 170, Name: "Mind Reader", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 171, Name: "Nightmare", Type: 128, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 172, Name: "Flame Wheel", Type: 512, Category: Physical, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 173, Name: "Snore", Type: 1, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 174, Name: "Curse", Type: 128, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 175, Name: "Flail", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 176, Name: "Conversion 2", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 177, Name: "Aeroblast", Type: 4, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 100, Accuracy: 95},
-	{ID: 178, Name: "Cotton Spore", Type: 2048, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 179, Name: "Reversal", Type: 2, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 180, Name: "Spite", Type: 128, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 181, Name: "Powder Snow", Type: 16384, Category: Special, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 182, Name: "Protect", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 4, Power: 0, Accuracy: 0},
-	{ID: 183, Name: "Mach Punch", Type: 2, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 184, Name: "Scary Face", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 185, Name: "Feint Attack", Type: 65536, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 186, Name: "Sweet Kiss", Type: 131072, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 75},
-	{ID: 187, Name: "Belly Drum", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 188, Name: "Sludge Bomb", Type: 8, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 189, Name: "Mud-Slap", Type: 16, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 20, Accuracy: 100},
-	{ID: 190, Name: "Octazooka", Type: 1024, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 65, Accuracy: 85},
-	{ID: 191, Name: "Spikes", Type: 16, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 192, Name: "Zap Cannon", Type: 4096, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 120, Accuracy: 50},
-	{ID: 193, Name: "Foresight", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 194, Name: "Destiny Bond", Type: 128, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 195, Name: "Perish Song", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 196, Name: "Icy Wind", Type: 16384, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 55, Accuracy: 95},
-	{ID: 197, Name: "Detect", Type: 2, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 4, Power: 0, Accuracy: 0},
-	{ID: 198, Name: "Bone Rush", Type: 16, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 25, Accuracy: 90},
-	{ID: 199, Name: "Lock-On", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 200, Name: "Outrage", Type: 32768, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 201, Name: "Sandstorm", Type: 32, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 202, Name: "Giga Drain", Type: 2048, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 203, Name: "Endure", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 4, Power: 0, Accuracy: 0},
-	{ID: 204, Name: "Charm", Type: 131072, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 205, Name: "Rollout", Type: 32, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 30, Accuracy: 90},
-	{ID: 206, Name: "False Swipe", Type: 1, Category: Physical, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 207, Name: "Swagger", Type: 1, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 85},
-	{ID: 208, Name: "Milk Drink", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 209, Name: "Spark", Type: 4096, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 210, Name: "Fury Cutter", Type: 64, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 40, Accuracy: 95},
-	{ID: 211, Name: "Steel Wing", Type: 256, Category: Physical, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 70, Accuracy: 90},
-	{ID: 212, Name: "Mean Look", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 213, Name: "Attract", Type: 1, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 214, Name: "Sleep Talk", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 215, Name: "Heal Bell", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 216, Name: "Return", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 217, Name: "Present", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 218, Name: "Frustration", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 219, Name: "Safeguard", Type: 1, Category: Status, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 220, Name: "Pain Split", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 221, Name: "Sacred Fire", Type: 512, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 100, Accuracy: 95},
-	{ID: 222, Name: "Magnitude", Type: 16, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 223, Name: "Dynamic Punch", Type: 2, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 100, Accuracy: 50},
-	{ID: 224, Name: "Megahorn", Type: 64, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 120, Accuracy: 85},
-	{ID: 225, Name: "Dragon Breath", Type: 32768, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 226, Name: "Baton Pass", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 227, Name: "Encore", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 228, Name: "Pursuit", Type: 65536, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 229, Name: "Rapid Spin", Type: 1, Category: Physical, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 20, Accuracy: 100},
-	{ID: 230, Name: "Sweet Scent", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 231, Name: "Iron Tail", Type: 256, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 100, Accuracy: 75},
-	{ID: 232, Name: "Metal Claw", Type: 256, Category: Physical, CurrentPP: 35, MaxPP: 35, Priority: 0, Power: 50, Accuracy: 95},
-	{ID: 233, Name: "Vital Throw", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: -1, Power: 70, Accuracy: 0},
-	{ID: 234, Name: "Morning Sun", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 235, Name: "Synthesis", Type: 2048, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 236, Name: "Moonlight", Type: 131072, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 237, Name: "Hidden Power", Type: 1, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 238, Name: "Cross Chop", Type: 2, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 100, Accuracy: 80},
-	{ID: 239, Name: "Twister", Type: 32768, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 240, Name: "Rain Dance", Type: 1024, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 241, Name: "Sunny Day", Type: 512, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 242, Name: "Crunch", Type: 65536, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 243, Name: "Mirror Coat", Type: 8192, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: -5, Power: 0, Accuracy: 100},
-	{ID: 244, Name: "Psych Up", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 245, Name: "Extreme Speed", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 2, Power: 80, Accuracy: 100},
-	{ID: 246, Name: "Ancient Power", Type: 32, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 247, Name: "Shadow Ball", Type: 128, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 248, Name: "Future Sight", Type: 8192, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 249, Name: "Rock Smash", Type: 2, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 250, Name: "Whirlpool", Type: 1024, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 35, Accuracy: 85},
-	{ID: 251, Name: "Beat Up", Type: 65536, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 252, Name: "Fake Out", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 3, Power: 40, Accuracy: 100},
-	{ID: 253, Name: "Uproar", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 254, Name: "Stockpile", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 255, Name: "Spit Up", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 256, Name: "Swallow", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 257, Name: "Heat Wave", Type: 512, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 95, Accuracy: 90},
-	{ID: 258, Name: "Hail", Type: 16384, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 259, Name: "Torment", Type: 65536, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 260, Name: "Flatter", Type: 65536, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 261, Name: "Will-O-Wisp", Type: 512, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 85},
-	{ID: 262, Name: "Memento", Type: 65536, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 263, Name: "Facade", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 264, Name: "Focus Punch", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: -3, Power: 150, Accuracy: 100},
-	{ID: 265, Name: "Smelling Salts", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 266, Name: "Follow Me", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 2, Power: 0, Accuracy: 0},
-	{ID: 267, Name: "Nature Power", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 268, Name: "Charge", Type: 4096, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 269, Name: "Taunt", Type: 65536, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 270, Name: "Helping Hand", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 5, Power: 0, Accuracy: 0},
-	{ID: 271, Name: "Trick", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 272, Name: "Role Play", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 273, Name: "Wish", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 274, Name: "Assist", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 275, Name: "Ingrain", Type: 2048, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 276, Name: "Superpower", Type: 2, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 277, Name: "Magic Coat", Type: 8192, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 4, Power: 0, Accuracy: 0},
-	{ID: 278, Name: "Recycle", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 279, Name: "Revenge", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: -4, Power: 60, Accuracy: 100},
-	{ID: 280, Name: "Brick Break", Type: 2, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 281, Name: "Yawn", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 282, Name: "Knock Off", Type: 65536, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 283, Name: "Endeavor", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 284, Name: "Eruption", Type: 512, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 150, Accuracy: 100},
-	{ID: 285, Name: "Skill Swap", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 286, Name: "Imprison", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 287, Name: "Refresh", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 288, Name: "Grudge", Type: 128, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 289, Name: "Snatch", Type: 65536, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 4, Power: 0, Accuracy: 0},
-	{ID: 290, Name: "Secret Power", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 291, Name: "Dive", Type: 1024, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 292, Name: "Arm Thrust", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 15, Accuracy: 100},
-	{ID: 293, Name: "Camouflage", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 294, Name: "Tail Glow", Type: 64, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 295, Name: "Luster Purge", Type: 8192, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 296, Name: "Mist Ball", Type: 8192, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 297, Name: "Feather Dance", Type: 4, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 298, Name: "Teeter Dance", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 299, Name: "Blaze Kick", Type: 512, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 85, Accuracy: 90},
-	{ID: 300, Name: "Mud Sport", Type: 16, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 301, Name: "Ice Ball", Type: 16384, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 30, Accuracy: 90},
-	{ID: 302, Name: "Needle Arm", Type: 2048, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 303, Name: "Slack Off", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 304, Name: "Hyper Voice", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 305, Name: "Poison Fang", Type: 8, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 306, Name: "Crush Claw", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 75, Accuracy: 95},
-	{ID: 307, Name: "Blast Burn", Type: 512, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 308, Name: "Hydro Cannon", Type: 1024, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 309, Name: "Meteor Mash", Type: 256, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 90},
-	{ID: 310, Name: "Astonish", Type: 128, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 30, Accuracy: 100},
-	{ID: 311, Name: "Weather Ball", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 312, Name: "Aromatherapy", Type: 2048, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 313, Name: "Fake Tears", Type: 65536, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 314, Name: "Air Cutter", Type: 4, Category: Special, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 60, Accuracy: 95},
-	{ID: 315, Name: "Overheat", Type: 512, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 130, Accuracy: 90},
-	{ID: 316, Name: "Odor Sleuth", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 317, Name: "Rock Tomb", Type: 32, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 60, Accuracy: 95},
-	{ID: 318, Name: "Silver Wind", Type: 64, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 319, Name: "Metal Sound", Type: 256, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 85},
-	{ID: 320, Name: "Grass Whistle", Type: 2048, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 55},
-	{ID: 321, Name: "Tickle", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 322, Name: "Cosmic Power", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 323, Name: "Water Spout", Type: 1024, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 150, Accuracy: 100},
-	{ID: 324, Name: "Signal Beam", Type: 64, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 325, Name: "Shadow Punch", Type: 128, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 326, Name: "Extrasensory", Type: 8192, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 327, Name: "Sky Uppercut", Type: 2, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 85, Accuracy: 90},
-	{ID: 328, Name: "Sand Tomb", Type: 16, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 35, Accuracy: 85},
-	{ID: 329, Name: "Sheer Cold", Type: 16384, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 30},
-	{ID: 330, Name: "Muddy Water", Type: 1024, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 85},
-	{ID: 331, Name: "Bullet Seed", Type: 2048, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 25, Accuracy: 100},
-	{ID: 332, Name: "Aerial Ace", Type: 4, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 333, Name: "Icicle Spear", Type: 16384, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 25, Accuracy: 100},
-	{ID: 334, Name: "Iron Defense", Type: 256, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 335, Name: "Block", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 336, Name: "Howl", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 337, Name: "Dragon Claw", Type: 32768, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 338, Name: "Frenzy Plant", Type: 2048, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 339, Name: "Bulk Up", Type: 2, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 340, Name: "Bounce", Type: 4, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 85, Accuracy: 85},
-	{ID: 341, Name: "Mud Shot", Type: 16, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 55, Accuracy: 95},
-	{ID: 342, Name: "Poison Tail", Type: 8, Category: Physical, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 343, Name: "Covet", Type: 1, Category: Physical, CurrentPP: 25, MaxPP: 25, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 344, Name: "Volt Tackle", Type: 4096, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 345, Name: "Magical Leaf", Type: 2048, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 346, Name: "Water Sport", Type: 1024, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 347, Name: "Calm Mind", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 348, Name: "Leaf Blade", Type: 2048, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 349, Name: "Dragon Dance", Type: 32768, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 350, Name: "Rock Blast", Type: 32, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 25, Accuracy: 90},
-	{ID: 351, Name: "Shock Wave", Type: 4096, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 352, Name: "Water Pulse", Type: 1024, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 353, Name: "Doom Desire", Type: 256, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 140, Accuracy: 100},
-	{ID: 354, Name: "Psycho Boost", Type: 8192, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 140, Accuracy: 90},
-	{ID: 355, Name: "Roost", Type: 4, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 356, Name: "Gravity", Type: 8192, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 357, Name: "Miracle Eye", Type: 8192, Category: Status, CurrentPP: 40, MaxPP: 40, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 358, Name: "Wake-Up Slap", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 359, Name: "Hammer Arm", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 100, Accuracy: 90},
-	{ID: 360, Name: "Gyro Ball", Type: 256, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 361, Name: "Healing Wish", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 362, Name: "Brine", Type: 1024, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 363, Name: "Natural Gift", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 364, Name: "Feint", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 2, Power: 30, Accuracy: 100},
-	{ID: 365, Name: "Pluck", Type: 4, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 366, Name: "Tailwind", Type: 4, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 367, Name: "Acupressure", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 368, Name: "Metal Burst", Type: 256, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 369, Name: "U-turn", Type: 64, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 370, Name: "Close Combat", Type: 2, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 371, Name: "Payback", Type: 65536, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 372, Name: "Assurance", Type: 65536, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 373, Name: "Embargo", Type: 65536, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 374, Name: "Fling", Type: 65536, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 375, Name: "Psycho Shift", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 376, Name: "Trump Card", Type: 1, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 377, Name: "Heal Block", Type: 8192, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 378, Name: "Wring Out", Type: 1, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 379, Name: "Power Trick", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 380, Name: "Gastro Acid", Type: 8, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 381, Name: "Lucky Chant", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 382, Name: "Me First", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 383, Name: "Copycat", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 384, Name: "Power Swap", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 385, Name: "Guard Swap", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 386, Name: "Punishment", Type: 65536, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 387, Name: "Last Resort", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 140, Accuracy: 100},
-	{ID: 388, Name: "Worry Seed", Type: 2048, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 389, Name: "Sucker Punch", Type: 65536, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 1, Power: 70, Accuracy: 100},
-	{ID: 390, Name: "Toxic Spikes", Type: 8, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 391, Name: "Heart Swap", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 392, Name: "Aqua Ring", Type: 1024, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 393, Name: "Magnet Rise", Type: 4096, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 394, Name: "Flare Blitz", Type: 512, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 395, Name: "Force Palm", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 396, Name: "Aura Sphere", Type: 2, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 80, Accuracy: 0},
-	{ID: 397, Name: "Rock Polish", Type: 32, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 398, Name: "Poison Jab", Type: 8, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 399, Name: "Dark Pulse", Type: 65536, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 400, Name: "Night Slash", Type: 65536, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 401, Name: "Aqua Tail", Type: 1024, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 90},
-	{ID: 402, Name: "Seed Bomb", Type: 2048, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 403, Name: "Air Slash", Type: 4, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 75, Accuracy: 95},
-	{ID: 404, Name: "X-Scissor", Type: 64, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 405, Name: "Bug Buzz", Type: 64, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 406, Name: "Dragon Pulse", Type: 32768, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 85, Accuracy: 100},
-	{ID: 407, Name: "Dragon Rush", Type: 32768, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 100, Accuracy: 75},
-	{ID: 408, Name: "Power Gem", Type: 32, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 409, Name: "Drain Punch", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 410, Name: "Vacuum Wave", Type: 2, Category: Special, CurrentPP: 30, MaxPP: 30, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 411, Name: "Focus Blast", Type: 2, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 120, Accuracy: 70},
-	{ID: 412, Name: "Energy Ball", Type: 2048, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 413, Name: "Brave Bird", Type: 4, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 414, Name: "Earth Power", Type: 16, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 415, Name: "Switcheroo", Type: 65536, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 416, Name: "Giga Impact", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 417, Name: "Nasty Plot", Type: 65536, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 418, Name: "Bullet Punch", Type: 256, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 419, Name: "Avalanche", Type: 16384, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: -4, Power: 60, Accuracy: 100},
-	{ID: 420, Name: "Ice Shard", Type: 16384, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 421, Name: "Shadow Claw", Type: 128, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 422, Name: "Thunder Fang", Type: 4096, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 65, Accuracy: 95},
-	{ID: 423, Name: "Ice Fang", Type: 16384, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 65, Accuracy: 95},
-	{ID: 424, Name: "Fire Fang", Type: 512, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 65, Accuracy: 95},
-	{ID: 425, Name: "Shadow Sneak", Type: 128, Category: Physical, CurrentPP: 30, MaxPP: 30, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 426, Name: "Mud Bomb", Type: 16, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 65, Accuracy: 85},
-	{ID: 427, Name: "Psycho Cut", Type: 8192, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 428, Name: "Zen Headbutt", Type: 8192, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 90},
-	{ID: 429, Name: "Mirror Shot", Type: 256, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 65, Accuracy: 85},
-	{ID: 430, Name: "Flash Cannon", Type: 256, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 431, Name: "Rock Climb", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 90, Accuracy: 85},
-	{ID: 432, Name: "Defog", Type: 4, Category: Status, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 433, Name: "Trick Room", Type: 8192, Category: Status, CurrentPP: 5, MaxPP: 5, Priority: -7, Power: 0, Accuracy: 0},
-	{ID: 434, Name: "Draco Meteor", Type: 32768, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 130, Accuracy: 90},
-	{ID: 435, Name: "Discharge", Type: 4096, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 436, Name: "Lava Plume", Type: 512, Category: Special, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 437, Name: "Leaf Storm", Type: 2048, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 130, Accuracy: 90},
-	{ID: 438, Name: "Power Whip", Type: 2048, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 120, Accuracy: 85},
-	{ID: 439, Name: "Rock Wrecker", Type: 32, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 440, Name: "Cross Poison", Type: 8, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 441, Name: "Gunk Shot", Type: 8, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 120, Accuracy: 80},
-	{ID: 442, Name: "Iron Head", Type: 256, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 443, Name: "Magnet Bomb", Type: 256, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 444, Name: "Stone Edge", Type: 32, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 100, Accuracy: 80},
-	{ID: 445, Name: "Captivate", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 446, Name: "Stealth Rock", Type: 32, Category: Status, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 447, Name: "Grass Knot", Type: 2048, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 448, Name: "Chatter", Type: 4, Category: Special, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 449, Name: "Judgment", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 100, Accuracy: 100},
-	{ID: 450, Name: "Bug Bite", Type: 64, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 451, Name: "Charge Beam", Type: 4096, Category: Special, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 50, Accuracy: 90},
-	{ID: 452, Name: "Wood Hammer", Type: 2048, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 453, Name: "Aqua Jet", Type: 1024, Category: Physical, CurrentPP: 20, MaxPP: 20, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 454, Name: "Attack Order", Type: 64, Category: Physical, CurrentPP: 15, MaxPP: 15, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 455, Name: "Defend Order", Type: 64, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 456, Name: "Heal Order", Type: 64, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 457, Name: "Head Smash", Type: 32, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 150, Accuracy: 80},
-	{ID: 458, Name: "Double Hit", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 35, Accuracy: 90},
-	{ID: 459, Name: "Roar of Time", Type: 32768, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 460, Name: "Spacial Rend", Type: 32768, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 100, Accuracy: 95},
-	{ID: 461, Name: "Lunar Dance", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 462, Name: "Crush Grip", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 463, Name: "Magma Storm", Type: 512, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 100, Accuracy: 75},
-	{ID: 464, Name: "Dark Void", Type: 65536, Category: Status, CurrentPP: 10, MaxPP: 10, Priority: 0, Power: 0, Accuracy: 50},
-	{ID: 465, Name: "Seed Flare", Type: 2048, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 120, Accuracy: 85},
-	{ID: 466, Name: "Ominous Wind", Type: 128, Category: Special, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 467, Name: "Shadow Force", Type: 128, Category: Physical, CurrentPP: 5, MaxPP: 5, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 10001, Name: "Shadow Rush", Type: 0, Category: Physical, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 55, Accuracy: 100},
-	{ID: 10002, Name: "Shadow Blast", Type: 0, Category: Physical, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 10003, Name: "Shadow Blitz", Type: 0, Category: Physical, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 10004, Name: "Shadow Bolt", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 10005, Name: "Shadow Break", Type: 0, Category: Physical, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 10006, Name: "Shadow Chill", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 10007, Name: "Shadow End", Type: 0, Category: Physical, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 120, Accuracy: 60},
-	{ID: 10008, Name: "Shadow Fire", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 10009, Name: "Shadow Rave", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 10010, Name: "Shadow Storm", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 95, Accuracy: 100},
-	{ID: 10011, Name: "Shadow Wave", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 10012, Name: "Shadow Down", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 10013, Name: "Shadow Half", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 10014, Name: "Shadow Hold", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 10015, Name: "Shadow Mist", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 10016, Name: "Shadow Panic", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 10017, Name: "Shadow Shed", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 10018, Name: "Shadow Sky", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 1, Name: "Pound", Type: 1, Category: Physical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 2, Name: "Karate Chop", Type: 2, Category: Physical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
+	{ID: 3, Name: "Double Slap", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 15, Accuracy: 85},
+	{ID: 4, Name: "Comet Punch", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 18, Accuracy: 85},
+	{ID: 5, Name: "Mega Punch", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 85},
+	{ID: 6, Name: "Pay Day", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 7, Name: "Fire Punch", Type: 512, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 8, Name: "Ice Punch", Type: 16384, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 9, Name: "Thunder Punch", Type: 4096, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 10, Name: "Scratch", Type: 1, Category: Physical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 11, Name: "Vice Grip", Type: 1, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 55, Accuracy: 100},
+	{ID: 12, Name: "Guillotine", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 30},
+	{ID: 13, Name: "Razor Wind", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 14, Name: "Swords Dance", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 15, Name: "Cut", Type: 1, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 50, Accuracy: 95},
+	{ID: 16, Name: "Gust", Type: 4, Category: Special, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 17, Name: "Wing Attack", Type: 4, Category: Physical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 18, Name: "Whirlwind", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: -6, Power: 0, Accuracy: 0},
+	{ID: 19, Name: "Fly", Type: 4, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 90, Accuracy: 95},
+	{ID: 20, Name: "Bind", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 15, Accuracy: 85},
+	{ID: 21, Name: "Slam", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 75},
+	{ID: 22, Name: "Vine Whip", Type: 2048, Category: Physical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 45, Accuracy: 100},
+	{ID: 23, Name: "Stomp", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
+	{ID: 24, Name: "Double Kick", Type: 2, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 30, Accuracy: 100},
+	{ID: 25, Name: "Mega Kick", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 75},
+	{ID: 26, Name: "Jump Kick", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 95},
+	{ID: 27, Name: "Rolling Kick", Type: 2, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 60, Accuracy: 85},
+	{ID: 28, Name: "Sand Attack", Type: 16, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 29, Name: "Headbutt", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 30, Name: "Horn Attack", Type: 1, Category: Physical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
+	{ID: 31, Name: "Fury Attack", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 15, Accuracy: 85},
+	{ID: 32, Name: "Horn Drill", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 30},
+	{ID: 33, Name: "Tackle", Type: 1, Category: Physical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 34, Name: "Body Slam", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 85, Accuracy: 100},
+	{ID: 35, Name: "Wrap", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 15, Accuracy: 90},
+	{ID: 36, Name: "Take Down", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 90, Accuracy: 85},
+	{ID: 37, Name: "Thrash", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 8, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 38, Name: "Double-Edge", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 39, Name: "Tail Whip", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 40, Name: "Poison Sting", Type: 8, Category: Physical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 15, Accuracy: 100},
+	{ID: 41, Name: "Twineedle", Type: 64, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 25, Accuracy: 100},
+	{ID: 42, Name: "Pin Missile", Type: 64, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 25, Accuracy: 95},
+	{ID: 43, Name: "Leer", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 44, Name: "Bite", Type: 65536, Category: Physical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 45, Name: "Growl", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 46, Name: "Roar", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: -6, Power: 0, Accuracy: 0},
+	{ID: 47, Name: "Sing", Type: 1, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 55},
+	{ID: 48, Name: "Supersonic", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 55},
+	{ID: 49, Name: "Sonic Boom", Type: 1, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
+	{ID: 50, Name: "Disable", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 51, Name: "Acid", Type: 8, Category: Special, CurrentPP: 30, MaxPP: 30, Targets: 11, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 52, Name: "Ember", Type: 512, Category: Special, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 53, Name: "Flamethrower", Type: 512, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 54, Name: "Mist", Type: 16384, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 55, Name: "Water Gun", Type: 1024, Category: Special, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 56, Name: "Hydro Pump", Type: 1024, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 110, Accuracy: 80},
+	{ID: 57, Name: "Surf", Type: 1024, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 9, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 58, Name: "Ice Beam", Type: 16384, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 59, Name: "Blizzard", Type: 16384, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 11, Priority: 0, Power: 110, Accuracy: 70},
+	{ID: 60, Name: "Psybeam", Type: 8192, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
+	{ID: 61, Name: "Bubble Beam", Type: 1024, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
+	{ID: 62, Name: "Aurora Beam", Type: 16384, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
+	{ID: 63, Name: "Hyper Beam", Type: 1, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
+	{ID: 64, Name: "Peck", Type: 4, Category: Physical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 35, Accuracy: 100},
+	{ID: 65, Name: "Drill Peck", Type: 4, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 66, Name: "Submission", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 80},
+	{ID: 67, Name: "Low Kick", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 68, Name: "Counter", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 1, Priority: -5, Power: 0, Accuracy: 100},
+	{ID: 69, Name: "Seismic Toss", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 70, Name: "Strength", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 71, Name: "Absorb", Type: 2048, Category: Special, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 20, Accuracy: 100},
+	{ID: 72, Name: "Mega Drain", Type: 2048, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 73, Name: "Leech Seed", Type: 2048, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
+	{ID: 74, Name: "Growth", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 75, Name: "Razor Leaf", Type: 2048, Category: Physical, CurrentPP: 25, MaxPP: 25, Targets: 11, Priority: 0, Power: 55, Accuracy: 95},
+	{ID: 76, Name: "Solar Beam", Type: 2048, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 77, Name: "Poison Powder", Type: 8, Category: Status, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 0, Accuracy: 75},
+	{ID: 78, Name: "Stun Spore", Type: 2048, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 0, Accuracy: 75},
+	{ID: 79, Name: "Sleep Powder", Type: 2048, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 75},
+	{ID: 80, Name: "Petal Dance", Type: 2048, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 8, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 81, Name: "String Shot", Type: 64, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 11, Priority: 0, Power: 0, Accuracy: 95},
+	{ID: 82, Name: "Dragon Rage", Type: 32768, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 83, Name: "Fire Spin", Type: 512, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 35, Accuracy: 85},
+	{ID: 84, Name: "Thunder Shock", Type: 4096, Category: Special, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 85, Name: "Thunderbolt", Type: 4096, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 86, Name: "Thunder Wave", Type: 4096, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
+	{ID: 87, Name: "Thunder", Type: 4096, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 110, Accuracy: 70},
+	{ID: 88, Name: "Rock Throw", Type: 32, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 50, Accuracy: 90},
+	{ID: 89, Name: "Earthquake", Type: 16, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 9, Priority: 0, Power: 100, Accuracy: 100},
+	{ID: 90, Name: "Fissure", Type: 16, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 30},
+	{ID: 91, Name: "Dig", Type: 16, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 92, Name: "Toxic", Type: 8, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
+	{ID: 93, Name: "Confusion", Type: 8192, Category: Special, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
+	{ID: 94, Name: "Psychic", Type: 8192, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 95, Name: "Hypnosis", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 60},
+	{ID: 96, Name: "Meditate", Type: 8192, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 97, Name: "Agility", Type: 8192, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 98, Name: "Quick Attack", Type: 1, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
+	{ID: 99, Name: "Rage", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 20, Accuracy: 100},
+	{ID: 100, Name: "Teleport", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 101, Name: "Night Shade", Type: 128, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 102, Name: "Mimic", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 103, Name: "Screech", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 0, Accuracy: 85},
+	{ID: 104, Name: "Double Team", Type: 1, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 105, Name: "Recover", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 106, Name: "Harden", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 107, Name: "Minimize", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 108, Name: "Smokescreen", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 109, Name: "Confuse Ray", Type: 128, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 110, Name: "Withdraw", Type: 1024, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 111, Name: "Defense Curl", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 112, Name: "Barrier", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 113, Name: "Light Screen", Type: 8192, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 114, Name: "Haze", Type: 16384, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 115, Name: "Reflect", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 116, Name: "Focus Energy", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 117, Name: "Bide", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 1, Power: 0, Accuracy: 0},
+	{ID: 118, Name: "Metronome", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 119, Name: "Mirror Move", Type: 4, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 120, Name: "Self-Destruct", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 9, Priority: 0, Power: 200, Accuracy: 100},
+	{ID: 121, Name: "Egg Bomb", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 75},
+	{ID: 122, Name: "Lick", Type: 128, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 30, Accuracy: 100},
+	{ID: 123, Name: "Smog", Type: 8, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 30, Accuracy: 70},
+	{ID: 124, Name: "Sludge", Type: 8, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
+	{ID: 125, Name: "Bone Club", Type: 16, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 85},
+	{ID: 126, Name: "Fire Blast", Type: 512, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 110, Accuracy: 85},
+	{ID: 127, Name: "Waterfall", Type: 1024, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 128, Name: "Clamp", Type: 1024, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 35, Accuracy: 85},
+	{ID: 129, Name: "Swift", Type: 1, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 11, Priority: 0, Power: 60, Accuracy: 0},
+	{ID: 130, Name: "Skull Bash", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 130, Accuracy: 100},
+	{ID: 131, Name: "Spike Cannon", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 20, Accuracy: 100},
+	{ID: 132, Name: "Constrict", Type: 1, Category: Physical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 10, Accuracy: 100},
+	{ID: 133, Name: "Amnesia", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 134, Name: "Kinesis", Type: 8192, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 80},
+	{ID: 135, Name: "Soft-Boiled", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 136, Name: "High Jump Kick", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 130, Accuracy: 90},
+	{ID: 137, Name: "Glare", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 138, Name: "Dream Eater", Type: 8192, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 100, Accuracy: 100},
+	{ID: 139, Name: "Poison Gas", Type: 8, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 11, Priority: 0, Power: 0, Accuracy: 90},
+	{ID: 140, Name: "Barrage", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 15, Accuracy: 85},
+	{ID: 141, Name: "Leech Life", Type: 64, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 142, Name: "Lovely Kiss", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 75},
+	{ID: 143, Name: "Sky Attack", Type: 4, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 140, Accuracy: 90},
+	{ID: 144, Name: "Transform", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 145, Name: "Bubble", Type: 1024, Category: Special, CurrentPP: 30, MaxPP: 30, Targets: 11, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 146, Name: "Dizzy Punch", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 147, Name: "Spore", Type: 2048, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 148, Name: "Flash", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 149, Name: "Psywave", Type: 8192, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 150, Name: "Splash", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 151, Name: "Acid Armor", Type: 8, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 152, Name: "Crabhammer", Type: 1024, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 90},
+	{ID: 153, Name: "Explosion", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 9, Priority: 0, Power: 250, Accuracy: 100},
+	{ID: 154, Name: "Fury Swipes", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 18, Accuracy: 80},
+	{ID: 155, Name: "Bonemerang", Type: 16, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 50, Accuracy: 90},
+	{ID: 156, Name: "Rest", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 157, Name: "Rock Slide", Type: 32, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 75, Accuracy: 90},
+	{ID: 158, Name: "Hyper Fang", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 90},
+	{ID: 159, Name: "Sharpen", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 160, Name: "Conversion", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 161, Name: "Tri Attack", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 162, Name: "Super Fang", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
+	{ID: 163, Name: "Slash", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 164, Name: "Substitute", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 165, Name: "Struggle", Type: 1, Category: Physical, CurrentPP: 1, MaxPP: 1, Targets: 8, Priority: 0, Power: 50, Accuracy: 0},
+	{ID: 166, Name: "Sketch", Type: 1, Category: Status, CurrentPP: 1, MaxPP: 1, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 167, Name: "Triple Kick", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 10, Accuracy: 90},
+	{ID: 168, Name: "Thief", Type: 65536, Category: Physical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 169, Name: "Spider Web", Type: 64, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 170, Name: "Mind Reader", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 171, Name: "Nightmare", Type: 128, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 172, Name: "Flame Wheel", Type: 512, Category: Physical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 173, Name: "Snore", Type: 1, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
+	{ID: 174, Name: "Curse", Type: 128, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 1, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 175, Name: "Flail", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 176, Name: "Conversion 2", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 177, Name: "Aeroblast", Type: 4, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 95},
+	{ID: 178, Name: "Cotton Spore", Type: 2048, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 179, Name: "Reversal", Type: 2, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 180, Name: "Spite", Type: 128, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 181, Name: "Powder Snow", Type: 16384, Category: Special, CurrentPP: 25, MaxPP: 25, Targets: 11, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 182, Name: "Protect", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 4, Power: 0, Accuracy: 0},
+	{ID: 183, Name: "Mach Punch", Type: 2, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
+	{ID: 184, Name: "Scary Face", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 185, Name: "Feint Attack", Type: 65536, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
+	{ID: 186, Name: "Sweet Kiss", Type: 131072, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 75},
+	{ID: 187, Name: "Belly Drum", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 188, Name: "Sludge Bomb", Type: 8, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 189, Name: "Mud-Slap", Type: 16, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 20, Accuracy: 100},
+	{ID: 190, Name: "Octazooka", Type: 1024, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 65, Accuracy: 85},
+	{ID: 191, Name: "Spikes", Type: 16, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 6, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 192, Name: "Zap Cannon", Type: 4096, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 50},
+	{ID: 193, Name: "Foresight", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 194, Name: "Destiny Bond", Type: 128, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 195, Name: "Perish Song", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 14, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 196, Name: "Icy Wind", Type: 16384, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 11, Priority: 0, Power: 55, Accuracy: 95},
+	{ID: 197, Name: "Detect", Type: 2, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 4, Power: 0, Accuracy: 0},
+	{ID: 198, Name: "Bone Rush", Type: 16, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 25, Accuracy: 90},
+	{ID: 199, Name: "Lock-On", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 200, Name: "Outrage", Type: 32768, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 8, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 201, Name: "Sandstorm", Type: 32, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 202, Name: "Giga Drain", Type: 2048, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 203, Name: "Endure", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 4, Power: 0, Accuracy: 0},
+	{ID: 204, Name: "Charm", Type: 131072, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 205, Name: "Rollout", Type: 32, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 30, Accuracy: 90},
+	{ID: 206, Name: "False Swipe", Type: 1, Category: Physical, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 207, Name: "Swagger", Type: 1, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 85},
+	{ID: 208, Name: "Milk Drink", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 209, Name: "Spark", Type: 4096, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
+	{ID: 210, Name: "Fury Cutter", Type: 64, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 40, Accuracy: 95},
+	{ID: 211, Name: "Steel Wing", Type: 256, Category: Physical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 70, Accuracy: 90},
+	{ID: 212, Name: "Mean Look", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 213, Name: "Attract", Type: 1, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 214, Name: "Sleep Talk", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 215, Name: "Heal Bell", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 13, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 216, Name: "Return", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 217, Name: "Present", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
+	{ID: 218, Name: "Frustration", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 219, Name: "Safeguard", Type: 1, Category: Status, CurrentPP: 25, MaxPP: 25, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 220, Name: "Pain Split", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 221, Name: "Sacred Fire", Type: 512, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 95},
+	{ID: 222, Name: "Magnitude", Type: 16, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 9, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 223, Name: "Dynamic Punch", Type: 2, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 50},
+	{ID: 224, Name: "Megahorn", Type: 64, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 120, Accuracy: 85},
+	{ID: 225, Name: "Dragon Breath", Type: 32768, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 226, Name: "Baton Pass", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 227, Name: "Encore", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 228, Name: "Pursuit", Type: 65536, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 229, Name: "Rapid Spin", Type: 1, Category: Physical, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 20, Accuracy: 100},
+	{ID: 230, Name: "Sweet Scent", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 231, Name: "Iron Tail", Type: 256, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 100, Accuracy: 75},
+	{ID: 232, Name: "Metal Claw", Type: 256, Category: Physical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 50, Accuracy: 95},
+	{ID: 233, Name: "Vital Throw", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: -1, Power: 70, Accuracy: 0},
+	{ID: 234, Name: "Morning Sun", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 235, Name: "Synthesis", Type: 2048, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 236, Name: "Moonlight", Type: 131072, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 237, Name: "Hidden Power", Type: 1, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 238, Name: "Cross Chop", Type: 2, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 80},
+	{ID: 239, Name: "Twister", Type: 32768, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 11, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 240, Name: "Rain Dance", Type: 1024, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 241, Name: "Sunny Day", Type: 512, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 242, Name: "Crunch", Type: 65536, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 243, Name: "Mirror Coat", Type: 8192, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 1, Priority: -5, Power: 0, Accuracy: 100},
+	{ID: 244, Name: "Psych Up", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 245, Name: "Extreme Speed", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 2, Power: 80, Accuracy: 100},
+	{ID: 246, Name: "Ancient Power", Type: 32, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 247, Name: "Shadow Ball", Type: 128, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 248, Name: "Future Sight", Type: 8192, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 249, Name: "Rock Smash", Type: 2, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 250, Name: "Whirlpool", Type: 1024, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 35, Accuracy: 85},
+	{ID: 251, Name: "Beat Up", Type: 65536, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 252, Name: "Fake Out", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 3, Power: 40, Accuracy: 100},
+	{ID: 253, Name: "Uproar", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 8, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 254, Name: "Stockpile", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 255, Name: "Spit Up", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 256, Name: "Swallow", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 257, Name: "Heat Wave", Type: 512, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 95, Accuracy: 90},
+	{ID: 258, Name: "Hail", Type: 16384, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 259, Name: "Torment", Type: 65536, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 260, Name: "Flatter", Type: 65536, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 261, Name: "Will-O-Wisp", Type: 512, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 85},
+	{ID: 262, Name: "Memento", Type: 65536, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 263, Name: "Facade", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 264, Name: "Focus Punch", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: -3, Power: 150, Accuracy: 100},
+	{ID: 265, Name: "Smelling Salts", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 266, Name: "Follow Me", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 2, Power: 0, Accuracy: 0},
+	{ID: 267, Name: "Nature Power", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 268, Name: "Charge", Type: 4096, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 269, Name: "Taunt", Type: 65536, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 270, Name: "Helping Hand", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 3, Priority: 5, Power: 0, Accuracy: 0},
+	{ID: 271, Name: "Trick", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 272, Name: "Role Play", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 273, Name: "Wish", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 274, Name: "Assist", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 275, Name: "Ingrain", Type: 2048, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 276, Name: "Superpower", Type: 2, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 277, Name: "Magic Coat", Type: 8192, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 7, Priority: 4, Power: 0, Accuracy: 0},
+	{ID: 278, Name: "Recycle", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 279, Name: "Revenge", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: -4, Power: 60, Accuracy: 100},
+	{ID: 280, Name: "Brick Break", Type: 2, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 281, Name: "Yawn", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 282, Name: "Knock Off", Type: 65536, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
+	{ID: 283, Name: "Endeavor", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 284, Name: "Eruption", Type: 512, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 11, Priority: 0, Power: 150, Accuracy: 100},
+	{ID: 285, Name: "Skill Swap", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 286, Name: "Imprison", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 287, Name: "Refresh", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 288, Name: "Grudge", Type: 128, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 289, Name: "Snatch", Type: 65536, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 4, Power: 0, Accuracy: 0},
+	{ID: 290, Name: "Secret Power", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 291, Name: "Dive", Type: 1024, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 292, Name: "Arm Thrust", Type: 2, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 15, Accuracy: 100},
+	{ID: 293, Name: "Camouflage", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 294, Name: "Tail Glow", Type: 64, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 295, Name: "Luster Purge", Type: 8192, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 296, Name: "Mist Ball", Type: 8192, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 297, Name: "Feather Dance", Type: 4, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 298, Name: "Teeter Dance", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 9, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 299, Name: "Blaze Kick", Type: 512, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 85, Accuracy: 90},
+	{ID: 300, Name: "Mud Sport", Type: 16, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 301, Name: "Ice Ball", Type: 16384, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 30, Accuracy: 90},
+	{ID: 302, Name: "Needle Arm", Type: 2048, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 303, Name: "Slack Off", Type: 1, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 304, Name: "Hyper Voice", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 305, Name: "Poison Fang", Type: 8, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
+	{ID: 306, Name: "Crush Claw", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 75, Accuracy: 95},
+	{ID: 307, Name: "Blast Burn", Type: 512, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
+	{ID: 308, Name: "Hydro Cannon", Type: 1024, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
+	{ID: 309, Name: "Meteor Mash", Type: 256, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 90},
+	{ID: 310, Name: "Astonish", Type: 128, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 30, Accuracy: 100},
+	{ID: 311, Name: "Weather Ball", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
+	{ID: 312, Name: "Aromatherapy", Type: 2048, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 13, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 313, Name: "Fake Tears", Type: 65536, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 314, Name: "Air Cutter", Type: 4, Category: Special, CurrentPP: 25, MaxPP: 25, Targets: 11, Priority: 0, Power: 60, Accuracy: 95},
+	{ID: 315, Name: "Overheat", Type: 512, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 130, Accuracy: 90},
+	{ID: 316, Name: "Odor Sleuth", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 317, Name: "Rock Tomb", Type: 32, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 60, Accuracy: 95},
+	{ID: 318, Name: "Silver Wind", Type: 64, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 319, Name: "Metal Sound", Type: 256, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 0, Accuracy: 85},
+	{ID: 320, Name: "Grass Whistle", Type: 2048, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 55},
+	{ID: 321, Name: "Tickle", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 322, Name: "Cosmic Power", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 323, Name: "Water Spout", Type: 1024, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 11, Priority: 0, Power: 150, Accuracy: 100},
+	{ID: 324, Name: "Signal Beam", Type: 64, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 325, Name: "Shadow Punch", Type: 128, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
+	{ID: 326, Name: "Extrasensory", Type: 8192, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 327, Name: "Sky Uppercut", Type: 2, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 85, Accuracy: 90},
+	{ID: 328, Name: "Sand Tomb", Type: 16, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 35, Accuracy: 85},
+	{ID: 329, Name: "Sheer Cold", Type: 16384, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 30},
+	{ID: 330, Name: "Muddy Water", Type: 1024, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 90, Accuracy: 85},
+	{ID: 331, Name: "Bullet Seed", Type: 2048, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 25, Accuracy: 100},
+	{ID: 332, Name: "Aerial Ace", Type: 4, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
+	{ID: 333, Name: "Icicle Spear", Type: 16384, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 25, Accuracy: 100},
+	{ID: 334, Name: "Iron Defense", Type: 256, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 335, Name: "Block", Type: 1, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 336, Name: "Howl", Type: 1, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 337, Name: "Dragon Claw", Type: 32768, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 338, Name: "Frenzy Plant", Type: 2048, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
+	{ID: 339, Name: "Bulk Up", Type: 2, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 340, Name: "Bounce", Type: 4, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 85, Accuracy: 85},
+	{ID: 341, Name: "Mud Shot", Type: 16, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 55, Accuracy: 95},
+	{ID: 342, Name: "Poison Tail", Type: 8, Category: Physical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
+	{ID: 343, Name: "Covet", Type: 1, Category: Physical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 344, Name: "Volt Tackle", Type: 4096, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 345, Name: "Magical Leaf", Type: 2048, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
+	{ID: 346, Name: "Water Sport", Type: 1024, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 347, Name: "Calm Mind", Type: 8192, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 348, Name: "Leaf Blade", Type: 2048, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 349, Name: "Dragon Dance", Type: 32768, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 350, Name: "Rock Blast", Type: 32, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 25, Accuracy: 90},
+	{ID: 351, Name: "Shock Wave", Type: 4096, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
+	{ID: 352, Name: "Water Pulse", Type: 1024, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 353, Name: "Doom Desire", Type: 256, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 140, Accuracy: 100},
+	{ID: 354, Name: "Psycho Boost", Type: 8192, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 140, Accuracy: 90},
+	{ID: 355, Name: "Roost", Type: 4, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 356, Name: "Gravity", Type: 8192, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 357, Name: "Miracle Eye", Type: 8192, Category: Status, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 358, Name: "Wake-Up Slap", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 359, Name: "Hammer Arm", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 90},
+	{ID: 360, Name: "Gyro Ball", Type: 256, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 361, Name: "Healing Wish", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 362, Name: "Brine", Type: 1024, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
+	{ID: 363, Name: "Natural Gift", Type: 1, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 364, Name: "Feint", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 2, Power: 30, Accuracy: 100},
+	{ID: 365, Name: "Pluck", Type: 4, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 366, Name: "Tailwind", Type: 4, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 367, Name: "Acupressure", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 5, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 368, Name: "Metal Burst", Type: 256, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 1, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 369, Name: "U-turn", Type: 64, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 370, Name: "Close Combat", Type: 2, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 371, Name: "Payback", Type: 65536, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
+	{ID: 372, Name: "Assurance", Type: 65536, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 373, Name: "Embargo", Type: 65536, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 374, Name: "Fling", Type: 65536, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 375, Name: "Psycho Shift", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 376, Name: "Trump Card", Type: 1, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 377, Name: "Heal Block", Type: 8192, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 378, Name: "Wring Out", Type: 1, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 379, Name: "Power Trick", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 380, Name: "Gastro Acid", Type: 8, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 381, Name: "Lucky Chant", Type: 1, Category: Status, CurrentPP: 30, MaxPP: 30, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 382, Name: "Me First", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 2, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 383, Name: "Copycat", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 384, Name: "Power Swap", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 385, Name: "Guard Swap", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 386, Name: "Punishment", Type: 65536, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 387, Name: "Last Resort", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 140, Accuracy: 100},
+	{ID: 388, Name: "Worry Seed", Type: 2048, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 389, Name: "Sucker Punch", Type: 65536, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 1, Power: 70, Accuracy: 100},
+	{ID: 390, Name: "Toxic Spikes", Type: 8, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 6, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 391, Name: "Heart Swap", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 392, Name: "Aqua Ring", Type: 1024, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 393, Name: "Magnet Rise", Type: 4096, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 394, Name: "Flare Blitz", Type: 512, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 395, Name: "Force Palm", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 396, Name: "Aura Sphere", Type: 2, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 0},
+	{ID: 397, Name: "Rock Polish", Type: 32, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 398, Name: "Poison Jab", Type: 8, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 399, Name: "Dark Pulse", Type: 65536, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 400, Name: "Night Slash", Type: 65536, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 401, Name: "Aqua Tail", Type: 1024, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 90},
+	{ID: 402, Name: "Seed Bomb", Type: 2048, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 403, Name: "Air Slash", Type: 4, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 95},
+	{ID: 404, Name: "X-Scissor", Type: 64, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 405, Name: "Bug Buzz", Type: 64, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 406, Name: "Dragon Pulse", Type: 32768, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 85, Accuracy: 100},
+	{ID: 407, Name: "Dragon Rush", Type: 32768, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 75},
+	{ID: 408, Name: "Power Gem", Type: 32, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 409, Name: "Drain Punch", Type: 2, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 410, Name: "Vacuum Wave", Type: 2, Category: Special, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
+	{ID: 411, Name: "Focus Blast", Type: 2, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 70},
+	{ID: 412, Name: "Energy Ball", Type: 2048, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 413, Name: "Brave Bird", Type: 4, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 414, Name: "Earth Power", Type: 16, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 415, Name: "Switcheroo", Type: 65536, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 416, Name: "Giga Impact", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
+	{ID: 417, Name: "Nasty Plot", Type: 65536, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 418, Name: "Bullet Punch", Type: 256, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
+	{ID: 419, Name: "Avalanche", Type: 16384, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: -4, Power: 60, Accuracy: 100},
+	{ID: 420, Name: "Ice Shard", Type: 16384, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
+	{ID: 421, Name: "Shadow Claw", Type: 128, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 422, Name: "Thunder Fang", Type: 4096, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 65, Accuracy: 95},
+	{ID: 423, Name: "Ice Fang", Type: 16384, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 65, Accuracy: 95},
+	{ID: 424, Name: "Fire Fang", Type: 512, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 65, Accuracy: 95},
+	{ID: 425, Name: "Shadow Sneak", Type: 128, Category: Physical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
+	{ID: 426, Name: "Mud Bomb", Type: 16, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 65, Accuracy: 85},
+	{ID: 427, Name: "Psycho Cut", Type: 8192, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 428, Name: "Zen Headbutt", Type: 8192, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 90},
+	{ID: 429, Name: "Mirror Shot", Type: 256, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 65, Accuracy: 85},
+	{ID: 430, Name: "Flash Cannon", Type: 256, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 431, Name: "Rock Climb", Type: 1, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 90, Accuracy: 85},
+	{ID: 432, Name: "Defog", Type: 4, Category: Status, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 433, Name: "Trick Room", Type: 8192, Category: Status, CurrentPP: 5, MaxPP: 5, Targets: 12, Priority: -7, Power: 0, Accuracy: 0},
+	{ID: 434, Name: "Draco Meteor", Type: 32768, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 130, Accuracy: 90},
+	{ID: 435, Name: "Discharge", Type: 4096, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 9, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 436, Name: "Lava Plume", Type: 512, Category: Special, CurrentPP: 15, MaxPP: 15, Targets: 9, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 437, Name: "Leaf Storm", Type: 2048, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 130, Accuracy: 90},
+	{ID: 438, Name: "Power Whip", Type: 2048, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 120, Accuracy: 85},
+	{ID: 439, Name: "Rock Wrecker", Type: 32, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
+	{ID: 440, Name: "Cross Poison", Type: 8, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 441, Name: "Gunk Shot", Type: 8, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 80},
+	{ID: 442, Name: "Iron Head", Type: 256, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 443, Name: "Magnet Bomb", Type: 256, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
+	{ID: 444, Name: "Stone Edge", Type: 32, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 80},
+	{ID: 445, Name: "Captivate", Type: 1, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 446, Name: "Stealth Rock", Type: 32, Category: Status, CurrentPP: 20, MaxPP: 20, Targets: 6, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 447, Name: "Grass Knot", Type: 2048, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 448, Name: "Chatter", Type: 4, Category: Special, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
+	{ID: 449, Name: "Judgment", Type: 1, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 100},
+	{ID: 450, Name: "Bug Bite", Type: 64, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 451, Name: "Charge Beam", Type: 4096, Category: Special, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 50, Accuracy: 90},
+	{ID: 452, Name: "Wood Hammer", Type: 2048, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 453, Name: "Aqua Jet", Type: 1024, Category: Physical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
+	{ID: 454, Name: "Attack Order", Type: 64, Category: Physical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
+	{ID: 455, Name: "Defend Order", Type: 64, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 456, Name: "Heal Order", Type: 64, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 457, Name: "Head Smash", Type: 32, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 80},
+	{ID: 458, Name: "Double Hit", Type: 1, Category: Physical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 35, Accuracy: 90},
+	{ID: 459, Name: "Roar of Time", Type: 32768, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
+	{ID: 460, Name: "Spacial Rend", Type: 32768, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 95},
+	{ID: 461, Name: "Lunar Dance", Type: 8192, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 462, Name: "Crush Grip", Type: 1, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 463, Name: "Magma Storm", Type: 512, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 75},
+	{ID: 464, Name: "Dark Void", Type: 65536, Category: Status, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 0, Accuracy: 50},
+	{ID: 465, Name: "Seed Flare", Type: 2048, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 85},
+	{ID: 466, Name: "Ominous Wind", Type: 128, Category: Special, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
+	{ID: 467, Name: "Shadow Force", Type: 128, Category: Physical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
+	{ID: 10001, Name: "Shadow Rush", Type: 0, Category: Physical, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 55, Accuracy: 100},
+	{ID: 10002, Name: "Shadow Blast", Type: 0, Category: Physical, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
+	{ID: 10003, Name: "Shadow Blitz", Type: 0, Category: Physical, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
+	{ID: 10004, Name: "Shadow Bolt", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 10005, Name: "Shadow Break", Type: 0, Category: Physical, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 10006, Name: "Shadow Chill", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 10007, Name: "Shadow End", Type: 0, Category: Physical, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 120, Accuracy: 60},
+	{ID: 10008, Name: "Shadow Fire", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
+	{ID: 10009, Name: "Shadow Rave", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 70, Accuracy: 100},
+	{ID: 10010, Name: "Shadow Storm", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 95, Accuracy: 100},
+	{ID: 10011, Name: "Shadow Wave", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 50, Accuracy: 100},
+	{ID: 10012, Name: "Shadow Down", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 10013, Name: "Shadow Half", Type: 0, Category: Special, CurrentPP: 0, MaxPP: 0, Targets: 12, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 10014, Name: "Shadow Hold", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 10015, Name: "Shadow Mist", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 0, Accuracy: 100},
+	{ID: 10016, Name: "Shadow Panic", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 0, Accuracy: 90},
+	{ID: 10017, Name: "Shadow Shed", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
+	{ID: 10018, Name: "Shadow Sky", Type: 0, Category: Status, CurrentPP: 0, MaxPP: 0, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
 }
+
+// Create move constant enum for quick reference
+const (
+	MOVE_POUND          = 1
+	MOVE_KARATE_CHOP    = 2
+	MOVE_DOUBLE_SLAP    = 3
+	MOVE_COMET_PUNCH    = 4
+	MOVE_MEGA_PUNCH     = 5
+	MOVE_PAY_DAY        = 6
+	MOVE_FIRE_PUNCH     = 7
+	MOVE_ICE_PUNCH      = 8
+	MOVE_THUNDER_PUNCH  = 9
+	MOVE_SCRATCH        = 10
+	MOVE_VICE_GRIP      = 11
+	MOVE_GUILLOTINE     = 12
+	MOVE_RAZOR_WIND     = 13
+	MOVE_SWORDS_DANCE   = 14
+	MOVE_CUT            = 15
+	MOVE_GUST           = 16
+	MOVE_WING_ATTACK    = 17
+	MOVE_WHIRLWIND      = 18
+	MOVE_FLY            = 19
+	MOVE_BIND           = 20
+	MOVE_SLAM           = 21
+	MOVE_VINE_WHIP      = 22
+	MOVE_STOMP          = 23
+	MOVE_DOUBLE_KICK    = 24
+	MOVE_MEGA_KICK      = 25
+	MOVE_JUMP_KICK      = 26
+	MOVE_ROLLING_KICK   = 27
+	MOVE_SAND_ATTACK    = 28
+	MOVE_HEADBUTT       = 29
+	MOVE_HORN_ATTACK    = 30
+	MOVE_FURY_ATTACK    = 31
+	MOVE_HORN_DRILL     = 32
+	MOVE_TACKLE         = 33
+	MOVE_BODY_SLAM      = 34
+	MOVE_WRAP           = 35
+	MOVE_TAKE_DOWN      = 36
+	MOVE_THRASH         = 37
+	MOVE_DOUBLEEDGE     = 38
+	MOVE_TAIL_WHIP      = 39
+	MOVE_POISON_STING   = 40
+	MOVE_TWINEEDLE      = 41
+	MOVE_PIN_MISSILE    = 42
+	MOVE_LEER           = 43
+	MOVE_BITE           = 44
+	MOVE_GROWL          = 45
+	MOVE_ROAR           = 46
+	MOVE_SING           = 47
+	MOVE_SUPERSONIC     = 48
+	MOVE_SONIC_BOOM     = 49
+	MOVE_DISABLE        = 50
+	MOVE_ACID           = 51
+	MOVE_EMBER          = 52
+	MOVE_FLAMETHROWER   = 53
+	MOVE_MIST           = 54
+	MOVE_WATER_GUN      = 55
+	MOVE_HYDRO_PUMP     = 56
+	MOVE_SURF           = 57
+	MOVE_ICE_BEAM       = 58
+	MOVE_BLIZZARD       = 59
+	MOVE_PSYBEAM        = 60
+	MOVE_BUBBLE_BEAM    = 61
+	MOVE_AURORA_BEAM    = 62
+	MOVE_HYPER_BEAM     = 63
+	MOVE_PECK           = 64
+	MOVE_DRILL_PECK     = 65
+	MOVE_SUBMISSION     = 66
+	MOVE_LOW_KICK       = 67
+	MOVE_COUNTER        = 68
+	MOVE_SEISMIC_TOSS   = 69
+	MOVE_STRENGTH       = 70
+	MOVE_ABSORB         = 71
+	MOVE_MEGA_DRAIN     = 72
+	MOVE_LEECH_SEED     = 73
+	MOVE_GROWTH         = 74
+	MOVE_RAZOR_LEAF     = 75
+	MOVE_SOLAR_BEAM     = 76
+	MOVE_POISON_POWDER  = 77
+	MOVE_STUN_SPORE     = 78
+	MOVE_SLEEP_POWDER   = 79
+	MOVE_PETAL_DANCE    = 80
+	MOVE_STRING_SHOT    = 81
+	MOVE_DRAGON_RAGE    = 82
+	MOVE_FIRE_SPIN      = 83
+	MOVE_THUNDER_SHOCK  = 84
+	MOVE_THUNDERBOLT    = 85
+	MOVE_THUNDER_WAVE   = 86
+	MOVE_THUNDER        = 87
+	MOVE_ROCK_THROW     = 88
+	MOVE_EARTHQUAKE     = 89
+	MOVE_FISSURE        = 90
+	MOVE_DIG            = 91
+	MOVE_TOXIC          = 92
+	MOVE_CONFUSION      = 93
+	MOVE_PSYCHIC        = 94
+	MOVE_HYPNOSIS       = 95
+	MOVE_MEDITATE       = 96
+	MOVE_AGILITY        = 97
+	MOVE_QUICK_ATTACK   = 98
+	MOVE_RAGE           = 99
+	MOVE_TELEPORT       = 100
+	MOVE_NIGHT_SHADE    = 101
+	MOVE_MIMIC          = 102
+	MOVE_SCREECH        = 103
+	MOVE_DOUBLE_TEAM    = 104
+	MOVE_RECOVER        = 105
+	MOVE_HARDEN         = 106
+	MOVE_MINIMIZE       = 107
+	MOVE_SMOKESCREEN    = 108
+	MOVE_CONFUSE_RAY    = 109
+	MOVE_WITHDRAW       = 110
+	MOVE_DEFENSE_CURL   = 111
+	MOVE_BARRIER        = 112
+	MOVE_LIGHT_SCREEN   = 113
+	MOVE_HAZE           = 114
+	MOVE_REFLECT        = 115
+	MOVE_FOCUS_ENERGY   = 116
+	MOVE_BIDE           = 117
+	MOVE_METRONOME      = 118
+	MOVE_MIRROR_MOVE    = 119
+	MOVE_SELFDESTRUCT   = 120
+	MOVE_EGG_BOMB       = 121
+	MOVE_LICK           = 122
+	MOVE_SMOG           = 123
+	MOVE_SLUDGE         = 124
+	MOVE_BONE_CLUB      = 125
+	MOVE_FIRE_BLAST     = 126
+	MOVE_WATERFALL      = 127
+	MOVE_CLAMP          = 128
+	MOVE_SWIFT          = 129
+	MOVE_SKULL_BASH     = 130
+	MOVE_SPIKE_CANNON   = 131
+	MOVE_CONSTRICT      = 132
+	MOVE_AMNESIA        = 133
+	MOVE_KINESIS        = 134
+	MOVE_SOFTBOILED     = 135
+	MOVE_HIGH_JUMP_KICK = 136
+	MOVE_GLARE          = 137
+	MOVE_DREAM_EATER    = 138
+	MOVE_POISON_GAS     = 139
+	MOVE_BARRAGE        = 140
+	MOVE_LEECH_LIFE     = 141
+	MOVE_LOVELY_KISS    = 142
+	MOVE_SKY_ATTACK     = 143
+	MOVE_TRANSFORM      = 144
+	MOVE_BUBBLE         = 145
+	MOVE_DIZZY_PUNCH    = 146
+	MOVE_SPORE          = 147
+	MOVE_FLASH          = 148
+	MOVE_PSYWAVE        = 149
+	MOVE_SPLASH         = 150
+	MOVE_ACID_ARMOR     = 151
+	MOVE_CRABHAMMER     = 152
+	MOVE_EXPLOSION      = 153
+	MOVE_FURY_SWIPES    = 154
+	MOVE_BONEMERANG     = 155
+	MOVE_REST           = 156
+	MOVE_ROCK_SLIDE     = 157
+	MOVE_HYPER_FANG     = 158
+	MOVE_SHARPEN        = 159
+	MOVE_CONVERSION     = 160
+	MOVE_TRI_ATTACK     = 161
+	MOVE_SUPER_FANG     = 162
+	MOVE_SLASH          = 163
+	MOVE_SUBSTITUTE     = 164
+	MOVE_STRUGGLE       = 165
+	MOVE_SKETCH         = 166
+	MOVE_TRIPLE_KICK    = 167
+	MOVE_THIEF          = 168
+	MOVE_SPIDER_WEB     = 169
+	MOVE_MIND_READER    = 170
+	MOVE_NIGHTMARE      = 171
+	MOVE_FLAME_WHEEL    = 172
+	MOVE_SNORE          = 173
+	MOVE_CURSE          = 174
+	MOVE_FLAIL          = 175
+	MOVE_CONVERSION_2   = 176
+	MOVE_AEROBLAST      = 177
+	MOVE_COTTON_SPORE   = 178
+	MOVE_REVERSAL       = 179
+	MOVE_SPITE          = 180
+	MOVE_POWDER_SNOW    = 181
+	MOVE_PROTECT        = 182
+	MOVE_MACH_PUNCH     = 183
+	MOVE_SCARY_FACE     = 184
+	MOVE_FEINT_ATTACK   = 185
+	MOVE_SWEET_KISS     = 186
+	MOVE_BELLY_DRUM     = 187
+	MOVE_SLUDGE_BOMB    = 188
+	MOVE_MUDSLAP        = 189
+	MOVE_OCTAZOOKA      = 190
+	MOVE_SPIKES         = 191
+	MOVE_ZAP_CANNON     = 192
+	MOVE_FORESIGHT      = 193
+	MOVE_DESTINY_BOND   = 194
+	MOVE_PERISH_SONG    = 195
+	MOVE_ICY_WIND       = 196
+	MOVE_DETECT         = 197
+	MOVE_BONE_RUSH      = 198
+	MOVE_LOCKON         = 199
+	MOVE_OUTRAGE        = 200
+	MOVE_SANDSTORM      = 201
+	MOVE_GIGA_DRAIN     = 202
+	MOVE_ENDURE         = 203
+	MOVE_CHARM          = 204
+	MOVE_ROLLOUT        = 205
+	MOVE_FALSE_SWIPE    = 206
+	MOVE_SWAGGER        = 207
+	MOVE_MILK_DRINK     = 208
+	MOVE_SPARK          = 209
+	MOVE_FURY_CUTTER    = 210
+	MOVE_STEEL_WING     = 211
+	MOVE_MEAN_LOOK      = 212
+	MOVE_ATTRACT        = 213
+	MOVE_SLEEP_TALK     = 214
+	MOVE_HEAL_BELL      = 215
+	MOVE_RETURN         = 216
+	MOVE_PRESENT        = 217
+	MOVE_FRUSTRATION    = 218
+	MOVE_SAFEGUARD      = 219
+	MOVE_PAIN_SPLIT     = 220
+	MOVE_SACRED_FIRE    = 221
+	MOVE_MAGNITUDE      = 222
+	MOVE_DYNAMIC_PUNCH  = 223
+	MOVE_MEGAHORN       = 224
+	MOVE_DRAGON_BREATH  = 225
+	MOVE_BATON_PASS     = 226
+	MOVE_ENCORE         = 227
+	MOVE_PURSUIT        = 228
+	MOVE_RAPID_SPIN     = 229
+	MOVE_SWEET_SCENT    = 230
+	MOVE_IRON_TAIL      = 231
+	MOVE_METAL_CLAW     = 232
+	MOVE_VITAL_THROW    = 233
+	MOVE_MORNING_SUN    = 234
+	MOVE_SYNTHESIS      = 235
+	MOVE_MOONLIGHT      = 236
+	MOVE_HIDDEN_POWER   = 237
+	MOVE_CROSS_CHOP     = 238
+	MOVE_TWISTER        = 239
+	MOVE_RAIN_DANCE     = 240
+	MOVE_SUNNY_DAY      = 241
+	MOVE_CRUNCH         = 242
+	MOVE_MIRROR_COAT    = 243
+	MOVE_PSYCH_UP       = 244
+	MOVE_EXTREME_SPEED  = 245
+	MOVE_ANCIENT_POWER  = 246
+	MOVE_SHADOW_BALL    = 247
+	MOVE_FUTURE_SIGHT   = 248
+	MOVE_ROCK_SMASH     = 249
+	MOVE_WHIRLPOOL      = 250
+	MOVE_BEAT_UP        = 251
+	MOVE_FAKE_OUT       = 252
+	MOVE_UPROAR         = 253
+	MOVE_STOCKPILE      = 254
+	MOVE_SPIT_UP        = 255
+	MOVE_SWALLOW        = 256
+	MOVE_HEAT_WAVE      = 257
+	MOVE_HAIL           = 258
+	MOVE_TORMENT        = 259
+	MOVE_FLATTER        = 260
+	MOVE_WILLOWISP      = 261
+	MOVE_MEMENTO        = 262
+	MOVE_FACADE         = 263
+	MOVE_FOCUS_PUNCH    = 264
+	MOVE_SMELLING_SALTS = 265
+	MOVE_FOLLOW_ME      = 266
+	MOVE_NATURE_POWER   = 267
+	MOVE_CHARGE         = 268
+	MOVE_TAUNT          = 269
+	MOVE_HELPING_HAND   = 270
+	MOVE_TRICK          = 271
+	MOVE_ROLE_PLAY      = 272
+	MOVE_WISH           = 273
+	MOVE_ASSIST         = 274
+	MOVE_INGRAIN        = 275
+	MOVE_SUPERPOWER     = 276
+	MOVE_MAGIC_COAT     = 277
+	MOVE_RECYCLE        = 278
+	MOVE_REVENGE        = 279
+	MOVE_BRICK_BREAK    = 280
+	MOVE_YAWN           = 281
+	MOVE_KNOCK_OFF      = 282
+	MOVE_ENDEAVOR       = 283
+	MOVE_ERUPTION       = 284
+	MOVE_SKILL_SWAP     = 285
+	MOVE_IMPRISON       = 286
+	MOVE_REFRESH        = 287
+	MOVE_GRUDGE         = 288
+	MOVE_SNATCH         = 289
+	MOVE_SECRET_POWER   = 290
+	MOVE_DIVE           = 291
+	MOVE_ARM_THRUST     = 292
+	MOVE_CAMOUFLAGE     = 293
+	MOVE_TAIL_GLOW      = 294
+	MOVE_LUSTER_PURGE   = 295
+	MOVE_MIST_BALL      = 296
+	MOVE_FEATHER_DANCE  = 297
+	MOVE_TEETER_DANCE   = 298
+	MOVE_BLAZE_KICK     = 299
+	MOVE_MUD_SPORT      = 300
+	MOVE_ICE_BALL       = 301
+	MOVE_NEEDLE_ARM     = 302
+	MOVE_SLACK_OFF      = 303
+	MOVE_HYPER_VOICE    = 304
+	MOVE_POISON_FANG    = 305
+	MOVE_CRUSH_CLAW     = 306
+	MOVE_BLAST_BURN     = 307
+	MOVE_HYDRO_CANNON   = 308
+	MOVE_METEOR_MASH    = 309
+	MOVE_ASTONISH       = 310
+	MOVE_WEATHER_BALL   = 311
+	MOVE_AROMATHERAPY   = 312
+	MOVE_FAKE_TEARS     = 313
+	MOVE_AIR_CUTTER     = 314
+	MOVE_OVERHEAT       = 315
+	MOVE_ODOR_SLEUTH    = 316
+	MOVE_ROCK_TOMB      = 317
+	MOVE_SILVER_WIND    = 318
+	MOVE_METAL_SOUND    = 319
+	MOVE_GRASS_WHISTLE  = 320
+	MOVE_TICKLE         = 321
+	MOVE_COSMIC_POWER   = 322
+	MOVE_WATER_SPOUT    = 323
+	MOVE_SIGNAL_BEAM    = 324
+	MOVE_SHADOW_PUNCH   = 325
+	MOVE_EXTRASENSORY   = 326
+	MOVE_SKY_UPPERCUT   = 327
+	MOVE_SAND_TOMB      = 328
+	MOVE_SHEER_COLD     = 329
+	MOVE_MUDDY_WATER    = 330
+	MOVE_BULLET_SEED    = 331
+	MOVE_AERIAL_ACE     = 332
+	MOVE_ICICLE_SPEAR   = 333
+	MOVE_IRON_DEFENSE   = 334
+	MOVE_BLOCK          = 335
+	MOVE_HOWL           = 336
+	MOVE_DRAGON_CLAW    = 337
+	MOVE_FRENZY_PLANT   = 338
+	MOVE_BULK_UP        = 339
+	MOVE_BOUNCE         = 340
+	MOVE_MUD_SHOT       = 341
+	MOVE_POISON_TAIL    = 342
+	MOVE_COVET          = 343
+	MOVE_VOLT_TACKLE    = 344
+	MOVE_MAGICAL_LEAF   = 345
+	MOVE_WATER_SPORT    = 346
+	MOVE_CALM_MIND      = 347
+	MOVE_LEAF_BLADE     = 348
+	MOVE_DRAGON_DANCE   = 349
+	MOVE_ROCK_BLAST     = 350
+	MOVE_SHOCK_WAVE     = 351
+	MOVE_WATER_PULSE    = 352
+	MOVE_DOOM_DESIRE    = 353
+	MOVE_PSYCHO_BOOST   = 354
+	MOVE_ROOST          = 355
+	MOVE_GRAVITY        = 356
+	MOVE_MIRACLE_EYE    = 357
+	MOVE_WAKEUP_SLAP    = 358
+	MOVE_HAMMER_ARM     = 359
+	MOVE_GYRO_BALL      = 360
+	MOVE_HEALING_WISH   = 361
+	MOVE_BRINE          = 362
+	MOVE_NATURAL_GIFT   = 363
+	MOVE_FEINT          = 364
+	MOVE_PLUCK          = 365
+	MOVE_TAILWIND       = 366
+	MOVE_ACUPRESSURE    = 367
+	MOVE_METAL_BURST    = 368
+	MOVE_UTURN          = 369
+	MOVE_CLOSE_COMBAT   = 370
+	MOVE_PAYBACK        = 371
+	MOVE_ASSURANCE      = 372
+	MOVE_EMBARGO        = 373
+	MOVE_FLING          = 374
+	MOVE_PSYCHO_SHIFT   = 375
+	MOVE_TRUMP_CARD     = 376
+	MOVE_HEAL_BLOCK     = 377
+	MOVE_WRING_OUT      = 378
+	MOVE_POWER_TRICK    = 379
+	MOVE_GASTRO_ACID    = 380
+	MOVE_LUCKY_CHANT    = 381
+	MOVE_ME_FIRST       = 382
+	MOVE_COPYCAT        = 383
+	MOVE_POWER_SWAP     = 384
+	MOVE_GUARD_SWAP     = 385
+	MOVE_PUNISHMENT     = 386
+	MOVE_LAST_RESORT    = 387
+	MOVE_WORRY_SEED     = 388
+	MOVE_SUCKER_PUNCH   = 389
+	MOVE_TOXIC_SPIKES   = 390
+	MOVE_HEART_SWAP     = 391
+	MOVE_AQUA_RING      = 392
+	MOVE_MAGNET_RISE    = 393
+	MOVE_FLARE_BLITZ    = 394
+	MOVE_FORCE_PALM     = 395
+	MOVE_AURA_SPHERE    = 396
+	MOVE_ROCK_POLISH    = 397
+	MOVE_POISON_JAB     = 398
+	MOVE_DARK_PULSE     = 399
+	MOVE_NIGHT_SLASH    = 400
+	MOVE_AQUA_TAIL      = 401
+	MOVE_SEED_BOMB      = 402
+	MOVE_AIR_SLASH      = 403
+	MOVE_XSCISSOR       = 404
+	MOVE_BUG_BUZZ       = 405
+	MOVE_DRAGON_PULSE   = 406
+	MOVE_DRAGON_RUSH    = 407
+	MOVE_POWER_GEM      = 408
+	MOVE_DRAIN_PUNCH    = 409
+	MOVE_VACUUM_WAVE    = 410
+	MOVE_FOCUS_BLAST    = 411
+	MOVE_ENERGY_BALL    = 412
+	MOVE_BRAVE_BIRD     = 413
+	MOVE_EARTH_POWER    = 414
+	MOVE_SWITCHEROO     = 415
+	MOVE_GIGA_IMPACT    = 416
+	MOVE_NASTY_PLOT     = 417
+	MOVE_BULLET_PUNCH   = 418
+	MOVE_AVALANCHE      = 419
+	MOVE_ICE_SHARD      = 420
+	MOVE_SHADOW_CLAW    = 421
+	MOVE_THUNDER_FANG   = 422
+	MOVE_ICE_FANG       = 423
+	MOVE_FIRE_FANG      = 424
+	MOVE_SHADOW_SNEAK   = 425
+	MOVE_MUD_BOMB       = 426
+	MOVE_PSYCHO_CUT     = 427
+	MOVE_ZEN_HEADBUTT   = 428
+	MOVE_MIRROR_SHOT    = 429
+	MOVE_FLASH_CANNON   = 430
+	MOVE_ROCK_CLIMB     = 431
+	MOVE_DEFOG          = 432
+	MOVE_TRICK_ROOM     = 433
+	MOVE_DRACO_METEOR   = 434
+	MOVE_DISCHARGE      = 435
+	MOVE_LAVA_PLUME     = 436
+	MOVE_LEAF_STORM     = 437
+	MOVE_POWER_WHIP     = 438
+	MOVE_ROCK_WRECKER   = 439
+	MOVE_CROSS_POISON   = 440
+	MOVE_GUNK_SHOT      = 441
+	MOVE_IRON_HEAD      = 442
+	MOVE_MAGNET_BOMB    = 443
+	MOVE_STONE_EDGE     = 444
+	MOVE_CAPTIVATE      = 445
+	MOVE_STEALTH_ROCK   = 446
+	MOVE_GRASS_KNOT     = 447
+	MOVE_CHATTER        = 448
+	MOVE_JUDGMENT       = 449
+	MOVE_BUG_BITE       = 450
+	MOVE_CHARGE_BEAM    = 451
+	MOVE_WOOD_HAMMER    = 452
+	MOVE_AQUA_JET       = 453
+	MOVE_ATTACK_ORDER   = 454
+	MOVE_DEFEND_ORDER   = 455
+	MOVE_HEAL_ORDER     = 456
+	MOVE_HEAD_SMASH     = 457
+	MOVE_DOUBLE_HIT     = 458
+	MOVE_ROAR_OF_TIME   = 459
+	MOVE_SPACIAL_REND   = 460
+	MOVE_LUNAR_DANCE    = 461
+	MOVE_CRUSH_GRIP     = 462
+	MOVE_MAGMA_STORM    = 463
+	MOVE_DARK_VOID      = 464
+	MOVE_SEED_FLARE     = 465
+	MOVE_OMINOUS_WIND   = 466
+	MOVE_SHADOW_FORCE   = 467
+	MOVE_SHADOW_RUSH    = 10001
+	MOVE_SHADOW_BLAST   = 10002
+	MOVE_SHADOW_BLITZ   = 10003
+	MOVE_SHADOW_BOLT    = 10004
+	MOVE_SHADOW_BREAK   = 10005
+	MOVE_SHADOW_CHILL   = 10006
+	MOVE_SHADOW_END     = 10007
+	MOVE_SHADOW_FIRE    = 10008
+	MOVE_SHADOW_RAVE    = 10009
+	MOVE_SHADOW_STORM   = 10010
+	MOVE_SHADOW_WAVE    = 10011
+	MOVE_SHADOW_DOWN    = 10012
+	MOVE_SHADOW_HALF    = 10013
+	MOVE_SHADOW_HOLD    = 10014
+	MOVE_SHADOW_MIST    = 10015
+	MOVE_SHADOW_PANIC   = 10016
+	MOVE_SHADOW_SHED    = 10017
+	MOVE_SHADOW_SKY     = 10018
+)
 
 // Create item constant enum for quick reference
 const (
