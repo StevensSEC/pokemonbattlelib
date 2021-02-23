@@ -261,6 +261,8 @@ func (b *Battle) ProcessQueue() {
 			if t.Target.HeldItem == t.Item {
 				t.Target.HeldItem = nil
 			}
+		case FriendshipTransaction:
+			t.Target.Friendship += t.Amount
 		case HealTransaction:
 			t.Target.CurrentHP += t.Amount
 		case InflictStatusTransaction:
