@@ -26,12 +26,33 @@ func (c MoveCategory) String() string {
 const MOVE_PRIORITY_MAX = 5
 const MOVE_PRIORITY_MIN = -7
 
+// Targets that the move can specify
+type MoveTarget int
+
+const (
+	TARGET_SPECIFIC_MOVE MoveTarget = iota + 1
+	TARGET_SELECTED_ME_FIRST
+	TARGET_ALLY
+	TARGET_USERS_FIELD
+	TARGET_USER_OR_ALLY
+	TARGET_OPPONENTS_FIELD
+	TARGET_USER
+	TARGET_RANDOM_OPPONENT
+	TARGET_ALL_OTHERS
+	TARGET_SELECTED
+	TARGET_ALL_OPPONENTS
+	TARGET_ENTIRE_FIELD
+	TARGET_USER_AND_ALLIES
+	TARGET_ALL
+)
+
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
 type Move struct {
 	ID        int
 	Name      string
 	Type      ElementalType
 	Category  MoveCategory
+	Target    MoveTarget
 	CurrentPP int
 	MaxPP     int
 	Priority  int
