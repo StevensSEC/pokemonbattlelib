@@ -17,7 +17,7 @@ type Pokemon struct {
 	EVs               [6]uint8         // values from 0-255 that represents a Pokemon's training in a particular stat
 	Nature            *Nature          // represents a Pokemon's disposition and affects stats
 	Stats             [6]uint          // the actual stats of a Pokemon determined from the above data
-	StatModifiers     [6]int           // ranges from +6 (buffing) to -6 (debuffing) a stat
+	StatModifiers     [9]int           // ranges from +6 (buffing) to -6 (debuffing) a stat
 	StatusEffects     StatusCondition  // the current status effects inflicted on a Pokemon
 	CurrentHP         uint             // the remaining HP of this Pokemon
 	HeldItem          *Item            // the item a Pokemon is holding
@@ -57,6 +57,7 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		TotalExperience: 0,
 		IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 		EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+		StatModifiers:   [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0},
 		Nature:          GetNature(HARDY), // this nature is neutral and has no effect
 	}
 	for _, opt := range opts {

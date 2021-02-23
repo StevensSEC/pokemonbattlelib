@@ -160,7 +160,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				}
 			} else {
-				modifier := uint(1) // TODO: damage multiplers
+				crit := 1
+				if b.rng.Get(1, CRIT_CHANCE[user.StatModifiers[STAT_CRIT_CHANCE]]) == 1 {
+					crit = 2
+				}
+				modifier := uint(crit) // TODO: damage multiplers
 				levelEffect := (2 * uint(user.Level) / 5) + 2
 				movePower := uint(move.Power)
 				statRatio := user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF]
