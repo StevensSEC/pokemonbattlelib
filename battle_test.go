@@ -156,6 +156,23 @@ var _ = Describe("One round of battle", func() {
 			Expect(squirtle.CurrentHP < squirtle.Stats[STAT_HP]).To(BeTrue())
 		})
 	})
+
+	Context("should deal the correct amount of damage", func() {
+		It("should account for same-type attack bonus", func() {
+			// TODO: remove when elemental type added
+			charmander.Elemental = Fire
+			ember := GetMove(52)
+			charmander.Moves[0] = &ember
+			battle.Start()
+			battle.SimulateRound()
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(6))
+			squirtle.CurrentHP = 100
+			adaptability := Ability{ID: 91}
+			charmander.Ability = &adaptability
+			battle.SimulateRound()
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(93))
+		})
+	})
 })
 
 var _ = Describe("Using items in battle", func() {
