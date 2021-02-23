@@ -185,6 +185,35 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		}
 	}
 
+	// handle post turn status effects
+	for a, party := range b.parties {
+		for ap, pkmn := range party.activePokemon {
+			if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
+				t := target{
+					party:     a,
+					partySlot: ap,
+					Pokemon:   *pkmn,
+					Team:      party.team,
+				}
+				cond := pkmn.StatusEffects & NONVOLATILE_STATUS_MASK
+				var damage uint
+				switch cond {
+				case StatusBurn, StatusPoison:
+					damage = pkmn.Stats[STAT_HP] / 8
+				case StatusBadlyPoison:
+					// TODO: implement counter for increasing bad poison damage
+					damage = pkmn.Stats[STAT_HP] / 16
+				}
+				b.QueueTransaction(DamageTransaction{
+					Target:       t,
+					Damage:       damage,
+					StatusEffect: cond,
+				})
+			}
+		}
+	}
+	b.ProcessQueue()
+
 	if len(b.tQueue) > 0 {
 		log.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
 	}
