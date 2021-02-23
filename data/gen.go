@@ -372,17 +372,18 @@ func main() {
 	if err != nil {
 		log.Panicln(err)
 	}
-	itemFlagMap := map[string]string{
-		"2": "FlagConsumable",
-		"4": "FlagUsableInBattle",
-		"5": "FlagHoldable",
-		"6": "FlagHoldablePassive",
-		"7": "FlagHoldableActive",
+	itemFlagMap := map[int]string{
+		2: "FlagConsumable",
+		4: "FlagUsableInBattle",
+		5: "FlagHoldable",
+		6: "FlagHoldablePassive",
+		7: "FlagHoldableActive",
 	}
 	item_flags := make(map[string][]string)
 	for _, r := range records {
-		if r[1] == "4" || r[1] == "5" || r[1] == "7" {
-			item_flags[r[0]] = append(item_flags[r[0]], itemFlagMap[r[1]])
+		v := parseInt(r[1])
+		if v == 2 || v >= 4 && v <= 7 {
+			item_flags[r[0]] = append(item_flags[r[0]], itemFlagMap[v])
 		}
 	}
 	output += "// Create item constant enum for quick reference\nconst (\n"
