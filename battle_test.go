@@ -53,7 +53,7 @@ func TestRcAgent(t *testing.T) {
 	a2 := newRcAgent()
 	_a1 := Agent(a1)
 	_a2 := Agent(a2)
-	pound := GetMove(1)
+	pound := GetMove(MOVE_POUND)
 	pkmn1 := GeneratePokemon(4)
 	pkmn1.Moves[0] = &pound
 	pkmn2 := GeneratePokemon(7)
@@ -121,7 +121,7 @@ var _ = Describe("One round of battle", func() {
 	BeforeEach(func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
-		pound = GetMove(1)
+		pound = GetMove(MOVE_POUND)
 		charmander = GeneratePokemon(4, WithMoves(&pound))
 		party1 = NewOccupiedParty(&agent1, 0, charmander)
 		squirtle = GeneratePokemon(7, WithMoves(&pound))
@@ -290,7 +290,7 @@ var _ = Describe("Pokemon speed", func() {
 	BeforeEach(func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
-		pound = GetMove(1)
+		pound = GetMove(MOVE_POUND)
 		party1 = NewOccupiedParty(&agent1, 0, GeneratePokemon(4, WithMoves(&pound)))
 		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(291, WithMoves(&pound))) // ninjask is faster than charmander
 		battle = NewBattle()
@@ -349,7 +349,7 @@ var _ = Describe("Fainting", func() {
 	BeforeEach(func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
-		pound = GetMove(1)
+		pound = GetMove(MOVE_POUND)
 		scary_monster := GeneratePokemon(7, WithLevel(100), WithMoves(&pound))
 		scary_monster.Stats[STAT_SPD] = 1
 		party1 = NewOccupiedParty(&agent1, 0, GeneratePokemon(4, WithMoves(&pound)), GeneratePokemon(387, WithMoves(&pound)))
@@ -399,7 +399,7 @@ var _ = Describe("Fainting", func() {
 		party1 := NewParty(&a1, 0)
 		pkmn1 := GeneratePokemon(4, WithLevel(3))
 		pkmn1.CurrentHP = 1
-		pound := GetMove(1)
+		pound := GetMove(MOVE_POUND)
 		pkmn1.Moves[0] = &pound
 		party1.AddPokemon(pkmn1)
 		party2 := NewParty(&a2, 1)
@@ -444,7 +444,7 @@ var _ = Describe("Fainting", func() {
 		pkmn1 := GeneratePokemon(4, WithLevel(3))
 		pkmn3 := GeneratePokemon(387, WithLevel(3))
 		pkmn1.CurrentHP = 1
-		pound := GetMove(1)
+		pound := GetMove(MOVE_POUND)
 		pkmn1.Moves[0] = &pound
 		pkmn3.Moves[0] = &pound
 		party1.AddPokemon(pkmn1, pkmn3)
@@ -497,7 +497,7 @@ var _ = Describe("Ending a battle", func() {
 	BeforeEach(func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
-		pound = GetMove(1)
+		pound = GetMove(MOVE_POUND)
 		low_health_pkmn := GeneratePokemon(4, WithMoves(&pound))
 		low_health_pkmn.CurrentHP = 1
 		party1 = NewOccupiedParty(&agent1, 0, low_health_pkmn)
@@ -551,7 +551,7 @@ var _ = Describe("Status Conditions", func() {
 	})
 
 	It("should inflict burn and poison damage", func() {
-		pound := GetMove(1)
+		pound := GetMove(MOVE_POUND)
 		p1 := GeneratePokemon(1)
 		p1.Moves[0] = &pound
 		p1.StatusEffects = StatusPoison
@@ -586,7 +586,7 @@ var _ = Describe("Status Conditions", func() {
 
 	It("should inflict badly poisoned damage", func() {
 		p1 := GeneratePokemon(1, WithLevel(8))
-		pound := GetMove(1)
+		pound := GetMove(MOVE_POUND)
 		p1.Moves[0] = &pound
 		p1.StatusEffects = StatusBadlyPoison
 		party1 := NewOccupiedParty(&a1, 0, p1)

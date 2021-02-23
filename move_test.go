@@ -6,7 +6,7 @@ import (
 )
 
 func TestGetMove(t *testing.T) {
-	m := GetMove(1)
+	m := GetMove(MOVE_POUND)
 	if m.Name != "Pound" {
 		t.Errorf("expected move name to be Pound, got %v", m.Name)
 	}
