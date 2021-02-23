@@ -127,6 +127,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
 			switch turnA.(type) {
 			case FightTurn:
+				ftA := turnA.(FightTurn)
+				ftB := turnB.(FightTurn)
+				mvA := ctxA.Pokemon.Moves[ftA.Move]
+				mvB := ctxB.Pokemon.Moves[ftB.Move]
+				if mvA.Priority != mvB.Priority {
+					return mvA.Priority > mvB.Priority
+				}
 				// speedy pokemon should go first
 				return ctxA.Pokemon.Stats[STAT_SPD] > ctxB.Pokemon.Stats[STAT_SPD]
 			}
