@@ -52,7 +52,7 @@ type Move struct {
 	Name      string
 	Type      ElementalType
 	Category  MoveCategory
-	Target    MoveTarget
+	Targets   MoveTarget
 	CurrentPP int
 	MaxPP     int
 	Priority  int
