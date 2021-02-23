@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"reflect"
@@ -207,6 +208,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					}
 				}
 				statRatio := attack / defense
+				fmt.Println(statRatio, levelEffect, movePower, modifier)
 				// Calculate damage total
 				damage := (((levelEffect * movePower * statRatio) / 50) + 2) * modifier
 				// TODO: handle accuracy/evasion
