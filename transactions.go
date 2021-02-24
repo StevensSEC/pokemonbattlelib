@@ -39,7 +39,7 @@ func (t DamageTransaction) BattleLog() string {
 // A transaction to change the friendship level of a Pokemon.
 type FriendshipTransaction struct {
 	Target *Pokemon // The target Pokemon
-	Amount uint8    // The amount of friendship to increase/decrease
+	Amount int      // The amount of friendship to increase/decrease
 }
 
 func (t FriendshipTransaction) BattleLog() string {
