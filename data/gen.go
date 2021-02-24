@@ -57,6 +57,7 @@ type data_item struct {
 	CategoryID    int
 	FlingPower    int
 	FlingEffectID int
+	Flags         []string
 }
 
 func parseInt(s string) (n int) {
@@ -68,6 +69,17 @@ func parseInt(s string) (n int) {
 		log.Panicln(err)
 	}
 	return n
+}
+
+func cleanName(s string) string {
+	name := strings.ToUpper(s)
+	name = strings.ReplaceAll(name, "É", "E")
+	name = strings.ReplaceAll(name, " ", "_")
+	re, err := regexp.Compile(`[^a-zA-Z_0-9]`)
+	if err != nil {
+		log.Panicln(err)
+	}
+	return re.ReplaceAllString(name, "")
 }
 
 func getCsvReader(path string) *csv.Reader {
@@ -352,9 +364,16 @@ func main() {
 	output += "var ALL_MOVES = []Move{\n"
 	for _, p := range moves {
 		output += fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, CurrentPP: %d, MaxPP: %d,"+
-			" Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Priority, p.Power, p.Accuracy)
+			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Targets, p.Priority, p.Power, p.Accuracy)
 	}
 	output += "}\n\n"
+	// Add move constants
+	output += "// Create move constant enum for quick reference\nconst (\n"
+	for _, m := range moves {
+		name := cleanName(m.Name)
+		output += fmt.Sprintf("\tMOVE_%s = %v\n", name, m.Id)
+	}
+	output += ")\n\n"
 	// Generate hold item data
 	/* id,identifier (we only care about items with flag 4, 5, or 7)
 	1,countable
@@ -371,10 +390,18 @@ func main() {
 	if err != nil {
 		log.Panicln(err)
 	}
-	valid_items := make(map[string]bool)
+	itemFlagMap := map[int]string{
+		2: "FlagConsumable",
+		4: "FlagUsableInBattle",
+		5: "FlagHoldable",
+		6: "FlagHoldablePassive",
+		7: "FlagHoldableActive",
+	}
+	item_flags := make(map[string][]string)
 	for _, r := range records {
-		if r[1] == "4" || r[1] == "5" || r[1] == "7" {
-			valid_items[r[0]] = true
+		v := parseInt(r[1])
+		if v == 2 || v >= 4 && v <= 7 {
+			item_flags[r[0]] = append(item_flags[r[0]], itemFlagMap[v])
 		}
 	}
 	output += "// Create item constant enum for quick reference\nconst (\n"
@@ -386,21 +413,14 @@ func main() {
 	}
 	// Add item names
 	for _, r := range records {
-		if _, ok := valid_items[r[0]]; !ok {
+		if _, ok := item_flags[r[0]]; !ok {
 			continue
 		}
 		if parseInt(r[1]) != ENGLISH_LANGUAGE_ID {
 			continue
 		}
 		item_names[r[0]] = r[2]
-		name := strings.ToUpper(r[2])
-		name = strings.ReplaceAll(name, "É", "E")
-		name = strings.ReplaceAll(name, " ", "_")
-		re, err := regexp.Compile(`[^a-zA-Z_0-9]`)
-		if err != nil {
-			log.Panicln(err)
-		}
-		name = re.ReplaceAllString(name, "")
+		name := cleanName(r[2])
 		output += fmt.Sprintf("\tITEM_%s = %v\n", name, r[0])
 	}
 	output += ")\n"
@@ -411,7 +431,7 @@ func main() {
 		log.Panicln(err)
 	}
 	for _, r := range records {
-		if _, ok := valid_items[r[0]]; !ok {
+		if _, ok := item_flags[r[0]]; !ok {
 			continue
 		}
 		item := data_item{
@@ -420,14 +440,15 @@ func main() {
 			CategoryID:    parseInt(r[2]),
 			FlingPower:    parseInt(r[4]),
 			FlingEffectID: parseInt(r[5]),
+			Flags:         item_flags[r[0]],
 		}
 		items = append(items, item)
 	}
 	// Add item data to generated output
 	output += "// A collection of all items in the game\n" + "var ALL_ITEMS = []Item{\n"
 	for _, item := range items {
-		output += fmt.Sprintf("\t{ID: %s, Name: \"%s\", Category: %d, FlingPower: %d, FlingEffect: %d},\n",
-			item.ID, item_names[item.ID], item.CategoryID, item.FlingPower, item.FlingEffectID)
+		output += fmt.Sprintf("\t{ID: %s, Name: \"%s\", Category: %d, FlingPower: %d, FlingEffect: %d, Flags: %s},\n",
+			item.ID, item_names[item.ID], item.CategoryID, item.FlingPower, item.FlingEffectID, strings.Join(item.Flags, " | "))
 	}
 	output += "}\n\n"
 

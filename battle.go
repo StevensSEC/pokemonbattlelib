@@ -153,30 +153,37 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			if move.Category == Status {
-				if move.ID == 78 { // Stun spore
+				if move.ID == MOVE_STUN_SPORE {
 					b.QueueTransaction(InflictStatusTransaction{
 						Target: receiver,
 						Status: StatusParalyze,
 					})
 				}
 			} else {
-				crit := 1
+				crit := 1.0
 				if b.rng.Get(1, CRIT_CHANCE[user.StatModifiers[STAT_CRIT_CHANCE]]) == 1 {
-					crit = 2
+					crit = 2.0
 				}
-				modifier := uint(crit) // TODO: damage multiplers
-				levelEffect := (2 * uint(user.Level) / 5) + 2
-				movePower := uint(move.Power)
-				statRatio := user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF]
+				stab := 1.0
+				if move != nil && user.Elemental&move.Type != 0 {
+					stab = 1.5
+					if user.Ability != nil && user.Ability.ID == 91 { // Adaptability
+						stab = 2.0
+					}
+				}
+				modifier := crit * stab // TODO: damage multiplers
+				levelEffect := float64((2 * user.Level / 5) + 2)
+				movePower := float64(move.Power)
+				statRatio := float64(user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF])
 				if move.Category == Special {
-					statRatio = user.Stats[STAT_SPATK] / receiver.Stats[STAT_SPDEF]
+					statRatio = float64(user.Stats[STAT_SPATK] / receiver.Stats[STAT_SPDEF])
 				}
 				damage := (((levelEffect * movePower * statRatio) / 50) + 2) * modifier
 				b.QueueTransaction(DamageTransaction{
 					User:   &user,
 					Target: t.Target,
 					Move:   user.Moves[t.Move],
-					Damage: damage,
+					Damage: uint(damage),
 				})
 			}
 		case ItemTurn:

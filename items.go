@@ -8,6 +8,7 @@ type Item struct {
 	Category    ItemCategory
 	FlingPower  int
 	FlingEffect FlingEffect
+	Flags       ItemFlags
 }
 type ItemCategory int
 
@@ -72,6 +73,22 @@ const (
 	FlingParalyze
 	FlingPoison
 	FlingFlinch
+)
+
+// Properties that an item can have.
+type ItemFlags uint8
+
+const (
+	// The item can be consumed
+	FlagConsumable ItemFlags = 1 << iota
+	// The item can be held by a pokemon
+	FlagHoldable
+	// The item has passive effects when held.
+	FlagHoldablePassive
+	// The item can be used by a pokemon when held.
+	FlagHoldableActive
+	// The item can be used in battle
+	FlagUsableInBattle
 )
 
 // For item effects, see https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/item_prose.csv
