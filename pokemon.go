@@ -22,7 +22,7 @@ type Pokemon struct {
 	CurrentHP         uint             // the remaining HP of this Pokemon
 	HeldItem          *Item            // the item a Pokemon is holding
 	Moves             [MAX_MOVES]*Move // the moves the Pokemon currenly knows
-	Friendship        uint8            // how close this Pokemon is to its Trainer
+	Friendship        int              // how close this Pokemon is to its Trainer
 	OriginalTrainerID uint16           // a number associated with the first Trainer who caught this Pokemon
 	Elemental         ElementalType    // Indicates what type(s) (up to 2 simultaneously) this pokemon has
 }

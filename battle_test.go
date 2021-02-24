@@ -381,10 +381,10 @@ var _ = Describe("Fainting", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 
-		It("causes 4 transactions to occur", func() {
+		It("causes 5 transactions to occur", func() {
 			battle.Start()
 			transactions, _ := battle.SimulateRound()
-			Expect(transactions).To(HaveLen(4))
+			Expect(transactions).To(HaveLen(5))
 		})
 		It("should log all transactions as expected", func() {
 			battle.Start()
@@ -406,7 +406,38 @@ var _ = Describe("Fainting", func() {
 			log2 := transactions[2].BattleLog()
 			Expect(log2).To(Equal("Charmander fainted."))
 			log3 := transactions[3].BattleLog()
-			Expect(log3).To(Equal("Turtwig was sent out."))
+			Expect(log3).To(Equal("Charmander's friendship changed by -5."))
+			log4 := transactions[4].BattleLog()
+			Expect(log4).To(Equal("Turtwig was sent out."))
+		})
+	})
+
+	Context("Fainting causes friendship to be lost", func() {
+		It("should lose 1 friendship when fainting", func() {
+			dies := GeneratePokemon(1, WithLevel(1), WithMoves(&pound))
+			dies.Friendship = 100
+			p1 := NewOccupiedParty(&agent1, 0, dies)
+			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(25), WithMoves(&pound)))
+			battle = NewBattle()
+			battle.AddParty(p1, p2)
+			battle.Start()
+			battle.SimulateRound()
+			Expect(dies.Friendship).To(Equal(99))
+		})
+		It("should lose 5 or 10 friendship when fainting", func() {
+			dies := GeneratePokemon(1, WithLevel(1), WithMoves(&pound))
+			dies.Friendship = 100
+			dies2 := GeneratePokemon(1, WithLevel(1), WithMoves(&pound))
+			dies2.Friendship = 200
+			p1 := NewOccupiedParty(&agent1, 0, dies, dies2)
+			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(100), WithMoves(&pound)))
+			battle = NewBattle()
+			battle.AddParty(p1, p2)
+			battle.Start()
+			battle.SimulateRound()
+			Expect(dies.Friendship).To(Equal(95))
+			battle.SimulateRound()
+			Expect(dies2.Friendship).To(Equal(190))
 		})
 	})
 
@@ -431,7 +462,7 @@ var _ = Describe("Fainting", func() {
 
 		transactions, ended := b.SimulateRound()
 		Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
-		Expect(len(transactions)).To(Equal(3), "Expected 3 transactions to occur")
+		Expect(len(transactions)).To(Equal(4), "Expected 4 transactions to occur")
 		logtest := []struct {
 			turn Transaction
 			want string
@@ -445,7 +476,7 @@ var _ = Describe("Fainting", func() {
 				want: "Charmander fainted.",
 			},
 			{
-				turn: transactions[2],
+				turn: transactions[3],
 				want: "The battle has ended.",
 			},
 		}
@@ -477,7 +508,7 @@ var _ = Describe("Fainting", func() {
 
 		transactions, ended := b.SimulateRound()
 		Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
-		Expect(len(transactions)).To(Equal(3), "Expected 3 transactions to occur")
+		Expect(len(transactions)).To(Equal(4), "Expected 4 transactions to occur")
 		logtest := []struct {
 			turn Transaction
 			want string
@@ -491,7 +522,7 @@ var _ = Describe("Fainting", func() {
 				want: "Charmander fainted.",
 			},
 			{
-				turn: transactions[2],
+				turn: transactions[3],
 				want: "Turtwig was sent out.",
 			},
 		}
@@ -535,10 +566,10 @@ var _ = Describe("Ending a battle", func() {
 			Expect(ended).To(BeTrue())
 		})
 
-		It("should have 4 transactions occur", func() {
+		It("should have 5 transactions occur", func() {
 			battle.Start()
 			transactions, _ := battle.SimulateRound()
-			Expect(transactions).To(HaveLen(4))
+			Expect(transactions).To(HaveLen(5))
 		})
 
 		It("should log all transaction correctly", func() {
@@ -551,7 +582,9 @@ var _ = Describe("Ending a battle", func() {
 			log2 := transactions[2].BattleLog()
 			Expect(log2).To(Equal("Charmander fainted."))
 			log3 := transactions[3].BattleLog()
-			Expect(log3).To(Equal("The battle has ended."))
+			Expect(log3).To(Equal("Charmander's friendship changed by -1."))
+			log4 := transactions[4].BattleLog()
+			Expect(log4).To(Equal("The battle has ended."))
 		})
 	})
 })

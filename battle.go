@@ -262,12 +262,28 @@ func (b *Battle) ProcessQueue() {
 				b.QueueTransaction(FaintTransaction{
 					Target: t.Target,
 				})
+				// friendship is lowered based on level difference
+				levelGap := t.User.Level - receiver.Level
+				loss := -1
+				if levelGap >= 30 {
+					if receiver.Friendship < 200 {
+						loss = -5
+					} else {
+						loss = -10
+					}
+				}
+				b.QueueTransaction(FriendshipTransaction{
+					Target: receiver,
+					Amount: loss,
+				})
 			}
 		case ItemTransaction:
 			// TODO: do not consume certain items
 			if t.Target.HeldItem == t.Item {
 				t.Target.HeldItem = nil
 			}
+		case FriendshipTransaction:
+			t.Target.Friendship += t.Amount
 		case HealTransaction:
 			t.Target.CurrentHP += t.Amount
 		case InflictStatusTransaction:
