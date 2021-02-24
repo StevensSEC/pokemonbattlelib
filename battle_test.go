@@ -629,4 +629,52 @@ var _ = Describe("Status Conditions", func() {
 			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
 		}
 	})
+
+	Specify("Paralysis", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(&pound))
+		p1.StatusEffects = StatusParalyze
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(&pound))
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.SetSeed(1337)
+		Expect(b.Start()).To(Succeed())
+		transactions, _ := b.SimulateRound()
+
+		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is paralyzed and is unable to move."))
+	})
+
+	Specify("Freeze", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(&pound))
+		p1.StatusEffects = StatusFreeze
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(&pound))
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.SetSeed(34987)
+		Expect(b.Start()).To(Succeed())
+		transactions, _ := b.SimulateRound()
+
+		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is frozen and is unable to move."))
+	})
+
+	Specify("Sleep", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(&pound))
+		p1.StatusEffects = StatusSleep
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(&pound))
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.SetSeed(1337)
+		Expect(b.Start()).To(Succeed())
+		transactions, _ := b.SimulateRound()
+
+		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is asleep and is unable to move."))
+	})
 })

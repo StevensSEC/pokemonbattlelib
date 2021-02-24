@@ -149,6 +149,39 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
+
+			// pre-move checks
+			forfeitTurn := false
+			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
+				var success bool
+				if user.StatusEffects.check(StatusFreeze) {
+					success = b.rng.Get(1, 5) == 1
+				} else if user.StatusEffects.check(StatusParalyze) {
+					success = b.rng.Get(1, 4) != 1
+				}
+				if !success {
+					b.QueueTransaction(ImmobilizeTransaction{
+						Target: target{
+							Pokemon: user,
+						},
+						StatusEffect: user.StatusEffects & NONVOLATILE_STATUS_MASK,
+					})
+					forfeitTurn = true
+				}
+			} else if user.StatusEffects.check(StatusSleep) {
+				b.QueueTransaction(ImmobilizeTransaction{
+					Target: target{
+						Pokemon: user,
+					},
+					StatusEffect: StatusSleep,
+				})
+				forfeitTurn = true
+			}
+			if forfeitTurn {
+				continue
+			}
+
+			// use the move
 			move := user.Moves[t.Move]
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
