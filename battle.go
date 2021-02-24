@@ -86,7 +86,6 @@ func (b *Battle) GetOpponents(p *party) []target {
 
 func (b *Battle) Start() error {
 	// TODO: validate the battle, return error if invalid
-
 	// Initiate the battle! Send out the first pokemon in the parties.
 	b.State = BATTLE_IN_PROGRESS
 	for _, party := range b.parties {
