@@ -3,6 +3,9 @@ package pokemonbattlelib
 import (
 	"fmt"
 	"testing"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 func TestGetEffect(t *testing.T) {
@@ -89,37 +92,16 @@ func TestElementalTypeString(t *testing.T) {
 	}
 }
 
-func TestGenderString(t *testing.T) {
-	tests := []struct {
-		name   string
-		gender Gender
-		want   string
-	}{
-		{
-			name:   "Genderless",
-			gender: Genderless,
-			want:   "",
-		},
-		{
-			name:   "Female",
-			gender: Female,
-			want:   "♀",
-		},
-		{
-			name:   "Male",
-			gender: Male,
-			want:   "♂",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("Gender Stringer: %s", tt.name), func(t *testing.T) {
-			got := tt.gender.String()
-			if got != tt.want {
-				t.Errorf("Gender Stringer %s got %v, want %v", tt.name, got, tt.want)
-			}
-		})
-	}
-}
+var _ = Describe("Gender", func() {
+	It("should show correct string for gender", func() {
+		Expect(Genderless.String()).To(Equal(""))
+		Expect(Female.String()).To(Equal("♀"))
+		Expect(Male.String()).To(Equal("♂"))
+		Expect(func() {
+			var _ = Gender(-1).String()
+		}).To(Panic())
+	})
+})
 
 func TestStatusConditionCheck(t *testing.T) {
 	tests := []struct {
