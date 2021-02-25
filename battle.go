@@ -174,7 +174,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						stab = 2.0
 					}
 				}
-				modifier := stab // TODO: damage multiplers
+				modifier := float64(GetElementalEffect(move.Type, receiver.Elemental)) * stab // TODO: add more damage multiplers
 				levelEffect := float64((2 * user.Level / 5) + 2)
 				movePower := float64(move.Power)
 				statRatio := float64(user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF])
