@@ -32,7 +32,7 @@ func TestMoveString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Move Stringer: %s", tt.move.Name), func(t *testing.T) {
-			got := fmt.Sprintf("%s", tt.move)
+			got := tt.move.String()
 			if got != tt.want {
 				t.Errorf("Move Stringer %s got %v, want %v", tt.move.Name, got, tt.want)
 			}
