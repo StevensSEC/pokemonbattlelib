@@ -1,6 +1,8 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -159,6 +161,6 @@ var _ = Describe("Stringer interface", func() {
 		pkmn = GeneratePokemon(1, WithLevel(5))
 		pkmn.Gender = Female
 		want = "Bulbasaur♀\tLv5\nHP: 19/19\n"
-		Expect(pkmn.String()).To(Equal(want))
+		Expect(fmt.Sprintf("%s", pkmn)).To(Equal(want))
 	})
 })

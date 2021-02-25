@@ -81,7 +81,7 @@ func TestElementalTypeString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("ElementalType Stringer: %s", tt.want), func(t *testing.T) {
-			got := tt.value.String()
+			got := fmt.Sprintf("%s", tt.value)
 			if got != tt.want {
 				t.Errorf("ElementalType (%d) got %v, want %v", tt.value, got, tt.want)
 			}
@@ -113,7 +113,7 @@ func TestGenderString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Gender Stringer: %s", tt.name), func(t *testing.T) {
-			got := tt.gender.String()
+			got := fmt.Sprintf("%s", tt.gender)
 			if got != tt.want {
 				t.Errorf("Gender Stringer %s got %v, want %v", tt.name, got, tt.want)
 			}
@@ -308,7 +308,7 @@ func TestStatusConditionString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Status Condition Stringer: %s", tt.name), func(t *testing.T) {
-			got := tt.cond.String()
+			got := fmt.Sprintf("%s", tt.cond)
 			if got != tt.want {
 				t.Errorf("Status Condition %s got %v, want %v", tt.name, got, tt.want)
 			}

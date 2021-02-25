@@ -60,7 +60,7 @@ func TestMoveCategoryString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("MoveCategory Stringer: %s", tt.want), func(t *testing.T) {
-			got := tt.value.String()
+			got := fmt.Sprintf("%s", tt.value)
 			if got != tt.want {
 				t.Errorf("Move Category (%d) got %v, want %v", tt.value, got, tt.want)
 			}
