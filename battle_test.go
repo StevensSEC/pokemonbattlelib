@@ -294,6 +294,51 @@ var _ = Describe("Getting party Pokemon", func() {
 	})
 })
 
+var _ = Describe("Move priority", func() {
+	var (
+		a1 Agent
+		a2 Agent
+	)
+
+	BeforeEach(func() {
+		a1 = Agent(dumbAgent{})
+		a2 = Agent(dumbAgent{})
+	})
+
+	Specify("Moves with higher priority should go first", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1, WithLevel(5), WithMoves(&pound))
+		p1.Stats[STAT_SPD] = 100
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		fakeout := GetMove(252)
+		p2 := GeneratePokemon(4, WithLevel(5), WithMoves(&fakeout))
+		p2.Stats[STAT_SPD] = 10
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.Start()
+		transactions, _ := b.SimulateRound()
+		Expect(len(transactions)).To(Equal(2))
+
+		logtest := []struct {
+			turn Transaction
+			want string
+		}{
+			{
+				turn: transactions[0],
+				want: "Charmander used Fake Out on Bulbasaur for 5 damage.",
+			},
+			{
+				turn: transactions[1],
+				want: "Bulbasaur used Pound on Charmander for 5 damage.",
+			},
+		}
+		for _, tt := range logtest {
+			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
+		}
+	})
+})
+
 var _ = Describe("Pokemon speed", func() {
 	var (
 		agent1 Agent
