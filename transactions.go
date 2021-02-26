@@ -213,6 +213,10 @@ func (t ImmobilizeTransaction) BattleLog() string {
 		t.Target.Pokemon.StatusEffects&NONVOLATILE_STATUS_MASK)
 }
 
+func (t ImmobilizeTransaction) Mutate(b *Battle) {
+	// currently a no-op.
+}
+
 // Handles evasion, misses, dodging, etc. when using moves
 type EvadeTransaction struct {
 	User *Pokemon
