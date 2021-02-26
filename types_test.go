@@ -29,12 +29,12 @@ func TestGetEffect(t *testing.T) {
 		{
 			move: Ghost,
 			def:  Normal,
-			want: NoEffect,
+			want: Immune,
 		},
 		{
 			move: Steel,
 			def:  Ground,
-			want: NormalEffect,
+			want: NeutralEffect,
 		},
 		{
 			move: Fire,

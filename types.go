@@ -3,7 +3,6 @@ package pokemonbattlelib
 import (
 	"fmt"
 	"math"
-	"math/bits"
 	"strings"
 )
 
@@ -69,79 +68,113 @@ var elementalTypeStrings = map[ElementalType]string{
 type Effectiveness float64
 
 const (
-	NoEffect           Effectiveness = 0
+	Immune             Effectiveness = 0
 	VeryIneffective    Effectiveness = 0.25
 	Ineffective        Effectiveness = 0.5
-	NormalEffect       Effectiveness = 1
+	NeutralEffect      Effectiveness = 1
 	SuperEffective     Effectiveness = 2
 	VerySuperEffective Effectiveness = 4
 )
 
-var noEffect = map[ElementalType]ElementalType{
-	Normal:   Ghost,
-	Fighting: Ghost,
-	Poison:   Steel,
-	Ground:   Flying,
-	Ghost:    Normal,
-	Electric: Ground,
-	Psychic:  Dark,
-}
-
-var halfEffect = map[ElementalType]ElementalType{
-	Normal:   Rock | Steel,
-	Fighting: Flying | Poison | Bug | Psychic,
-	Flying:   Rock | Steel | Electric,
-	Poison:   Poison | Ground | Rock | Ghost,
-	Ground:   Bug | Grass,
-	Rock:     Fighting | Ground | Steel,
-	Bug:      Fighting | Flying | Poison | Ghost | Steel | Fire,
-	Ghost:    Steel | Dark,
-	Steel:    Steel | Fire | Water | Electric,
-	Fire:     Rock | Fire | Water | Dragon,
-	Water:    Water | Grass | Dragon,
-	Grass:    Flying | Poison | Bug | Steel | Fire | Grass | Dragon,
-	Electric: Grass | Electric | Dragon,
-	Psychic:  Steel | Psychic,
-	Ice:      Steel | Fire | Water | Ice,
-	Dragon:   Steel,
-	Dark:     Fighting | Steel | Dark,
-}
-
-var doubleEffect = map[ElementalType]ElementalType{
-	Fighting: Normal | Rock | Steel | Ice | Dark,
-	Flying:   Fighting | Bug | Grass,
-	Poison:   Grass,
-	Ground:   Poison | Rock | Steel | Fire | Electric,
-	Rock:     Flying | Bug | Fire | Ice,
-	Bug:      Grass | Psychic | Dark,
-	Ghost:    Ghost | Psychic,
-	Steel:    Rock | Ice,
-	Fire:     Bug | Steel | Grass | Ice,
-	Water:    Ground | Rock | Fire,
-	Grass:    Ground | Rock | Water,
-	Electric: Flying | Water,
-	Psychic:  Fighting | Poison,
-	Ice:      Flying | Ground | Grass | Dragon,
-	Dragon:   Dragon,
-	Dark:     Ghost | Psychic,
+// Maps attacker, defender(s) to effectiveness
+// If key is not found, defaults to NormalEffect
+var typeChart = map[ElementalType]map[ElementalType]Effectiveness{
+	Normal: {
+		Rock | Steel: Ineffective,
+		Ghost:        Immune,
+	},
+	Fighting: {
+		Normal | Rock | Steel | Ice | Dark: SuperEffective,
+		Flying | Poison | Bug | Psychic:    Ineffective,
+		Ghost:                              Immune,
+	},
+	Flying: {
+		Fighting | Bug | Grass:  SuperEffective,
+		Rock | Steel | Electric: Ineffective,
+	},
+	Poison: {
+		Grass:                          SuperEffective,
+		Poison | Ground | Rock | Ghost: Ineffective,
+		Steel:                          Immune,
+	},
+	Ground: {
+		Poison | Rock | Steel | Fire | Electric: SuperEffective,
+		Bug | Grass:                             Ineffective,
+		Flying:                                  Immune,
+	},
+	Rock: {
+		Flying | Bug | Fire | Ice: SuperEffective,
+		Fighting | Ground | Steel: Ineffective,
+	},
+	Bug: {
+		Grass | Psychic | Dark:                            SuperEffective,
+		Fighting | Flying | Poison | Ghost | Steel | Fire: Ineffective,
+	},
+	Ghost: {
+		Ghost | Psychic: SuperEffective,
+		Steel | Dark:    Ineffective,
+		Normal:          Immune,
+	},
+	Steel: {
+		Rock | Ice:                      SuperEffective,
+		Steel | Fire | Water | Electric: Ineffective,
+	},
+	Fire: {
+		Bug | Steel | Ice:            SuperEffective,
+		Rock | Fire | Water | Dragon: Ineffective,
+	},
+	Water: {
+		Ground | Rock | Fire:   SuperEffective,
+		Water | Grass | Dragon: Ineffective,
+	},
+	Grass: {
+		Ground | Rock | Water: SuperEffective,
+		Flying | Poison | Bug | Steel | Fire | Grass | Dragon: Ineffective,
+	},
+	Electric: {
+		Flying | Water:            SuperEffective,
+		Grass | Electric | Dragon: Ineffective,
+		Ground:                    Immune,
+	},
+	Psychic: {
+		Fighting | Poison: SuperEffective,
+		Steel | Psychic:   Ineffective,
+		Dark:              Immune,
+	},
+	Ice: {
+		Flying | Ground | Grass | Dragon: SuperEffective,
+		Steel | Fire | Water | Ice:       Ineffective,
+	},
+	Dragon: {
+		Dragon: SuperEffective,
+		Steel:  Ineffective,
+	},
+	Dark: {
+		Ghost | Psychic:         SuperEffective,
+		Fighting | Steel | Dark: Ineffective,
+	},
 }
 
 // Get effectiveness of a given elemental type matchup.
-func GetElementalEffect(move, def ElementalType) Effectiveness {
-	if noEffect[move]&def > 0 {
-		return NoEffect
+func GetElementalEffect(attacking, defending ElementalType) Effectiveness {
+	multiType := false
+	total := NeutralEffect
+	for elem := Normal; elem <= Dark; elem <<= 1 {
+		if elem&defending == 0 {
+			continue
+		}
+		for keys, effect := range typeChart[attacking] {
+			if keys&defending != 0 {
+				if !multiType {
+					multiType = true
+					total = effect
+				} else {
+					total *= effect
+				}
+			}
+		}
 	}
-
-	reduce := bits.OnesCount32(uint32(halfEffect[move] & def))
-	increase := bits.OnesCount32(uint32(doubleEffect[move] & def))
-	effect := (increase - reduce) * 2
-	if effect == 0 {
-		return NormalEffect
-	} else if effect > 0 {
-		return Effectiveness(effect)
-	} else {
-		return Effectiveness(1 / math.Abs(float64(effect)))
-	}
+	return total
 }
 
 func (e ElementalType) String() string {
