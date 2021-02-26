@@ -302,7 +302,7 @@ func (b *Battle) ProcessQueue() {
 		case HealTransaction:
 			t.Mutate(b)
 		case InflictStatusTransaction:
-			t.Target.StatusEffects.apply(t.Status)
+			t.Mutate(b)
 		case CureStatusTransaction:
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			receiver.StatusEffects.clear(t.Status)

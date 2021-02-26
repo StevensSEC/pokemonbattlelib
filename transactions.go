@@ -124,6 +124,10 @@ func (t InflictStatusTransaction) BattleLog() string {
 	return fmt.Sprintf("%s now has <STATUS: %d>!", t.Target.GetName(), t.Status)
 }
 
+func (t InflictStatusTransaction) Mutate(b *Battle) {
+	t.Target.StatusEffects.apply(t.Status)
+}
+
 type CureStatusTransaction struct {
 	Target target
 	Status StatusCondition
