@@ -36,6 +36,16 @@ func (t DamageTransaction) BattleLog() string {
 	}
 }
 
+// A transaction to change the friendship level of a Pokemon.
+type FriendshipTransaction struct {
+	Target *Pokemon // The target Pokemon
+	Amount int      // The amount of friendship to increase/decrease
+}
+
+func (t FriendshipTransaction) BattleLog() string {
+	return fmt.Sprintf("%s's friendship changed by %v.", t.Target.GetName(), t.Amount)
+}
+
 // A transaction to use and possibly consume an item.
 type ItemTransaction struct {
 	Target *Pokemon

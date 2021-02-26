@@ -56,8 +56,10 @@ func BenchmarkBattle(b *testing.B) {
 		p2.team = 1
 		battle := NewBattle()
 		battle.AddParty(p1, p2)
-
-		battle.Start()
+		err := battle.Start()
+		if err != nil {
+			panic(err)
+		}
 		for {
 			transactions, ended := battle.SimulateRound()
 			for _, t := range transactions {

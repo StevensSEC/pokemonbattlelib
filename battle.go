@@ -127,6 +127,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
 			switch turnA.(type) {
 			case FightTurn:
+				ftA := turnA.(FightTurn)
+				ftB := turnB.(FightTurn)
+				mvA := ctxA.Pokemon.Moves[ftA.Move]
+				mvB := ctxB.Pokemon.Moves[ftB.Move]
+				if mvA.Priority != mvB.Priority {
+					return mvA.Priority > mvB.Priority
+				}
 				// speedy pokemon should go first
 				return ctxA.Pokemon.Stats[STAT_SPD] > ctxB.Pokemon.Stats[STAT_SPD]
 			}
@@ -186,7 +193,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			if move.Category == Status {
-				if move.ID == 78 { // Stun spore
+				if move.ID == MOVE_STUN_SPORE {
 					b.QueueTransaction(InflictStatusTransaction{
 						Target: receiver,
 						Status: StatusParalyze,
@@ -295,12 +302,28 @@ func (b *Battle) ProcessQueue() {
 				b.QueueTransaction(FaintTransaction{
 					Target: t.Target,
 				})
+				// friendship is lowered based on level difference
+				levelGap := t.User.Level - receiver.Level
+				loss := -1
+				if levelGap >= 30 {
+					if receiver.Friendship < 200 {
+						loss = -5
+					} else {
+						loss = -10
+					}
+				}
+				b.QueueTransaction(FriendshipTransaction{
+					Target: receiver,
+					Amount: loss,
+				})
 			}
 		case ItemTransaction:
 			// TODO: do not consume certain items
 			if t.Target.HeldItem == t.Item {
 				t.Target.HeldItem = nil
 			}
+		case FriendshipTransaction:
+			t.Target.Friendship += t.Amount
 		case HealTransaction:
 			t.Target.CurrentHP += t.Amount
 		case InflictStatusTransaction:
