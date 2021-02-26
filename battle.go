@@ -158,7 +158,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			user := turn.Context.Pokemon
 
 			// pre-move checks
-			forfeitTurn := false
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
 				var success bool
 				if user.StatusEffects.check(StatusFreeze) {
@@ -173,7 +172,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						},
 						StatusEffect: user.StatusEffects & NONVOLATILE_STATUS_MASK,
 					})
-					forfeitTurn = true
+					continue // forfeit turn
 				}
 			} else if user.StatusEffects.check(StatusSleep) {
 				b.QueueTransaction(ImmobilizeTransaction{
@@ -182,10 +181,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					},
 					StatusEffect: StatusSleep,
 				})
-				forfeitTurn = true
-			}
-			if forfeitTurn {
-				continue
+				continue // forfeit turn
 			}
 
 			// use the move
