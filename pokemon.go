@@ -174,10 +174,6 @@ func (p *Pokemon) GainExperience(exp int) {
 		panic(fmt.Sprintf("%s's experience tried to decrease by %d", p.GetName(), exp))
 	}
 
-	if exp == 0 {
-		return
-	}
-
 	max_exp := EXP_TABLE[p.GetGrowthRate()][MAX_LEVEL]
 
 	// if would gain experience beyond leveling to 100, set level to 100
