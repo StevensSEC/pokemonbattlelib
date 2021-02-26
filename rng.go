@@ -3,6 +3,7 @@ package pokemonbattlelib
 type RNG interface {
 	SetSeed(seed uint)
 	Get(min, max int) int
+	Roll(x, y int) bool
 }
 
 type LCRNG uint32
