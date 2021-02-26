@@ -1,7 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -78,10 +77,10 @@ func TestRcAgent(t *testing.T) {
 			partySlot: 0,
 		},
 	}
-	transactions, _ := b.SimulateRound()
-	for _, t := range transactions {
-		fmt.Printf("%s\n", t.BattleLog())
-	}
+	// transactions, _ := b.SimulateRound()
+	// for _, t := range transactions {
+	// 	fmt.Printf("%s\n", t.BattleLog())
+	// }
 }
 
 var _ = Describe("Battle", func() {
@@ -102,6 +101,28 @@ var _ = Describe("Battle", func() {
 			b := NewBattle()
 			b.AddParty(party1, party2)
 			b.SetSeed(849823)
+		})
+
+		It("panics when adding too many Pokemon to a party", func() {
+			party := NewParty(&agent1, 0)
+			for i := 0; i < MAX_PARTY_SIZE; i += 1 {
+				party.AddPokemon(GeneratePokemon(1))
+			}
+			Expect(func() {
+				party.AddPokemon(GeneratePokemon(1))
+			}).To(Panic())
+		})
+
+		It("panics when getting an invalid Pokemon", func() {
+			party := NewOccupiedParty(&agent1, 0, GeneratePokemon(1))
+			b := NewBattle()
+			b.AddParty(party)
+			Expect(func() {
+				b.getPokemon(1, 5)
+			}).To(Panic())
+			Expect(func() {
+				b.getPokemon(0, 5)
+			}).To(Panic())
 		})
 	})
 })
@@ -133,6 +154,12 @@ var _ = Describe("One round of battle", func() {
 	It("starts without error", func() {
 		err := battle.Start()
 		Expect(err).ShouldNot(HaveOccurred())
+	})
+
+	It("panics if battle is not in progress", func() {
+		Expect(func() {
+			battle.SimulateRound()
+		}).To(Panic())
 	})
 
 	Context("when simulating a round between two agents", func() {
@@ -237,6 +264,22 @@ var _ = Describe("Active pokemon in battle", func() {
 		party.SetActive(1)
 		pkmn := party.GetActivePokemon()[1]
 		Expect(int(pkmn.NatDex)).To(Equal(9))
+	})
+
+	It("should panic when Pokemon should not change active state", func() {
+		Expect(func() {
+			party.SetInactive(0)
+		}).To(Panic())
+		party.SetActive(0)
+		Expect(func() {
+			party.SetActive(0)
+		}).To(Panic())
+	})
+
+	It("should panic when Pokemon does not exist", func() {
+		Expect(func() {
+			party.IsActivePokemon(7)
+		}).To(Panic())
 	})
 })
 
