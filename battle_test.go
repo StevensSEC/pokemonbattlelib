@@ -1,7 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -62,8 +61,10 @@ func TestRcAgent(t *testing.T) {
 	party2 := NewOccupiedParty(&_a2, 1, pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
-
-	b.Start()
+	err := b.Start()
+	if err != nil {
+		panic(err)
+	}
 	a1 <- FightTurn{
 		Move: 0,
 		Target: target{
@@ -78,10 +79,10 @@ func TestRcAgent(t *testing.T) {
 			partySlot: 0,
 		},
 	}
-	transactions, _ := b.SimulateRound()
-	for _, t := range transactions {
-		fmt.Printf("%s\n", t.BattleLog())
-	}
+	// transactions, _ := b.SimulateRound()
+	// for _, t := range transactions {
+	// 	fmt.Printf("%s\n", t.BattleLog())
+	// }
 }
 
 var _ = Describe("Battle", func() {
@@ -102,6 +103,28 @@ var _ = Describe("Battle", func() {
 			b := NewBattle()
 			b.AddParty(party1, party2)
 			b.SetSeed(849823)
+		})
+
+		It("panics when adding too many Pokemon to a party", func() {
+			party := NewParty(&agent1, 0)
+			for i := 0; i < MAX_PARTY_SIZE; i += 1 {
+				party.AddPokemon(GeneratePokemon(1))
+			}
+			Expect(func() {
+				party.AddPokemon(GeneratePokemon(1))
+			}).To(Panic())
+		})
+
+		It("panics when getting an invalid Pokemon", func() {
+			party := NewOccupiedParty(&agent1, 0, GeneratePokemon(1))
+			b := NewBattle()
+			b.AddParty(party)
+			Expect(func() {
+				b.getPokemon(1, 5)
+			}).To(Panic())
+			Expect(func() {
+				b.getPokemon(0, 5)
+			}).To(Panic())
 		})
 	})
 })
@@ -135,14 +158,20 @@ var _ = Describe("One round of battle", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 	})
 
+	It("panics if battle is not in progress", func() {
+		Expect(func() {
+			battle.SimulateRound()
+		}).To(Panic())
+	})
+
 	Context("when simulating a round between two agents", func() {
 		It("should return two transactions", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			Expect(transactions).To(HaveLen(2))
 		})
 		It("should log FightTurns correctly", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
@@ -150,7 +179,7 @@ var _ = Describe("One round of battle", func() {
 			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 3 damage."))
 		})
 		It("should cause Pokemon to have reduced HP", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
 			Expect(charmander.CurrentHP < charmander.Stats[STAT_HP]).To(BeTrue())
 			Expect(squirtle.CurrentHP < squirtle.Stats[STAT_HP]).To(BeTrue())
@@ -163,7 +192,7 @@ var _ = Describe("One round of battle", func() {
 			charmander.Elemental = Fire
 			ember := GetMove(52)
 			charmander.Moves[0] = &ember
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
 			Expect(squirtle.CurrentHP).To(BeEquivalentTo(6))
 			squirtle.CurrentHP = 100
@@ -198,13 +227,13 @@ var _ = Describe("Using items in battle", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 		It("should log ItemTurns correctly", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Potion used on Venusaur."))
 		})
 		It("should heal the Pokemon by 20 HP", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
 			Expect(int(pkmn.CurrentHP)).To(Equal(30))
 		})
@@ -237,6 +266,22 @@ var _ = Describe("Active pokemon in battle", func() {
 		party.SetActive(1)
 		pkmn := party.GetActivePokemon()[1]
 		Expect(int(pkmn.NatDex)).To(Equal(9))
+	})
+
+	It("should panic when Pokemon should not change active state", func() {
+		Expect(func() {
+			party.SetInactive(0)
+		}).To(Panic())
+		party.SetActive(0)
+		Expect(func() {
+			party.SetActive(0)
+		}).To(Panic())
+	})
+
+	It("should panic when Pokemon does not exist", func() {
+		Expect(func() {
+			party.IsActivePokemon(7)
+		}).To(Panic())
 	})
 })
 
@@ -271,7 +316,7 @@ var _ = Describe("Getting party Pokemon", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 		It("should return targets whose team matches the passed party ", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			for _, party := range []*party{party1, party2} {
 				allies := battle.GetAllies(party)
 				Expect(allies).To(HaveLen(1))
@@ -285,7 +330,7 @@ var _ = Describe("Getting party Pokemon", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 		It("should return targets whose team does not match the passed party ", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			for _, party := range []*party{party1, party2} {
 				opponents := battle.GetOpponents(party)
 				Expect(opponents).To(HaveLen(1))
@@ -316,7 +361,7 @@ var _ = Describe("Move priority", func() {
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
-		b.Start()
+		Expect(b.Start()).To(Succeed())
 		transactions, _ := b.SimulateRound()
 		Expect(len(transactions)).To(Equal(2))
 
@@ -366,13 +411,13 @@ var _ = Describe("Pokemon speed", func() {
 		})
 
 		It("should create two transactions when simulating a round", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			Expect(transactions).To(HaveLen(2))
 		})
 
 		Specify("faster Pokemon should go first", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Ninjask used Pound on Charmander for 3 damage."))
@@ -427,12 +472,12 @@ var _ = Describe("Fainting", func() {
 		})
 
 		It("causes 5 transactions to occur", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			Expect(transactions).To(HaveLen(5))
 		})
 		It("should log all transactions as expected", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 2 damage."))
@@ -465,7 +510,7 @@ var _ = Describe("Fainting", func() {
 			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(25), WithMoves(&pound)))
 			battle = NewBattle()
 			battle.AddParty(p1, p2)
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
 			Expect(dies.Friendship).To(Equal(99))
 		})
@@ -478,7 +523,7 @@ var _ = Describe("Fainting", func() {
 			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(100), WithMoves(&pound)))
 			battle = NewBattle()
 			battle.AddParty(p1, p2)
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
 			Expect(dies.Friendship).To(Equal(95))
 			battle.SimulateRound()
@@ -502,9 +547,7 @@ var _ = Describe("Fainting", func() {
 		party2.AddPokemon(pkmn2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
-		err := b.Start()
-		Expect(err).To(BeNil())
-
+		Expect(b.Start()).To(Succeed())
 		transactions, ended := b.SimulateRound()
 		Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
 		Expect(len(transactions)).To(Equal(4), "Expected 4 transactions to occur")
@@ -548,9 +591,7 @@ var _ = Describe("Fainting", func() {
 		party2.AddPokemon(pkmn2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
-		err := b.Start()
-		Expect(err).To(BeNil())
-
+		Expect(b.Start()).To(Succeed())
 		transactions, ended := b.SimulateRound()
 		Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
 		Expect(len(transactions)).To(Equal(4), "Expected 4 transactions to occur")
@@ -606,19 +647,19 @@ var _ = Describe("Ending a battle", func() {
 		})
 
 		It("should end", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			_, ended := battle.SimulateRound()
 			Expect(ended).To(BeTrue())
 		})
 
 		It("should have 5 transactions occur", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			Expect(transactions).To(HaveLen(5))
 		})
 
 		It("should log all transaction correctly", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
@@ -657,7 +698,7 @@ var _ = Describe("Status Conditions", func() {
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
-		b.Start()
+		Expect(b.Start()).To(Succeed())
 		transactions, _ := b.SimulateRound()
 		Expect(len(transactions)).To(Equal(4), "Expected only 4 transactions to occur in a round")
 
@@ -690,7 +731,7 @@ var _ = Describe("Status Conditions", func() {
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
-		b.Start()
+		Expect(b.Start()).To(Succeed())
 		transactions, _ := b.SimulateRound()
 		Expect(len(transactions)).To(Equal(3), "Expected only 3 transactions to occur in a round")
 
