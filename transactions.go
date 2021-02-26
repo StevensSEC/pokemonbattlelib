@@ -148,6 +148,32 @@ func (t FaintTransaction) BattleLog() string {
 	)
 }
 
+func (t FaintTransaction) Mutate(b *Battle) {
+	p := b.parties[t.Target.party]
+	p.SetInactive(t.Target.partySlot)
+	anyAlive := false
+	for i, pkmn := range p.pokemon {
+		if pkmn.CurrentHP > 0 {
+			anyAlive = true
+			// TODO: prompt Agent for which pokemon to send out next
+			// auto send out next pokemon
+			b.QueueTransaction(SendOutTransaction{
+				Target: target{
+					Pokemon:   *b.getPokemon(t.Target.party, i),
+					party:     t.Target.party,
+					partySlot: i,
+					Team:      t.Target.Team,
+				},
+			})
+			break
+		}
+	}
+	if !anyAlive {
+		// cause the battle to end by knockout
+		b.QueueTransaction(EndBattleTransaction{})
+	}
+}
+
 // A transaction that makes a party send out a pokemon.
 type SendOutTransaction struct {
 	Target target
