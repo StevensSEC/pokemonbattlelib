@@ -109,6 +109,10 @@ func (t HealTransaction) BattleLog() string {
 	return fmt.Sprintf("%s restored %d HP.", t.Target.GetName(), t.Amount)
 }
 
+func (t HealTransaction) Mutate(b *Battle) {
+	t.Target.CurrentHP += t.Amount
+}
+
 // A transaction to apply a status effect to a Pokemon.
 type InflictStatusTransaction struct {
 	Target *Pokemon

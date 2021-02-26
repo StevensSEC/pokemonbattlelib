@@ -300,7 +300,7 @@ func (b *Battle) ProcessQueue() {
 		case FriendshipTransaction:
 			t.Mutate(b)
 		case HealTransaction:
-			t.Target.CurrentHP += t.Amount
+			t.Mutate(b)
 		case InflictStatusTransaction:
 			t.Target.StatusEffects.apply(t.Status)
 		case CureStatusTransaction:
