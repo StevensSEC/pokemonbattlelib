@@ -309,8 +309,7 @@ func (b *Battle) ProcessQueue() {
 		case FaintTransaction:
 			t.Mutate(b)
 		case SendOutTransaction:
-			p := b.parties[t.Target.party]
-			p.SetActive(t.Target.partySlot)
+			t.Mutate(b)
 		case EndBattleTransaction:
 			b.State = BATTLE_END
 		}

@@ -185,6 +185,11 @@ func (t SendOutTransaction) BattleLog() string {
 	)
 }
 
+func (t SendOutTransaction) Mutate(b *Battle) {
+	p := b.parties[t.Target.party]
+	p.SetActive(t.Target.partySlot)
+}
+
 type EndBattleTransaction struct{}
 
 func (t EndBattleTransaction) BattleLog() string {
