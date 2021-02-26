@@ -1,25 +1,25 @@
 package pokemonbattlelib
 
 import (
-	"testing"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func testLog(t *testing.T, tt Transaction, want string) {
-	// TODO: generalize more testing functions
-	if got := tt.BattleLog(); got != want {
-		t.Errorf("Expected battle log to be %s, received %s.\n", want, got)
-	}
-}
+var _ = Describe("Using items", func() {
+	It("should correctly retrieve items by ID", func() {
+		i := GetItem(ITEM_POTION)
+		Expect(i.Name).To(Equal(("Potion")))
+		Expect(func() {
+			GetItem(-1)
+		}).To(Panic())
+	})
 
-func TestUseItem(t *testing.T) {
-	i := GetItem(ITEM_POTION)
-	if i.Name != "Potion" {
-		t.Errorf("expected item to be named 'Potion', received %v", i.Name)
-	}
-	p := GeneratePokemon(1)
-	p.CurrentHP = 50
-	p.Stats = [6]uint{100, 0, 0, 0, 0, 0}
-	testLog(t, p.UseItem(&i)[0], "Bulbasaur restored 20 HP.")
-	p.CurrentHP = 99
-	testLog(t, p.UseItem(&i)[0], "Bulbasaur restored 1 HP.")
-}
+	It("should use the item and produce transactions", func() {
+		i := GetItem(ITEM_POTION)
+		p := GeneratePokemon(1)
+		p.Stats[STAT_HP] = 100
+		logs := p.UseItem(&i)
+		Expect(logs).To(HaveLen(1))
+		Expect(logs[0].BattleLog()).To(Equal("Bulbasaur restored 20 HP."))
+	})
+})
