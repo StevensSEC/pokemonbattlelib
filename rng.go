@@ -16,3 +16,8 @@ func (g *LCRNG) Get(min, max int) int {
 	diff := max - min
 	return int(*g)%diff + min
 }
+
+// Rolls for a x/y chance, returning whether it was hit
+func (g *LCRNG) Roll(x, y int) bool {
+	return g.Get(1, y) <= x
+}
