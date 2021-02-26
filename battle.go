@@ -294,33 +294,7 @@ func (b *Battle) ProcessQueue() {
 		b.tQueue = b.tQueue[1:]
 		switch t := next.(type) {
 		case DamageTransaction:
-			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-			if receiver.CurrentHP >= t.Damage {
-				receiver.CurrentHP -= t.Damage
-			} else {
-				// prevent underflow
-				receiver.CurrentHP = 0
-			}
-			if receiver.CurrentHP == 0 {
-				// pokemon has fainted
-				b.QueueTransaction(FaintTransaction{
-					Target: t.Target,
-				})
-				// friendship is lowered based on level difference
-				levelGap := t.User.Level - receiver.Level
-				loss := -1
-				if levelGap >= 30 {
-					if receiver.Friendship < 200 {
-						loss = -5
-					} else {
-						loss = -10
-					}
-				}
-				b.QueueTransaction(FriendshipTransaction{
-					Target: receiver,
-					Amount: loss,
-				})
-			}
+			t.Mutate(b)
 		case ItemTransaction:
 			// TODO: do not consume certain items
 			if t.Target.HeldItem == t.Item {

@@ -6,6 +6,7 @@ import "fmt"
 // A sequence of transactions should be able to describe an entire battle.
 type Transaction interface {
 	BattleLog() string
+	// Mutate(b *Battle) // Modifies the battle to apply the transaction. Can also queue additional transactions via b.QueueTransaction().
 }
 
 // A transaction to deal damage to an opponent Pokemon.
@@ -33,6 +34,36 @@ func (t DamageTransaction) BattleLog() string {
 		)
 	} else {
 		panic("I don't know how to log this DamageTransaction.")
+	}
+}
+
+func (t DamageTransaction) Mutate(b *Battle) {
+	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+	if receiver.CurrentHP >= t.Damage {
+		receiver.CurrentHP -= t.Damage
+	} else {
+		// prevent underflow
+		receiver.CurrentHP = 0
+	}
+	if receiver.CurrentHP == 0 {
+		// pokemon has fainted
+		b.QueueTransaction(FaintTransaction{
+			Target: t.Target,
+		})
+		// friendship is lowered based on level difference
+		levelGap := t.User.Level - receiver.Level
+		loss := -1
+		if levelGap >= 30 {
+			if receiver.Friendship < 200 {
+				loss = -5
+			} else {
+				loss = -10
+			}
+		}
+		b.QueueTransaction(FriendshipTransaction{
+			Target: receiver,
+			Amount: loss,
+		})
 	}
 }
 
