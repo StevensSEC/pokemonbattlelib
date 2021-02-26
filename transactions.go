@@ -106,3 +106,15 @@ func (t EndBattleTransaction) BattleLog() string {
 	// TODO: include reason the battle ended
 	return "The battle has ended."
 }
+
+// Handles pre-turn status checks. (Paralysis, Sleeping, etc.)
+type ImmobilizeTransaction struct {
+	Target       target
+	StatusEffect StatusCondition
+}
+
+func (t ImmobilizeTransaction) BattleLog() string {
+	return fmt.Sprintf("%s is %s and is unable to move.",
+		t.Target.Pokemon.GetName(),
+		t.Target.Pokemon.StatusEffects&NONVOLATILE_STATUS_MASK)
+}
