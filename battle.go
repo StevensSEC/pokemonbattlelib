@@ -301,7 +301,7 @@ func (b *Battle) ProcessQueue() {
 				t.Target.HeldItem = nil
 			}
 		case FriendshipTransaction:
-			t.Target.Friendship += t.Amount
+			t.Mutate(b)
 		case HealTransaction:
 			t.Target.CurrentHP += t.Amount
 		case InflictStatusTransaction:

@@ -77,6 +77,10 @@ func (t FriendshipTransaction) BattleLog() string {
 	return fmt.Sprintf("%s's friendship changed by %v.", t.Target.GetName(), t.Amount)
 }
 
+func (t FriendshipTransaction) Mutate(b *Battle) {
+	t.Target.Friendship += t.Amount
+}
+
 // A transaction to use and possibly consume an item.
 type ItemTransaction struct {
 	Target *Pokemon
