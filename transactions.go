@@ -197,6 +197,10 @@ func (t EndBattleTransaction) BattleLog() string {
 	return "The battle has ended."
 }
 
+func (t EndBattleTransaction) Mutate(b *Battle) {
+	b.State = BATTLE_END
+}
+
 // Handles pre-turn status checks. (Paralysis, Sleeping, etc.)
 type ImmobilizeTransaction struct {
 	Target       target

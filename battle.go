@@ -311,7 +311,7 @@ func (b *Battle) ProcessQueue() {
 		case SendOutTransaction:
 			t.Mutate(b)
 		case EndBattleTransaction:
-			b.State = BATTLE_END
+			t.Mutate(b)
 		}
 		// add to the list of processed transactions
 		b.tProcessed = append(b.tProcessed, next)
