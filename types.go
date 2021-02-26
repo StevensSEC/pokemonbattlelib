@@ -3,6 +3,7 @@ package pokemonbattlelib
 import (
 	"fmt"
 	"math"
+	"math/bits"
 	"strings"
 )
 
@@ -157,20 +158,14 @@ var typeChart = map[ElementalType]map[ElementalType]Effectiveness{
 
 // Get effectiveness of a given elemental type matchup.
 func GetElementalEffect(attacking, defending ElementalType) Effectiveness {
-	multiType := false
 	total := NeutralEffect
-	for elem := Normal; elem <= Dark; elem <<= 1 {
-		if elem&defending == 0 {
-			continue
-		}
-		for keys, effect := range typeChart[attacking] {
-			if keys&defending != 0 {
-				if !multiType {
-					multiType = true
-					total = effect
-				} else {
-					total *= effect
-				}
+	for keys, effect := range typeChart[attacking] {
+		if keys&defending != 0 {
+			numTypes := bits.OnesCount(uint(defending))
+			if numTypes == 1 {
+				total *= effect
+			} else if numTypes == 2 {
+				total *= effect * effect
 			}
 		}
 	}
