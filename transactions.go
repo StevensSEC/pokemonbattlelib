@@ -92,6 +92,13 @@ func (t ItemTransaction) BattleLog() string {
 	return fmt.Sprintf("%s used on %s.", t.Item.Name, t.Target.GetName())
 }
 
+func (t ItemTransaction) Mutate(b *Battle) {
+	// TODO: do not consume certain items
+	if t.Target.HeldItem == t.Item {
+		t.Target.HeldItem = nil
+	}
+}
+
 // A transaction to restore HP to a Pokemon.
 type HealTransaction struct {
 	Target *Pokemon

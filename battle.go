@@ -296,10 +296,7 @@ func (b *Battle) ProcessQueue() {
 		case DamageTransaction:
 			t.Mutate(b)
 		case ItemTransaction:
-			// TODO: do not consume certain items
-			if t.Target.HeldItem == t.Item {
-				t.Target.HeldItem = nil
-			}
+			t.Mutate(b)
 		case FriendshipTransaction:
 			t.Mutate(b)
 		case HealTransaction:
