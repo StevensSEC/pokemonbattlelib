@@ -2,17 +2,25 @@ package pokemonbattlelib
 
 import (
 	"fmt"
-	"testing"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestGetMove(t *testing.T) {
-	m := GetMove(MOVE_POUND)
-	if m.Name != "Pound" {
-		t.Errorf("expected move name to be Pound, got %v", m.Name)
-	}
-}
+var _ = Describe("Get move by ID", func() {
+	It("should get the correct move", func() {
+		m := GetMove(MOVE_POUND)
+		Expect(m.Name).To(Equal("Pound"))
+	})
 
-func TestMoveString(t *testing.T) {
+	It("should panic when a move does not exist", func() {
+		Expect(func() {
+			GetMove(-1)
+		}).To(Panic())
+	})
+})
+
+var _ = Describe("Move string representation", func() {
 	tests := []struct {
 		move Move
 		want string
@@ -30,40 +38,20 @@ func TestMoveString(t *testing.T) {
 			want: "Shadow Ball\nType: [Ghost], Power: 80, Accuracy: 100\n",
 		},
 	}
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("Move Stringer: %s", tt.move.Name), func(t *testing.T) {
-			got := fmt.Sprintf("%s", tt.move)
-			if got != tt.want {
-				t.Errorf("Move Stringer %s got %v, want %v", tt.move.Name, got, tt.want)
-			}
-		})
-	}
-}
+	It("should show the correct string for moves", func() {
+		for _, tt := range tests {
+			Expect(fmt.Sprintf("%s", tt.move)).To(Equal(tt.want))
+		}
+	})
+})
 
-func TestMoveCategoryString(t *testing.T) {
-	tests := []struct {
-		value MoveCategory
-		want  string
-	}{
-		{
-			value: Status,
-			want:  "Status",
-		},
-		{
-			value: Physical,
-			want:  "Physical",
-		},
-		{
-			value: Special,
-			want:  "Special",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("MoveCategory Stringer: %s", tt.want), func(t *testing.T) {
-			got := tt.value.String()
-			if got != tt.want {
-				t.Errorf("Move Category (%d) got %v, want %v", tt.value, got, tt.want)
-			}
-		})
-	}
-}
+var _ = Describe("Move category", func() {
+	It("should show correct string for move category", func() {
+		Expect(Status.String()).To(Equal("Status"))
+		Expect(Physical.String()).To(Equal("Physical"))
+		Expect(Special.String()).To(Equal("Special"))
+		Expect(func() {
+			var _ = MoveCategory(99).String()
+		}).To(Panic())
+	})
+})
