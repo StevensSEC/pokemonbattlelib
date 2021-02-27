@@ -202,6 +202,18 @@ var _ = Describe("One round of battle", func() {
 			Expect(squirtle.CurrentHP).To(BeEquivalentTo(93))
 		})
 	})
+
+	Context("should account for accuracy/evasion", func() {
+		It("should miss moves randomly", func() {
+			Expect(battle.Start()).To(Succeed())
+			charmander.Moves[0].Accuracy = 1
+			logs, _ := battle.SimulateRound()
+			Expect(logs[0].BattleLog()).To(Equal("Charmander's attack missed!"))
+			charmander.Moves[0].Accuracy = 99
+			logs, _ = battle.SimulateRound()
+			Expect(logs[0].BattleLog()).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
+		})
+	})
 })
 
 var _ = Describe("Using items in battle", func() {

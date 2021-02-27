@@ -127,3 +127,12 @@ func (t ImmobilizeTransaction) BattleLog() string {
 		t.Target.Pokemon.GetName(),
 		t.Target.Pokemon.StatusEffects&NONVOLATILE_STATUS_MASK)
 }
+
+// Handles evasion, misses, dodging, etc. when using moves
+type EvadeTransaction struct {
+	User *Pokemon
+}
+
+func (t EvadeTransaction) BattleLog() string {
+	return fmt.Sprintf("%s's attack missed!", t.User.GetName())
+}

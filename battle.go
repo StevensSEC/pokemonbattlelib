@@ -186,7 +186,15 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 			// use the move
 			move := user.Moves[t.Move]
+			accuracy := move.Accuracy
+			// Todo: account for receiver's evasion
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			if !b.rng.Roll(accuracy, 100) {
+				b.QueueTransaction(EvadeTransaction{
+					User: &user,
+				})
+				continue
+			}
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			if move.Category == Status {
 				if move.ID == MOVE_STUN_SPORE {
