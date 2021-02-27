@@ -796,4 +796,30 @@ var _ = Describe("Status Conditions", func() {
 
 		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is asleep and is unable to move."))
 	})
+
+	It("Should cure paralysis", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(&pound))
+		p1.StatusEffects = StatusParalyze
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(&pound))
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.SetSeed(1337)
+		Expect(b.Start()).To(Succeed())
+		b.QueueTransaction(CureStatusTransaction{
+			Target: target{
+				Pokemon:   *p1,
+				party:     0,
+				partySlot: 0,
+				Team:      0,
+			},
+			Status: StatusParalyze,
+		})
+		b.ProcessQueue()
+		transactions, _ := b.SimulateRound()
+
+		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is no longer paralyzed."))
+	})
 })

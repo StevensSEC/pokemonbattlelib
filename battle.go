@@ -324,6 +324,9 @@ func (b *Battle) ProcessQueue() {
 			t.Target.CurrentHP += t.Amount
 		case InflictStatusTransaction:
 			t.Target.StatusEffects.apply(t.Status)
+		case CureStatusTransaction:
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			receiver.StatusEffects.clear(t.Status)
 		case FaintTransaction:
 			p := b.parties[t.Target.party]
 			p.SetInactive(t.Target.partySlot)

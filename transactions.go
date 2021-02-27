@@ -78,6 +78,15 @@ func (t InflictStatusTransaction) BattleLog() string {
 	return fmt.Sprintf("%s now has <STATUS: %d>!", t.Target.GetName(), t.Status)
 }
 
+type CureStatusTransaction struct {
+	Target target
+	Status StatusCondition
+}
+
+func (t CureStatusTransaction) BattleLog() string {
+	return fmt.Sprintf("%s is no longer %s.", t.Target.Pokemon.GetName(), t.Status)
+}
+
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
 type FaintTransaction struct {
 	Target target
