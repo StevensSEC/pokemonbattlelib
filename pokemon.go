@@ -22,7 +22,7 @@ type Pokemon struct {
 	CurrentHP         uint             // the remaining HP of this Pokemon
 	HeldItem          *Item            // the item a Pokemon is holding
 	Moves             [MAX_MOVES]*Move // the moves the Pokemon currenly knows
-	Friendship        uint8            // how close this Pokemon is to its Trainer
+	Friendship        int              // how close this Pokemon is to its Trainer
 	OriginalTrainerID uint16           // a number associated with the first Trainer who caught this Pokemon
 	Elemental         ElementalType    // Indicates what type(s) (up to 2 simultaneously) this pokemon has
 }
@@ -57,6 +57,7 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		TotalExperience: 0,
 		IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 		EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
+		Stats:           [6]uint{1, 4, 4, 4, 4, 4},
 		Nature:          GetNature(HARDY), // this nature is neutral and has no effect
 	}
 	for _, opt := range opts {
@@ -181,10 +182,6 @@ func (p *Pokemon) GainExperience(exp int) {
 
 	if exp < 0 {
 		panic(fmt.Sprintf("%s's experience tried to decrease by %d", p.GetName(), exp))
-	}
-
-	if exp == 0 {
-		return
 	}
 
 	max_exp := EXP_TABLE[p.GetGrowthRate()][MAX_LEVEL]

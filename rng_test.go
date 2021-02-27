@@ -22,4 +22,12 @@ var _ = Describe("LCRNG type", func() {
 		Expect(got <= 10).To(BeTrue())
 		Expect(got >= 1).To(BeTrue())
 	})
+
+	It("should roll predictably", func() {
+		gen = LCRNG(1337)
+		Expect(gen.Roll(1, 10)).To(BeTrue())
+		Expect(gen.Roll(1, 10)).To(BeFalse())
+		Expect(gen.Roll(5, 9)).To(BeTrue())
+		Expect(gen.Roll(5, 9)).To(BeFalse())
+	})
 })

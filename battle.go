@@ -1,7 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"reflect"
@@ -128,6 +127,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
 			switch turnA.(type) {
 			case FightTurn:
+				ftA := turnA.(FightTurn)
+				ftB := turnB.(FightTurn)
+				mvA := ctxA.Pokemon.Moves[ftA.Move]
+				mvB := ctxB.Pokemon.Moves[ftB.Move]
+				if mvA.Priority != mvB.Priority {
+					return mvA.Priority > mvB.Priority
+				}
 				// speedy pokemon should go first
 				return ctxA.Pokemon.Stats[STAT_SPD] > ctxB.Pokemon.Stats[STAT_SPD]
 			}
@@ -150,11 +156,40 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
+
+			// pre-move checks
+			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
+				var success bool
+				if user.StatusEffects.check(StatusFreeze) {
+					success = b.rng.Get(1, 5) == 1
+				} else if user.StatusEffects.check(StatusParalyze) {
+					success = b.rng.Get(1, 4) != 1
+				}
+				if !success {
+					b.QueueTransaction(ImmobilizeTransaction{
+						Target: target{
+							Pokemon: user,
+						},
+						StatusEffect: user.StatusEffects & NONVOLATILE_STATUS_MASK,
+					})
+					continue // forfeit turn
+				}
+			} else if user.StatusEffects.check(StatusSleep) {
+				b.QueueTransaction(ImmobilizeTransaction{
+					Target: target{
+						Pokemon: user,
+					},
+					StatusEffect: StatusSleep,
+				})
+				continue // forfeit turn
+			}
+
+			// use the move
 			move := user.Moves[t.Move]
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			if move.Category == Status {
-				if move.ID == 78 { // Stun spore
+				if move.ID == MOVE_STUN_SPORE {
 					b.QueueTransaction(InflictStatusTransaction{
 						Target: receiver,
 						Status: StatusParalyze,
@@ -167,50 +202,53 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				} else if (rain && move.Type == Fire) || (sun && move.Type == Water) {
 					weather = 0.5
 				}
-				modifier := uint(weather) // TODO: damage multiplers
-				levelEffect := (2 * uint(user.Level) / 5) + 2
-				movePower := uint(move.Power)
+				stab := 1.0
+				if move != nil && user.Elemental&move.Type != 0 {
+					stab = 1.5
+					if user.Ability != nil && user.Ability.ID == 91 { // Adaptability
+						stab = 2.0
+					}
+				}
+				modifier := weather * stab // TODO: damage multiplers
+				levelEffect := float64((2 * user.Level / 5) + 2)
+				movePower := float64(move.Power)
 				accuracy := move.Accuracy
-				attack := user.Stats[STAT_ATK]
-				defense := user.Stats[STAT_DEF]
+				attack := float64(user.Stats[STAT_ATK])
+				defense := float64(receiver.Stats[STAT_DEF])
 				// Move modifiers
 				if move.Category == Special {
-					attack = user.Stats[STAT_SPATK]
-					defense = receiver.Stats[STAT_SPDEF]
+					attack = float64(user.Stats[STAT_SPATK])
+					defense = float64(receiver.Stats[STAT_SPDEF])
 				}
 				// Weather modifiers
 				if b.Weather == WEATHER_SANDSTORM {
 					if receiver.HasType(Rock) {
-						defense = uint(float64(defense) * 1.5)
+						defense *= 1.5
 					}
-					if move.ID == 76 { // Solar beam
+					if move.ID == MOVE_SOLAR_BEAM {
 						movePower /= 2
 					}
 				}
-				if b.Weather == WEATHER_HAIL && move.ID == 76 {
+				if b.Weather == WEATHER_HAIL && move.ID == MOVE_SOLAR_BEAM {
 					movePower /= 2
 				}
 				if b.Weather == WEATHER_FOG {
 					accuracy *= 3 / 5
-					if move.ID == 311 { // Weather ball
+					if move.ID == MOVE_WEATHER_BALL {
 						movePower *= 2
 					}
-					if move.ID == 76 { // Solar beam
+					if move.ID == MOVE_SOLAR_BEAM {
 						movePower /= 2
 					}
 					// Maybe a better way of doing this?
-					if move.ID == 236 || move.ID == 235 || move.ID == 234 {
-						// Moonlight, Synthesis, Morning Sun
+					if move.ID == MOVE_MOONLIGHT || move.ID == MOVE_SYNTHESIS || move.ID == MOVE_MORNING_SUN {
 						b.QueueTransaction(HealTransaction{
 							Target: self,
 							Amount: self.Stats[STAT_HP] / 4,
 						})
 					}
 				}
-				statRatio := attack / defense
-				fmt.Println(attack, defense, statRatio, levelEffect, movePower, modifier)
-				// Calculate damage total
-				damage := (((levelEffect * movePower * statRatio) / 50) + 2) * modifier
+				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
 				// TODO: handle accuracy/evasion
 				if accuracy == 0 {
 				}
@@ -218,7 +256,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					User:   &user,
 					Target: t.Target,
 					Move:   user.Moves[t.Move],
-					Damage: damage,
+					Damage: uint(damage),
 				})
 			}
 		case ItemTurn:
@@ -320,16 +358,35 @@ func (b *Battle) ProcessQueue() {
 				b.QueueTransaction(FaintTransaction{
 					Target: t.Target,
 				})
+				// friendship is lowered based on level difference
+				levelGap := t.User.Level - receiver.Level
+				loss := -1
+				if levelGap >= 30 {
+					if receiver.Friendship < 200 {
+						loss = -5
+					} else {
+						loss = -10
+					}
+				}
+				b.QueueTransaction(FriendshipTransaction{
+					Target: receiver,
+					Amount: loss,
+				})
 			}
 		case ItemTransaction:
 			// TODO: do not consume certain items
 			if t.Target.HeldItem == t.Item {
 				t.Target.HeldItem = nil
 			}
+		case FriendshipTransaction:
+			t.Target.Friendship += t.Amount
 		case HealTransaction:
 			t.Target.CurrentHP += t.Amount
 		case InflictStatusTransaction:
 			t.Target.StatusEffects.apply(t.Status)
+		case CureStatusTransaction:
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			receiver.StatusEffects.clear(t.Status)
 		case FaintTransaction:
 			p := b.parties[t.Target.party]
 			p.SetInactive(t.Target.partySlot)

@@ -1,6 +1,8 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -91,6 +93,13 @@ var _ = Describe("Pokemon generation", func() {
 		Expect(pkmn).To(Equal(want))
 	})
 
+	It("generates a Pokemon with a given moveset", func() {
+		pound := GetMove(MOVE_POUND)
+		pursuit := GetMove(MOVE_PURSUIT)
+		pkmn := GeneratePokemon(393, WithMoves(&pound, &pursuit))
+		Expect(pkmn.Moves).To(BeEquivalentTo([MAX_MOVES]*Move{&pound, &pursuit, nil, nil}))
+	})
+
 	It("creates Pokemon with accurate stats reflecting its given values", func() {
 		// see: https://bulbapedia.bulbagarden.net/wiki/Stat, scroll down to 'Example'
 		pkmn := GeneratePokemon(
@@ -112,8 +121,15 @@ var _ = Describe("Pokemon generation", func() {
 		Expect(pkmn).To(Equal(want))
 	})
 
-	It("panics when trying to create a Pokemon with higher than max level", func() {
+	It("panics when computing stats of illegal Pokemon", func() {
+		p := GeneratePokemon(1)
+		p.Level = 105
+		Expect(func() { p.computeStats() }).To(Panic())
+	})
+
+	It("panics when trying to create a Pokemon out of level bounds", func() {
 		Expect(func() { GeneratePokemon(396, WithLevel(MAX_LEVEL+1)) }).To(Panic())
+		Expect(func() { GeneratePokemon(396, WithLevel(MIN_LEVEL-1)) }).To(Panic())
 	})
 
 	It("panics when creating a Pokemon with higher than max IVs", func() {
@@ -124,6 +140,10 @@ var _ = Describe("Pokemon generation", func() {
 		Expect(func() { GeneratePokemon(396, WithEVs([6]uint8{255, 255, 255, 255, 255, 255})) }).To(Panic())
 	})
 
+	It("panics when creating a Pokemon with more than the maximum allowed moves", func() {
+		pound := GetMove(MOVE_POUND)
+		Expect(func() { GeneratePokemon(396, WithMoves(&pound, &pound, &pound, &pound, &pound)) }).To(Panic())
+	})
 })
 
 var _ = Describe("Test leveling methods", func() {
@@ -159,6 +179,6 @@ var _ = Describe("Stringer interface", func() {
 		pkmn = GeneratePokemon(1, WithLevel(5))
 		pkmn.Gender = Female
 		want = "Bulbasaur♀\tLv5\nHP: 19/19\n"
-		Expect(pkmn.String()).To(Equal(want))
+		Expect(fmt.Sprintf("%s", pkmn)).To(Equal(want))
 	})
 })

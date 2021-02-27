@@ -282,6 +282,7 @@ func (s StatusCondition) String() string {
 
 type Ability struct {
 	//TODO
+	ID int // The ID of the ability
 }
 
 type Nature struct {

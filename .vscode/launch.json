@@ -16,7 +16,7 @@
 			"type": "go",
 			"request": "launch",
 			"mode": "test",
-			"program": "${workspaceFolder}/pokemonbattlelib_test"
+			"program": "${workspaceFolder}"
 		},
 		{
 			"name": "Run benchmarks",

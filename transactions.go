@@ -36,6 +36,16 @@ func (t DamageTransaction) BattleLog() string {
 	}
 }
 
+// A transaction to change the friendship level of a Pokemon.
+type FriendshipTransaction struct {
+	Target *Pokemon // The target Pokemon
+	Amount int      // The amount of friendship to increase/decrease
+}
+
+func (t FriendshipTransaction) BattleLog() string {
+	return fmt.Sprintf("%s's friendship changed by %v.", t.Target.GetName(), t.Amount)
+}
+
 // A transaction to use and possibly consume an item.
 type ItemTransaction struct {
 	Target *Pokemon
@@ -68,6 +78,15 @@ func (t InflictStatusTransaction) BattleLog() string {
 	return fmt.Sprintf("%s now has <STATUS: %d>!", t.Target.GetName(), t.Status)
 }
 
+type CureStatusTransaction struct {
+	Target target
+	Status StatusCondition
+}
+
+func (t CureStatusTransaction) BattleLog() string {
+	return fmt.Sprintf("%s is no longer %s.", t.Target.Pokemon.GetName(), t.Status)
+}
+
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
 type FaintTransaction struct {
 	Target target
@@ -95,4 +114,16 @@ type EndBattleTransaction struct{}
 func (t EndBattleTransaction) BattleLog() string {
 	// TODO: include reason the battle ended
 	return "The battle has ended."
+}
+
+// Handles pre-turn status checks. (Paralysis, Sleeping, etc.)
+type ImmobilizeTransaction struct {
+	Target       target
+	StatusEffect StatusCondition
+}
+
+func (t ImmobilizeTransaction) BattleLog() string {
+	return fmt.Sprintf("%s is %s and is unable to move.",
+		t.Target.Pokemon.GetName(),
+		t.Target.Pokemon.StatusEffects&NONVOLATILE_STATUS_MASK)
 }
