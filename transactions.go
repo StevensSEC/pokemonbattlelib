@@ -109,6 +109,16 @@ func (t SendOutTransaction) BattleLog() string {
 	)
 }
 
+// Changes the current weather in a battle
+type WeatherTransaction struct {
+	Weather Weather
+}
+
+func (t WeatherTransaction) BattleLog() string {
+	// TODO: add weather stringer
+	return fmt.Sprintf("The weather changed to %v.", t.Weather)
+}
+
 type EndBattleTransaction struct{}
 
 func (t EndBattleTransaction) BattleLog() string {
