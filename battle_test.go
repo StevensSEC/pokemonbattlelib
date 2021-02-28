@@ -622,6 +622,30 @@ var _ = Describe("Fainting", func() {
 		for _, tt := range logtest {
 			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
 		}
+
+		Expect(transactions).To(HaveTransactionsInOrder(
+			FaintTransaction{
+				Target: target{
+					Pokemon:   *pkmn1,
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+			},
+			EndBattleTransaction{},
+		))
+
+		Expect(transactions).ToNot(HaveTransaction(
+			DamageTransaction{
+				User: pkmn1,
+				Target: target{
+					Pokemon:   *pkmn2,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+			},
+		))
 	})
 
 	Specify("Dead pokemon should not take turns", func() {
