@@ -137,6 +137,11 @@ func (t CureStatusTransaction) BattleLog() string {
 	return fmt.Sprintf("%s is no longer %s.", t.Target.Pokemon.GetName(), t.Status)
 }
 
+func (t CureStatusTransaction) Mutate(b *Battle) {
+	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+	receiver.StatusEffects.clear(t.Status)
+}
+
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
 type FaintTransaction struct {
 	Target target
