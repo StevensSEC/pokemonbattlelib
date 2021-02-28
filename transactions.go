@@ -230,3 +230,7 @@ type EvadeTransaction struct {
 func (t EvadeTransaction) BattleLog() string {
 	return fmt.Sprintf("%s's attack missed!", t.User.GetName())
 }
+
+func (t EvadeTransaction) Mutate(b *Battle) {
+	// currently a no-op.
+}
