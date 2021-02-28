@@ -452,7 +452,6 @@ var _ = Describe("Fainting", func() {
 		party1 *party
 		party2 *party
 		battle *Battle
-		pound  Move
 	)
 
 	BeforeEach(func() {
@@ -462,7 +461,7 @@ var _ = Describe("Fainting", func() {
 		scary_monster.Stats[STAT_SPD] = 1
 		party1 = NewOccupiedParty(&agent1, 0,
 			GeneratePokemon(4, WithMoves(GetMove(MOVE_POUND))),
-			GeneratePokemon(387, WithMoves(&pound)),
+			GeneratePokemon(387, WithMoves(GetMove(MOVE_POUND))),
 		)
 		party2 = NewOccupiedParty(&agent2, 1, scary_monster)
 		battle = NewBattle()
@@ -508,10 +507,10 @@ var _ = Describe("Fainting", func() {
 
 	Context("Fainting causes friendship to be lost", func() {
 		It("should lose 1 friendship when fainting", func() {
-			dies := GeneratePokemon(1, WithLevel(1), WithMoves(&pound))
+			dies := GeneratePokemon(1, WithLevel(1), WithMoves(GetMove(MOVE_POUND)))
 			dies.Friendship = 100
 			p1 := NewOccupiedParty(&agent1, 0, dies)
-			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(25), WithMoves(&pound)))
+			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(25), WithMoves(GetMove(MOVE_POUND))))
 			battle = NewBattle()
 			battle.AddParty(p1, p2)
 			Expect(battle.Start()).To(Succeed())
@@ -519,12 +518,12 @@ var _ = Describe("Fainting", func() {
 			Expect(dies.Friendship).To(Equal(99))
 		})
 		It("should lose 5 or 10 friendship when fainting", func() {
-			dies := GeneratePokemon(1, WithLevel(1), WithMoves(&pound))
+			dies := GeneratePokemon(1, WithLevel(1), WithMoves(GetMove(MOVE_POUND)))
 			dies.Friendship = 100
-			dies2 := GeneratePokemon(1, WithLevel(1), WithMoves(&pound))
+			dies2 := GeneratePokemon(1, WithLevel(1), WithMoves(GetMove(MOVE_POUND)))
 			dies2.Friendship = 200
 			p1 := NewOccupiedParty(&agent1, 0, dies, dies2)
-			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(100), WithMoves(&pound)))
+			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(100), WithMoves(GetMove(MOVE_POUND))))
 			battle = NewBattle()
 			battle.AddParty(p1, p2)
 			Expect(battle.Start()).To(Succeed())
