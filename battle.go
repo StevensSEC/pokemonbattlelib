@@ -205,7 +205,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else {
 				crit := 1.0
-				if b.rng.Get(1, CRIT_CHANCE[user.StatModifiers[STAT_CRIT_CHANCE]]) == 1 {
+				if b.rng.Roll(1, CRIT_CHANCE[user.StatModifiers[STAT_CRIT_CHANCE]]) {
 					crit = 2.0
 				}
 				stab := 1.0

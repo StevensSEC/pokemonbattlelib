@@ -151,6 +151,7 @@ var _ = Describe("One round of battle", func() {
 		party2 = NewOccupiedParty(&agent2, 1, squirtle)
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
+		battle.SetSeed(1337)
 	})
 
 	It("starts without error", func() {
@@ -199,7 +200,16 @@ var _ = Describe("One round of battle", func() {
 			adaptability := Ability{ID: 91}
 			charmander.Ability = &adaptability
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(93))
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(86))
+		})
+
+		It("should account for critical hits", func() {
+			Expect(battle.Start()).To(Succeed())
+			battle.SimulateRound()
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(8))
+			charmander.StatModifiers[STAT_CRIT_CHANCE] = 4 // 50% crit, max stage
+			battle.SimulateRound()
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(1))
 		})
 	})
 
@@ -231,6 +241,7 @@ var _ = Describe("Using items in battle", func() {
 		party = NewOccupiedParty(&agent, 0, pkmn)
 		battle = NewBattle()
 		battle.AddParty(party)
+		battle.SetSeed(1337)
 	})
 
 	Context("an Agent uses an ItemTurn to use a Potion on a Pokemon", func() {
@@ -373,6 +384,7 @@ var _ = Describe("Move priority", func() {
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
+		b.SetSeed(1337)
 		Expect(b.Start()).To(Succeed())
 		transactions, _ := b.SimulateRound()
 		Expect(len(transactions)).To(Equal(2))
@@ -414,6 +426,7 @@ var _ = Describe("Pokemon speed", func() {
 		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(291, WithMoves(&pound))) // ninjask is faster than charmander
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
+		battle.SetSeed(1337)
 	})
 
 	Context("A faster Pokemon is fighting a slower one", func() {
@@ -475,6 +488,7 @@ var _ = Describe("Fainting", func() {
 		party2 = NewOccupiedParty(&agent2, 1, scary_monster)
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
+		battle.SetSeed(1337)
 	})
 
 	Context("Switch is forced after a Pokemon faints", func() {
@@ -559,6 +573,7 @@ var _ = Describe("Fainting", func() {
 		party2.AddPokemon(pkmn2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
+		b.SetSeed(1337)
 		Expect(b.Start()).To(Succeed())
 		transactions, ended := b.SimulateRound()
 		Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
@@ -603,6 +618,7 @@ var _ = Describe("Fainting", func() {
 		party2.AddPokemon(pkmn2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
+		b.SetSeed(1337)
 		Expect(b.Start()).To(Succeed())
 		transactions, ended := b.SimulateRound()
 		Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
@@ -650,6 +666,7 @@ var _ = Describe("Ending a battle", func() {
 		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(7, WithMoves(&pound)))
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
+		battle.SetSeed(1337)
 	})
 
 	Context("Battle ends by knockout", func() {
@@ -710,6 +727,7 @@ var _ = Describe("Status Conditions", func() {
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
+		b.SetSeed(1337)
 		Expect(b.Start()).To(Succeed())
 		transactions, _ := b.SimulateRound()
 		Expect(len(transactions)).To(Equal(4), "Expected only 4 transactions to occur in a round")
@@ -743,6 +761,7 @@ var _ = Describe("Status Conditions", func() {
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
+		b.SetSeed(1337)
 		Expect(b.Start()).To(Succeed())
 		transactions, _ := b.SimulateRound()
 		Expect(len(transactions)).To(Equal(3), "Expected only 3 transactions to occur in a round")
