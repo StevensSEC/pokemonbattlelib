@@ -6,7 +6,7 @@ import "fmt"
 // A sequence of transactions should be able to describe an entire battle.
 type Transaction interface {
 	BattleLog() string
-	// Mutate(b *Battle) // Modifies the battle to apply the transaction. Can also queue additional transactions via b.QueueTransaction().
+	Mutate(b *Battle) // Modifies the battle to apply the transaction. Can also queue additional transactions via b.QueueTransaction().
 }
 
 // A transaction to deal damage to an opponent Pokemon.

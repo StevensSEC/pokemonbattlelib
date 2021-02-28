@@ -290,30 +290,12 @@ func (b *Battle) QueueTransaction(t ...Transaction) {
 // Process Transactions that are in the queue until the queue is empty.
 func (b *Battle) ProcessQueue() {
 	for len(b.tQueue) > 0 {
-		next := b.tQueue[0]
+		t := b.tQueue[0]
 		b.tQueue = b.tQueue[1:]
-		switch t := next.(type) {
-		case DamageTransaction:
-			t.Mutate(b)
-		case ItemTransaction:
-			t.Mutate(b)
-		case FriendshipTransaction:
-			t.Mutate(b)
-		case HealTransaction:
-			t.Mutate(b)
-		case InflictStatusTransaction:
-			t.Mutate(b)
-		case CureStatusTransaction:
-			t.Mutate(b)
-		case FaintTransaction:
-			t.Mutate(b)
-		case SendOutTransaction:
-			t.Mutate(b)
-		case EndBattleTransaction:
-			t.Mutate(b)
-		}
+		t.Mutate(b)
+
 		// add to the list of processed transactions
-		b.tProcessed = append(b.tProcessed, next)
+		b.tProcessed = append(b.tProcessed, t)
 		if b.State == BATTLE_END {
 			break
 		}
