@@ -1,7 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -62,8 +61,10 @@ func TestRcAgent(t *testing.T) {
 	party2 := NewOccupiedParty(&_a2, 1, pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
-
-	b.Start()
+	err := b.Start()
+	if err != nil {
+		panic(err)
+	}
 	a1 <- FightTurn{
 		Move: 0,
 		Target: target{
@@ -78,10 +79,10 @@ func TestRcAgent(t *testing.T) {
 			partySlot: 0,
 		},
 	}
-	transactions, _ := b.SimulateRound()
-	for _, t := range transactions {
-		fmt.Printf("%s\n", t.BattleLog())
-	}
+	// transactions, _ := b.SimulateRound()
+	// for _, t := range transactions {
+	// 	fmt.Printf("%s\n", t.BattleLog())
+	// }
 }
 
 var _ = Describe("Battle", func() {
@@ -102,6 +103,28 @@ var _ = Describe("Battle", func() {
 			b := NewBattle()
 			b.AddParty(party1, party2)
 			b.SetSeed(849823)
+		})
+
+		It("panics when adding too many Pokemon to a party", func() {
+			party := NewParty(&agent1, 0)
+			for i := 0; i < MAX_PARTY_SIZE; i += 1 {
+				party.AddPokemon(GeneratePokemon(1))
+			}
+			Expect(func() {
+				party.AddPokemon(GeneratePokemon(1))
+			}).To(Panic())
+		})
+
+		It("panics when getting an invalid Pokemon", func() {
+			party := NewOccupiedParty(&agent1, 0, GeneratePokemon(1))
+			b := NewBattle()
+			b.AddParty(party)
+			Expect(func() {
+				b.getPokemon(1, 5)
+			}).To(Panic())
+			Expect(func() {
+				b.getPokemon(0, 5)
+			}).To(Panic())
 		})
 	})
 })
@@ -135,14 +158,20 @@ var _ = Describe("One round of battle", func() {
 		Expect(err).ShouldNot(HaveOccurred())
 	})
 
+	It("panics if battle is not in progress", func() {
+		Expect(func() {
+			battle.SimulateRound()
+		}).To(Panic())
+	})
+
 	Context("when simulating a round between two agents", func() {
 		It("should return two transactions", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			Expect(transactions).To(HaveLen(2))
 		})
 		It("should log FightTurns correctly", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
@@ -150,7 +179,7 @@ var _ = Describe("One round of battle", func() {
 			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 3 damage."))
 		})
 		It("should cause Pokemon to have reduced HP", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
 			Expect(charmander.CurrentHP < charmander.Stats[STAT_HP]).To(BeTrue())
 			Expect(squirtle.CurrentHP < squirtle.Stats[STAT_HP]).To(BeTrue())
@@ -163,7 +192,7 @@ var _ = Describe("One round of battle", func() {
 			charmander.Elemental = Fire
 			ember := GetMove(52)
 			charmander.Moves[0] = &ember
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
 			Expect(squirtle.CurrentHP).To(BeEquivalentTo(6))
 			squirtle.CurrentHP = 100
@@ -171,6 +200,18 @@ var _ = Describe("One round of battle", func() {
 			charmander.Ability = &adaptability
 			battle.SimulateRound()
 			Expect(squirtle.CurrentHP).To(BeEquivalentTo(93))
+		})
+	})
+
+	Context("should account for accuracy/evasion", func() {
+		It("should miss moves randomly", func() {
+			Expect(battle.Start()).To(Succeed())
+			charmander.Moves[0].Accuracy = 1
+			logs, _ := battle.SimulateRound()
+			Expect(logs[0].BattleLog()).To(Equal("Charmander's attack missed!"))
+			charmander.Moves[0].Accuracy = 99
+			logs, _ = battle.SimulateRound()
+			Expect(logs[0].BattleLog()).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
 		})
 	})
 })
@@ -198,13 +239,13 @@ var _ = Describe("Using items in battle", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 		It("should log ItemTurns correctly", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Potion used on Venusaur."))
 		})
 		It("should heal the Pokemon by 20 HP", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
 			Expect(int(pkmn.CurrentHP)).To(Equal(30))
 		})
@@ -237,6 +278,22 @@ var _ = Describe("Active pokemon in battle", func() {
 		party.SetActive(1)
 		pkmn := party.GetActivePokemon()[1]
 		Expect(int(pkmn.NatDex)).To(Equal(9))
+	})
+
+	It("should panic when Pokemon should not change active state", func() {
+		Expect(func() {
+			party.SetInactive(0)
+		}).To(Panic())
+		party.SetActive(0)
+		Expect(func() {
+			party.SetActive(0)
+		}).To(Panic())
+	})
+
+	It("should panic when Pokemon does not exist", func() {
+		Expect(func() {
+			party.IsActivePokemon(7)
+		}).To(Panic())
 	})
 })
 
@@ -271,7 +328,7 @@ var _ = Describe("Getting party Pokemon", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 		It("should return targets whose team matches the passed party ", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			for _, party := range []*party{party1, party2} {
 				allies := battle.GetAllies(party)
 				Expect(allies).To(HaveLen(1))
@@ -285,12 +342,57 @@ var _ = Describe("Getting party Pokemon", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 		It("should return targets whose team does not match the passed party ", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			for _, party := range []*party{party1, party2} {
 				opponents := battle.GetOpponents(party)
 				Expect(opponents).To(HaveLen(1))
 			}
 		})
+	})
+})
+
+var _ = Describe("Move priority", func() {
+	var (
+		a1 Agent
+		a2 Agent
+	)
+
+	BeforeEach(func() {
+		a1 = Agent(dumbAgent{})
+		a2 = Agent(dumbAgent{})
+	})
+
+	Specify("Moves with higher priority should go first", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1, WithLevel(5), WithMoves(&pound))
+		p1.Stats[STAT_SPD] = 100
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		fakeout := GetMove(252)
+		p2 := GeneratePokemon(4, WithLevel(5), WithMoves(&fakeout))
+		p2.Stats[STAT_SPD] = 10
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		Expect(b.Start()).To(Succeed())
+		transactions, _ := b.SimulateRound()
+		Expect(len(transactions)).To(Equal(2))
+
+		logtest := []struct {
+			turn Transaction
+			want string
+		}{
+			{
+				turn: transactions[0],
+				want: "Charmander used Fake Out on Bulbasaur for 5 damage.",
+			},
+			{
+				turn: transactions[1],
+				want: "Bulbasaur used Pound on Charmander for 5 damage.",
+			},
+		}
+		for _, tt := range logtest {
+			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
+		}
 	})
 })
 
@@ -321,13 +423,13 @@ var _ = Describe("Pokemon speed", func() {
 		})
 
 		It("should create two transactions when simulating a round", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			Expect(transactions).To(HaveLen(2))
 		})
 
 		Specify("faster Pokemon should go first", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Ninjask used Pound on Charmander for 3 damage."))
@@ -381,13 +483,13 @@ var _ = Describe("Fainting", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 
-		It("causes 4 transactions to occur", func() {
-			battle.Start()
+		It("causes 5 transactions to occur", func() {
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
-			Expect(transactions).To(HaveLen(4))
+			Expect(transactions).To(HaveLen(5))
 		})
 		It("should log all transactions as expected", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 2 damage."))
@@ -406,7 +508,38 @@ var _ = Describe("Fainting", func() {
 			log2 := transactions[2].BattleLog()
 			Expect(log2).To(Equal("Charmander fainted."))
 			log3 := transactions[3].BattleLog()
-			Expect(log3).To(Equal("Turtwig was sent out."))
+			Expect(log3).To(Equal("Charmander's friendship changed by -5."))
+			log4 := transactions[4].BattleLog()
+			Expect(log4).To(Equal("Turtwig was sent out."))
+		})
+	})
+
+	Context("Fainting causes friendship to be lost", func() {
+		It("should lose 1 friendship when fainting", func() {
+			dies := GeneratePokemon(1, WithLevel(1), WithMoves(&pound))
+			dies.Friendship = 100
+			p1 := NewOccupiedParty(&agent1, 0, dies)
+			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(25), WithMoves(&pound)))
+			battle = NewBattle()
+			battle.AddParty(p1, p2)
+			Expect(battle.Start()).To(Succeed())
+			battle.SimulateRound()
+			Expect(dies.Friendship).To(Equal(99))
+		})
+		It("should lose 5 or 10 friendship when fainting", func() {
+			dies := GeneratePokemon(1, WithLevel(1), WithMoves(&pound))
+			dies.Friendship = 100
+			dies2 := GeneratePokemon(1, WithLevel(1), WithMoves(&pound))
+			dies2.Friendship = 200
+			p1 := NewOccupiedParty(&agent1, 0, dies, dies2)
+			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(100), WithMoves(&pound)))
+			battle = NewBattle()
+			battle.AddParty(p1, p2)
+			Expect(battle.Start()).To(Succeed())
+			battle.SimulateRound()
+			Expect(dies.Friendship).To(Equal(95))
+			battle.SimulateRound()
+			Expect(dies2.Friendship).To(Equal(190))
 		})
 	})
 
@@ -426,12 +559,10 @@ var _ = Describe("Fainting", func() {
 		party2.AddPokemon(pkmn2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
-		err := b.Start()
-		Expect(err).To(BeNil())
-
+		Expect(b.Start()).To(Succeed())
 		transactions, ended := b.SimulateRound()
 		Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
-		Expect(len(transactions)).To(Equal(3), "Expected 3 transactions to occur")
+		Expect(len(transactions)).To(Equal(4), "Expected 4 transactions to occur")
 		logtest := []struct {
 			turn Transaction
 			want string
@@ -445,7 +576,7 @@ var _ = Describe("Fainting", func() {
 				want: "Charmander fainted.",
 			},
 			{
-				turn: transactions[2],
+				turn: transactions[3],
 				want: "The battle has ended.",
 			},
 		}
@@ -472,12 +603,10 @@ var _ = Describe("Fainting", func() {
 		party2.AddPokemon(pkmn2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
-		err := b.Start()
-		Expect(err).To(BeNil())
-
+		Expect(b.Start()).To(Succeed())
 		transactions, ended := b.SimulateRound()
 		Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
-		Expect(len(transactions)).To(Equal(3), "Expected 3 transactions to occur")
+		Expect(len(transactions)).To(Equal(4), "Expected 4 transactions to occur")
 		logtest := []struct {
 			turn Transaction
 			want string
@@ -491,7 +620,7 @@ var _ = Describe("Fainting", func() {
 				want: "Charmander fainted.",
 			},
 			{
-				turn: transactions[2],
+				turn: transactions[3],
 				want: "Turtwig was sent out.",
 			},
 		}
@@ -530,19 +659,19 @@ var _ = Describe("Ending a battle", func() {
 		})
 
 		It("should end", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			_, ended := battle.SimulateRound()
 			Expect(ended).To(BeTrue())
 		})
 
-		It("should have 4 transactions occur", func() {
-			battle.Start()
+		It("should have 5 transactions occur", func() {
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
-			Expect(transactions).To(HaveLen(4))
+			Expect(transactions).To(HaveLen(5))
 		})
 
 		It("should log all transaction correctly", func() {
-			battle.Start()
+			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
@@ -551,7 +680,9 @@ var _ = Describe("Ending a battle", func() {
 			log2 := transactions[2].BattleLog()
 			Expect(log2).To(Equal("Charmander fainted."))
 			log3 := transactions[3].BattleLog()
-			Expect(log3).To(Equal("The battle has ended."))
+			Expect(log3).To(Equal("Charmander's friendship changed by -1."))
+			log4 := transactions[4].BattleLog()
+			Expect(log4).To(Equal("The battle has ended."))
 		})
 	})
 })
@@ -579,7 +710,7 @@ var _ = Describe("Status Conditions", func() {
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
-		b.Start()
+		Expect(b.Start()).To(Succeed())
 		transactions, _ := b.SimulateRound()
 		Expect(len(transactions)).To(Equal(4), "Expected only 4 transactions to occur in a round")
 
@@ -612,7 +743,7 @@ var _ = Describe("Status Conditions", func() {
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
-		b.Start()
+		Expect(b.Start()).To(Succeed())
 		transactions, _ := b.SimulateRound()
 		Expect(len(transactions)).To(Equal(3), "Expected only 3 transactions to occur in a round")
 
@@ -628,5 +759,79 @@ var _ = Describe("Status Conditions", func() {
 		for _, tt := range logtest {
 			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
 		}
+	})
+
+	Specify("Paralysis", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(&pound))
+		p1.StatusEffects = StatusParalyze
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(&pound))
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.SetSeed(1337)
+		Expect(b.Start()).To(Succeed())
+		transactions, _ := b.SimulateRound()
+
+		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is paralyzed and is unable to move."))
+	})
+
+	Specify("Freeze", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(&pound))
+		p1.StatusEffects = StatusFreeze
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(&pound))
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.SetSeed(34987)
+		Expect(b.Start()).To(Succeed())
+		transactions, _ := b.SimulateRound()
+
+		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is frozen and is unable to move."))
+	})
+
+	Specify("Sleep", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(&pound))
+		p1.StatusEffects = StatusSleep
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(&pound))
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.SetSeed(1337)
+		Expect(b.Start()).To(Succeed())
+		transactions, _ := b.SimulateRound()
+
+		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is asleep and is unable to move."))
+	})
+
+	It("Should cure paralysis", func() {
+		pound := GetMove(1)
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(&pound))
+		p1.StatusEffects = StatusParalyze
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(&pound))
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.SetSeed(1337)
+		Expect(b.Start()).To(Succeed())
+		b.QueueTransaction(CureStatusTransaction{
+			Target: target{
+				Pokemon:   *p1,
+				party:     0,
+				partySlot: 0,
+				Team:      0,
+			},
+			Status: StatusParalyze,
+		})
+		b.ProcessQueue()
+		transactions, _ := b.SimulateRound()
+
+		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is no longer paralyzed."))
 	})
 })

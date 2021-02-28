@@ -127,6 +127,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
 			switch turnA.(type) {
 			case FightTurn:
+				ftA := turnA.(FightTurn)
+				ftB := turnB.(FightTurn)
+				mvA := ctxA.Pokemon.Moves[ftA.Move]
+				mvB := ctxB.Pokemon.Moves[ftB.Move]
+				if mvA.Priority != mvB.Priority {
+					return mvA.Priority > mvB.Priority
+				}
 				// speedy pokemon should go first
 				return ctxA.Pokemon.Stats[STAT_SPD] > ctxB.Pokemon.Stats[STAT_SPD]
 			}
@@ -149,8 +156,45 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
+
+			// pre-move checks
+			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
+				var success bool
+				if user.StatusEffects.check(StatusFreeze) {
+					success = b.rng.Get(1, 5) == 1
+				} else if user.StatusEffects.check(StatusParalyze) {
+					success = b.rng.Get(1, 4) != 1
+				}
+				if !success {
+					b.QueueTransaction(ImmobilizeTransaction{
+						Target: target{
+							Pokemon: user,
+						},
+						StatusEffect: user.StatusEffects & NONVOLATILE_STATUS_MASK,
+					})
+					continue // forfeit turn
+				}
+			} else if user.StatusEffects.check(StatusSleep) {
+				b.QueueTransaction(ImmobilizeTransaction{
+					Target: target{
+						Pokemon: user,
+					},
+					StatusEffect: StatusSleep,
+				})
+				continue // forfeit turn
+			}
+
+			// use the move
 			move := user.Moves[t.Move]
+			accuracy := move.Accuracy
+			// Todo: account for receiver's evasion
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			if !b.rng.Roll(accuracy, 100) {
+				b.QueueTransaction(EvadeTransaction{
+					User: &user,
+				})
+				continue
+			}
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			if move.Category == Status {
 				if move.ID == MOVE_STUN_SPORE {
@@ -250,64 +294,12 @@ func (b *Battle) QueueTransaction(t ...Transaction) {
 // Process Transactions that are in the queue until the queue is empty.
 func (b *Battle) ProcessQueue() {
 	for len(b.tQueue) > 0 {
-		next := b.tQueue[0]
+		t := b.tQueue[0]
 		b.tQueue = b.tQueue[1:]
-		switch t := next.(type) {
-		case DamageTransaction:
-			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-			if receiver.CurrentHP >= t.Damage {
-				receiver.CurrentHP -= t.Damage
-			} else {
-				// prevent underflow
-				receiver.CurrentHP = 0
-			}
-			if receiver.CurrentHP == 0 {
-				// pokemon has fainted
-				b.QueueTransaction(FaintTransaction{
-					Target: t.Target,
-				})
-			}
-		case ItemTransaction:
-			// TODO: do not consume certain items
-			if t.Target.HeldItem == t.Item {
-				t.Target.HeldItem = nil
-			}
-		case HealTransaction:
-			t.Target.CurrentHP += t.Amount
-		case InflictStatusTransaction:
-			t.Target.StatusEffects.apply(t.Status)
-		case FaintTransaction:
-			p := b.parties[t.Target.party]
-			p.SetInactive(t.Target.partySlot)
-			anyAlive := false
-			for i, pkmn := range p.pokemon {
-				if pkmn.CurrentHP > 0 {
-					anyAlive = true
-					// TODO: prompt Agent for which pokemon to send out next
-					// auto send out next pokemon
-					b.QueueTransaction(SendOutTransaction{
-						Target: target{
-							Pokemon:   *b.getPokemon(t.Target.party, i),
-							party:     t.Target.party,
-							partySlot: i,
-							Team:      t.Target.Team,
-						},
-					})
-					break
-				}
-			}
-			if !anyAlive {
-				// cause the battle to end by knockout
-				b.QueueTransaction(EndBattleTransaction{})
-			}
-		case SendOutTransaction:
-			p := b.parties[t.Target.party]
-			p.SetActive(t.Target.partySlot)
-		case EndBattleTransaction:
-			b.State = BATTLE_END
-		}
+		t.Mutate(b)
+
 		// add to the list of processed transactions
-		b.tProcessed = append(b.tProcessed, next)
+		b.tProcessed = append(b.tProcessed, t)
 		if b.State == BATTLE_END {
 			break
 		}
