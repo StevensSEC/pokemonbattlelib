@@ -455,6 +455,85 @@ var _ = Describe("Turn priority", func() {
 	})
 })
 
+var _ = Describe("Weather", func() {
+	var (
+		a1 Agent
+		a2 Agent
+		p1 *party
+		p2 *party
+		b  *Battle
+	)
+
+	BeforeEach(func() {
+		a1 = Agent(dumbAgent{})
+		a2 = Agent(dumbAgent{})
+		p1 = NewParty(&a1, 0)
+		p2 = NewParty(&a2, 1)
+		b = NewBattle()
+		b.AddParty(p1, p2)
+	})
+
+	Context("Weather should be caused by moves/abilities", func() {
+		// TODO: https://bulbapedia.bulbagarden.net/wiki/Weather#Causing_weather
+	})
+
+	Context("Weather has effects in battle", func() {
+		It("should affect fire/water attacks during harsh sunlight", func() {
+			ember := GetMove(MOVE_EMBER)
+			charmander := GeneratePokemon(4, WithLevel(100), WithMoves(&ember))
+			bubble := GetMove(MOVE_BUBBLE)
+			squirtle := GeneratePokemon(7, WithLevel(100), WithMoves(&bubble))
+			p1.AddPokemon(charmander)
+			p2.AddPokemon(squirtle)
+			Expect(b.Start()).To(Succeed())
+			// TODO: test damage
+		})
+		It("should affect fire/water attacks during rain", func() {
+			ember := GetMove(MOVE_EMBER)
+			charmander := GeneratePokemon(4, WithLevel(100), WithMoves(&ember))
+			bubble := GetMove(MOVE_BUBBLE)
+			squirtle := GeneratePokemon(7, WithLevel(100), WithMoves(&bubble))
+			p1.AddPokemon(charmander)
+			p2.AddPokemon(squirtle)
+			Expect(b.Start()).To(Succeed())
+			// TODO: test damage
+		})
+		It("should damage/cause side effects during sandstorm", func() {
+			tackle := GetMove(MOVE_TACKLE)
+			geodude := GeneratePokemon(74, WithMoves(&tackle))
+			solarBeam := GetMove(MOVE_SOLAR_BEAM)
+			bulbasaur := GeneratePokemon(1, WithMoves(&solarBeam))
+			p1.AddPokemon(geodude)
+			p2.AddPokemon(bulbasaur)
+			Expect(b.Start()).To(Succeed())
+			// TODO: test sandstorm
+		})
+		It("should damage/cause side effects during sandstorm", func() {
+			tackle := GetMove(MOVE_TACKLE)
+			articuno := GeneratePokemon(144, WithMoves(&tackle))
+			solarBeam := GetMove(MOVE_SOLAR_BEAM)
+			bulbasaur := GeneratePokemon(1, WithMoves(&solarBeam))
+			p1.AddPokemon(articuno)
+			p2.AddPokemon(bulbasaur)
+			Expect(b.Start()).To(Succeed())
+			// TODO: test hail
+		})
+		It("should cause side effects during fog", func() {
+			weatherBall := GetMove(MOVE_WEATHER_BALL)
+			castform := GeneratePokemon(351, WithMoves(&weatherBall))
+			solarBeam := GetMove(MOVE_SOLAR_BEAM)
+			bulbasaur := GeneratePokemon(1, WithMoves(&solarBeam))
+			p1.AddPokemon(castform)
+			p2.AddPokemon(bulbasaur)
+			Expect(b.Start()).To(Succeed())
+			// TODO: test fog move accuracy/boost
+			moonlight := GetMove(MOVE_MOONLIGHT)
+			bulbasaur.Moves[0] = &moonlight
+			// TODO: test fog move heal
+		})
+	})
+})
+
 var _ = Describe("Fainting", func() {
 	var (
 		agent1 Agent
