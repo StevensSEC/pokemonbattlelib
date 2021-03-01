@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -13,6 +14,9 @@ func buildRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/pokedex/list/moves", HandleListMoves)
 	mux.HandleFunc("/pokedex/generate", HandleGeneratePokemon)
+	mux.HandleFunc("/battle/new", HandleCreateBattle)
+	mux.HandleFunc("/battle/simulate", HandleBattleSimulate)
+	mux.HandleFunc("/agent/dumb", HandleDumbAgent)
 	return mux
 }
 
@@ -100,4 +104,72 @@ func HandleGeneratePokemon(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 	w.Write(bytes)
+}
+
+var nextBattleId int
+var battles = map[int]*Battle{}
+
+type newBattleArgs struct {
+	Parties      [][]*Pokemon
+	CallbackUrls []string
+}
+
+func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		var args newBattleArgs
+		err := json.NewDecoder(r.Body).Decode(&args)
+		if err != nil {
+			log.Printf("Failed to decode newBattleArgs: %s", err)
+			w.WriteHeader(400)
+			w.Write([]byte("Bad request: Failed to parse arguments"))
+			return
+		}
+
+		b := NewBattle()
+		for i := range args.Parties {
+			a := Agent(NewHttpCallbackAgent(args.CallbackUrls[i]))
+			p := NewParty(&a, i)
+			p.AddPokemon(args.Parties[i]...)
+			b.AddParty(p)
+		}
+		battles[nextBattleId] = b
+
+		b.Start()
+
+		log.Printf("Battle created: %v", b)
+		w.WriteHeader(200)
+		w.Write([]byte(fmt.Sprintf("%d", nextBattleId)))
+		nextBattleId++
+	} else {
+		w.WriteHeader(400)
+		w.Write([]byte("Bad request: Wrong method"))
+	}
+}
+
+func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
+	battleId := parseNumberArg(r, "id")
+	b := battles[battleId]
+	transactions, ended := b.SimulateRound()
+
+	type roundResults struct {
+		Transactions []Transaction
+		Ended        bool
+	}
+
+	results := roundResults{
+		transactions,
+		ended,
+	}
+
+	bytes, err := json.Marshal(results)
+	if err != nil {
+		log.Fatalf("Failed to marshal into JSON: %s", err)
+	}
+
+	w.WriteHeader(200)
+	w.Write(bytes)
+}
+
+func HandleDumbAgent(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte(`{"type": 0, "args": {"target": {"party":0, "slot": 0}, "move": 0}}`))
 }
