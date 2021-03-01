@@ -166,13 +166,36 @@ var _ = Describe("One round of battle", func() {
 			transactions, _ := battle.SimulateRound()
 			Expect(transactions).To(HaveLen(2))
 		})
-		It("should log FightTurns correctly", func() {
+		It("should create 2 damage transactions", func() {
 			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
 			log0 := transactions[0].BattleLog()
 			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
 			log1 := transactions[1].BattleLog()
 			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 3 damage."))
+			pound := GetMove(MOVE_POUND)
+			Expect(transactions).To(HaveTransaction(DamageTransaction{
+				User: charmander,
+				Target: target{
+					Pokemon:   *squirtle,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Move:   pound,
+				Damage: 3,
+			}))
+			Expect(transactions).To(HaveTransaction(DamageTransaction{
+				User: squirtle,
+				Target: target{
+					Pokemon:   *charmander,
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+				Move:   pound,
+				Damage: 3,
+			}))
 		})
 		It("should cause Pokemon to have reduced HP", func() {
 			Expect(battle.Start()).To(Succeed())
@@ -402,18 +425,24 @@ var _ = Describe("Move priority", func() {
 
 var _ = Describe("Pokemon speed", func() {
 	var (
-		agent1 Agent
-		agent2 Agent
-		party1 *party
-		party2 *party
-		battle *Battle
+		agent1     Agent
+		agent2     Agent
+		party1     *party
+		party2     *party
+		pound      *Move
+		battle     *Battle
+		charmander *Pokemon
+		ninjask    *Pokemon
 	)
 
 	BeforeEach(func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
-		party1 = NewOccupiedParty(&agent1, 0, GeneratePokemon(4, WithMoves(GetMove(MOVE_POUND))))
-		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(291, WithMoves(GetMove(MOVE_POUND)))) // ninjask is faster than charmander
+		pound = GetMove(MOVE_POUND)
+		charmander = GeneratePokemon(4, WithMoves(pound))
+		ninjask = GeneratePokemon(291, WithMoves(pound))
+		party1 = NewOccupiedParty(&agent1, 0, charmander)
+		party2 = NewOccupiedParty(&agent2, 1, ninjask) // ninjask is faster than charmander
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
 		battle.SetSeed(1337)
@@ -438,6 +467,31 @@ var _ = Describe("Pokemon speed", func() {
 			Expect(log0).To(Equal("Ninjask used Pound on Charmander for 3 damage."))
 			log1 := transactions[1].BattleLog()
 			Expect(log1).To(Equal("Charmander used Pound on Ninjask for 3 damage."))
+
+			Expect(transactions).To(HaveTransactionsInOrder(
+				DamageTransaction{
+					User: ninjask,
+					Target: target{
+						Pokemon:   *charmander,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Move:   pound,
+					Damage: 3,
+				},
+				DamageTransaction{
+					User: charmander,
+					Target: target{
+						Pokemon:   *ninjask,
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+					},
+					Move:   pound,
+					Damage: 3,
+				},
+			))
 		})
 	})
 })
@@ -586,6 +640,30 @@ var _ = Describe("Fainting", func() {
 		for _, tt := range logtest {
 			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
 		}
+
+		Expect(transactions).To(HaveTransactionsInOrder(
+			FaintTransaction{
+				Target: target{
+					Pokemon:   *pkmn1,
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+			},
+			EndBattleTransaction{},
+		))
+
+		Expect(transactions).ToNot(HaveTransaction(
+			DamageTransaction{
+				User: pkmn1,
+				Target: target{
+					Pokemon:   *pkmn2,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+			},
+		))
 	})
 
 	Specify("Dead pokemon should not take turns", func() {
