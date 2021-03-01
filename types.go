@@ -9,13 +9,21 @@ import (
 
 // Constants for looking up Pokemon stats
 const (
+	// Base stats
 	STAT_HP = iota
 	STAT_ATK
 	STAT_DEF
 	STAT_SPATK
 	STAT_SPDEF
 	STAT_SPD
+	// Fighting stats
+	STAT_CRIT_CHANCE
+	STAT_ACCURACY
+	STAT_EVASION
 )
+
+// Table of critical hit chances (denominator of 1/X)
+var CRIT_CHANCE = [5]int{16, 8, 4, 3, 2}
 
 const (
 	MAX_STAT_MODIFIER = 6
@@ -246,6 +254,7 @@ func (s *StatusCondition) check(c StatusCondition) bool {
 	}
 }
 
+// Applies the given status conditions to this status condition. Non-volatile status conditions are overwritten.
 func (s *StatusCondition) apply(c StatusCondition) {
 	nv := c & NONVOLATILE_STATUS_MASK
 	if nv == 0 {
@@ -255,6 +264,7 @@ func (s *StatusCondition) apply(c StatusCondition) {
 	*s = nv | v
 }
 
+// Clears the given status conditions from this status condition.
 func (s *StatusCondition) clear(c StatusCondition) {
 	*s ^= c
 }

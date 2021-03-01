@@ -84,6 +84,7 @@ func (b *Battle) GetOpponents(p *party) []target {
 	return opponents
 }
 
+// Start the battle.
 func (b *Battle) Start() error {
 	// TODO: validate the battle, return error if invalid
 
@@ -159,13 +160,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
-				var success bool
+				immobilize := false
 				if user.StatusEffects.check(StatusFreeze) {
-					success = b.rng.Get(1, 5) == 1
+					immobilize = b.rng.Roll(4, 5)
 				} else if user.StatusEffects.check(StatusParalyze) {
-					success = b.rng.Get(1, 4) != 1
+					immobilize = b.rng.Roll(1, 4)
 				}
-				if !success {
+				if immobilize {
 					b.QueueTransaction(ImmobilizeTransaction{
 						Target: target{
 							Pokemon: user,
@@ -188,11 +189,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			move := user.Moves[t.Move]
 			accuracy := float64(move.Accuracy)
 			if b.Weather == WEATHER_FOG {
-				accuracy *= 3 / 5
+				accuracy = accuracy * 3 / 5
 			}
 			// Todo: account for receiver's evasion
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-			if !b.rng.Roll(int(accuracy), 100) {
+			if move.Accuracy != 0 && !b.rng.Roll(int(accuracy), 100) {
 				b.QueueTransaction(EvadeTransaction{
 					User: &user,
 				})
@@ -206,12 +207,29 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Status: StatusParalyze,
 					})
 				}
+				if move.ID == MOVE_DEFOG {
+					b.QueueTransaction(WeatherTransaction{
+						Weather: WEATHER_CLEAR_SKIES,
+					})
+				}
+				if b.Weather == WEATHER_FOG {
+					if move.ID == MOVE_MOONLIGHT || move.ID == MOVE_SYNTHESIS || move.ID == MOVE_MORNING_SUN {
+						b.QueueTransaction(HealTransaction{
+							Target: self,
+							Amount: self.Stats[STAT_HP] / 4,
+						})
+					}
+				}
 			} else {
 				weather := 1.0
 				if rain, sun := b.Weather == WEATHER_RAIN, b.Weather == WEATHER_HARSH_SUNLIGHT; (rain && move.Type == Water) || (sun && move.Type == Fire) {
 					weather = 1.5
 				} else if (rain && move.Type == Fire) || (sun && move.Type == Water) {
 					weather = 0.5
+				}
+				crit := 1.0
+				if b.rng.Roll(1, CRIT_CHANCE[user.StatModifiers[STAT_CRIT_CHANCE]]) {
+					crit = 2.0
 				}
 				stab := 1.0
 				if move != nil && user.Elemental&move.Type != 0 {
@@ -220,7 +238,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						stab = 2.0
 					}
 				}
-				modifier := weather * stab
+				modifier := weather * crit * stab
 				levelEffect := float64((2 * user.Level / 5) + 2)
 				movePower := float64(move.Power)
 				attack := float64(user.Stats[STAT_ATK])
@@ -248,13 +266,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					}
 					if move.ID == MOVE_SOLAR_BEAM {
 						movePower /= 2
-					}
-					// Maybe a better way of doing this?
-					if move.ID == MOVE_MOONLIGHT || move.ID == MOVE_SYNTHESIS || move.ID == MOVE_MORNING_SUN {
-						b.QueueTransaction(HealTransaction{
-							Target: self,
-							Amount: self.Stats[STAT_HP] / 4,
-						})
 					}
 				}
 				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
@@ -406,7 +417,6 @@ func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 }
 
 // An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
-
 type Turn interface {
 	Priority() int // Gets the turn's priority. Higher values go first. Not to be confused with Move priority.
 }
@@ -418,6 +428,7 @@ type TurnContext struct {
 	Context *BattleContext // The context in which the Pokemon took its turn
 }
 
+// A turn to represent a Pokemon using a Move.
 type FightTurn struct {
 	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
 	Target target // Info containing data determining the target of
@@ -427,7 +438,7 @@ func (turn FightTurn) Priority() int {
 	return 0
 }
 
-// An item turn has the a higher priority than any move.
+// A turn to represent using an item from the Party's inventory. An item turn has the a higher priority than any move.
 type ItemTurn struct {
 	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
 	Target target // Info containing data determining the target of

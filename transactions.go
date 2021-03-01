@@ -38,6 +38,10 @@ func (t DamageTransaction) BattleLog() string {
 }
 
 func (t DamageTransaction) Mutate(b *Battle) {
+	// Minimum 1HP attack
+	if t.Damage == 0 {
+		t.Damage = 1
+	}
 	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 	if receiver.CurrentHP >= t.Damage {
 		receiver.CurrentHP -= t.Damage
@@ -209,6 +213,7 @@ func (t WeatherTransaction) Mutate(b *Battle) {
 	b.Weather = t.Weather
 }
 
+// A transaction that ends the battle.
 type EndBattleTransaction struct{}
 
 func (t EndBattleTransaction) BattleLog() string {
