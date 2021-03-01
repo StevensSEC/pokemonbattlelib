@@ -49,7 +49,7 @@ const (
 
 type GeneratePokemonOption func(p *Pokemon)
 
-// Creates a new Pokemon given its national dex number
+// Creates a new Pokemon given its national dex number and other options.
 func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 	p := &Pokemon{
 		NatDex:          uint16(natdex),

@@ -2,6 +2,7 @@ package pokemonbattlelib
 
 import "fmt"
 
+// A Party can use Items in a battle for different effects. A Pokemon can hold one Item.
 type Item struct {
 	ID          int
 	Name        string
@@ -91,9 +92,9 @@ const (
 	FlagUsableInBattle
 )
 
-// For item effects, see https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/item_prose.csv
 // Retrieves an item using its ID
 // Can also use constants like ITEM_POTION or ITEM_REVIVE
+// For item effects, see https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/item_prose.csv
 func GetItem(itemID int) Item {
 	for _, item := range ALL_ITEMS {
 		if item.ID == itemID {

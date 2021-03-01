@@ -195,6 +195,7 @@ func (t SendOutTransaction) Mutate(b *Battle) {
 	p.SetActive(t.Target.partySlot)
 }
 
+// A transaction that ends the battle.
 type EndBattleTransaction struct{}
 
 func (t EndBattleTransaction) BattleLog() string {
