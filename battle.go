@@ -161,9 +161,9 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
 				var success bool
 				if user.StatusEffects.check(StatusFreeze) {
-					success = b.rng.Get(1, 5) == 1
+					success = b.rng.Roll(1, 5)
 				} else if user.StatusEffects.check(StatusParalyze) {
-					success = b.rng.Get(1, 4) != 1
+					success = b.rng.Roll(1, 4)
 				}
 				if !success {
 					b.QueueTransaction(ImmobilizeTransaction{
@@ -186,7 +186,15 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 			// use the move
 			move := user.Moves[t.Move]
+			accuracy := move.Accuracy
+			// Todo: account for receiver's evasion
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			if !b.rng.Roll(accuracy, 100) {
+				b.QueueTransaction(EvadeTransaction{
+					User: &user,
+				})
+				continue
+			}
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			if move.Category == Status {
 				if move.ID == MOVE_STUN_SPORE {
@@ -196,6 +204,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				}
 			} else {
+				crit := 1.0
+				if b.rng.Roll(1, CRIT_CHANCE[user.StatModifiers[STAT_CRIT_CHANCE]]) {
+					crit = 2.0
+				}
 				stab := 1.0
 				if move != nil && user.Elemental&move.Type != 0 {
 					stab = 1.5
@@ -203,7 +215,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						stab = 2.0
 					}
 				}
-				modifier := stab // TODO: damage multiplers
+				modifier := crit * stab // TODO: damage multiplers
 				levelEffect := float64((2 * user.Level / 5) + 2)
 				movePower := float64(move.Power)
 				statRatio := float64(user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF])
@@ -282,80 +294,12 @@ func (b *Battle) QueueTransaction(t ...Transaction) {
 // Process Transactions that are in the queue until the queue is empty.
 func (b *Battle) ProcessQueue() {
 	for len(b.tQueue) > 0 {
-		next := b.tQueue[0]
+		t := b.tQueue[0]
 		b.tQueue = b.tQueue[1:]
-		switch t := next.(type) {
-		case DamageTransaction:
-			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-			if receiver.CurrentHP >= t.Damage {
-				receiver.CurrentHP -= t.Damage
-			} else {
-				// prevent underflow
-				receiver.CurrentHP = 0
-			}
-			if receiver.CurrentHP == 0 {
-				// pokemon has fainted
-				b.QueueTransaction(FaintTransaction{
-					Target: t.Target,
-				})
-				// friendship is lowered based on level difference
-				levelGap := t.User.Level - receiver.Level
-				loss := -1
-				if levelGap >= 30 {
-					if receiver.Friendship < 200 {
-						loss = -5
-					} else {
-						loss = -10
-					}
-				}
-				b.QueueTransaction(FriendshipTransaction{
-					Target: receiver,
-					Amount: loss,
-				})
-			}
-		case ItemTransaction:
-			// TODO: do not consume certain items
-			if t.Target.HeldItem == t.Item {
-				t.Target.HeldItem = nil
-			}
-		case FriendshipTransaction:
-			t.Target.Friendship += t.Amount
-		case HealTransaction:
-			t.Target.CurrentHP += t.Amount
-		case InflictStatusTransaction:
-			t.Target.StatusEffects.apply(t.Status)
-		case FaintTransaction:
-			p := b.parties[t.Target.party]
-			p.SetInactive(t.Target.partySlot)
-			anyAlive := false
-			for i, pkmn := range p.pokemon {
-				if pkmn.CurrentHP > 0 {
-					anyAlive = true
-					// TODO: prompt Agent for which pokemon to send out next
-					// auto send out next pokemon
-					b.QueueTransaction(SendOutTransaction{
-						Target: target{
-							Pokemon:   *b.getPokemon(t.Target.party, i),
-							party:     t.Target.party,
-							partySlot: i,
-							Team:      t.Target.Team,
-						},
-					})
-					break
-				}
-			}
-			if !anyAlive {
-				// cause the battle to end by knockout
-				b.QueueTransaction(EndBattleTransaction{})
-			}
-		case SendOutTransaction:
-			p := b.parties[t.Target.party]
-			p.SetActive(t.Target.partySlot)
-		case EndBattleTransaction:
-			b.State = BATTLE_END
-		}
+		t.Mutate(b)
+
 		// add to the list of processed transactions
-		b.tProcessed = append(b.tProcessed, next)
+		b.tProcessed = append(b.tProcessed, t)
 		if b.State == BATTLE_END {
 			break
 		}
