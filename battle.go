@@ -84,6 +84,7 @@ func (b *Battle) GetOpponents(p *party) []target {
 	return opponents
 }
 
+// Start the battle.
 func (b *Battle) Start() error {
 	// TODO: validate the battle, return error if invalid
 
@@ -352,7 +353,6 @@ func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 }
 
 // An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
-
 type Turn interface {
 	Priority() int // Gets the turn's priority. Higher values go first. Not to be confused with Move priority.
 }
@@ -364,6 +364,7 @@ type TurnContext struct {
 	Context *BattleContext // The context in which the Pokemon took its turn
 }
 
+// A turn to represent a Pokemon using a Move.
 type FightTurn struct {
 	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
 	Target target // Info containing data determining the target of
@@ -373,7 +374,7 @@ func (turn FightTurn) Priority() int {
 	return 0
 }
 
-// An item turn has the a higher priority than any move.
+// A turn to represent using an item from the Party's inventory. An item turn has the a higher priority than any move.
 type ItemTurn struct {
 	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
 	Target target // Info containing data determining the target of
