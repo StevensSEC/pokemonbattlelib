@@ -14,7 +14,7 @@ func (g *LCRNG) SetSeed(seed uint) {
 
 func (g *LCRNG) Get(min, max int) int {
 	*g = LCRNG(0x41C64E6D)*(*g) + LCRNG(0x00006073)
-	diff := max - min
+	diff := max - min + 1
 	return int(*g)%diff + min
 }
 
