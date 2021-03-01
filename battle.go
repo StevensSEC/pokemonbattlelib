@@ -204,6 +204,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				}
 			} else {
+				crit := 1.0
+				if b.rng.Roll(1, CRIT_CHANCE[user.StatModifiers[STAT_CRIT_CHANCE]]) {
+					crit = 2.0
+				}
 				stab := 1.0
 				if move != nil && user.Elemental&move.Type != 0 {
 					stab = 1.5
@@ -211,7 +215,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						stab = 2.0
 					}
 				}
-				modifier := stab // TODO: damage multiplers
+				modifier := crit * stab // TODO: damage multiplers
 				levelEffect := float64((2 * user.Level / 5) + 2)
 				movePower := float64(move.Power)
 				statRatio := float64(user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF])

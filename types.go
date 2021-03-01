@@ -9,13 +9,21 @@ import (
 
 // Constants for looking up Pokemon stats
 const (
+	// Base stats
 	STAT_HP = iota
 	STAT_ATK
 	STAT_DEF
 	STAT_SPATK
 	STAT_SPDEF
 	STAT_SPD
+	// Fighting stats
+	STAT_CRIT_CHANCE
+	STAT_ACCURACY
+	STAT_EVASION
 )
+
+// Table of critical hit chances (denominator of 1/X)
+var CRIT_CHANCE = [5]int{16, 8, 4, 3, 2}
 
 const (
 	MAX_STAT_MODIFIER = 6
