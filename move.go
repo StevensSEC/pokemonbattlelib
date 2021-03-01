@@ -61,10 +61,10 @@ type Move struct {
 }
 
 // Retrieves a Pokemon move given its move ID
-func GetMove(id int) Move {
+func GetMove(id int) *Move {
 	for _, m := range ALL_MOVES {
 		if m.ID == id {
-			return m
+			return &m
 		}
 	}
 	panic("move not found")
