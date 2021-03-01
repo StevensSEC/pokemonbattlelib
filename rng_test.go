@@ -25,9 +25,9 @@ var _ = Describe("LCRNG type", func() {
 
 	It("should roll predictably", func() {
 		gen = LCRNG(1337)
-		Expect(gen.Roll(1, 10)).To(BeTrue())
-		Expect(gen.Roll(1, 10)).To(BeFalse())
-		Expect(gen.Roll(5, 9)).To(BeTrue())
-		Expect(gen.Roll(5, 9)).To(BeFalse())
+		Expect(gen.Roll(1, 2)).To(BeTrue())
+		Expect(gen.Roll(1, 2)).To(BeFalse())
+		Expect(gen.Roll(5, 8)).To(BeTrue())
+		Expect(gen.Roll(5, 8)).To(BeFalse())
 	})
 })

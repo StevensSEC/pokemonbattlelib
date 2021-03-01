@@ -146,7 +146,7 @@ var _ = Describe("One round of battle", func() {
 		party2 = NewOccupiedParty(&agent2, 1, squirtle)
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
-		battle.SetSeed(1337)
+		battle.SetSeed(2)
 	})
 
 	It("starts without error", func() {

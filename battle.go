@@ -159,13 +159,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
-				var success bool
+				immobilize := false
 				if user.StatusEffects.check(StatusFreeze) {
-					success = b.rng.Roll(1, 5)
+					immobilize = b.rng.Roll(4, 5)
 				} else if user.StatusEffects.check(StatusParalyze) {
-					success = b.rng.Roll(1, 4)
+					immobilize = b.rng.Roll(1, 4)
 				}
-				if !success {
+				if immobilize {
 					b.QueueTransaction(ImmobilizeTransaction{
 						Target: target{
 							Pokemon: user,
