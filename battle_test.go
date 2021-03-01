@@ -764,10 +764,9 @@ var _ = Describe("Status Conditions", func() {
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
-		b.SetSeed(1337)
+		b.SetSeed(1)
 		Expect(b.Start()).To(Succeed())
 		transactions, _ := b.SimulateRound()
-
 		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is paralyzed and is unable to move."))
 	})
 

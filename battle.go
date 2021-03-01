@@ -163,7 +163,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				if user.StatusEffects.check(StatusFreeze) {
 					success = b.rng.Roll(1, 5)
 				} else if user.StatusEffects.check(StatusParalyze) {
-					success = b.rng.Roll(3, 4)
+					success = b.rng.Roll(1, 4)
 				}
 				if !success {
 					b.QueueTransaction(ImmobilizeTransaction{
