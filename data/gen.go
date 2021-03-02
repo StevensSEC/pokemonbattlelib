@@ -444,7 +444,7 @@ func main() {
 		items = append(items, item)
 	}
 	// Add item data to generated output
-	output += "// A collection of all items in the game\n" + "var ALL_ITEMS = []Item{\n"
+	output += "// A collection of all items in the game\n" + "var AllItems = []Item{\n"
 	for _, item := range items {
 		output += fmt.Sprintf("\t{ID: %s, Name: \"%s\", Category: %d, FlingPower: %d, FlingEffect: %d, Flags: %s},\n",
 			item.ID, item_names[item.ID], item.CategoryID, item.FlingPower, item.FlingEffectID, strings.Join(item.Flags, " | "))
@@ -464,7 +464,7 @@ func main() {
 	fluctuating_leveling := make([]int, 101)
 
 	output += "//A table of levels mapped to the total experience at that level for each growth rate\n" +
-		"var EXP_TABLE = map[int]map[int]int{\n"
+		"var ExpTable = map[int]map[int]int{\n"
 
 	for {
 		record, err := experience_csv.Read()

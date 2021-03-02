@@ -165,7 +165,7 @@ func (p *Pokemon) GainLevels(levels int) {
 	}
 
 	p.Level = uint8(newLevel)
-	p.TotalExperience = uint(EXP_TABLE[p.GetGrowthRate()][int(p.Level)])
+	p.TotalExperience = uint(ExpTable[p.GetGrowthRate()][int(p.Level)])
 	p.computeStats()
 }
 
@@ -176,7 +176,7 @@ func (p *Pokemon) GainExperience(exp int) {
 		panic(fmt.Sprintf("%s's experience tried to decrease by %d", p.GetName(), exp))
 	}
 
-	max_exp := EXP_TABLE[p.GetGrowthRate()][MaxLevel]
+	max_exp := ExpTable[p.GetGrowthRate()][MaxLevel]
 
 	// if would gain experience beyond leveling to 100, set level to 100
 	if int(p.TotalExperience)+exp > max_exp {
@@ -185,12 +185,12 @@ func (p *Pokemon) GainExperience(exp int) {
 	}
 
 	remaining_exp := exp
-	toNextLevel := EXP_TABLE[p.GetGrowthRate()][int(p.Level+1)] - int(p.TotalExperience)
+	toNextLevel := ExpTable[p.GetGrowthRate()][int(p.Level+1)] - int(p.TotalExperience)
 
 	for remaining_exp >= toNextLevel {
 		p.GainLevels(1)
 		remaining_exp -= toNextLevel
-		toNextLevel = EXP_TABLE[p.GetGrowthRate()][int(p.Level+1)] - int(p.TotalExperience)
+		toNextLevel = ExpTable[p.GetGrowthRate()][int(p.Level+1)] - int(p.TotalExperience)
 	}
 
 	// add whats left

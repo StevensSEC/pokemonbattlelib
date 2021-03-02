@@ -1705,7 +1705,7 @@ const (
 )
 
 // A collection of all items in the game
-var ALL_ITEMS = []Item{
+var AllItems = []Item{
 	{ID: 1, Name: "Master Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
 	{ID: 2, Name: "Ultra Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
 	{ID: 3, Name: "Great Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
@@ -1932,7 +1932,7 @@ var ALL_ITEMS = []Item{
 }
 
 //A table of levels mapped to the total experience at that level for each growth rate
-var EXP_TABLE = map[int]map[int]int{
+var ExpTable = map[int]map[int]int{
 	GrowthSlow: {
 		0:   0,
 		1:   0,

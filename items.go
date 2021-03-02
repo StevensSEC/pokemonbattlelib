@@ -93,10 +93,10 @@ const (
 )
 
 // Retrieves an item using its ID
-// Can also use constants like ITEM_POTION or ITEM_REVIVE
+// Can also use constants like ItemPotion or ItemRevive
 // For item effects, see https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/item_prose.csv
 func GetItem(itemID int) Item {
-	for _, item := range ALL_ITEMS {
+	for _, item := range AllItems {
 		if item.ID == itemID {
 			return item
 		}
