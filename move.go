@@ -33,20 +33,20 @@ const (
 type MoveTarget int
 
 const (
-	TARGET_SPECIFIC_MOVE MoveTarget = iota + 1
-	TARGET_SELECTED_ME_FIRST
-	TARGET_ALLY
-	TARGET_USERS_FIELD
-	TARGET_USER_OR_ALLY
-	TARGET_OPPONENTS_FIELD
-	TARGET_USER
-	TARGET_RANDOM_OPPONENT
-	TARGET_ALL_OTHERS
-	TARGET_SELECTED
-	TARGET_ALL_OPPONENTS
-	TARGET_ENTIRE_FIELD
-	TARGET_USER_AND_ALLIES
-	TARGET_ALL
+	MoveTargetSpecificMove MoveTarget = iota + 1
+	MoveTargetSelectedMeFirst
+	MoveTargetAlly
+	MoveTargetUsersField
+	MoveTargetUserOrAlly
+	MoveTargetOpponentsField
+	MoveTargetUser
+	MoveTargetRandomOpponent
+	MoveTargetAllOthers
+	MoveTargetSelected
+	MoveTargetAllOpponents
+	MoveTargetEntireField
+	MoveTargetUserAndAllies
+	MoveTargetAll
 )
 
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
