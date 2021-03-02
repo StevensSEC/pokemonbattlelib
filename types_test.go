@@ -225,7 +225,7 @@ var _ = Describe("Status conditions", func() {
 			{
 				name:  "Should not clear freeze",
 				from:  StatusParalyze,
-				clear: StatusConfusion,
+				clear: StatusFreeze,
 				want:  StatusParalyze,
 			},
 			{
