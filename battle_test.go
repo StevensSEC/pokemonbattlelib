@@ -25,7 +25,7 @@ type healAgent struct{}
 
 // Always uses a potion on first Pokemon
 func (a healAgent) Act(ctx *BattleContext) Turn {
-	item := GetItem(ITEM_POTION)
+	item := GetItem(ItemPotion)
 	for _, target := range ctx.Allies {
 		return ItemTurn{
 			Item:   &item,
@@ -52,8 +52,8 @@ func TestRcAgent(t *testing.T) {
 	a2 := newRcAgent()
 	_a1 := Agent(a1)
 	_a2 := Agent(a2)
-	pkmn1 := GeneratePokemon(4, WithMoves(GetMove(MOVE_POUND)))
-	pkmn2 := GeneratePokemon(7, WithMoves(GetMove(MOVE_POUND)))
+	pkmn1 := GeneratePokemon(4, WithMoves(GetMove(MovePound)))
+	pkmn2 := GeneratePokemon(7, WithMoves(GetMove(MovePound)))
 	party1 := NewOccupiedParty(&_a1, 0, pkmn1)
 	party2 := NewOccupiedParty(&_a2, 1, pkmn2)
 	b := NewBattle()
@@ -104,7 +104,7 @@ var _ = Describe("Battle", func() {
 
 		It("panics when adding too many Pokemon to a party", func() {
 			party := NewParty(&agent1, 0)
-			for i := 0; i < MAX_PARTY_SIZE; i += 1 {
+			for i := 0; i < MaxPartySize; i += 1 {
 				party.AddPokemon(GeneratePokemon(1))
 			}
 			Expect(func() {
@@ -140,9 +140,9 @@ var _ = Describe("One round of battle", func() {
 	BeforeEach(func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
-		charmander = GeneratePokemon(4, WithMoves(GetMove(MOVE_POUND)))
+		charmander = GeneratePokemon(4, WithMoves(GetMove(MovePound)))
 		party1 = NewOccupiedParty(&agent1, 0, charmander)
-		squirtle = GeneratePokemon(7, WithMoves(GetMove(MOVE_POUND)))
+		squirtle = GeneratePokemon(7, WithMoves(GetMove(MovePound)))
 		party2 = NewOccupiedParty(&agent2, 1, squirtle)
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
@@ -173,7 +173,7 @@ var _ = Describe("One round of battle", func() {
 			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
 			log1 := transactions[1].BattleLog()
 			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 3 damage."))
-			pound := GetMove(MOVE_POUND)
+			pound := GetMove(MovePound)
 			Expect(transactions).To(HaveTransaction(DamageTransaction{
 				User: charmander,
 				Target: target{
@@ -200,16 +200,16 @@ var _ = Describe("One round of battle", func() {
 		It("should cause Pokemon to have reduced HP", func() {
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(charmander.CurrentHP < charmander.Stats[STAT_HP]).To(BeTrue())
-			Expect(squirtle.CurrentHP < squirtle.Stats[STAT_HP]).To(BeTrue())
+			Expect(charmander.CurrentHP < charmander.Stats[StatHP]).To(BeTrue())
+			Expect(squirtle.CurrentHP < squirtle.Stats[StatHP]).To(BeTrue())
 		})
 	})
 
 	Context("should deal the correct amount of damage", func() {
 		It("should account for same-type attack bonus", func() {
 			// TODO: remove when elemental type added
-			charmander.Elemental = Fire
-			charmander.Moves[0] = GetMove(MOVE_EMBER)
+			charmander.Type = TypeFire
+			charmander.Moves[0] = GetMove(MoveEmber)
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
 			Expect(squirtle.CurrentHP).To(BeEquivalentTo(6))
@@ -389,11 +389,11 @@ var _ = Describe("Move priority", func() {
 	})
 
 	Specify("Moves with higher priority should go first", func() {
-		p1 := GeneratePokemon(1, WithLevel(5), WithMoves(GetMove(MOVE_POUND)))
-		p1.Stats[STAT_SPD] = 100
+		p1 := GeneratePokemon(1, WithLevel(5), WithMoves(GetMove(MovePound)))
+		p1.Stats[StatSpeed] = 100
 		party1 := NewOccupiedParty(&a1, 0, p1)
-		p2 := GeneratePokemon(4, WithLevel(5), WithMoves(GetMove(MOVE_FAKE_OUT)))
-		p2.Stats[STAT_SPD] = 10
+		p2 := GeneratePokemon(4, WithLevel(5), WithMoves(GetMove(MoveFakeOut)))
+		p2.Stats[StatSpeed] = 10
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
@@ -436,7 +436,7 @@ var _ = Describe("Pokemon speed", func() {
 	BeforeEach(func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
-		pound = GetMove(MOVE_POUND)
+		pound = GetMove(MovePound)
 		charmander = GeneratePokemon(4, WithMoves(pound))
 		ninjask = GeneratePokemon(291, WithMoves(pound))
 		party1 = NewOccupiedParty(&agent1, 0, charmander)
@@ -532,32 +532,32 @@ var _ = Describe("Weather", func() {
 	Context("Weather should be caused by moves/abilities", func() {
 		// TODO: https://bulbapedia.bulbagarden.net/wiki/Weather#Causing_weather
 		It("should change to clear skies from defog", func() {
-			poke1 := GeneratePokemon(1, WithMoves(GetMove(MOVE_DEFOG)))
-			poke2 := GeneratePokemon(1, WithMoves(GetMove(MOVE_POUND)))
+			poke1 := GeneratePokemon(1, WithMoves(GetMove(MoveDefog)))
+			poke2 := GeneratePokemon(1, WithMoves(GetMove(MovePound)))
 			p1.AddPokemon(poke1)
 			p2.AddPokemon(poke2)
-			b.Weather = WEATHER_HAIL
+			b.Weather = WeatherFog
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			Expect(transactions).To(HaveTransaction(WeatherTransaction{
-				Weather: WEATHER_CLEAR_SKIES,
+				Weather: WeatherClearSkies,
 			}))
 		})
 	})
 
 	Context("Weather has effects in battle", func() {
-		ember := GetMove(MOVE_EMBER)
-		bubble := GetMove(MOVE_BUBBLE)
-		tackle := GetMove(MOVE_TACKLE)
-		solarBeam := GetMove(MOVE_SOLAR_BEAM)
-		weatherBall := GetMove(MOVE_WEATHER_BALL)
-		moonlight := GetMove(MOVE_MOONLIGHT)
+		ember := GetMove(MoveEmber)
+		bubble := GetMove(MoveBubble)
+		tackle := GetMove(MoveTackle)
+		solarBeam := GetMove(MoveSolarBeam)
+		weatherBall := GetMove(MoveWeatherBall)
+		moonlight := GetMove(MoveMoonlight)
 		It("should affect fire/water attacks during harsh sunlight", func() {
 			charmander := GeneratePokemon(4, WithLevel(100), WithMoves(ember))
 			squirtle := GeneratePokemon(7, WithLevel(100), WithMoves(bubble))
 			p1.AddPokemon(charmander)
 			p2.AddPokemon(squirtle)
-			b.Weather = WEATHER_HARSH_SUNLIGHT
+			b.Weather = WeatherHarshSunlight
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			// Fire boosted
@@ -594,7 +594,7 @@ var _ = Describe("Weather", func() {
 			squirtle := GeneratePokemon(7, WithLevel(100), WithMoves(bubble))
 			p1.AddPokemon(charmander)
 			p2.AddPokemon(squirtle)
-			b.Weather = WEATHER_RAIN
+			b.Weather = WeatherRain
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			// Fire weakened
@@ -628,11 +628,11 @@ var _ = Describe("Weather", func() {
 		})
 		It("should damage/cause side effects during sandstorm", func() {
 			geodude := GeneratePokemon(74, WithLevel(50), WithMoves(tackle))
-			geodude.Elemental = Rock | Ground
+			geodude.Type = TypeRock | TypeGround
 			bulbasaur := GeneratePokemon(1, WithLevel(50), WithMoves(solarBeam))
 			p1.AddPokemon(geodude)
 			p2.AddPokemon(bulbasaur)
-			b.Weather = WEATHER_SANDSTORM
+			b.Weather = WeatherSandstorm
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			Expect(transactions).To(HaveLen(3))
@@ -663,11 +663,11 @@ var _ = Describe("Weather", func() {
 		})
 		It("should damage/cause side effects during hail", func() {
 			articuno := GeneratePokemon(144, WithMoves(tackle))
-			articuno.Elemental = Ice
+			articuno.Type = TypeIce
 			bulbasaur := GeneratePokemon(1, WithMoves(solarBeam))
 			p1.AddPokemon(articuno)
 			p2.AddPokemon(bulbasaur)
-			b.Weather = WEATHER_HAIL
+			b.Weather = WeatherHail
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			Expect(transactions).To(HaveLen(3))
@@ -701,7 +701,7 @@ var _ = Describe("Weather", func() {
 			bulbasaur := GeneratePokemon(1, WithLevel(50), WithMoves(solarBeam))
 			p1.AddPokemon(castform)
 			p2.AddPokemon(bulbasaur)
-			b.Weather = WEATHER_FOG
+			b.Weather = WeatherFog
 			b.SetSeed(777777)
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
@@ -759,11 +759,11 @@ var _ = Describe("Fainting", func() {
 	BeforeEach(func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
-		scary_monster := GeneratePokemon(7, WithLevel(100), WithMoves(GetMove(MOVE_POUND)))
-		scary_monster.Stats[STAT_SPD] = 1
+		scary_monster := GeneratePokemon(7, WithLevel(100), WithMoves(GetMove(MovePound)))
+		scary_monster.Stats[StatSpeed] = 1
 		party1 = NewOccupiedParty(&agent1, 0,
-			GeneratePokemon(4, WithMoves(GetMove(MOVE_POUND))),
-			GeneratePokemon(387, WithMoves(GetMove(MOVE_POUND))),
+			GeneratePokemon(4, WithMoves(GetMove(MovePound))),
+			GeneratePokemon(387, WithMoves(GetMove(MovePound))),
 		)
 		party2 = NewOccupiedParty(&agent2, 1, scary_monster)
 		battle = NewBattle()
@@ -810,10 +810,10 @@ var _ = Describe("Fainting", func() {
 
 	Context("Fainting causes friendship to be lost", func() {
 		It("should lose 1 friendship when fainting", func() {
-			dies := GeneratePokemon(1, WithLevel(1), WithMoves(GetMove(MOVE_POUND)))
+			dies := GeneratePokemon(1, WithLevel(1), WithMoves(GetMove(MovePound)))
 			dies.Friendship = 100
 			p1 := NewOccupiedParty(&agent1, 0, dies)
-			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(25), WithMoves(GetMove(MOVE_POUND))))
+			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(25), WithMoves(GetMove(MovePound))))
 			battle = NewBattle()
 			battle.AddParty(p1, p2)
 			Expect(battle.Start()).To(Succeed())
@@ -821,12 +821,12 @@ var _ = Describe("Fainting", func() {
 			Expect(dies.Friendship).To(Equal(99))
 		})
 		It("should lose 5 or 10 friendship when fainting", func() {
-			dies := GeneratePokemon(1, WithLevel(1), WithMoves(GetMove(MOVE_POUND)))
+			dies := GeneratePokemon(1, WithLevel(1), WithMoves(GetMove(MovePound)))
 			dies.Friendship = 100
-			dies2 := GeneratePokemon(1, WithLevel(1), WithMoves(GetMove(MOVE_POUND)))
+			dies2 := GeneratePokemon(1, WithLevel(1), WithMoves(GetMove(MovePound)))
 			dies2.Friendship = 200
 			p1 := NewOccupiedParty(&agent1, 0, dies, dies2)
-			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(100), WithMoves(GetMove(MOVE_POUND))))
+			p2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(4, WithLevel(100), WithMoves(GetMove(MovePound))))
 			battle = NewBattle()
 			battle.AddParty(p1, p2)
 			Expect(battle.Start()).To(Succeed())
@@ -841,12 +841,12 @@ var _ = Describe("Fainting", func() {
 		a1 := Agent(dumbAgent{})
 		a2 := Agent(dumbAgent{})
 		party1 := NewParty(&a1, 0)
-		pkmn1 := GeneratePokemon(4, WithLevel(3), WithMoves(GetMove(MOVE_POUND)))
+		pkmn1 := GeneratePokemon(4, WithLevel(3), WithMoves(GetMove(MovePound)))
 		pkmn1.CurrentHP = 1
 		party1.AddPokemon(pkmn1)
 		party2 := NewParty(&a2, 1)
-		pkmn2 := GeneratePokemon(7, WithLevel(10), WithMoves(GetMove(MOVE_POUND)))
-		pkmn2.Stats[STAT_SPD] = 255
+		pkmn2 := GeneratePokemon(7, WithLevel(10), WithMoves(GetMove(MovePound)))
+		pkmn2.Stats[StatSpeed] = 255
 		party2.AddPokemon(pkmn2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
@@ -905,13 +905,13 @@ var _ = Describe("Fainting", func() {
 		a1 := Agent(dumbAgent{})
 		a2 := Agent(dumbAgent{})
 		party1 := NewParty(&a1, 0)
-		pkmn1 := GeneratePokemon(4, WithLevel(3), WithMoves(GetMove(MOVE_POUND)))
-		pkmn2 := GeneratePokemon(7, WithLevel(10), WithMoves(GetMove(MOVE_POUND)))
-		pkmn3 := GeneratePokemon(387, WithLevel(3), WithMoves(GetMove(MOVE_POUND)))
+		pkmn1 := GeneratePokemon(4, WithLevel(3), WithMoves(GetMove(MovePound)))
+		pkmn2 := GeneratePokemon(7, WithLevel(10), WithMoves(GetMove(MovePound)))
+		pkmn3 := GeneratePokemon(387, WithLevel(3), WithMoves(GetMove(MovePound)))
 		pkmn1.CurrentHP = 1
 		party1.AddPokemon(pkmn1, pkmn3)
 		party2 := NewParty(&a2, 1)
-		pkmn2.Stats[STAT_SPD] = 255
+		pkmn2.Stats[StatSpeed] = 255
 		party2.AddPokemon(pkmn2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
@@ -955,10 +955,10 @@ var _ = Describe("Ending a battle", func() {
 	BeforeEach(func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
-		low_health_pkmn := GeneratePokemon(4, WithMoves(GetMove(MOVE_POUND)))
+		low_health_pkmn := GeneratePokemon(4, WithMoves(GetMove(MovePound)))
 		low_health_pkmn.CurrentHP = 1
 		party1 = NewOccupiedParty(&agent1, 0, low_health_pkmn)
-		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(7, WithMoves(GetMove(MOVE_POUND))))
+		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(7, WithMoves(GetMove(MovePound))))
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
 		battle.SetSeed(1337)
@@ -1011,10 +1011,10 @@ var _ = Describe("Status Conditions", func() {
 	})
 
 	It("should inflict burn and poison damage", func() {
-		p1 := GeneratePokemon(1, WithMoves(GetMove(MOVE_POUND)))
+		p1 := GeneratePokemon(1, WithMoves(GetMove(MovePound)))
 		p1.StatusEffects = StatusPoison
 		party1 := NewOccupiedParty(&a1, 0, p1)
-		p2 := GeneratePokemon(2, WithMoves(GetMove(MOVE_POUND)))
+		p2 := GeneratePokemon(2, WithMoves(GetMove(MovePound)))
 		p2.StatusEffects = StatusBurn
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
@@ -1043,10 +1043,10 @@ var _ = Describe("Status Conditions", func() {
 	})
 
 	It("should inflict badly poisoned damage", func() {
-		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MOVE_POUND)))
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MovePound)))
 		p1.StatusEffects = StatusBadlyPoison
 		party1 := NewOccupiedParty(&a1, 0, p1)
-		p2 := GeneratePokemon(2, WithMoves(GetMove(MOVE_POUND)))
+		p2 := GeneratePokemon(2, WithMoves(GetMove(MovePound)))
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
@@ -1070,10 +1070,10 @@ var _ = Describe("Status Conditions", func() {
 	})
 
 	Specify("Paralysis", func() {
-		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MOVE_POUND)))
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MovePound)))
 		p1.StatusEffects = StatusParalyze
 		party1 := NewOccupiedParty(&a1, 0, p1)
-		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(GetMove(MOVE_POUND)))
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(GetMove(MovePound)))
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
@@ -1084,10 +1084,10 @@ var _ = Describe("Status Conditions", func() {
 	})
 
 	Specify("Freeze", func() {
-		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MOVE_POUND)))
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MovePound)))
 		p1.StatusEffects = StatusFreeze
 		party1 := NewOccupiedParty(&a1, 0, p1)
-		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(GetMove(MOVE_POUND)))
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(GetMove(MovePound)))
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
@@ -1099,10 +1099,10 @@ var _ = Describe("Status Conditions", func() {
 	})
 
 	Specify("Sleep", func() {
-		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MOVE_POUND)))
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MovePound)))
 		p1.StatusEffects = StatusSleep
 		party1 := NewOccupiedParty(&a1, 0, p1)
-		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(GetMove(MOVE_POUND)))
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(GetMove(MovePound)))
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
@@ -1114,10 +1114,10 @@ var _ = Describe("Status Conditions", func() {
 	})
 
 	It("Should cure paralysis", func() {
-		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MOVE_POUND)))
+		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MovePound)))
 		p1.StatusEffects = StatusParalyze
 		party1 := NewOccupiedParty(&a1, 0, p1)
-		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(GetMove(MOVE_POUND)))
+		p2 := GeneratePokemon(4, WithLevel(4), WithMoves(GetMove(MovePound)))
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)

@@ -22,7 +22,7 @@ func (smartAgent) Act(ctx *BattleContext) Turn {
 	}
 	best := 0
 	for i, target := range ctx.Opponents {
-		if target.Pokemon.Stats[STAT_DEF] < ctx.Opponents[best].Pokemon.Stats[STAT_DEF] {
+		if target.Pokemon.Stats[StatDef] < ctx.Opponents[best].Pokemon.Stats[StatDef] {
 			best = i
 		}
 	}
@@ -38,10 +38,10 @@ func randParty() *party {
 	count := rand.Intn(5) + 1
 	for j := 0; j < count; j++ {
 		p := GeneratePokemon(rand.Intn(493), WithLevel(uint8(47+rand.Intn(6))))
-		p.Moves[0] = &ALL_MOVES[rand.Intn(len(ALL_MOVES))]
-		p.Moves[1] = &ALL_MOVES[rand.Intn(len(ALL_MOVES))]
-		p.Moves[2] = &ALL_MOVES[rand.Intn(len(ALL_MOVES))]
-		p.Moves[3] = &ALL_MOVES[rand.Intn(len(ALL_MOVES))]
+		p.Moves[0] = &AllMoves[rand.Intn(len(AllMoves))]
+		p.Moves[1] = &AllMoves[rand.Intn(len(AllMoves))]
+		p.Moves[2] = &AllMoves[rand.Intn(len(AllMoves))]
+		p.Moves[3] = &AllMoves[rand.Intn(len(AllMoves))]
 		party.AddPokemon(p)
 	}
 	return party

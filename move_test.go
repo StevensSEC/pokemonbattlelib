@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("Get move by ID", func() {
 	It("should get the correct move", func() {
-		m := GetMove(MOVE_POUND)
+		m := GetMove(MovePound)
 		Expect(m.Name).To(Equal("Pound"))
 	})
 
@@ -28,8 +28,8 @@ var _ = Describe("Move string representation", func() {
 		{
 			move: Move{
 				Name:     "Shadow Ball",
-				Type:     Ghost,
-				Category: Special,
+				Type:     TypeGhost,
+				Category: MoveCategorySpecial,
 				MaxPP:    15,
 				Priority: 0,
 				Power:    80,
@@ -47,9 +47,9 @@ var _ = Describe("Move string representation", func() {
 
 var _ = Describe("Move category", func() {
 	It("should show correct string for move category", func() {
-		Expect(Status.String()).To(Equal("Status"))
-		Expect(Physical.String()).To(Equal("Physical"))
-		Expect(Special.String()).To(Equal("Special"))
+		Expect(MoveCategoryStatus.String()).To(Equal("Status"))
+		Expect(MoveCategoryPhysical.String()).To(Equal("Physical"))
+		Expect(MoveCategorySpecial.String()).To(Equal("Special"))
 		Expect(func() {
 			var _ = MoveCategory(99).String()
 		}).To(Panic())
