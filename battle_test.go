@@ -169,18 +169,13 @@ var _ = Describe("One round of battle", func() {
 		It("should create 2 damage transactions", func() {
 			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
-			log0 := transactions[0].BattleLog()
-			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
-			log1 := transactions[1].BattleLog()
-			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 3 damage."))
 			pound := GetMove(MOVE_POUND)
 			Expect(transactions).To(HaveTransaction(DamageTransaction{
 				User: charmander,
 				Target: target{
-					Pokemon:   *squirtle,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
+					Pokemon: *squirtle,
+					party:   1,
+					Team:    1,
 				},
 				Move:   pound,
 				Damage: 3,
@@ -188,10 +183,7 @@ var _ = Describe("One round of battle", func() {
 			Expect(transactions).To(HaveTransaction(DamageTransaction{
 				User: squirtle,
 				Target: target{
-					Pokemon:   *charmander,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
+					Pokemon: *charmander,
 				},
 				Move:   pound,
 				Damage: 3,
@@ -232,11 +224,15 @@ var _ = Describe("One round of battle", func() {
 		It("should miss moves randomly", func() {
 			battle.rng = &NeverRNG
 			Expect(battle.Start()).To(Succeed())
-			logs, _ := battle.SimulateRound()
-			Expect(logs[0].BattleLog()).To(Equal("Charmander's attack missed!"))
+			t, _ := battle.SimulateRound()
+			Expect(t).To(HaveTransaction(EvadeTransaction{
+				User: charmander,
+			}))
 			battle.rng = &SimpleRNG
-			logs, _ = battle.SimulateRound()
-			Expect(logs[0].BattleLog()).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
+			t, _ = battle.SimulateRound()
+			Expect(t).ToNot(HaveTransaction(EvadeTransaction{
+				User: charmander,
+			}))
 		})
 	})
 })
@@ -400,24 +396,27 @@ var _ = Describe("Move priority", func() {
 		b.SetSeed(1337)
 		Expect(b.Start()).To(Succeed())
 		transactions, _ := b.SimulateRound()
-		Expect(len(transactions)).To(Equal(2))
-
-		logtest := []struct {
-			turn Transaction
-			want string
-		}{
-			{
-				turn: transactions[0],
-				want: "Charmander used Fake Out on Bulbasaur for 5 damage.",
+		Expect(transactions).To(HaveLen(2))
+		Expect(transactions).To(HaveTransactionsInOrder(
+			DamageTransaction{
+				User: p2,
+				Target: target{
+					Pokemon: *p1,
+				},
+				Damage: 5,
+				Move:   GetMove(MOVE_FAKE_OUT),
 			},
-			{
-				turn: transactions[1],
-				want: "Bulbasaur used Pound on Charmander for 5 damage.",
+			DamageTransaction{
+				User: p1,
+				Target: target{
+					Pokemon: *p2,
+					party:   1,
+					Team:    1,
+				},
+				Damage: 5,
+				Move:   GetMove(MOVE_POUND),
 			},
-		}
-		for _, tt := range logtest {
-			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
-		}
+		))
 	})
 })
 
@@ -461,19 +460,11 @@ var _ = Describe("Pokemon speed", func() {
 		Specify("faster Pokemon should go first", func() {
 			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
-			log0 := transactions[0].BattleLog()
-			Expect(log0).To(Equal("Ninjask used Pound on Charmander for 3 damage."))
-			log1 := transactions[1].BattleLog()
-			Expect(log1).To(Equal("Charmander used Pound on Ninjask for 3 damage."))
-
 			Expect(transactions).To(HaveTransactionsInOrder(
 				DamageTransaction{
 					User: ninjask,
 					Target: target{
-						Pokemon:   *charmander,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
+						Pokemon: *charmander,
 					},
 					Move:   pound,
 					Damage: 3,
@@ -481,10 +472,9 @@ var _ = Describe("Pokemon speed", func() {
 				DamageTransaction{
 					User: charmander,
 					Target: target{
-						Pokemon:   *ninjask,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
+						Pokemon: *ninjask,
+						party:   1,
+						Team:    1,
 					},
 					Move:   pound,
 					Damage: 3,
@@ -548,26 +538,27 @@ var _ = Describe("Fainting", func() {
 		It("should log all transactions as expected", func() {
 			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
-			log0 := transactions[0].BattleLog()
-			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 2 damage."))
 			// Charmander smashed his nubby little fist into Squirtle as
 			// hard as he could. Spectators gasped and winced when the
 			// impact created a very audible crack. But it was not
 			// Squirtle's shell that broke, it was Charmanders knuckles.
 			// The Squirtle was unfazed.
-			log1 := transactions[1].BattleLog()
-			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 674 damage."))
 			// Ash watched in horror as his Charmander was obliterated from the
 			// battlefield. "Critical hit!" echoed the automated announcer. The
 			// Squirtle snarled, now covered in the entrails of his previous
 			// opponent. "OH GOD, WHAT THE FUCK!?" sobbed Ash, "Is my friend
 			// really gone forever? Please tell me I'm dreaming, this can't be real!"
-			log2 := transactions[2].BattleLog()
-			Expect(log2).To(Equal("Charmander fainted."))
-			log3 := transactions[3].BattleLog()
-			Expect(log3).To(Equal("Charmander's friendship changed by -5."))
-			log4 := transactions[4].BattleLog()
-			Expect(log4).To(Equal("Turtwig was sent out."))
+			Expect(transactions).To(HaveTransactionsInOrder(
+				FaintTransaction{
+					Target: target{
+						Pokemon: *battle.parties[0].pokemon[0],
+					},
+				}, SendOutTransaction{
+					Target: target{
+						Pokemon:   *battle.parties[0].pokemon[1],
+						partySlot: 1,
+					},
+				}))
 		})
 	})
 
@@ -617,48 +608,22 @@ var _ = Describe("Fainting", func() {
 		Expect(b.Start()).To(Succeed())
 		transactions, ended := b.SimulateRound()
 		Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
-		Expect(len(transactions)).To(Equal(4), "Expected 4 transactions to occur")
-		logtest := []struct {
-			turn Transaction
-			want string
-		}{
-			{
-				turn: transactions[0],
-				want: "Squirtle used Pound on Charmander for 11 damage.",
-			},
-			{
-				turn: transactions[1],
-				want: "Charmander fainted.",
-			},
-			{
-				turn: transactions[3],
-				want: "The battle has ended.",
-			},
-		}
-		for _, tt := range logtest {
-			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
-		}
-
+		Expect(transactions).To(HaveLen(4))
 		Expect(transactions).To(HaveTransactionsInOrder(
 			FaintTransaction{
 				Target: target{
-					Pokemon:   *pkmn1,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
+					Pokemon: *pkmn1,
 				},
 			},
 			EndBattleTransaction{},
 		))
-
 		Expect(transactions).ToNot(HaveTransaction(
 			DamageTransaction{
 				User: pkmn1,
 				Target: target{
-					Pokemon:   *pkmn2,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
+					Pokemon: *pkmn2,
+					party:   1,
+					Team:    1,
 				},
 			},
 		))
@@ -680,29 +645,32 @@ var _ = Describe("Fainting", func() {
 		b.AddParty(party1, party2)
 		b.SetSeed(1337)
 		Expect(b.Start()).To(Succeed())
-		transactions, ended := b.SimulateRound()
+		t, ended := b.SimulateRound()
 		Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
-		Expect(len(transactions)).To(Equal(4), "Expected 4 transactions to occur")
-		logtest := []struct {
-			turn Transaction
-			want string
-		}{
-			{
-				turn: transactions[0],
-				want: "Squirtle used Pound on Charmander for 11 damage.",
+		Expect(t).To(HaveLen(4), "Expected 4 transactions to occur")
+		Expect(t).To(HaveTransactionsInOrder(
+			FaintTransaction{
+				Target: target{
+					Pokemon: *pkmn1,
+				},
 			},
-			{
-				turn: transactions[1],
-				want: "Charmander fainted.",
+			SendOutTransaction{
+				Target: target{
+					Pokemon:   *pkmn3,
+					partySlot: 1,
+				},
 			},
-			{
-				turn: transactions[3],
-				want: "Turtwig was sent out.",
+		))
+		Expect(t).ToNot(HaveTransaction(
+			DamageTransaction{
+				User: pkmn1,
+				Target: target{
+					Pokemon: *pkmn2,
+					party:   1,
+					Team:    1,
+				},
 			},
-		}
-		for _, tt := range logtest {
-			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
-		}
+		))
 	})
 })
 
@@ -748,16 +716,14 @@ var _ = Describe("Ending a battle", func() {
 		It("should log all transaction correctly", func() {
 			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
-			log0 := transactions[0].BattleLog()
-			Expect(log0).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
-			log1 := transactions[1].BattleLog()
-			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 3 damage."))
-			log2 := transactions[2].BattleLog()
-			Expect(log2).To(Equal("Charmander fainted."))
-			log3 := transactions[3].BattleLog()
-			Expect(log3).To(Equal("Charmander's friendship changed by -1."))
-			log4 := transactions[4].BattleLog()
-			Expect(log4).To(Equal("The battle has ended."))
+			Expect(transactions).To(HaveTransactionsInOrder(
+				FaintTransaction{
+					Target: target{
+						Pokemon: *battle.parties[0].pokemon[0],
+					},
+				},
+				EndBattleTransaction{},
+			))
 		})
 	})
 })
@@ -784,52 +750,45 @@ var _ = Describe("Status Conditions", func() {
 		b.AddParty(party1, party2)
 		b.SetSeed(1337)
 		Expect(b.Start()).To(Succeed())
-		transactions, _ := b.SimulateRound()
-		Expect(len(transactions)).To(Equal(4), "Expected only 4 transactions to occur in a round")
-
-		logtest := []struct {
-			turn Transaction
-			want string
-		}{
-			{
-				turn: transactions[2],
-				want: "Bulbasaur took 1 damage from being poisoned.",
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveLen(4), "Expected only 4 transactions to occur in a round")
+		Expect(t).To(HaveTransaction(DamageTransaction{
+			Target: target{
+				Pokemon: *p1,
 			},
-			{
-				turn: transactions[3],
-				want: "Ivysaur took 1 damage from being burned.",
+			Damage:       1,
+			StatusEffect: StatusPoison,
+		}))
+		Expect(t).To(HaveTransaction(DamageTransaction{
+			Target: target{
+				Pokemon: *p2,
+				party:   1,
+				Team:    1,
 			},
-		}
-		for _, tt := range logtest {
-			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
-		}
+			Damage:       1,
+			StatusEffect: StatusBurn,
+		}))
 	})
 
 	It("should inflict badly poisoned damage", func() {
-		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MOVE_POUND)))
+		p1 := GeneratePokemon(1, WithLevel(100), WithMoves(GetMove(MOVE_POUND)))
 		p1.StatusEffects = StatusBadlyPoison
 		party1 := NewOccupiedParty(&a1, 0, p1)
-		p2 := GeneratePokemon(2, WithMoves(GetMove(MOVE_POUND)))
+		p2 := GeneratePokemon(2, WithLevel(100), WithMoves(GetMove(MOVE_POUND)))
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
 		b.SetSeed(1337)
 		Expect(b.Start()).To(Succeed())
-		transactions, _ := b.SimulateRound()
-		Expect(len(transactions)).To(Equal(3), "Expected only 3 transactions to occur in a round")
-
-		logtest := []struct {
-			turn Transaction
-			want string
-		}{
-			{
-				turn: transactions[2],
-				want: "Bulbasaur took 1 damage from being badly poisoned.",
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveLen(3), "Expected only 3 transactions to occur in a round")
+		Expect(t).To(HaveTransaction(DamageTransaction{
+			Target: target{
+				Pokemon: *p1,
 			},
-		}
-		for _, tt := range logtest {
-			Expect(tt.turn.BattleLog()).To(Equal(tt.want))
-		}
+			Damage:       12,
+			StatusEffect: StatusBadlyPoison,
+		}))
 	})
 
 	Specify("Paralysis", func() {
@@ -888,10 +847,7 @@ var _ = Describe("Status Conditions", func() {
 		Expect(b.Start()).To(Succeed())
 		b.QueueTransaction(CureStatusTransaction{
 			Target: target{
-				Pokemon:   *p1,
-				party:     0,
-				partySlot: 0,
-				Team:      0,
+				Pokemon: *p1,
 			},
 			Status: StatusParalyze,
 		})

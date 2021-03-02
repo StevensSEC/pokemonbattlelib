@@ -19,22 +19,23 @@ type DamageTransaction struct {
 }
 
 func (t DamageTransaction) BattleLog() string {
-	if t.User != nil && t.Move != nil {
-		return fmt.Sprintf("%s used %s on %s for %d damage.",
-			t.User.GetName(),
-			t.Move.Name,
-			t.Target.Pokemon.GetName(),
-			t.Damage,
-		)
-	} else if t.StatusEffect != StatusNone {
-		return fmt.Sprintf("%s took %d damage from being %s.",
-			t.Target.Pokemon.GetName(),
-			t.Damage,
-			t.StatusEffect,
-		)
-	} else {
-		panic("I don't know how to log this DamageTransaction.")
-	}
+	return "REMOVE"
+	// if t.User != nil && t.Move != nil {
+	// 	return fmt.Sprintf("%s used %s on %s for %d damage.",
+	// 		t.User.GetName(),
+	// 		t.Move.Name,
+	// 		t.Target.Pokemon.GetName(),
+	// 		t.Damage,
+	// 	)
+	// } else if t.StatusEffect != StatusNone {
+	// 	return fmt.Sprintf("%s took %d damage from being %s.",
+	// 		t.Target.Pokemon.GetName(),
+	// 		t.Damage,
+	// 		t.StatusEffect,
+	// 	)
+	// } else {
+	// 	panic("I don't know how to log this DamageTransaction.")
+	// }
 }
 
 func (t DamageTransaction) Mutate(b *Battle) {
