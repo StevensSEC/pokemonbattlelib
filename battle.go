@@ -201,13 +201,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			if move.Category == MoveCategoryStatus {
-				if move.ID == MOVE_STUN_SPORE {
+				if move.ID == MoveStunSpore {
 					b.QueueTransaction(InflictStatusTransaction{
 						Target: receiver,
 						Status: StatusParalyze,
 					})
 				}
-				if move.ID == MOVE_DEFOG {
+				if move.ID == MoveDefog {
 					if b.Weather == WeatherFog {
 						b.QueueTransaction(WeatherTransaction{
 							Weather: WeatherClearSkies,
@@ -215,7 +215,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					}
 				}
 				if b.Weather == WeatherFog {
-					if move.ID == MOVE_MOONLIGHT || move.ID == MOVE_SYNTHESIS || move.ID == MOVE_MORNING_SUN {
+					if move.ID == MoveMoonlight || move.ID == MoveSynthesis || move.ID == MoveMorningSun {
 						b.QueueTransaction(HealTransaction{
 							Target: self,
 							Amount: self.Stats[StatHP] / 4,
@@ -255,18 +255,18 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					if receiver.Type&TypeRock != 0 {
 						defense *= 1.5
 					}
-					if move.ID == MOVE_SOLAR_BEAM {
+					if move.ID == MoveSolarBeam {
 						movePower /= 2
 					}
 				}
-				if b.Weather == WeatherHail && move.ID == MOVE_SOLAR_BEAM {
+				if b.Weather == WeatherHail && move.ID == MoveSolarBeam {
 					movePower /= 2
 				}
 				if b.Weather == WeatherFog {
-					if move.ID == MOVE_WEATHER_BALL {
+					if move.ID == MoveWeatherBall {
 						movePower *= 2
 					}
-					if move.ID == MOVE_SOLAR_BEAM {
+					if move.ID == MoveSolarBeam {
 						movePower /= 2
 					}
 				}

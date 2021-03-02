@@ -12,10 +12,10 @@ import (
 	"strings"
 )
 
-const ENGLISH_LANGUAGE_ID = 9
-const NATIONAL_DEX_ID = 1
-const HIGHEST_GEN = 4
-const HIGHEST_DEX_NUM = 493
+const EnglishLanguageID = 9
+const NationalDexID = 1
+const HighestGen = 4
+const HighestDexNum = 493
 
 type data_pokemon struct {
 	Identifier     string
@@ -72,9 +72,8 @@ func parseInt(s string) (n int) {
 }
 
 func cleanName(s string) string {
-	name := strings.ToUpper(s)
-	name = strings.ReplaceAll(name, "É", "E")
-	name = strings.ReplaceAll(name, " ", "_")
+	name := strings.ReplaceAll(s, "É", "E")
+	name = strings.ReplaceAll(name, " ", "")
 	re, err := regexp.Compile(`[^a-zA-Z_0-9]`)
 	if err != nil {
 		log.Panicln(err)
@@ -168,7 +167,7 @@ func main() {
 			break
 		}
 		gen_id := parseInt(record[2])
-		if gen_id <= HIGHEST_GEN {
+		if gen_id <= HighestGen {
 			group_id := parseInt(record[0])
 			valid_version_groups = append(valid_version_groups, group_id)
 		}
@@ -237,7 +236,7 @@ func main() {
 			break
 		}
 		lang := parseInt(record[1])
-		if lang != ENGLISH_LANGUAGE_ID {
+		if lang != EnglishLanguageID {
 			continue
 		}
 		sid := parseInt(record[0])
@@ -259,7 +258,7 @@ func main() {
 			break
 		}
 		dexid := parseInt(record[1])
-		if dexid != NATIONAL_DEX_ID {
+		if dexid != NationalDexID {
 			continue
 		}
 		sid := parseInt(record[0])
@@ -287,9 +286,9 @@ func main() {
 	log.Println("Getting all available moves")
 	moves_csv := getCsvReader("data/moves.csv")
 	moveMap := map[int]string{
-		1: "Status",
-		2: "Physical",
-		3: "Special",
+		1: "MoveCategoryStatus",
+		2: "MoveCategoryPhysical",
+		3: "MoveCategorySpecial",
 	}
 	for {
 		record, err := moves_csv.Read()
@@ -297,7 +296,7 @@ func main() {
 			break
 		}
 		gid := parseInt(record[2])
-		if gid > HIGHEST_GEN {
+		if gid > HighestGen {
 			continue
 		}
 		mid := parseInt(record[0])
@@ -331,7 +330,7 @@ func main() {
 			break
 		}
 		lang := parseInt(record[1])
-		if lang != ENGLISH_LANGUAGE_ID {
+		if lang != EnglishLanguageID {
 			continue
 		}
 		mid := parseInt(record[0])
@@ -361,9 +360,9 @@ func main() {
 			break
 		}
 	}
-	output += "var ALL_MOVES = []Move{\n"
+	output += "var AllMoves = []Move{\n"
 	for _, p := range moves {
-		output += fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: MoveCategory%s, CurrentPP: %d, MaxPP: %d,"+
+		output += fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, CurrentPP: %d, MaxPP: %d,"+
 			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Targets, p.Priority, p.Power, p.Accuracy)
 	}
 	output += "}\n\n"
@@ -371,7 +370,7 @@ func main() {
 	output += "// Create move constant enum for quick reference\nconst (\n"
 	for _, m := range moves {
 		name := cleanName(m.Name)
-		output += fmt.Sprintf("\tMOVE_%s = %v\n", name, m.Id)
+		output += fmt.Sprintf("\tMove%s = %v\n", name, m.Id)
 	}
 	output += ")\n\n"
 	// Generate hold item data
@@ -416,12 +415,12 @@ func main() {
 		if _, ok := item_flags[r[0]]; !ok {
 			continue
 		}
-		if parseInt(r[1]) != ENGLISH_LANGUAGE_ID {
+		if parseInt(r[1]) != EnglishLanguageID {
 			continue
 		}
 		item_names[r[0]] = r[2]
 		name := cleanName(r[2])
-		output += fmt.Sprintf("\tITEM_%s = %v\n", name, r[0])
+		output += fmt.Sprintf("\tItem%s = %v\n", name, r[0])
 	}
 	output += ")\n"
 	items := make([]data_item, 0)
@@ -504,7 +503,7 @@ func main() {
 	log.Println("Mapping growth rates to dex numbers")
 	// map growth rates to pokemon national dex numbers
 	pokemon_species_csv := getCsvReader("data/pokemon_species.csv")
-	growth_rates := make([]int, HIGHEST_DEX_NUM+1)
+	growth_rates := make([]int, HighestDexNum+1)
 
 	for {
 		record, err := pokemon_species_csv.Read()
@@ -520,7 +519,7 @@ func main() {
 			continue
 		}
 
-		if dex_num > HIGHEST_DEX_NUM {
+		if dex_num > HighestDexNum {
 			break
 		}
 
@@ -546,7 +545,7 @@ func main() {
 	output += "var pokemonBaseStats = map[int][6]int{\n"
 
 	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
-	base_stat_array := make([][]int, HIGHEST_DEX_NUM+1)
+	base_stat_array := make([][]int, HighestDexNum+1)
 	for i := range base_stat_array {
 		number_of_stats := 6
 		base_stat_array[i] = make([]int, number_of_stats)
@@ -561,7 +560,7 @@ func main() {
 
 		dex_num := parseInt(record[0])
 
-		if dex_num > HIGHEST_DEX_NUM {
+		if dex_num > HighestDexNum {
 			break
 		}
 

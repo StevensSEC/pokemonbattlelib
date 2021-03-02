@@ -94,8 +94,8 @@ var _ = Describe("Pokemon generation", func() {
 	})
 
 	It("generates a Pokemon with a given moveset", func() {
-		pound := GetMove(MOVE_POUND)
-		pursuit := GetMove(MOVE_PURSUIT)
+		pound := GetMove(MovePound)
+		pursuit := GetMove(MovePursuit)
 		pkmn := GeneratePokemon(393, WithMoves(pound, pursuit))
 		Expect(pkmn.Moves).To(BeEquivalentTo([MaxMoves]*Move{pound, pursuit, nil, nil}))
 	})
@@ -141,7 +141,7 @@ var _ = Describe("Pokemon generation", func() {
 	})
 
 	It("panics when creating a Pokemon with more than the maximum allowed moves", func() {
-		pound := GetMove(MOVE_POUND)
+		pound := GetMove(MovePound)
 		Expect(func() { GeneratePokemon(396, WithMoves(pound, pound, pound, pound, pound)) }).To(Panic())
 	})
 })
