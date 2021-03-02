@@ -177,7 +177,7 @@ var _ = Describe("Stringer interface", func() {
 
 	It("prints as expected", func() {
 		pkmn = GeneratePokemon(1, WithLevel(5))
-		pkmn.Gender = Female
+		pkmn.Gender = GenderFemale
 		want = "Bulbasaur♀\tLv5\nHP: 19/19\n"
 		Expect(fmt.Sprintf("%s", pkmn)).To(Equal(want))
 	})

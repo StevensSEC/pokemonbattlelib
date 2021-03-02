@@ -54,7 +54,7 @@ const (
 	TypeDark
 )
 
-var elementalTypeStrings = map[Type]string{
+var typeStrings = map[Type]string{
 	TypeNormal:   "Normal",
 	TypeFighting: "Fighting",
 	TypeFlying:   "Flying",
@@ -157,7 +157,7 @@ func (t Type) String() string {
 	result := ""
 	for i := TypeNormal; i <= TypeDark; i <<= 1 {
 		if t&i > 0 {
-			result += fmt.Sprintf("[%s]", elementalTypeStrings[i])
+			result += fmt.Sprintf("[%s]", typeStrings[i])
 		}
 	}
 	return result
@@ -166,17 +166,17 @@ func (t Type) String() string {
 type Gender int
 
 const (
-	Genderless Gender = iota
-	Female
-	Male
+	GenderGenderless Gender = iota
+	GenderFemale
+	GenderMale
 )
 
 func (g Gender) String() string {
-	if g == Genderless {
+	if g == GenderGenderless {
 		return ""
-	} else if g == Female {
+	} else if g == GenderFemale {
 		return "♀"
-	} else if g == Male {
+	} else if g == GenderMale {
 		return "♂"
 	} else {
 		panic("Stringing gender reached unhandled condition")

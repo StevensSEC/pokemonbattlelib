@@ -94,9 +94,9 @@ func TestElementalTypeString(t *testing.T) {
 
 var _ = Describe("Gender", func() {
 	It("should show correct string for gender", func() {
-		Expect(Genderless.String()).To(Equal(""))
-		Expect(Female.String()).To(Equal("♀"))
-		Expect(Male.String()).To(Equal("♂"))
+		Expect(GenderGenderless.String()).To(Equal(""))
+		Expect(GenderFemale.String()).To(Equal("♀"))
+		Expect(GenderMale.String()).To(Equal("♂"))
 		Expect(func() {
 			var _ = Gender(-1).String()
 		}).To(Panic())
