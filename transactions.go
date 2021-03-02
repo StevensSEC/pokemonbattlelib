@@ -234,7 +234,7 @@ type ImmobilizeTransaction struct {
 func (t ImmobilizeTransaction) BattleLog() string {
 	return fmt.Sprintf("%s is %s and is unable to move.",
 		t.Target.Pokemon.GetName(),
-		t.Target.Pokemon.StatusEffects&NONVOLATILE_STATUS_MASK)
+		t.Target.Pokemon.StatusEffects&StatusNonvolatileMask)
 }
 
 func (t ImmobilizeTransaction) Mutate(b *Battle) {

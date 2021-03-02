@@ -171,7 +171,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Target: target{
 							Pokemon: user,
 						},
-						StatusEffect: user.StatusEffects & NONVOLATILE_STATUS_MASK,
+						StatusEffect: user.StatusEffects & StatusNonvolatileMask,
 					})
 					continue // forfeit turn
 				}
@@ -305,7 +305,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Team:      party.team,
 			}
 			if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
-				cond := pkmn.StatusEffects & NONVOLATILE_STATUS_MASK
+				cond := pkmn.StatusEffects & StatusNonvolatileMask
 				var damage uint
 				switch cond {
 				case StatusBurn, StatusPoison:

@@ -241,14 +241,14 @@ var statusStrings = map[StatusCondition]string{
 }
 
 const (
-	NONVOLATILE_STATUS_MASK StatusCondition = 0b111
-	VOLATILE_STATUS_MASK    StatusCondition = math.MaxUint32 ^ NONVOLATILE_STATUS_MASK
+	StatusNonvolatileMask StatusCondition = 0b111
+	StatusVolatileMask    StatusCondition = math.MaxUint32 ^ StatusNonvolatileMask
 )
 
 func (s *StatusCondition) check(c StatusCondition) bool {
-	vCheck := (*s&VOLATILE_STATUS_MASK)&(c&VOLATILE_STATUS_MASK) == c&VOLATILE_STATUS_MASK
-	if c&NONVOLATILE_STATUS_MASK > 0 {
-		nvCheck := (*s&NONVOLATILE_STATUS_MASK)^(c&NONVOLATILE_STATUS_MASK) == 0
+	vCheck := (*s&StatusVolatileMask)&(c&StatusVolatileMask) == c&StatusVolatileMask
+	if c&StatusNonvolatileMask > 0 {
+		nvCheck := (*s&StatusNonvolatileMask)^(c&StatusNonvolatileMask) == 0
 		return nvCheck && vCheck
 	} else {
 		return vCheck
@@ -257,11 +257,11 @@ func (s *StatusCondition) check(c StatusCondition) bool {
 
 // Applies the given status conditions to this status condition. Non-volatile status conditions are overwritten.
 func (s *StatusCondition) apply(c StatusCondition) {
-	nv := c & NONVOLATILE_STATUS_MASK
+	nv := c & StatusNonvolatileMask
 	if nv == 0 {
-		nv = *s & NONVOLATILE_STATUS_MASK
+		nv = *s & StatusNonvolatileMask
 	}
-	v := VOLATILE_STATUS_MASK & (*s | c)
+	v := StatusVolatileMask & (*s | c)
 	*s = nv | v
 }
 
