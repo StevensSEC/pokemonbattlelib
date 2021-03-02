@@ -222,7 +222,7 @@ func (t EndBattleTransaction) BattleLog() string {
 }
 
 func (t EndBattleTransaction) Mutate(b *Battle) {
-	b.State = BATTLE_END
+	b.State = BattleEnd
 }
 
 // Handles pre-turn status checks. (Paralysis, Sleeping, etc.)

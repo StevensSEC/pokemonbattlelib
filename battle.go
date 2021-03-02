@@ -23,16 +23,16 @@ type Battle struct {
 type BattleState int
 
 const (
-	BEFORE_START BattleState = iota
-	BATTLE_IN_PROGRESS
-	BATTLE_END
+	BattleBeforeStart BattleState = iota
+	BattleInProgress
+	BattleEnd
 )
 
 // Creates a new battle instance, setting initial conditions
 func NewBattle() *Battle {
 	rng := LCRNG(rand.Uint32())
 	b := Battle{
-		State: BEFORE_START,
+		State: BattleBeforeStart,
 		rng:   RNG(&rng),
 	}
 	return &b
@@ -89,7 +89,7 @@ func (b *Battle) Start() error {
 	// TODO: validate the battle, return error if invalid
 
 	// Initiate the battle! Send out the first pokemon in the parties.
-	b.State = BATTLE_IN_PROGRESS
+	b.State = BattleInProgress
 	for _, party := range b.parties {
 		party.SetActive(0)
 	}
@@ -98,7 +98,7 @@ func (b *Battle) Start() error {
 
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
 func (b *Battle) SimulateRound() ([]Transaction, bool) {
-	if b.State != BATTLE_IN_PROGRESS {
+	if b.State != BattleInProgress {
 		log.Panic("battle is not currently in progress")
 	}
 	// Collects all turn info from each active Pokemon
@@ -290,7 +290,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		}
 
 		b.ProcessQueue()
-		if b.State == BATTLE_END {
+		if b.State == BattleEnd {
 			break
 		}
 	}
@@ -348,7 +348,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	}
 	transactions := b.tProcessed
 	b.tProcessed = []Transaction{}
-	return transactions, b.State == BATTLE_END
+	return transactions, b.State == BattleEnd
 }
 
 // Add Transactions to the queue.
@@ -365,7 +365,7 @@ func (b *Battle) ProcessQueue() {
 
 		// add to the list of processed transactions
 		b.tProcessed = append(b.tProcessed, t)
-		if b.State == BATTLE_END {
+		if b.State == BattleEnd {
 			break
 		}
 	}
