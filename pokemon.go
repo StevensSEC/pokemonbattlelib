@@ -30,12 +30,12 @@ type Pokemon struct {
 
 // Constants for growth rates of a Pokemon
 const (
-	SLOW = iota + 1
-	MEDIUM_FAST
-	FAST
-	MEDIUM_SLOW
-	ERRATIC
-	FLUCTUATING
+	GrowthSlow = iota + 1
+	GrowthMediumFast
+	GrowthFast
+	GrowthMediumSlow
+	GrowthErratic
+	GrowthFluctuating
 )
 
 // Constants for IVs and EVs

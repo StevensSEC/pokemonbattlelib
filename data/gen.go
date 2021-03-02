@@ -151,12 +151,12 @@ func main() {
 	output := ""
 
 	growth_rate_strings := map[int]string{
-		1: "SLOW",
-		2: "MEDIUM_FAST",
-		3: "FAST",
-		4: "MEDIUM_SLOW",
-		5: "ERRATIC",
-		6: "FLUCTUATING",
+		1: "GrowthSlow",
+		2: "GrowthMediumFast",
+		3: "GrowthFast",
+		4: "GrowthMediumSlow",
+		5: "GrowthErratic",
+		6: "GrowthFluctuating",
 	}
 
 	// get all valid version ids
@@ -493,12 +493,12 @@ func main() {
 		}
 	}
 
-	output += createLevelTableStringFromArray("SLOW", slow_leveling) + ","
-	output += createLevelTableStringFromArray("MEDIUM_FAST", med_fast_leveling) + ","
-	output += createLevelTableStringFromArray("FAST", fast_leveling) + ","
-	output += createLevelTableStringFromArray("MEDIUM_SLOW", med_slow_leveling) + ","
-	output += createLevelTableStringFromArray("ERRATIC", erratic_leveling) + ","
-	output += createLevelTableStringFromArray("FLUCTUATING", fluctuating_leveling) + ","
+	output += createLevelTableStringFromArray("GrowthSlow", slow_leveling) + ","
+	output += createLevelTableStringFromArray("GrowthMediumFast", med_fast_leveling) + ","
+	output += createLevelTableStringFromArray("GrowthFast", fast_leveling) + ","
+	output += createLevelTableStringFromArray("GrowthMediumSlow", med_slow_leveling) + ","
+	output += createLevelTableStringFromArray("GrowthErratic", erratic_leveling) + ","
+	output += createLevelTableStringFromArray("GrowthFluctuating", fluctuating_leveling) + ","
 	output += "}\n\n"
 
 	log.Println("Mapping growth rates to dex numbers")
