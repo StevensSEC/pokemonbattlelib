@@ -73,6 +73,8 @@ func parseInt(s string) (n int) {
 
 func cleanName(s string) string {
 	name := strings.ToUpper(s)
+	name = strings.ReplaceAll(name, "♀", "F")
+	name = strings.ReplaceAll(name, "♂", "M")
 	name = strings.ReplaceAll(name, "É", "E")
 	name = strings.ReplaceAll(name, " ", "_")
 	re, err := regexp.Compile(`[^a-zA-Z_0-9]`)
@@ -282,6 +284,15 @@ func main() {
 		output += fmt.Sprintf("\t%d: \"%s\",\n", p.NatDex, p.Name)
 	}
 	output += "}\n\n"
+	output += "// Pokemon const enum for quick lookup\nconst (\n"
+	for _, p := range pokemon {
+		if p.NatDex == 0 {
+			continue
+		}
+		name := cleanName(p.Name)
+		output += fmt.Sprintf("\tPkmn%s = %v\n", name, p.NatDex)
+	}
+	output += ")\n\n"
 	// find all moves
 	moves := []data_move{}
 	log.Println("Getting all available moves")
