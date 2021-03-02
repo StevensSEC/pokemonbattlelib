@@ -27,7 +27,7 @@ var _ = Describe("Pokemon generation", func() {
 			CurrentHP:       20,
 			IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 			EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-			Nature:          GetNature(HARDY),
+			Nature:          GetNature(NatureHardy),
 			Stats:           [6]uint{20, 10, 10, 11, 10, 9},
 		}
 		Expect(p).To(Equal(want))
@@ -42,7 +42,7 @@ var _ = Describe("Pokemon generation", func() {
 			CurrentHP:       20,
 			IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 			EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-			Nature:          GetNature(HARDY),
+			Nature:          GetNature(NatureHardy),
 			Stats:           [6]uint{20, 10, 10, 11, 10, 9},
 		}
 		Expect(p).To(Equal(want))
@@ -57,7 +57,7 @@ var _ = Describe("Pokemon generation", func() {
 			CurrentHP:       21,
 			IVs:             [6]uint8{31, 31, 31, 31, 31, 31},
 			EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-			Nature:          GetNature(HARDY),
+			Nature:          GetNature(NatureHardy),
 			Stats:           [6]uint{21, 11, 11, 12, 12, 10},
 		}
 		Expect(pkmn).To(Equal(want))
@@ -72,14 +72,14 @@ var _ = Describe("Pokemon generation", func() {
 			CurrentHP:       20,
 			IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 			EVs:             [6]uint8{0, 252, 6, 0, 0, 252},
-			Nature:          GetNature(HARDY),
+			Nature:          GetNature(NatureHardy),
 			Stats:           [6]uint{20, 13, 10, 11, 10, 12},
 		}
 		Expect(pkmn).To(Equal(want))
 	})
 
 	It("generates a Pokemon with a given Nature", func() {
-		pkmn := GeneratePokemon(393, WithLevel(5), WithNature(GetNature(ADAMANT)))
+		pkmn := GeneratePokemon(393, WithLevel(5), WithNature(GetNature(NatureAdamant)))
 		want := &Pokemon{
 			NatDex:          393,
 			Level:           5,
@@ -87,7 +87,7 @@ var _ = Describe("Pokemon generation", func() {
 			CurrentHP:       20,
 			IVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 			EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
-			Nature:          GetNature(ADAMANT),
+			Nature:          GetNature(NatureAdamant),
 			Stats:           [6]uint{20, 11, 10, 9, 10, 9},
 		}
 		Expect(pkmn).To(Equal(want))
@@ -107,7 +107,7 @@ var _ = Describe("Pokemon generation", func() {
 			WithLevel(78),
 			WithIVs([6]uint8{24, 12, 30, 16, 23, 5}),
 			WithEVs([6]uint8{74, 190, 91, 48, 84, 23}),
-			WithNature(GetNature(ADAMANT)))
+			WithNature(GetNature(NatureAdamant)))
 		want := &Pokemon{
 			NatDex:          445, // garchomp
 			Level:           78,
@@ -115,7 +115,7 @@ var _ = Describe("Pokemon generation", func() {
 			CurrentHP:       289,
 			IVs:             [6]uint8{24, 12, 30, 16, 23, 5},
 			EVs:             [6]uint8{74, 190, 91, 48, 84, 23},
-			Nature:          GetNature(ADAMANT),
+			Nature:          GetNature(NatureAdamant),
 			Stats:           [6]uint{289, 278, 193, 135, 171, 171},
 		}
 		Expect(pkmn).To(Equal(want))

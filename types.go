@@ -304,42 +304,42 @@ type Nature struct {
 
 // Constants for looking up natures
 const (
-	HARDY = iota + 1
-	LONELY
-	ADAMANT
-	NAUGHTY
-	BRAVE
-	BOLD
-	DOCILE
-	IMPISH
-	LAX
-	RELAXED
-	MODEST
-	MILD
-	BASHFUL
-	RASH
-	QUIET
-	CALM
-	GENTLE
-	CAREFUL
-	QUIRKY
-	SASSY
-	TIMID
-	HASTY
-	JOLLY
-	NAIVE
-	SERIOUS
+	NatureHardy = iota + 1
+	NatureLonely
+	NatureAdamant
+	NatureNaughty
+	NatureBrave
+	NatureBold
+	NatureDocile
+	NatureImpish
+	NatureLax
+	NatureRelaxed
+	NatureModest
+	NatureMild
+	NatureBashful
+	NatureRash
+	NatureQuiet
+	NatureCalm
+	NatureGentle
+	NatureCareful
+	NatureQuirky
+	NatureSassy
+	NatureTimid
+	NatureHasty
+	NatureJolly
+	NatureNaive
+	NatureSerious
 )
 
 func GetNature(nature int) *Nature {
 	natures := map[int]*Nature{
 		//TODO: add all natures
-		HARDY: {
+		NatureHardy: {
 			StatUp:   StatAtk,
 			StatDown: StatAtk,
 			name:     "Hardy",
 		},
-		ADAMANT: {
+		NatureAdamant: {
 			StatUp:   StatAtk,
 			StatDown: StatSpAtk,
 			name:     "Adamant",
