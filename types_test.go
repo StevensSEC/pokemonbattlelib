@@ -239,6 +239,30 @@ func TestStatusConditionClear(t *testing.T) {
 			clear: StatusBound,
 			want:  StatusSleep | StatusLeechSeed,
 		},
+		{
+			name:  "Should not clear status that does not exist",
+			from:  StatusNone,
+			clear: StatusBurn,
+			want:  StatusNone,
+		},
+		{
+			name:  "Should not clear freeze",
+			from:  StatusParalyze,
+			clear: StatusConfusion,
+			want:  StatusParalyze,
+		},
+		{
+			name:  "Should clear only existing effects",
+			from:  StatusParalyze | StatusBound | StatusCantEscape,
+			clear: StatusConfusion | StatusBound | StatusCantEscape,
+			want:  StatusParalyze,
+		},
+		{
+			name:  "Should clear all non-volatile effects",
+			from:  StatusBurn | StatusConfusion,
+			clear: NONVOLATILE_STATUS_MASK,
+			want:  StatusConfusion,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("Status Condition clear: %s", tt.name), func(t *testing.T) {

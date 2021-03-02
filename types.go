@@ -266,9 +266,7 @@ func (s *StatusCondition) apply(c StatusCondition) {
 
 // Clears the given status conditions from this status condition.
 func (s *StatusCondition) clear(c StatusCondition) {
-	if s.check(c) {
-		*s ^= c
-	}
+	*s &= ^c
 }
 
 func (s StatusCondition) String() string {
