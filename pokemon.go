@@ -25,7 +25,7 @@ type Pokemon struct {
 	Moves             [MaxMoves]*Move // the moves the Pokemon currenly knows
 	Friendship        int             // how close this Pokemon is to its Trainer
 	OriginalTrainerID uint16          // a number associated with the first Trainer who caught this Pokemon
-	Elemental         ElementalType   // Indicates what type(s) (up to 2 simultaneously) this pokemon has
+	Type              Type            // Indicates what type(s) (up to 2 simultaneously) this pokemon has
 }
 
 // Constants for growth rates of a Pokemon

@@ -53,7 +53,7 @@ const (
 type Move struct {
 	ID        int
 	Name      string
-	Type      ElementalType
+	Type      Type
 	Category  MoveCategory
 	Targets   MoveTarget
 	CurrentPP int

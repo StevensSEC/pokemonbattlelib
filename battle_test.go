@@ -208,7 +208,7 @@ var _ = Describe("One round of battle", func() {
 	Context("should deal the correct amount of damage", func() {
 		It("should account for same-type attack bonus", func() {
 			// TODO: remove when elemental type added
-			charmander.Elemental = Fire
+			charmander.Type = TypeFire
 			charmander.Moves[0] = GetMove(MOVE_EMBER)
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
@@ -628,7 +628,7 @@ var _ = Describe("Weather", func() {
 		})
 		It("should damage/cause side effects during sandstorm", func() {
 			geodude := GeneratePokemon(74, WithLevel(50), WithMoves(tackle))
-			geodude.Elemental = Rock | Ground
+			geodude.Type = TypeRock | TypeGround
 			bulbasaur := GeneratePokemon(1, WithLevel(50), WithMoves(solarBeam))
 			p1.AddPokemon(geodude)
 			p2.AddPokemon(bulbasaur)
@@ -663,7 +663,7 @@ var _ = Describe("Weather", func() {
 		})
 		It("should damage/cause side effects during hail", func() {
 			articuno := GeneratePokemon(144, WithMoves(tackle))
-			articuno.Elemental = Ice
+			articuno.Type = TypeIce
 			bulbasaur := GeneratePokemon(1, WithMoves(solarBeam))
 			p1.AddPokemon(articuno)
 			p2.AddPokemon(bulbasaur)

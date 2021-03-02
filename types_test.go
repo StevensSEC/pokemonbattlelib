@@ -10,43 +10,43 @@ import (
 
 func TestGetEffect(t *testing.T) {
 	tests := []struct {
-		move ElementalType
-		def  ElementalType
+		move Type
+		def  Type
 		want Effectiveness
 	}{
 		{
-			move: Water,
-			def:  Fire,
+			move: TypeWater,
+			def:  TypeFire,
 			want: SuperEffective,
 		},
 		{
-			move: Grass,
-			def:  Water,
+			move: TypeGrass,
+			def:  TypeWater,
 			want: SuperEffective,
 		},
 		{
-			move: Fire,
-			def:  Water,
+			move: TypeFire,
+			def:  TypeWater,
 			want: Ineffective,
 		},
 		{
-			move: Ghost,
-			def:  Normal,
+			move: TypeGhost,
+			def:  TypeNormal,
 			want: NoEffect,
 		},
 		{
-			move: Steel,
-			def:  Ground,
+			move: TypeSteel,
+			def:  TypeGround,
 			want: NormalEffect,
 		},
 		{
-			move: Fire,
-			def:  Fire | Water,
+			move: TypeFire,
+			def:  TypeFire | TypeWater,
 			want: VeryIneffective,
 		},
 		{
-			move: Water,
-			def:  Ground | Rock,
+			move: TypeWater,
+			def:  TypeGround | TypeRock,
 			want: VerySuperEffective,
 		},
 	}
@@ -62,23 +62,23 @@ func TestGetEffect(t *testing.T) {
 
 func TestElementalTypeString(t *testing.T) {
 	tests := []struct {
-		value ElementalType
+		value Type
 		want  string
 	}{
 		{
-			value: Water,
+			value: TypeWater,
 			want:  "[Water]",
 		},
 		{
-			value: Normal,
+			value: TypeNormal,
 			want:  "[Normal]",
 		},
 		{
-			value: Fire,
+			value: TypeFire,
 			want:  "[Fire]",
 		},
 		{
-			value: Fire | Grass,
+			value: TypeFire | TypeGrass,
 			want:  "[Fire][Grass]",
 		},
 	}

@@ -22,7 +22,7 @@ func (smartAgent) Act(ctx *BattleContext) Turn {
 	}
 	best := 0
 	for i, target := range ctx.Opponents {
-		if target.Pokemon.Stats[STAT_DEF] < ctx.Opponents[best].Pokemon.Stats[STAT_DEF] {
+		if target.Pokemon.Stats[StatDef] < ctx.Opponents[best].Pokemon.Stats[StatDef] {
 			best = i
 		}
 	}

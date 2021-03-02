@@ -23,54 +23,55 @@ const (
 )
 
 // Table of critical hit chances (denominator of 1/X)
-var CRIT_CHANCE = [5]int{16, 8, 4, 3, 2}
+var CritChances = [5]int{16, 8, 4, 3, 2}
 
+// The min and max number of stages that a stat can be modified is [-6, 6]
 const (
-	MAX_STAT_MODIFIER = 6
-	MIN_STAT_MODIFIER = -6
+	MaxStatModifier = 6
+	MinStatModifier = -6
 )
 
 // Represents a bit mask of all elemental types
-type ElementalType uint32
+type Type uint32
 
 const (
-	Normal ElementalType = 1 << iota
-	Fighting
-	Flying
-	Poison
-	Ground
-	Rock
-	Bug
-	Ghost
-	Steel
-	Fire
-	Water
-	Grass
-	Electric
-	Psychic
-	Ice
-	Dragon
-	Dark
+	TypeNormal Type = 1 << iota
+	TypeFighting
+	TypeFlying
+	TypePoison
+	TypeGround
+	TypeRock
+	TypeBug
+	TypeGhost
+	TypeSteel
+	TypeFire
+	TypeWater
+	TypeGrass
+	TypeElectric
+	TypePsychic
+	TypeIce
+	TypeDragon
+	TypeDark
 )
 
-var elementalTypeStrings = map[ElementalType]string{
-	Normal:   "Normal",
-	Fighting: "Fighting",
-	Flying:   "Flying",
-	Poison:   "Poison",
-	Ground:   "Ground",
-	Rock:     "Rock",
-	Bug:      "Bug",
-	Ghost:    "Ghost",
-	Steel:    "Steel",
-	Fire:     "Fire",
-	Water:    "Water",
-	Grass:    "Grass",
-	Electric: "Electric",
-	Psychic:  "Psychic",
-	Ice:      "Ice",
-	Dragon:   "Dragon",
-	Dark:     "Dark",
+var elementalTypeStrings = map[Type]string{
+	TypeNormal:   "Normal",
+	TypeFighting: "Fighting",
+	TypeFlying:   "Flying",
+	TypePoison:   "Poison",
+	TypeGround:   "Ground",
+	TypeRock:     "Rock",
+	TypeBug:      "Bug",
+	TypeGhost:    "Ghost",
+	TypeSteel:    "Steel",
+	TypeFire:     "Fire",
+	TypeWater:    "Water",
+	TypeGrass:    "Grass",
+	TypeElectric: "Electric",
+	TypePsychic:  "Psychic",
+	TypeIce:      "Ice",
+	TypeDragon:   "Dragon",
+	TypeDark:     "Dark",
 }
 
 // Represents effectiveness of an elemental type matchup.
@@ -85,57 +86,57 @@ const (
 	VerySuperEffective Effectiveness = 4
 )
 
-var noEffect = map[ElementalType]ElementalType{
-	Normal:   Ghost,
-	Fighting: Ghost,
-	Poison:   Steel,
-	Ground:   Flying,
-	Ghost:    Normal,
-	Electric: Ground,
-	Psychic:  Dark,
+var noEffect = map[Type]Type{
+	TypeNormal:   TypeGhost,
+	TypeFighting: TypeGhost,
+	TypePoison:   TypeSteel,
+	TypeGround:   TypeFlying,
+	TypeGhost:    TypeNormal,
+	TypeElectric: TypeGround,
+	TypePsychic:  TypeDark,
 }
 
-var halfEffect = map[ElementalType]ElementalType{
-	Normal:   Rock | Steel,
-	Fighting: Flying | Poison | Bug | Psychic,
-	Flying:   Rock | Steel | Electric,
-	Poison:   Poison | Ground | Rock | Ghost,
-	Ground:   Bug | Grass,
-	Rock:     Fighting | Ground | Steel,
-	Bug:      Fighting | Flying | Poison | Ghost | Steel | Fire,
-	Ghost:    Steel | Dark,
-	Steel:    Steel | Fire | Water | Electric,
-	Fire:     Rock | Fire | Water | Dragon,
-	Water:    Water | Grass | Dragon,
-	Grass:    Flying | Poison | Bug | Steel | Fire | Grass | Dragon,
-	Electric: Grass | Electric | Dragon,
-	Psychic:  Steel | Psychic,
-	Ice:      Steel | Fire | Water | Ice,
-	Dragon:   Steel,
-	Dark:     Fighting | Steel | Dark,
+var halfEffect = map[Type]Type{
+	TypeNormal:   TypeRock | TypeSteel,
+	TypeFighting: TypeFlying | TypePoison | TypeBug | TypePsychic,
+	TypeFlying:   TypeRock | TypeSteel | TypeElectric,
+	TypePoison:   TypePoison | TypeGround | TypeRock | TypeGhost,
+	TypeGround:   TypeBug | TypeGrass,
+	TypeRock:     TypeFighting | TypeGround | TypeSteel,
+	TypeBug:      TypeFighting | TypeFlying | TypePoison | TypeGhost | TypeSteel | TypeFire,
+	TypeGhost:    TypeSteel | TypeDark,
+	TypeSteel:    TypeSteel | TypeFire | TypeWater | TypeElectric,
+	TypeFire:     TypeRock | TypeFire | TypeWater | TypeDragon,
+	TypeWater:    TypeWater | TypeGrass | TypeDragon,
+	TypeGrass:    TypeFlying | TypePoison | TypeBug | TypeSteel | TypeFire | TypeGrass | TypeDragon,
+	TypeElectric: TypeGrass | TypeElectric | TypeDragon,
+	TypePsychic:  TypeSteel | TypePsychic,
+	TypeIce:      TypeSteel | TypeFire | TypeWater | TypeIce,
+	TypeDragon:   TypeSteel,
+	TypeDark:     TypeFighting | TypeSteel | TypeDark,
 }
 
-var doubleEffect = map[ElementalType]ElementalType{
-	Fighting: Normal | Rock | Steel | Ice | Dark,
-	Flying:   Fighting | Bug | Grass,
-	Poison:   Grass,
-	Ground:   Poison | Rock | Steel | Fire | Electric,
-	Rock:     Flying | Bug | Fire | Ice,
-	Bug:      Grass | Psychic | Dark,
-	Ghost:    Ghost | Psychic,
-	Steel:    Rock | Ice,
-	Fire:     Bug | Steel | Grass | Ice,
-	Water:    Ground | Rock | Fire,
-	Grass:    Ground | Rock | Water,
-	Electric: Flying | Water,
-	Psychic:  Fighting | Poison,
-	Ice:      Flying | Ground | Grass | Dragon,
-	Dragon:   Dragon,
-	Dark:     Ghost | Psychic,
+var doubleEffect = map[Type]Type{
+	TypeFighting: TypeNormal | TypeRock | TypeSteel | TypeIce | TypeDark,
+	TypeFlying:   TypeFighting | TypeBug | TypeGrass,
+	TypePoison:   TypeGrass,
+	TypeGround:   TypePoison | TypeRock | TypeSteel | TypeFire | TypeElectric,
+	TypeRock:     TypeFlying | TypeBug | TypeFire | TypeIce,
+	TypeBug:      TypeGrass | TypePsychic | TypeDark,
+	TypeGhost:    TypeGhost | TypePsychic,
+	TypeSteel:    TypeRock | TypeIce,
+	TypeFire:     TypeBug | TypeSteel | TypeGrass | TypeIce,
+	TypeWater:    TypeGround | TypeRock | TypeFire,
+	TypeGrass:    TypeGround | TypeRock | TypeWater,
+	TypeElectric: TypeFlying | TypeWater,
+	TypePsychic:  TypeFighting | TypePoison,
+	TypeIce:      TypeFlying | TypeGround | TypeGrass | TypeDragon,
+	TypeDragon:   TypeDragon,
+	TypeDark:     TypeGhost | TypePsychic,
 }
 
 // Get effectiveness of a given elemental type matchup.
-func GetElementalEffect(move, def ElementalType) Effectiveness {
+func GetElementalEffect(move, def Type) Effectiveness {
 	if noEffect[move]&def > 0 {
 		return NoEffect
 	}
@@ -152,10 +153,10 @@ func GetElementalEffect(move, def ElementalType) Effectiveness {
 	}
 }
 
-func (e ElementalType) String() string {
+func (t Type) String() string {
 	result := ""
-	for i := Normal; i <= Dark; i <<= 1 {
-		if e&i > 0 {
+	for i := TypeNormal; i <= TypeDark; i <<= 1 {
+		if t&i > 0 {
 			result += fmt.Sprintf("[%s]", elementalTypeStrings[i])
 		}
 	}

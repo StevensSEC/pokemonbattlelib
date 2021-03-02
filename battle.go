@@ -222,17 +222,17 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else {
 				weather := 1.0
-				if rain, sun := b.Weather == WEATHER_RAIN, b.Weather == WEATHER_HARSH_SUNLIGHT; (rain && move.Type == Water) || (sun && move.Type == Fire) {
+				if rain, sun := b.Weather == WEATHER_RAIN, b.Weather == WEATHER_HARSH_SUNLIGHT; (rain && move.Type == TypeWater) || (sun && move.Type == TypeFire) {
 					weather = 1.5
-				} else if (rain && move.Type == Fire) || (sun && move.Type == Water) {
+				} else if (rain && move.Type == TypeFire) || (sun && move.Type == TypeWater) {
 					weather = 0.5
 				}
 				crit := 1.0
-				if b.rng.Roll(1, CRIT_CHANCE[user.StatModifiers[StatCritChance]]) {
+				if b.rng.Roll(1, CritChances[user.StatModifiers[StatCritChance]]) {
 					crit = 2.0
 				}
 				stab := 1.0
-				if move != nil && user.Elemental&move.Type != 0 {
+				if move != nil && user.Type&move.Type != 0 {
 					stab = 1.5
 					if user.Ability != nil && user.Ability.ID == 91 { // Adaptability
 						stab = 2.0
@@ -250,7 +250,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 				// Weather modifiers
 				if b.Weather == WEATHER_SANDSTORM {
-					if receiver.Elemental&Rock != 0 {
+					if receiver.Type&TypeRock != 0 {
 						defense *= 1.5
 					}
 					if move.ID == MOVE_SOLAR_BEAM {
@@ -323,7 +323,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// damage from weather
 			// TODO: check for weather resisting abilities
 			if b.Weather == WEATHER_SANDSTORM {
-				if pkmn.Elemental&(Rock|Ground|Steel) == 0 {
+				if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
 					damage := pkmn.Stats[StatHP] / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
@@ -331,7 +331,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				}
 			} else if b.Weather == WEATHER_HAIL {
-				if pkmn.Elemental&Ice == 0 {
+				if pkmn.Type&TypeIce == 0 {
 					damage := pkmn.Stats[StatHP] / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,

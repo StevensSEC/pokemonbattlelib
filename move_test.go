@@ -28,7 +28,7 @@ var _ = Describe("Move string representation", func() {
 		{
 			move: Move{
 				Name:     "Shadow Ball",
-				Type:     Ghost,
+				Type:     TypeGhost,
 				Category: MoveCategorySpecial,
 				MaxPP:    15,
 				Priority: 0,
