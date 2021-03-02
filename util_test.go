@@ -13,6 +13,11 @@ import (
 
 // Used for custom gomega matchers. Checks to see if a is probably the same pokemon as b based on values that are unlikely to change as a result of a transaction.
 func comparePokemon(a, b *Pokemon) bool {
+	if a == nil && b == nil {
+		return true
+	} else if a == nil || b == nil {
+		return false
+	}
 	return a.NatDex == b.NatDex &&
 		a.Nature.name == b.Nature.name &&
 		a.Gender == b.Gender &&
