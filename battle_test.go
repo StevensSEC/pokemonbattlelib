@@ -1,8 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"testing"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -47,7 +45,7 @@ func newRcAgent() rcAgent {
 }
 
 // Example usage for rcAgent
-func TestRcAgent(t *testing.T) {
+var _ = Describe("RC Agent", func() {
 	a1 := newRcAgent()
 	a2 := newRcAgent()
 	_a1 := Agent(a1)
@@ -58,10 +56,7 @@ func TestRcAgent(t *testing.T) {
 	party2 := NewOccupiedParty(&_a2, 1, pkmn2)
 	b := NewBattle()
 	b.AddParty(party1, party2)
-	err := b.Start()
-	if err != nil {
-		panic(err)
-	}
+	Expect(b.Start()).To(Succeed())
 	a1 <- FightTurn{
 		Move: 0,
 		Target: target{
@@ -76,11 +71,7 @@ func TestRcAgent(t *testing.T) {
 			partySlot: 0,
 		},
 	}
-	// transactions, _ := b.SimulateRound()
-	// for _, t := range transactions {
-	// 	fmt.Printf("%s\n", t.BattleLog())
-	// }
-}
+})
 
 var _ = Describe("Battle", func() {
 	var (
