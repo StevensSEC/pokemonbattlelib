@@ -9,8 +9,8 @@ import (
 
 // A Pokemon battle. Enforces rules of the battle, and queries `Agent`s for turns.
 type Battle struct {
-	Weather  int  // one of the 6 in-battle weather conditions
-	ShiftSet bool // shift or set battle style for NPC trainer battles
+	Weather  Weather // one of the 6 in-battle weather conditions
+	ShiftSet bool    // shift or set battle style for NPC trainer battles
 	State    BattleState
 	rng      RNG
 
@@ -150,8 +150,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		turn := turns[0]
 		turns = turns[1:]
 		// here, we can't use the turn context's reference to the pokemon, because it is a copy of the ground truth pokemon
-		user := b.getPokemon(turn.User.party, turn.User.partySlot)
-		if user.CurrentHP == 0 {
+		self := b.getPokemon(turn.User.party, turn.User.partySlot)
+		if self.CurrentHP == 0 {
 			continue
 		}
 		switch t := turn.Turn.(type) {
@@ -187,10 +187,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 			// use the move
 			move := user.Moves[t.Move]
-			accuracy := move.Accuracy
+			accuracy := float64(move.Accuracy)
+			if b.Weather == WEATHER_FOG {
+				accuracy *= 3. / 5.
+			}
 			// Todo: account for receiver's evasion
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-			if !b.rng.Roll(accuracy, 100) {
+			if move.Accuracy != 0 && !b.rng.Roll(int(accuracy), 100) {
 				b.QueueTransaction(EvadeTransaction{
 					User: &user,
 				})
@@ -204,7 +207,26 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Status: StatusParalyze,
 					})
 				}
+				if move.ID == MOVE_DEFOG {
+					b.QueueTransaction(WeatherTransaction{
+						Weather: WEATHER_CLEAR_SKIES,
+					})
+				}
+				if b.Weather == WEATHER_FOG {
+					if move.ID == MOVE_MOONLIGHT || move.ID == MOVE_SYNTHESIS || move.ID == MOVE_MORNING_SUN {
+						b.QueueTransaction(HealTransaction{
+							Target: self,
+							Amount: self.Stats[STAT_HP] / 4,
+						})
+					}
+				}
 			} else {
+				weather := 1.0
+				if rain, sun := b.Weather == WEATHER_RAIN, b.Weather == WEATHER_HARSH_SUNLIGHT; (rain && move.Type == Water) || (sun && move.Type == Fire) {
+					weather = 1.5
+				} else if (rain && move.Type == Fire) || (sun && move.Type == Water) {
+					weather = 0.5
+				}
 				crit := 1.0
 				if b.rng.Roll(1, CRIT_CHANCE[user.StatModifiers[STAT_CRIT_CHANCE]]) {
 					crit = 2.0
@@ -216,14 +238,37 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						stab = 2.0
 					}
 				}
-				modifier := crit * stab // TODO: damage multiplers
+				modifier := weather * crit * stab
 				levelEffect := float64((2 * user.Level / 5) + 2)
 				movePower := float64(move.Power)
-				statRatio := float64(user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF])
+				attack := float64(user.Stats[STAT_ATK])
+				defense := float64(receiver.Stats[STAT_DEF])
+				// Move modifiers
 				if move.Category == Special {
-					statRatio = float64(user.Stats[STAT_SPATK] / receiver.Stats[STAT_SPDEF])
+					attack = float64(user.Stats[STAT_SPATK])
+					defense = float64(receiver.Stats[STAT_SPDEF])
 				}
-				damage := (((levelEffect * movePower * statRatio) / 50) + 2) * modifier
+				// Weather modifiers
+				if b.Weather == WEATHER_SANDSTORM {
+					if receiver.Elemental&Rock != 0 {
+						defense *= 1.5
+					}
+					if move.ID == MOVE_SOLAR_BEAM {
+						movePower /= 2
+					}
+				}
+				if b.Weather == WEATHER_HAIL && move.ID == MOVE_SOLAR_BEAM {
+					movePower /= 2
+				}
+				if b.Weather == WEATHER_FOG {
+					if move.ID == MOVE_WEATHER_BALL {
+						movePower *= 2
+					}
+					if move.ID == MOVE_SOLAR_BEAM {
+						movePower /= 2
+					}
+				}
+				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
 				b.QueueTransaction(DamageTransaction{
 					User:   &user,
 					Target: t.Target,
@@ -253,13 +298,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	// handle post turn status effects
 	for a, party := range b.parties {
 		for ap, pkmn := range party.activePokemon {
+			t := target{
+				party:     a,
+				partySlot: ap,
+				Pokemon:   *pkmn,
+				Team:      party.team,
+			}
 			if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
-				t := target{
-					party:     a,
-					partySlot: ap,
-					Pokemon:   *pkmn,
-					Team:      party.team,
-				}
 				cond := pkmn.StatusEffects & NONVOLATILE_STATUS_MASK
 				var damage uint
 				switch cond {
@@ -274,6 +319,25 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					Damage:       damage,
 					StatusEffect: cond,
 				})
+			}
+			// damage from weather
+			// TODO: check for weather resisting abilities
+			if b.Weather == WEATHER_SANDSTORM {
+				if pkmn.Elemental&(Rock|Ground|Steel) == 0 {
+					damage := pkmn.Stats[STAT_HP] / 16
+					b.QueueTransaction(DamageTransaction{
+						Target: t,
+						Damage: damage,
+					})
+				}
+			} else if b.Weather == WEATHER_HAIL {
+				if pkmn.Elemental&Ice == 0 {
+					damage := pkmn.Stats[STAT_HP] / 16
+					b.QueueTransaction(DamageTransaction{
+						Target: t,
+						Damage: damage,
+					})
+				}
 			}
 		}
 	}

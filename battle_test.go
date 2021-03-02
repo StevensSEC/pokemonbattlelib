@@ -510,6 +510,243 @@ var _ = Describe("Turn priority", func() {
 	})
 })
 
+var _ = Describe("Weather", func() {
+	var (
+		a1 Agent
+		a2 Agent
+		p1 *party
+		p2 *party
+		b  *Battle
+	)
+
+	BeforeEach(func() {
+		a1 = Agent(dumbAgent{})
+		a2 = Agent(dumbAgent{})
+		p1 = NewParty(&a1, 0)
+		p2 = NewParty(&a2, 1)
+		b = NewBattle()
+		b.AddParty(p1, p2)
+		b.SetSeed(1337)
+	})
+
+	Context("Weather should be caused by moves/abilities", func() {
+		// TODO: https://bulbapedia.bulbagarden.net/wiki/Weather#Causing_weather
+		It("should change to clear skies from defog", func() {
+			poke1 := GeneratePokemon(1, WithMoves(GetMove(MOVE_DEFOG)))
+			poke2 := GeneratePokemon(1, WithMoves(GetMove(MOVE_POUND)))
+			p1.AddPokemon(poke1)
+			p2.AddPokemon(poke2)
+			b.Weather = WEATHER_HAIL
+			Expect(b.Start()).To(Succeed())
+			transactions, _ := b.SimulateRound()
+			Expect(transactions).To(HaveTransaction(WeatherTransaction{
+				Weather: WEATHER_CLEAR_SKIES,
+			}))
+		})
+	})
+
+	Context("Weather has effects in battle", func() {
+		ember := GetMove(MOVE_EMBER)
+		bubble := GetMove(MOVE_BUBBLE)
+		tackle := GetMove(MOVE_TACKLE)
+		solarBeam := GetMove(MOVE_SOLAR_BEAM)
+		weatherBall := GetMove(MOVE_WEATHER_BALL)
+		moonlight := GetMove(MOVE_MOONLIGHT)
+		It("should affect fire/water attacks during harsh sunlight", func() {
+			charmander := GeneratePokemon(4, WithLevel(100), WithMoves(ember))
+			squirtle := GeneratePokemon(7, WithLevel(100), WithMoves(bubble))
+			p1.AddPokemon(charmander)
+			p2.AddPokemon(squirtle)
+			b.Weather = WEATHER_HARSH_SUNLIGHT
+			Expect(b.Start()).To(Succeed())
+			transactions, _ := b.SimulateRound()
+			// Fire boosted
+			Expect(transactions).To(HaveTransaction(
+				DamageTransaction{
+					User: charmander,
+					Target: target{
+						Pokemon:   *squirtle,
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+					},
+					Move:   ember,
+					Damage: 50,
+				},
+			))
+			// Water weakened
+			Expect(transactions).To(HaveTransaction(
+				DamageTransaction{
+					User: squirtle,
+					Target: target{
+						Pokemon:   *charmander,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Move:   bubble,
+					Damage: 17,
+				},
+			))
+		})
+		It("should affect fire/water attacks during rain", func() {
+			charmander := GeneratePokemon(4, WithLevel(100), WithMoves(ember))
+			squirtle := GeneratePokemon(7, WithLevel(100), WithMoves(bubble))
+			p1.AddPokemon(charmander)
+			p2.AddPokemon(squirtle)
+			b.Weather = WEATHER_RAIN
+			Expect(b.Start()).To(Succeed())
+			transactions, _ := b.SimulateRound()
+			// Fire weakened
+			Expect(transactions).To(HaveTransaction(
+				DamageTransaction{
+					User: charmander,
+					Target: target{
+						Pokemon:   *squirtle,
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+					},
+					Move:   ember,
+					Damage: 16,
+				},
+			))
+			// Water boosted
+			Expect(transactions).To(HaveTransaction(
+				DamageTransaction{
+					User: squirtle,
+					Target: target{
+						Pokemon:   *charmander,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Move:   bubble,
+					Damage: 53,
+				},
+			))
+		})
+		It("should damage/cause side effects during sandstorm", func() {
+			geodude := GeneratePokemon(74, WithLevel(50), WithMoves(tackle))
+			geodude.Elemental = Rock | Ground
+			bulbasaur := GeneratePokemon(1, WithLevel(50), WithMoves(solarBeam))
+			p1.AddPokemon(geodude)
+			p2.AddPokemon(bulbasaur)
+			b.Weather = WEATHER_SANDSTORM
+			Expect(b.Start()).To(Succeed())
+			transactions, _ := b.SimulateRound()
+			Expect(transactions).To(HaveLen(3))
+			// Weaken solar beam, SPDEF of rock type
+			Expect(transactions).To(HaveTransaction(DamageTransaction{
+				User: bulbasaur,
+				Target: target{
+					Pokemon:   *geodude,
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+				Move:   solarBeam,
+				Damage: 37,
+			}))
+			// Damage from sandstorm
+			Expect(transactions).To(HaveTransaction(DamageTransaction{
+				User: nil,
+				Target: target{
+					Pokemon:   *bulbasaur,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Move:   nil,
+				Damage: 6,
+			}))
+		})
+		It("should damage/cause side effects during hail", func() {
+			articuno := GeneratePokemon(144, WithMoves(tackle))
+			articuno.Elemental = Ice
+			bulbasaur := GeneratePokemon(1, WithMoves(solarBeam))
+			p1.AddPokemon(articuno)
+			p2.AddPokemon(bulbasaur)
+			b.Weather = WEATHER_HAIL
+			Expect(b.Start()).To(Succeed())
+			transactions, _ := b.SimulateRound()
+			Expect(transactions).To(HaveLen(3))
+			// Weaken solar beam
+			Expect(transactions).To(HaveTransaction(DamageTransaction{
+				User: bulbasaur,
+				Target: target{
+					Pokemon:   *articuno,
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+				Move:   solarBeam,
+				Damage: 4,
+			}))
+			// Damage from hail
+			Expect(transactions).To(HaveTransaction(DamageTransaction{
+				User: nil,
+				Target: target{
+					Pokemon:   *bulbasaur,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Move:   nil,
+				Damage: 0,
+			}))
+		})
+		It("should cause side effects during fog", func() {
+			castform := GeneratePokemon(351, WithLevel(50), WithMoves(weatherBall))
+			bulbasaur := GeneratePokemon(1, WithLevel(50), WithMoves(solarBeam))
+			p1.AddPokemon(castform)
+			p2.AddPokemon(bulbasaur)
+			b.Weather = WEATHER_FOG
+			b.SetSeed(777777)
+			Expect(b.Start()).To(Succeed())
+			transactions, _ := b.SimulateRound()
+			// Accuracy decreases from fog
+			Expect(transactions).To(HaveTransaction(EvadeTransaction{
+				User: castform,
+			}))
+			// Solar beam weakened
+			Expect(transactions).To(HaveTransaction(DamageTransaction{
+				User: bulbasaur,
+				Target: target{
+					Pokemon:   *castform,
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+				Move:   solarBeam,
+				Damage: 26,
+			}))
+			bulbasaur.Moves[0] = moonlight
+			transactions, _ = b.SimulateRound()
+			Expect(transactions).To(HaveTransaction(EvadeTransaction{
+				User: castform,
+			}))
+			// Moonlight heals 1/4 max HP
+			Expect(transactions).To(HaveTransaction(HealTransaction{
+				Target: bulbasaur,
+				Amount: 26,
+			}))
+			transactions, _ = b.SimulateRound()
+			Expect(transactions).To(HaveTransaction(DamageTransaction{
+				User: castform,
+				Target: target{
+					Pokemon:   *bulbasaur,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Move:   weatherBall,
+				Damage: 49,
+			}))
+		})
+	})
+})
+
 var _ = Describe("Fainting", func() {
 	var (
 		agent1 Agent
@@ -556,7 +793,7 @@ var _ = Describe("Fainting", func() {
 			// Squirtle's shell that broke, it was Charmanders knuckles.
 			// The Squirtle was unfazed.
 			log1 := transactions[1].BattleLog()
-			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 674 damage."))
+			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 680 damage."))
 			// Ash watched in horror as his Charmander was obliterated from the
 			// battlefield. "Critical hit!" echoed the automated announcer. The
 			// Squirtle snarled, now covered in the entrails of his previous

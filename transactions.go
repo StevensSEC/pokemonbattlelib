@@ -38,6 +38,10 @@ func (t DamageTransaction) BattleLog() string {
 }
 
 func (t DamageTransaction) Mutate(b *Battle) {
+	// Minimum 1HP attack
+	if t.Damage == 0 {
+		t.Damage = 1
+	}
 	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 	if receiver.CurrentHP >= t.Damage {
 		receiver.CurrentHP -= t.Damage
@@ -193,6 +197,20 @@ func (t SendOutTransaction) BattleLog() string {
 func (t SendOutTransaction) Mutate(b *Battle) {
 	p := b.parties[t.Target.party]
 	p.SetActive(t.Target.partySlot)
+}
+
+// Changes the current weather in a battle
+type WeatherTransaction struct {
+	Weather Weather
+}
+
+func (t WeatherTransaction) BattleLog() string {
+	// TODO: add weather stringer
+	return fmt.Sprintf("The weather changed to %v.", t.Weather)
+}
+
+func (t WeatherTransaction) Mutate(b *Battle) {
+	b.Weather = t.Weather
 }
 
 // A transaction that ends the battle.
