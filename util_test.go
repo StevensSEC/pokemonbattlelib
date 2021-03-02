@@ -212,3 +212,24 @@ func (matcher *orderedTransactionMatcher) NegatedFailureMessage(actual interface
 		strings.Join(seq, "\n"),
 	)
 }
+
+// Tools for testing the library
+// Custom RNG struct which allows for predictable RNG output in a battle
+type TestRNG struct {
+	rolls  []bool
+	rounds int
+}
+
+func (g *TestRNG) SetSeed(uint) {}
+func (g *TestRNG) Get(min, max int) int {
+	return max
+}
+func (g *TestRNG) Roll(x, y int) bool {
+	v := g.rolls[g.rounds%len(g.rolls)]
+	g.rounds += 1
+	return v
+}
+
+var NeverRNG = TestRNG{rolls: []bool{false}}        // Never rolls random effects
+var AlwaysRNG = TestRNG{rolls: []bool{true}}        // Always rolls random effects
+var SimpleRNG = TestRNG{rolls: []bool{true, false}} // Always hit, never crit
