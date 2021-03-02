@@ -146,7 +146,7 @@ var _ = Describe("One round of battle", func() {
 		party2 = NewOccupiedParty(&agent2, 1, squirtle)
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
-		battle.SetSeed(2)
+		battle.rng = &SimpleRNG
 	})
 
 	It("starts without error", func() {
@@ -217,26 +217,24 @@ var _ = Describe("One round of battle", func() {
 			adaptability := Ability{ID: 91}
 			charmander.Ability = &adaptability
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(86))
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(93))
 		})
 
 		It("should account for critical hits", func() {
+			battle.rng = &AlwaysRNG
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(8))
-			charmander.StatModifiers[STAT_CRIT_CHANCE] = 4 // 50% crit, max stage
-			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(1))
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(4))
 		})
 	})
 
 	Context("should account for accuracy/evasion", func() {
 		It("should miss moves randomly", func() {
+			battle.rng = &NeverRNG
 			Expect(battle.Start()).To(Succeed())
-			charmander.Moves[0].Accuracy = 1
 			logs, _ := battle.SimulateRound()
 			Expect(logs[0].BattleLog()).To(Equal("Charmander's attack missed!"))
-			charmander.Moves[0].Accuracy = 99
+			battle.rng = &SimpleRNG
 			logs, _ = battle.SimulateRound()
 			Expect(logs[0].BattleLog()).To(Equal("Charmander used Pound on Squirtle for 3 damage."))
 		})
