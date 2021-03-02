@@ -5,26 +5,27 @@ import (
 	"math"
 )
 
-const MAX_MOVES = 4
+// Maximum number of moves a Pokemon can have in its moveset
+const MaxMoves = 4
 
 type Pokemon struct {
-	NatDex            uint16           // National Pokedex Number
-	Level             uint8            // value from 1-100 influencing stats
-	Ability           *Ability         // name of this Pokemon's ability
-	TotalExperience   uint             // the total amount of exp this Pokemon has gained, influencing its level
-	Gender            Gender           // this Pokemon's gender
-	IVs               [6]uint8         // values from 0-31 that represents a Pokemon's 'genetic' potential
-	EVs               [6]uint8         // values from 0-255 that represents a Pokemon's training in a particular stat
-	Nature            *Nature          // represents a Pokemon's disposition and affects stats
-	Stats             [6]uint          // the actual stats of a Pokemon determined from the above data
-	StatModifiers     [9]int           // ranges from +6 (buffing) to -6 (debuffing) a stat
-	StatusEffects     StatusCondition  // the current status effects inflicted on a Pokemon
-	CurrentHP         uint             // the remaining HP of this Pokemon
-	HeldItem          *Item            // the item a Pokemon is holding
-	Moves             [MAX_MOVES]*Move // the moves the Pokemon currenly knows
-	Friendship        int              // how close this Pokemon is to its Trainer
-	OriginalTrainerID uint16           // a number associated with the first Trainer who caught this Pokemon
-	Elemental         ElementalType    // Indicates what type(s) (up to 2 simultaneously) this pokemon has
+	NatDex            uint16          // National Pokedex Number
+	Level             uint8           // value from 1-100 influencing stats
+	Ability           *Ability        // name of this Pokemon's ability
+	TotalExperience   uint            // the total amount of exp this Pokemon has gained, influencing its level
+	Gender            Gender          // this Pokemon's gender
+	IVs               [6]uint8        // values from 0-31 that represents a Pokemon's 'genetic' potential
+	EVs               [6]uint8        // values from 0-255 that represents a Pokemon's training in a particular stat
+	Nature            *Nature         // represents a Pokemon's disposition and affects stats
+	Stats             [6]uint         // the actual stats of a Pokemon determined from the above data
+	StatModifiers     [9]int          // ranges from +6 (buffing) to -6 (debuffing) a stat
+	StatusEffects     StatusCondition // the current status effects inflicted on a Pokemon
+	CurrentHP         uint            // the remaining HP of this Pokemon
+	HeldItem          *Item           // the item a Pokemon is holding
+	Moves             [MaxMoves]*Move // the moves the Pokemon currenly knows
+	Friendship        int             // how close this Pokemon is to its Trainer
+	OriginalTrainerID uint16          // a number associated with the first Trainer who caught this Pokemon
+	Elemental         ElementalType   // Indicates what type(s) (up to 2 simultaneously) this pokemon has
 }
 
 // Constants for growth rates of a Pokemon
@@ -99,8 +100,8 @@ func WithNature(nature *Nature) GeneratePokemonOption {
 }
 
 func WithMoves(moves ...*Move) GeneratePokemonOption {
-	if len(moves) > MAX_MOVES {
-		panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MAX_MOVES))
+	if len(moves) > MaxMoves {
+		panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MaxMoves))
 	}
 
 	var limited_moves [4]*Move

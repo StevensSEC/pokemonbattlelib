@@ -97,7 +97,7 @@ var _ = Describe("Pokemon generation", func() {
 		pound := GetMove(MOVE_POUND)
 		pursuit := GetMove(MOVE_PURSUIT)
 		pkmn := GeneratePokemon(393, WithMoves(pound, pursuit))
-		Expect(pkmn.Moves).To(BeEquivalentTo([MAX_MOVES]*Move{pound, pursuit, nil, nil}))
+		Expect(pkmn.Moves).To(BeEquivalentTo([MaxMoves]*Move{pound, pursuit, nil, nil}))
 	})
 
 	It("creates Pokemon with accurate stats reflecting its given values", func() {

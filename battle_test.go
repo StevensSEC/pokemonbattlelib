@@ -104,7 +104,7 @@ var _ = Describe("Battle", func() {
 
 		It("panics when adding too many Pokemon to a party", func() {
 			party := NewParty(&agent1, 0)
-			for i := 0; i < MAX_PARTY_SIZE; i += 1 {
+			for i := 0; i < MaxPartySize; i += 1 {
 				party.AddPokemon(GeneratePokemon(1))
 			}
 			Expect(func() {
