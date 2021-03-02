@@ -50,7 +50,7 @@ var _ = Describe("Type effectiveness", func() {
 		},
 	}
 	for _, tt := range tests {
-		Expect(GetElementalEffect(tt.move, tt.def)).To(BeEquivalentTo(tt.want))
+		Expect(GetElementalEffect(tt.move, tt.def)).To(Equal(tt.want))
 	}
 })
 
@@ -131,7 +131,7 @@ var _ = Describe("Status conditions", func() {
 			},
 		}
 		for _, tt := range tests {
-			Expect(tt.status.check(tt.check)).To(BeEquivalentTo(tt.want))
+			Expect(tt.status.check(tt.check)).To(Equal(tt.want))
 		}
 	})
 
@@ -181,7 +181,7 @@ var _ = Describe("Status conditions", func() {
 		}
 		for _, tt := range tests {
 			tt.from.apply(tt.apply)
-			Expect(tt.from).To(BeEquivalentTo(tt.want))
+			Expect(tt.from).To(Equal(tt.want))
 		}
 	})
 
@@ -216,16 +216,10 @@ var _ = Describe("Status conditions", func() {
 				clear: StatusBound,
 				want:  StatusSleep | StatusLeechSeed,
 			},
-			{
-				name:  "Should not clear status that does not exist",
-				from:  StatusNone,
-				clear: StatusBurn,
-				want:  StatusNone,
-			},
 		}
 		for _, tt := range tests {
 			tt.from.clear(tt.clear)
-			Expect(tt.from).To(BeEquivalentTo(tt.want))
+			Expect(tt.from).To(Equal(tt.want))
 		}
 	})
 
