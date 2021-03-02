@@ -188,7 +188,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// use the move
 			move := user.Moves[t.Move]
 			accuracy := float64(move.Accuracy)
-			if b.Weather == WEATHER_FOG {
+			if b.Weather == WeatherFog {
 				accuracy *= 3. / 5.
 			}
 			// Todo: account for receiver's evasion
@@ -208,11 +208,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				}
 				if move.ID == MOVE_DEFOG {
-					b.QueueTransaction(WeatherTransaction{
-						Weather: WEATHER_CLEAR_SKIES,
-					})
+					if b.Weather == WeatherFog {
+						b.QueueTransaction(WeatherTransaction{
+							Weather: WeatherClearSkies,
+						})
+					}
 				}
-				if b.Weather == WEATHER_FOG {
+				if b.Weather == WeatherFog {
 					if move.ID == MOVE_MOONLIGHT || move.ID == MOVE_SYNTHESIS || move.ID == MOVE_MORNING_SUN {
 						b.QueueTransaction(HealTransaction{
 							Target: self,
@@ -222,7 +224,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else {
 				weather := 1.0
-				if rain, sun := b.Weather == WEATHER_RAIN, b.Weather == WEATHER_HARSH_SUNLIGHT; (rain && move.Type == TypeWater) || (sun && move.Type == TypeFire) {
+				if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Type == TypeWater) || (sun && move.Type == TypeFire) {
 					weather = 1.5
 				} else if (rain && move.Type == TypeFire) || (sun && move.Type == TypeWater) {
 					weather = 0.5
@@ -249,7 +251,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					defense = float64(receiver.Stats[StatSpDef])
 				}
 				// Weather modifiers
-				if b.Weather == WEATHER_SANDSTORM {
+				if b.Weather == WeatherSandstorm {
 					if receiver.Type&TypeRock != 0 {
 						defense *= 1.5
 					}
@@ -257,10 +259,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						movePower /= 2
 					}
 				}
-				if b.Weather == WEATHER_HAIL && move.ID == MOVE_SOLAR_BEAM {
+				if b.Weather == WeatherHail && move.ID == MOVE_SOLAR_BEAM {
 					movePower /= 2
 				}
-				if b.Weather == WEATHER_FOG {
+				if b.Weather == WeatherFog {
 					if move.ID == MOVE_WEATHER_BALL {
 						movePower *= 2
 					}
@@ -322,7 +324,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 			// damage from weather
 			// TODO: check for weather resisting abilities
-			if b.Weather == WEATHER_SANDSTORM {
+			if b.Weather == WeatherSandstorm {
 				if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
 					damage := pkmn.Stats[StatHP] / 16
 					b.QueueTransaction(DamageTransaction{
@@ -330,7 +332,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Damage: damage,
 					})
 				}
-			} else if b.Weather == WEATHER_HAIL {
+			} else if b.Weather == WeatherHail {
 				if pkmn.Type&TypeIce == 0 {
 					damage := pkmn.Stats[StatHP] / 16
 					b.QueueTransaction(DamageTransaction{

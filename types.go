@@ -365,10 +365,10 @@ func (n Nature) getNatureModifers() [6]float64 {
 type Weather int
 
 const (
-	WEATHER_CLEAR_SKIES Weather = iota
-	WEATHER_HARSH_SUNLIGHT
-	WEATHER_RAIN
-	WEATHER_SANDSTORM
-	WEATHER_HAIL
-	WEATHER_FOG
+	WeatherClearSkies Weather = iota
+	WeatherHarshSunlight
+	WeatherRain
+	WeatherSandstorm
+	WeatherHail
+	WeatherFog
 )

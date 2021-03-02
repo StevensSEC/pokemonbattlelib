@@ -536,11 +536,11 @@ var _ = Describe("Weather", func() {
 			poke2 := GeneratePokemon(1, WithMoves(GetMove(MOVE_POUND)))
 			p1.AddPokemon(poke1)
 			p2.AddPokemon(poke2)
-			b.Weather = WEATHER_HAIL
+			b.Weather = WeatherFog
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			Expect(transactions).To(HaveTransaction(WeatherTransaction{
-				Weather: WEATHER_CLEAR_SKIES,
+				Weather: WeatherClearSkies,
 			}))
 		})
 	})
@@ -557,7 +557,7 @@ var _ = Describe("Weather", func() {
 			squirtle := GeneratePokemon(7, WithLevel(100), WithMoves(bubble))
 			p1.AddPokemon(charmander)
 			p2.AddPokemon(squirtle)
-			b.Weather = WEATHER_HARSH_SUNLIGHT
+			b.Weather = WeatherHarshSunlight
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			// Fire boosted
@@ -594,7 +594,7 @@ var _ = Describe("Weather", func() {
 			squirtle := GeneratePokemon(7, WithLevel(100), WithMoves(bubble))
 			p1.AddPokemon(charmander)
 			p2.AddPokemon(squirtle)
-			b.Weather = WEATHER_RAIN
+			b.Weather = WeatherRain
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			// Fire weakened
@@ -632,7 +632,7 @@ var _ = Describe("Weather", func() {
 			bulbasaur := GeneratePokemon(1, WithLevel(50), WithMoves(solarBeam))
 			p1.AddPokemon(geodude)
 			p2.AddPokemon(bulbasaur)
-			b.Weather = WEATHER_SANDSTORM
+			b.Weather = WeatherSandstorm
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			Expect(transactions).To(HaveLen(3))
@@ -667,7 +667,7 @@ var _ = Describe("Weather", func() {
 			bulbasaur := GeneratePokemon(1, WithMoves(solarBeam))
 			p1.AddPokemon(articuno)
 			p2.AddPokemon(bulbasaur)
-			b.Weather = WEATHER_HAIL
+			b.Weather = WeatherHail
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			Expect(transactions).To(HaveLen(3))
@@ -701,7 +701,7 @@ var _ = Describe("Weather", func() {
 			bulbasaur := GeneratePokemon(1, WithLevel(50), WithMoves(solarBeam))
 			p1.AddPokemon(castform)
 			p2.AddPokemon(bulbasaur)
-			b.Weather = WEATHER_FOG
+			b.Weather = WeatherFog
 			b.SetSeed(777777)
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
