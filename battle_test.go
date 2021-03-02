@@ -200,8 +200,8 @@ var _ = Describe("One round of battle", func() {
 		It("should cause Pokemon to have reduced HP", func() {
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(charmander.CurrentHP < charmander.Stats[STAT_HP]).To(BeTrue())
-			Expect(squirtle.CurrentHP < squirtle.Stats[STAT_HP]).To(BeTrue())
+			Expect(charmander.CurrentHP < charmander.Stats[StatHP]).To(BeTrue())
+			Expect(squirtle.CurrentHP < squirtle.Stats[StatHP]).To(BeTrue())
 		})
 	})
 
@@ -390,10 +390,10 @@ var _ = Describe("Move priority", func() {
 
 	Specify("Moves with higher priority should go first", func() {
 		p1 := GeneratePokemon(1, WithLevel(5), WithMoves(GetMove(MOVE_POUND)))
-		p1.Stats[STAT_SPD] = 100
+		p1.Stats[StatSpeed] = 100
 		party1 := NewOccupiedParty(&a1, 0, p1)
 		p2 := GeneratePokemon(4, WithLevel(5), WithMoves(GetMove(MOVE_FAKE_OUT)))
-		p2.Stats[STAT_SPD] = 10
+		p2.Stats[StatSpeed] = 10
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
@@ -760,7 +760,7 @@ var _ = Describe("Fainting", func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
 		scary_monster := GeneratePokemon(7, WithLevel(100), WithMoves(GetMove(MOVE_POUND)))
-		scary_monster.Stats[STAT_SPD] = 1
+		scary_monster.Stats[StatSpeed] = 1
 		party1 = NewOccupiedParty(&agent1, 0,
 			GeneratePokemon(4, WithMoves(GetMove(MOVE_POUND))),
 			GeneratePokemon(387, WithMoves(GetMove(MOVE_POUND))),
@@ -846,7 +846,7 @@ var _ = Describe("Fainting", func() {
 		party1.AddPokemon(pkmn1)
 		party2 := NewParty(&a2, 1)
 		pkmn2 := GeneratePokemon(7, WithLevel(10), WithMoves(GetMove(MOVE_POUND)))
-		pkmn2.Stats[STAT_SPD] = 255
+		pkmn2.Stats[StatSpeed] = 255
 		party2.AddPokemon(pkmn2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
@@ -911,7 +911,7 @@ var _ = Describe("Fainting", func() {
 		pkmn1.CurrentHP = 1
 		party1.AddPokemon(pkmn1, pkmn3)
 		party2 := NewParty(&a2, 1)
-		pkmn2.Stats[STAT_SPD] = 255
+		pkmn2.Stats[StatSpeed] = 255
 		party2.AddPokemon(pkmn2)
 		b := NewBattle()
 		b.AddParty(party1, party2)

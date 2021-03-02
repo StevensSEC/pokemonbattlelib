@@ -215,15 +215,15 @@ func (p *Pokemon) computeStats() {
 	base_stats := p.GetBaseStats()
 
 	// compute HP
-	hp_ev_term := math.Floor(float64(p.EVs[STAT_HP]) / 4)
-	base_iv_ev_level_hp_term := (2*uint(base_stats[STAT_HP]) + uint(p.IVs[STAT_HP]) + uint(hp_ev_term)) * uint(p.Level)
+	hp_ev_term := math.Floor(float64(p.EVs[StatHP]) / 4)
+	base_iv_ev_level_hp_term := (2*uint(base_stats[StatHP]) + uint(p.IVs[StatHP]) + uint(hp_ev_term)) * uint(p.Level)
 	hp_floor_term := math.Floor(float64(base_iv_ev_level_hp_term) / 100)
-	p.Stats[STAT_HP] = uint(hp_floor_term + float64(p.Level) + 10)
-	p.CurrentHP = p.Stats[STAT_HP]
+	p.Stats[StatHP] = uint(hp_floor_term + float64(p.Level) + 10)
+	p.CurrentHP = p.Stats[StatHP]
 
 	// compute all other stats
 	natureModifiers := p.Nature.getNatureModifers()
-	for _, stat := range [5]int{STAT_ATK, STAT_DEF, STAT_SPATK, STAT_SPDEF, STAT_SPD} {
+	for _, stat := range [5]int{StatAtk, StatDef, StatSpAtk, StatSpDef, StatSpeed} {
 		ev_term := math.Floor(float64(p.EVs[stat]) / 4)
 		base_iv_ev_level_term := (2*uint(base_stats[stat]) + uint(p.IVs[stat]) + uint(ev_term)) * uint(p.Level)
 		floor_term := math.Floor(float64(base_iv_ev_level_term) / 100)
@@ -237,12 +237,12 @@ func (p *Pokemon) computeStats() {
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
-		p.Gender, p.Level, p.CurrentHP, p.Stats[STAT_HP])
+		p.Gender, p.Level, p.CurrentHP, p.Stats[StatHP])
 }
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
 func (p *Pokemon) RestoreHP(amount uint) Transaction {
-	if diff := p.Stats[STAT_HP] - p.CurrentHP; diff <= amount {
+	if diff := p.Stats[StatHP] - p.CurrentHP; diff <= amount {
 		amount = diff
 	}
 	return HealTransaction{Target: p, Amount: amount}

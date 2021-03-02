@@ -136,7 +136,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					return mvA.Priority > mvB.Priority
 				}
 				// speedy pokemon should go first
-				return ctxA.Pokemon.Stats[STAT_SPD] > ctxB.Pokemon.Stats[STAT_SPD]
+				return ctxA.Pokemon.Stats[StatSpeed] > ctxB.Pokemon.Stats[StatSpeed]
 			}
 		} else {
 			// make higher priority turns go first
@@ -216,7 +216,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					if move.ID == MOVE_MOONLIGHT || move.ID == MOVE_SYNTHESIS || move.ID == MOVE_MORNING_SUN {
 						b.QueueTransaction(HealTransaction{
 							Target: self,
-							Amount: self.Stats[STAT_HP] / 4,
+							Amount: self.Stats[StatHP] / 4,
 						})
 					}
 				}
@@ -228,7 +228,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					weather = 0.5
 				}
 				crit := 1.0
-				if b.rng.Roll(1, CRIT_CHANCE[user.StatModifiers[STAT_CRIT_CHANCE]]) {
+				if b.rng.Roll(1, CRIT_CHANCE[user.StatModifiers[StatCritChance]]) {
 					crit = 2.0
 				}
 				stab := 1.0
@@ -241,12 +241,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				modifier := weather * crit * stab
 				levelEffect := float64((2 * user.Level / 5) + 2)
 				movePower := float64(move.Power)
-				attack := float64(user.Stats[STAT_ATK])
-				defense := float64(receiver.Stats[STAT_DEF])
+				attack := float64(user.Stats[StatAtk])
+				defense := float64(receiver.Stats[StatDef])
 				// Move modifiers
 				if move.Category == MoveCategorySpecial {
-					attack = float64(user.Stats[STAT_SPATK])
-					defense = float64(receiver.Stats[STAT_SPDEF])
+					attack = float64(user.Stats[StatSpAtk])
+					defense = float64(receiver.Stats[StatSpDef])
 				}
 				// Weather modifiers
 				if b.Weather == WEATHER_SANDSTORM {
@@ -309,10 +309,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				var damage uint
 				switch cond {
 				case StatusBurn, StatusPoison:
-					damage = pkmn.Stats[STAT_HP] / 8
+					damage = pkmn.Stats[StatHP] / 8
 				case StatusBadlyPoison:
 					// TODO: implement counter for increasing bad poison damage
-					damage = pkmn.Stats[STAT_HP] / 16
+					damage = pkmn.Stats[StatHP] / 16
 				}
 				b.QueueTransaction(DamageTransaction{
 					Target:       t,
@@ -324,7 +324,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// TODO: check for weather resisting abilities
 			if b.Weather == WEATHER_SANDSTORM {
 				if pkmn.Elemental&(Rock|Ground|Steel) == 0 {
-					damage := pkmn.Stats[STAT_HP] / 16
+					damage := pkmn.Stats[StatHP] / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
 						Damage: damage,
@@ -332,7 +332,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else if b.Weather == WEATHER_HAIL {
 				if pkmn.Elemental&Ice == 0 {
-					damage := pkmn.Stats[STAT_HP] / 16
+					damage := pkmn.Stats[StatHP] / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
 						Damage: damage,

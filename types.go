@@ -10,16 +10,16 @@ import (
 // Constants for looking up Pokemon stats
 const (
 	// Base stats
-	STAT_HP = iota
-	STAT_ATK
-	STAT_DEF
-	STAT_SPATK
-	STAT_SPDEF
-	STAT_SPD
+	StatHP = iota
+	StatAtk
+	StatDef
+	StatSpAtk
+	StatSpDef
+	StatSpeed
 	// Fighting stats
-	STAT_CRIT_CHANCE
-	STAT_ACCURACY
-	STAT_EVASION
+	StatCritChance
+	StatAccuracy
+	StatEvasion
 )
 
 // Table of critical hit chances (denominator of 1/X)
@@ -334,13 +334,13 @@ func GetNature(nature int) *Nature {
 	natures := map[int]*Nature{
 		//TODO: add all natures
 		HARDY: {
-			StatUp:   STAT_ATK,
-			StatDown: STAT_ATK,
+			StatUp:   StatAtk,
+			StatDown: StatAtk,
 			name:     "Hardy",
 		},
 		ADAMANT: {
-			StatUp:   STAT_ATK,
-			StatDown: STAT_SPATK,
+			StatUp:   StatAtk,
+			StatDown: StatSpAtk,
 			name:     "Adamant",
 		},
 	}
