@@ -128,8 +128,8 @@ var _ = Describe("Pokemon generation", func() {
 	})
 
 	It("panics when trying to create a Pokemon out of level bounds", func() {
-		Expect(func() { GeneratePokemon(396, WithLevel(MAX_LEVEL+1)) }).To(Panic())
-		Expect(func() { GeneratePokemon(396, WithLevel(MIN_LEVEL-1)) }).To(Panic())
+		Expect(func() { GeneratePokemon(396, WithLevel(MaxLevel+1)) }).To(Panic())
+		Expect(func() { GeneratePokemon(396, WithLevel(MinLevel-1)) }).To(Panic())
 	})
 
 	It("panics when creating a Pokemon with higher than max IVs", func() {
@@ -148,7 +148,7 @@ var _ = Describe("Pokemon generation", func() {
 
 var _ = Describe("Test leveling methods", func() {
 	It("panics when leveling beyond the max level", func() {
-		pkmn := GeneratePokemon(6, WithLevel(MAX_LEVEL))
+		pkmn := GeneratePokemon(6, WithLevel(MaxLevel))
 		Expect(func() { pkmn.GainLevels(1) }).To(Panic())
 	})
 
@@ -163,9 +163,9 @@ var _ = Describe("Test leveling methods", func() {
 	})
 
 	It("prevents a Pokemon from gaining experience beyond the max", func() {
-		pkmn := GeneratePokemon(493, WithLevel(MAX_LEVEL))
+		pkmn := GeneratePokemon(493, WithLevel(MaxLevel))
 		pkmn.GainExperience(100000000000)
-		Expect(int(pkmn.Level)).To(Equal(MAX_LEVEL))
+		Expect(int(pkmn.Level)).To(Equal(MaxLevel))
 	})
 })
 

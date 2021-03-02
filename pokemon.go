@@ -40,12 +40,12 @@ const (
 
 // Constants for IVs and EVs
 const (
-	MAX_FRIENDSHIP = 255
-	MAX_EV         = 252
-	MAX_IV         = 31
-	TOTAL_EV       = 510
-	MIN_LEVEL      = 1
-	MAX_LEVEL      = 100
+	MaxFriendship = 255
+	MaxEV         = 252
+	MaxIV         = 31
+	TotalEV       = 510
+	MinLevel      = 1
+	MaxLevel      = 100
 )
 
 type GeneratePokemonOption func(p *Pokemon)
@@ -125,12 +125,12 @@ func (p *Pokemon) GetBaseStats() [6]int {
 }
 
 func (p *Pokemon) HasValidLevel() bool {
-	return p.Level >= MIN_LEVEL && p.Level <= MAX_LEVEL
+	return p.Level >= MinLevel && p.Level <= MaxLevel
 }
 
 func (p *Pokemon) HasValidIVs() bool {
 	for _, IV := range p.IVs {
-		if IV > MAX_IV {
+		if IV > MaxIV {
 			return false
 		}
 	}
@@ -140,19 +140,19 @@ func (p *Pokemon) HasValidIVs() bool {
 func (p *Pokemon) HasValidEVs() bool {
 	totalEVs := 0
 	for _, EV := range p.EVs {
-		if EV > MAX_EV {
+		if EV > MaxEV {
 			return false
 		}
 		totalEVs += int(EV)
 	}
-	return totalEVs <= TOTAL_EV
+	return totalEVs <= TotalEV
 }
 
 // Increases a Pokemon's level by `levels` and sets their total experience to
 // the minimum amount for that level.
 func (p *Pokemon) GainLevels(levels int) {
 	newLevel := int(p.Level) + levels
-	if newLevel > MAX_LEVEL {
+	if newLevel > MaxLevel {
 		panic(fmt.Sprintf("Level %d %s cannot level up to level %d!", p.Level, p.GetName(), newLevel))
 	}
 
@@ -176,11 +176,11 @@ func (p *Pokemon) GainExperience(exp int) {
 		panic(fmt.Sprintf("%s's experience tried to decrease by %d", p.GetName(), exp))
 	}
 
-	max_exp := EXP_TABLE[p.GetGrowthRate()][MAX_LEVEL]
+	max_exp := EXP_TABLE[p.GetGrowthRate()][MaxLevel]
 
 	// if would gain experience beyond leveling to 100, set level to 100
 	if int(p.TotalExperience)+exp > max_exp {
-		p.GainLevels(MAX_LEVEL - int(p.Level))
+		p.GainLevels(MaxLevel - int(p.Level))
 		return
 	}
 
