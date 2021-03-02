@@ -200,7 +200,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				continue
 			}
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
-			if move.Category == Status {
+			if move.Category == MoveCategoryStatus {
 				if move.ID == MOVE_STUN_SPORE {
 					b.QueueTransaction(InflictStatusTransaction{
 						Target: receiver,
@@ -244,7 +244,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				attack := float64(user.Stats[STAT_ATK])
 				defense := float64(receiver.Stats[STAT_DEF])
 				// Move modifiers
-				if move.Category == Special {
+				if move.Category == MoveCategorySpecial {
 					attack = float64(user.Stats[STAT_SPATK])
 					defense = float64(receiver.Stats[STAT_SPDEF])
 				}

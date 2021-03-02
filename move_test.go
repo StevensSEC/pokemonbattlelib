@@ -29,7 +29,7 @@ var _ = Describe("Move string representation", func() {
 			move: Move{
 				Name:     "Shadow Ball",
 				Type:     Ghost,
-				Category: Special,
+				Category: MoveCategorySpecial,
 				MaxPP:    15,
 				Priority: 0,
 				Power:    80,
@@ -47,9 +47,9 @@ var _ = Describe("Move string representation", func() {
 
 var _ = Describe("Move category", func() {
 	It("should show correct string for move category", func() {
-		Expect(Status.String()).To(Equal("Status"))
-		Expect(Physical.String()).To(Equal("Physical"))
-		Expect(Special.String()).To(Equal("Special"))
+		Expect(MoveCategoryStatus.String()).To(Equal("Status"))
+		Expect(MoveCategoryPhysical.String()).To(Equal("Physical"))
+		Expect(MoveCategorySpecial.String()).To(Equal("Special"))
 		Expect(func() {
 			var _ = MoveCategory(99).String()
 		}).To(Panic())

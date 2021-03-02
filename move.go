@@ -5,18 +5,18 @@ import "fmt"
 type MoveCategory uint8
 
 const (
-	Status MoveCategory = iota
-	Physical
-	Special
+	MoveCategoryStatus MoveCategory = iota
+	MoveCategoryPhysical
+	MoveCategorySpecial
 )
 
 func (c MoveCategory) String() string {
 	switch c {
-	case Status:
+	case MoveCategoryStatus:
 		return "Status"
-	case Physical:
+	case MoveCategoryPhysical:
 		return "Physical"
-	case Special:
+	case MoveCategorySpecial:
 		return "Special"
 	default:
 		panic("Unexpected value for move category")

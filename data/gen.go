@@ -363,7 +363,7 @@ func main() {
 	}
 	output += "var ALL_MOVES = []Move{\n"
 	for _, p := range moves {
-		output += fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, CurrentPP: %d, MaxPP: %d,"+
+		output += fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: MoveCategory%s, CurrentPP: %d, MaxPP: %d,"+
 			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Targets, p.Priority, p.Power, p.Accuracy)
 	}
 	output += "}\n\n"
