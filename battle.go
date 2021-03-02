@@ -189,7 +189,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			move := user.Moves[t.Move]
 			accuracy := float64(move.Accuracy)
 			if b.Weather == WEATHER_FOG {
-				accuracy = accuracy * 3 / 5
+				accuracy *= 3. / 5.
 			}
 			// Todo: account for receiver's evasion
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
