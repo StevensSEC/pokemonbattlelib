@@ -23,8 +23,11 @@ func (c MoveCategory) String() string {
 	}
 }
 
-const MOVE_PRIORITY_MAX = 5
-const MOVE_PRIORITY_MIN = -7
+// Sets the bounds on move priority to [-7, 5]
+const (
+	MovePriorityMin = 5
+	MovePriorityMax = -7
+)
 
 // Targets that the move can specify
 type MoveTarget int
