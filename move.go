@@ -5,52 +5,55 @@ import "fmt"
 type MoveCategory uint8
 
 const (
-	Status MoveCategory = iota
-	Physical
-	Special
+	MoveCategoryStatus MoveCategory = iota
+	MoveCategoryPhysical
+	MoveCategorySpecial
 )
 
 func (c MoveCategory) String() string {
 	switch c {
-	case Status:
+	case MoveCategoryStatus:
 		return "Status"
-	case Physical:
+	case MoveCategoryPhysical:
 		return "Physical"
-	case Special:
+	case MoveCategorySpecial:
 		return "Special"
 	default:
 		panic("Unexpected value for move category")
 	}
 }
 
-const MOVE_PRIORITY_MAX = 5
-const MOVE_PRIORITY_MIN = -7
+// Sets the bounds on move priority to [-7, 5]
+const (
+	MovePriorityMin = 5
+	MovePriorityMax = -7
+)
 
 // Targets that the move can specify
 type MoveTarget int
 
 const (
-	TARGET_SPECIFIC_MOVE MoveTarget = iota + 1
-	TARGET_SELECTED_ME_FIRST
-	TARGET_ALLY
-	TARGET_USERS_FIELD
-	TARGET_USER_OR_ALLY
-	TARGET_OPPONENTS_FIELD
-	TARGET_USER
-	TARGET_RANDOM_OPPONENT
-	TARGET_ALL_OTHERS
-	TARGET_SELECTED
-	TARGET_ALL_OPPONENTS
-	TARGET_ENTIRE_FIELD
-	TARGET_USER_AND_ALLIES
-	TARGET_ALL
+	MoveTargetSpecificMove MoveTarget = iota + 1
+	MoveTargetSelectedMeFirst
+	MoveTargetAlly
+	MoveTargetUsersField
+	MoveTargetUserOrAlly
+	MoveTargetOpponentsField
+	MoveTargetUser
+	MoveTargetRandomOpponent
+	MoveTargetAllOthers
+	MoveTargetSelected
+	MoveTargetAllOpponents
+	MoveTargetEntireField
+	MoveTargetUserAndAllies
+	MoveTargetAll
 )
 
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
 type Move struct {
 	ID        int
 	Name      string
-	Type      ElementalType
+	Type      Type
 	Category  MoveCategory
 	Targets   MoveTarget
 	CurrentPP int
@@ -62,7 +65,7 @@ type Move struct {
 
 // Retrieves a Pokemon move given its move ID
 func GetMove(id int) *Move {
-	for _, m := range ALL_MOVES {
+	for _, m := range AllMoves {
 		if m.ID == id {
 			return &m
 		}
