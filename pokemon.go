@@ -5,46 +5,47 @@ import (
 	"math"
 )
 
-const MAX_MOVES = 4
+// Maximum number of moves a Pokemon can have in its moveset
+const MaxMoves = 4
 
 type Pokemon struct {
-	NatDex            uint16           // National Pokedex Number
-	Level             uint8            // value from 1-100 influencing stats
-	Ability           *Ability         // name of this Pokemon's ability
-	TotalExperience   uint             // the total amount of exp this Pokemon has gained, influencing its level
-	Gender            Gender           // this Pokemon's gender
-	IVs               [6]uint8         // values from 0-31 that represents a Pokemon's 'genetic' potential
-	EVs               [6]uint8         // values from 0-255 that represents a Pokemon's training in a particular stat
-	Nature            *Nature          // represents a Pokemon's disposition and affects stats
-	Stats             [6]uint          // the actual stats of a Pokemon determined from the above data
-	StatModifiers     [9]int           // ranges from +6 (buffing) to -6 (debuffing) a stat
-	StatusEffects     StatusCondition  // the current status effects inflicted on a Pokemon
-	CurrentHP         uint             // the remaining HP of this Pokemon
-	HeldItem          *Item            // the item a Pokemon is holding
-	Moves             [MAX_MOVES]*Move // the moves the Pokemon currenly knows
-	Friendship        int              // how close this Pokemon is to its Trainer
-	OriginalTrainerID uint16           // a number associated with the first Trainer who caught this Pokemon
-	Elemental         ElementalType    // Indicates what type(s) (up to 2 simultaneously) this pokemon has
+	NatDex            uint16          // National Pokedex Number
+	Level             uint8           // value from 1-100 influencing stats
+	Ability           *Ability        // name of this Pokemon's ability
+	TotalExperience   uint            // the total amount of exp this Pokemon has gained, influencing its level
+	Gender            Gender          // this Pokemon's gender
+	IVs               [6]uint8        // values from 0-31 that represents a Pokemon's 'genetic' potential
+	EVs               [6]uint8        // values from 0-255 that represents a Pokemon's training in a particular stat
+	Nature            *Nature         // represents a Pokemon's disposition and affects stats
+	Stats             [6]uint         // the actual stats of a Pokemon determined from the above data
+	StatModifiers     [9]int          // ranges from +6 (buffing) to -6 (debuffing) a stat
+	StatusEffects     StatusCondition // the current status effects inflicted on a Pokemon
+	CurrentHP         uint            // the remaining HP of this Pokemon
+	HeldItem          *Item           // the item a Pokemon is holding
+	Moves             [MaxMoves]*Move // the moves the Pokemon currenly knows
+	Friendship        int             // how close this Pokemon is to its Trainer
+	OriginalTrainerID uint16          // a number associated with the first Trainer who caught this Pokemon
+	Type              Type            // Indicates what type(s) (up to 2 simultaneously) this pokemon has
 }
 
 // Constants for growth rates of a Pokemon
 const (
-	SLOW = iota + 1
-	MEDIUM_FAST
-	FAST
-	MEDIUM_SLOW
-	ERRATIC
-	FLUCTUATING
+	GrowthSlow = iota + 1
+	GrowthMediumFast
+	GrowthFast
+	GrowthMediumSlow
+	GrowthErratic
+	GrowthFluctuating
 )
 
 // Constants for IVs and EVs
 const (
-	MAX_FRIENDSHIP = 255
-	MAX_EV         = 252
-	MAX_IV         = 31
-	TOTAL_EV       = 510
-	MIN_LEVEL      = 1
-	MAX_LEVEL      = 100
+	MaxFriendship = 255
+	MaxEV         = 252
+	MaxIV         = 31
+	TotalEV       = 510
+	MinLevel      = 1
+	MaxLevel      = 100
 )
 
 type GeneratePokemonOption func(p *Pokemon)
@@ -59,7 +60,7 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 		StatModifiers:   [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0},
 		Stats:           [6]uint{1, 4, 4, 4, 4, 4},
-		Nature:          GetNature(HARDY), // this nature is neutral and has no effect
+		Nature:          GetNature(NatureHardy), // this nature is neutral and has no effect
 	}
 	for _, opt := range opts {
 		opt(p)
@@ -99,8 +100,8 @@ func WithNature(nature *Nature) GeneratePokemonOption {
 }
 
 func WithMoves(moves ...*Move) GeneratePokemonOption {
-	if len(moves) > MAX_MOVES {
-		panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MAX_MOVES))
+	if len(moves) > MaxMoves {
+		panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MaxMoves))
 	}
 
 	var limited_moves [4]*Move
@@ -124,12 +125,12 @@ func (p *Pokemon) GetBaseStats() [6]int {
 }
 
 func (p *Pokemon) HasValidLevel() bool {
-	return p.Level >= MIN_LEVEL && p.Level <= MAX_LEVEL
+	return p.Level >= MinLevel && p.Level <= MaxLevel
 }
 
 func (p *Pokemon) HasValidIVs() bool {
 	for _, IV := range p.IVs {
-		if IV > MAX_IV {
+		if IV > MaxIV {
 			return false
 		}
 	}
@@ -139,19 +140,19 @@ func (p *Pokemon) HasValidIVs() bool {
 func (p *Pokemon) HasValidEVs() bool {
 	totalEVs := 0
 	for _, EV := range p.EVs {
-		if EV > MAX_EV {
+		if EV > MaxEV {
 			return false
 		}
 		totalEVs += int(EV)
 	}
-	return totalEVs <= TOTAL_EV
+	return totalEVs <= TotalEV
 }
 
 // Increases a Pokemon's level by `levels` and sets their total experience to
 // the minimum amount for that level.
 func (p *Pokemon) GainLevels(levels int) {
 	newLevel := int(p.Level) + levels
-	if newLevel > MAX_LEVEL {
+	if newLevel > MaxLevel {
 		panic(fmt.Sprintf("Level %d %s cannot level up to level %d!", p.Level, p.GetName(), newLevel))
 	}
 
@@ -164,7 +165,7 @@ func (p *Pokemon) GainLevels(levels int) {
 	}
 
 	p.Level = uint8(newLevel)
-	p.TotalExperience = uint(EXP_TABLE[p.GetGrowthRate()][int(p.Level)])
+	p.TotalExperience = uint(ExpTable[p.GetGrowthRate()][int(p.Level)])
 	p.computeStats()
 }
 
@@ -175,21 +176,21 @@ func (p *Pokemon) GainExperience(exp int) {
 		panic(fmt.Sprintf("%s's experience tried to decrease by %d", p.GetName(), exp))
 	}
 
-	max_exp := EXP_TABLE[p.GetGrowthRate()][MAX_LEVEL]
+	max_exp := ExpTable[p.GetGrowthRate()][MaxLevel]
 
 	// if would gain experience beyond leveling to 100, set level to 100
 	if int(p.TotalExperience)+exp > max_exp {
-		p.GainLevels(MAX_LEVEL - int(p.Level))
+		p.GainLevels(MaxLevel - int(p.Level))
 		return
 	}
 
 	remaining_exp := exp
-	toNextLevel := EXP_TABLE[p.GetGrowthRate()][int(p.Level+1)] - int(p.TotalExperience)
+	toNextLevel := ExpTable[p.GetGrowthRate()][int(p.Level+1)] - int(p.TotalExperience)
 
 	for remaining_exp >= toNextLevel {
 		p.GainLevels(1)
 		remaining_exp -= toNextLevel
-		toNextLevel = EXP_TABLE[p.GetGrowthRate()][int(p.Level+1)] - int(p.TotalExperience)
+		toNextLevel = ExpTable[p.GetGrowthRate()][int(p.Level+1)] - int(p.TotalExperience)
 	}
 
 	// add whats left
@@ -214,15 +215,15 @@ func (p *Pokemon) computeStats() {
 	base_stats := p.GetBaseStats()
 
 	// compute HP
-	hp_ev_term := math.Floor(float64(p.EVs[STAT_HP]) / 4)
-	base_iv_ev_level_hp_term := (2*uint(base_stats[STAT_HP]) + uint(p.IVs[STAT_HP]) + uint(hp_ev_term)) * uint(p.Level)
+	hp_ev_term := math.Floor(float64(p.EVs[StatHP]) / 4)
+	base_iv_ev_level_hp_term := (2*uint(base_stats[StatHP]) + uint(p.IVs[StatHP]) + uint(hp_ev_term)) * uint(p.Level)
 	hp_floor_term := math.Floor(float64(base_iv_ev_level_hp_term) / 100)
-	p.Stats[STAT_HP] = uint(hp_floor_term + float64(p.Level) + 10)
-	p.CurrentHP = p.Stats[STAT_HP]
+	p.Stats[StatHP] = uint(hp_floor_term + float64(p.Level) + 10)
+	p.CurrentHP = p.Stats[StatHP]
 
 	// compute all other stats
 	natureModifiers := p.Nature.getNatureModifers()
-	for _, stat := range [5]int{STAT_ATK, STAT_DEF, STAT_SPATK, STAT_SPDEF, STAT_SPD} {
+	for _, stat := range [5]int{StatAtk, StatDef, StatSpAtk, StatSpDef, StatSpeed} {
 		ev_term := math.Floor(float64(p.EVs[stat]) / 4)
 		base_iv_ev_level_term := (2*uint(base_stats[stat]) + uint(p.IVs[stat]) + uint(ev_term)) * uint(p.Level)
 		floor_term := math.Floor(float64(base_iv_ev_level_term) / 100)
@@ -236,12 +237,12 @@ func (p *Pokemon) computeStats() {
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
-		p.Gender, p.Level, p.CurrentHP, p.Stats[STAT_HP])
+		p.Gender, p.Level, p.CurrentHP, p.Stats[StatHP])
 }
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
 func (p *Pokemon) RestoreHP(amount uint) Transaction {
-	if diff := p.Stats[STAT_HP] - p.CurrentHP; diff <= amount {
+	if diff := p.Stats[StatHP] - p.CurrentHP; diff <= amount {
 		amount = diff
 	}
 	return HealTransaction{Target: p, Amount: amount}

@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"log"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -8,6 +9,7 @@ import (
 )
 
 func TestPokemonbattlelib(t *testing.T) {
+	log.SetOutput(nil)
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Pokemonbattlelib Suite")
 }

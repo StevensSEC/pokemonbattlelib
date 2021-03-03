@@ -7,7 +7,7 @@ import (
 
 var _ = Describe("Using items", func() {
 	It("should correctly retrieve items by ID", func() {
-		i := GetItem(ITEM_POTION)
+		i := GetItem(ItemPotion)
 		Expect(i.Name).To(Equal(("Potion")))
 		Expect(func() {
 			GetItem(-1)
@@ -15,9 +15,9 @@ var _ = Describe("Using items", func() {
 	})
 
 	It("should use the item and produce transactions", func() {
-		i := GetItem(ITEM_POTION)
-		p := GeneratePokemon(1)
-		p.Stats[STAT_HP] = 100
+		i := GetItem(ItemPotion)
+		p := GeneratePokemon(PkmnBulbasaur)
+		p.Stats[StatHP] = 100
 		logs := p.UseItem(&i)
 		Expect(logs).To(HaveLen(1))
 		Expect(logs[0].BattleLog()).To(Equal("Bulbasaur restored 20 HP."))

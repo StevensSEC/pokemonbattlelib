@@ -15,53 +15,53 @@ type ItemCategory int
 
 // Fix: remove unnecessary items
 const (
-	ItemStatBoost ItemCategory = iota + 1
-	ItemEffortDrop
-	ItemMedicine
-	ItemOther
-	ItemInAPinch
-	ItemPickyHealing
-	ItemTypeProtection
-	ItemBakingOnly
-	ItemCollectibles
-	ItemEvolution
-	ItemSpelunking
-	ItemHeldItems
-	ItemChoice
-	ItemEffortTraining
-	ItemBadHeldItems
-	ItemTraining
-	ItemPlates
-	ItemSpeciesSpecific
-	ItemTypeEnhancement
-	ItemEventItems
-	ItemGameplay
-	ItemPlotAdvancement
-	ItemUnused
-	ItemLoot
-	ItemAllMail
+	ItemCategoryStatBoost ItemCategory = iota + 1
+	ItemCategoryEffortDrop
+	ItemCategoryMedicine
+	ItemCategoryOther
+	ItemCategoryInAPinch
+	ItemCategoryPickyHealing
+	ItemCategoryTypeProtection
+	ItemCategoryBakingOnly
+	ItemCategoryCollectibles
+	ItemCategoryEvolution
+	ItemCategorySpelunking
+	ItemCategoryHeldItems
+	ItemCategoryChoice
+	ItemCategoryEffortTraining
+	ItemCategoryBadHeldItems
+	ItemCategoryTraining
+	ItemCategoryPlates
+	ItemCategorySpeciesSpecific
+	ItemCategoryTypeEnhancement
+	ItemCategoryEventItems
+	ItemCategoryGameplay
+	ItemCategoryPlotAdvancement
+	ItemCategoryUnused
+	ItemCategoryLoot
+	ItemCategoryAllMail
 	// Medicine
-	ItemVitamins
-	ItemHealing
-	ItemPPRecovery
-	ItemRevival
-	ItemStatusCures
+	ItemCategoryVitamins
+	ItemCategoryHealing
+	ItemCategoryPPRecovery
+	ItemCategoryRevival
+	ItemCategoryStatusCures
 
-	ItemMulch
-	ItemSpecialBalls
-	ItemStandardBalls
-	ItemDexCompletion
-	ItemScarves
-	ItemAllMachines
-	ItemFlutes
-	ItemApricornBalls
-	ItemApricornBox
-	ItemDataCards
-	ItemJewels
-	ItemMiracleShooter
-	ItemMegaStones
-	ItemMemories
-	ItemZCrystals
+	ItemCategoryMulch
+	ItemCategorySpecialBalls
+	ItemCategoryStandardBalls
+	ItemCategoryDexCompletion
+	ItemCategoryScarves
+	ItemCategoryAllMachines
+	ItemCategoryFlutes
+	ItemCategoryApricornBalls
+	ItemCategoryApricornBox
+	ItemCategoryDataCards
+	ItemCategoryJewels
+	ItemCategoryMiracleShooter
+	ItemCategoryMegaStones
+	ItemCategoryMemories
+	ItemCategoryZCrystals
 )
 
 type FlingEffect int
@@ -93,10 +93,10 @@ const (
 )
 
 // Retrieves an item using its ID
-// Can also use constants like ITEM_POTION or ITEM_REVIVE
+// Can also use constants like ItemPotion or ItemRevive
 // For item effects, see https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/item_prose.csv
 func GetItem(itemID int) Item {
-	for _, item := range ALL_ITEMS {
+	for _, item := range AllItems {
 		if item.ID == itemID {
 			return item
 		}
@@ -107,7 +107,7 @@ func GetItem(itemID int) Item {
 // Dispatches the correct item handler based on its category
 func (p *Pokemon) UseItem(i *Item) []Transaction {
 	switch i.Category {
-	case ItemHealing, ItemRevival, ItemStatusCures:
+	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
 		return p.UseMedicine(i)
 	}
 	return make([]Transaction, 0)
@@ -116,7 +116,7 @@ func (p *Pokemon) UseItem(i *Item) []Transaction {
 // Uses a medicine item which affects HP and status effects
 func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
 	switch i.ID {
-	case ITEM_POTION:
+	case ItemPotion:
 		t = append(t, p.RestoreHP(20))
 	}
 	return t
