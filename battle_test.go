@@ -160,7 +160,7 @@ var _ = Describe("One round of battle", func() {
 		It("should create 2 damage transactions", func() {
 			Expect(battle.Start()).To(Succeed())
 			transactions, _ := battle.SimulateRound()
-			pound := GetMove(MOVE_POUND)
+			pound := GetMove(MovePound)
 			Expect(transactions).To(HaveTransaction(DamageTransaction{
 				User: charmander,
 				Target: target{
@@ -257,9 +257,15 @@ var _ = Describe("Using items in battle", func() {
 		})
 		It("should log ItemTurns correctly", func() {
 			Expect(battle.Start()).To(Succeed())
-			transactions, _ := battle.SimulateRound()
-			log0 := transactions[0].BattleLog()
-			Expect(log0).To(Equal("Potion used on Venusaur."))
+			t, _ := battle.SimulateRound()
+			potion := GetItem(ItemPotion)
+			Expect(t).To(HaveTransaction(
+				ItemTransaction{
+					Target: pkmn,
+					Item:   &potion,
+					Move:   nil,
+				},
+			))
 		})
 		It("should heal the Pokemon by 20 HP", func() {
 			Expect(battle.Start()).To(Succeed())
@@ -402,7 +408,7 @@ var _ = Describe("Move priority", func() {
 					Team:      0,
 				},
 				Damage: 5,
-				Move:   GetMove(MOVE_FAKE_OUT),
+				Move:   GetMove(MoveFakeOut),
 			},
 			DamageTransaction{
 				User: p1,
@@ -413,7 +419,7 @@ var _ = Describe("Move priority", func() {
 					Team:      1,
 				},
 				Damage: 5,
-				Move:   GetMove(MOVE_POUND),
+				Move:   GetMove(MovePound),
 			},
 		))
 	})
@@ -783,11 +789,6 @@ var _ = Describe("Fainting", func() {
 			// impact created a very audible crack. But it was not
 			// Squirtle's shell that broke, it was Charmanders knuckles.
 			// The Squirtle was unfazed.
-<<<<<<< HEAD
-=======
-			log1 := transactions[1].BattleLog()
-			Expect(log1).To(Equal("Squirtle used Pound on Charmander for 680 damage."))
->>>>>>> main
 			// Ash watched in horror as his Charmander was obliterated from the
 			// battlefield. "Critical hit!" echoed the automated announcer. The
 			// Squirtle snarled, now covered in the entrails of his previous
@@ -1038,17 +1039,10 @@ var _ = Describe("Status Conditions", func() {
 	})
 
 	It("should inflict badly poisoned damage", func() {
-<<<<<<< HEAD
-		p1 := GeneratePokemon(1, WithLevel(100), WithMoves(GetMove(MOVE_POUND)))
+		p1 := GeneratePokemon(1, WithLevel(100), WithMoves(GetMove(MovePound)))
 		p1.StatusEffects = StatusBadlyPoison
 		party1 := NewOccupiedParty(&a1, 0, p1)
-		p2 := GeneratePokemon(2, WithLevel(100), WithMoves(GetMove(MOVE_POUND)))
-=======
-		p1 := GeneratePokemon(1, WithLevel(8), WithMoves(GetMove(MovePound)))
-		p1.StatusEffects = StatusBadlyPoison
-		party1 := NewOccupiedParty(&a1, 0, p1)
-		p2 := GeneratePokemon(2, WithMoves(GetMove(MovePound)))
->>>>>>> main
+		p2 := GeneratePokemon(2, WithLevel(100), WithMoves(GetMove(MovePound)))
 		party2 := NewOccupiedParty(&a2, 1, p2)
 		b := NewBattle()
 		b.AddParty(party1, party2)
@@ -1078,8 +1072,18 @@ var _ = Describe("Status Conditions", func() {
 		b.AddParty(party1, party2)
 		b.SetSeed(1)
 		Expect(b.Start()).To(Succeed())
-		transactions, _ := b.SimulateRound()
-		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is paralyzed and is unable to move."))
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(
+			ImmobilizeTransaction{
+				Target: target{
+					Pokemon:   *p1,
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+				StatusEffect: StatusParalyze,
+			},
+		))
 	})
 
 	Specify("Freeze", func() {
