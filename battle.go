@@ -203,8 +203,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			if move.Category == MoveCategoryStatus {
 				if move.ID == MoveStunSpore {
 					b.QueueTransaction(InflictStatusTransaction{
-						Target: receiver,
-						Status: StatusParalyze,
+						Target:       receiver,
+						StatusEffect: StatusParalyze,
 					})
 				}
 				if move.ID == MoveDefog {
