@@ -62,9 +62,7 @@ func BenchmarkBattle(b *testing.B) {
 		}
 		for {
 			transactions, ended := battle.SimulateRound()
-			for _, t := range transactions {
-				fmt.Printf("%s\n", t.BattleLog())
-			}
+			fmt.Println(len(transactions))
 			if ended {
 				break
 			}

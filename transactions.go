@@ -1,11 +1,8 @@
 package pokemonbattlelib
 
-import "fmt"
-
 // Transactions describes a change to battle state.
 // A sequence of transactions should be able to describe an entire battle.
 type Transaction interface {
-	BattleLog() string
 	Mutate(b *Battle) // Modifies the battle to apply the transaction. Can also queue additional transactions via b.QueueTransaction().
 }
 
@@ -16,10 +13,6 @@ type DamageTransaction struct {
 	Move         *Move
 	Damage       uint
 	StatusEffect StatusCondition
-}
-
-func (t DamageTransaction) BattleLog() string {
-	return "REMOVE"
 }
 
 func (t DamageTransaction) Mutate(b *Battle) {
@@ -62,10 +55,6 @@ type FriendshipTransaction struct {
 	Amount int      // The amount of friendship to increase/decrease
 }
 
-func (t FriendshipTransaction) BattleLog() string {
-	return "REMOVE(friendship)"
-}
-
 func (t FriendshipTransaction) Mutate(b *Battle) {
 	t.Target.Friendship += t.Amount
 }
@@ -75,10 +64,6 @@ type ItemTransaction struct {
 	Target *Pokemon
 	Item   *Item
 	Move   *Move
-}
-
-func (t ItemTransaction) BattleLog() string {
-	return "REMOVE(item)"
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
@@ -94,10 +79,6 @@ type HealTransaction struct {
 	Amount uint
 }
 
-func (t HealTransaction) BattleLog() string {
-	return "REMOVE(heal)"
-}
-
 func (t HealTransaction) Mutate(b *Battle) {
 	t.Target.CurrentHP += t.Amount
 }
@@ -106,11 +87,6 @@ func (t HealTransaction) Mutate(b *Battle) {
 type InflictStatusTransaction struct {
 	Target       *Pokemon
 	StatusEffect StatusCondition
-}
-
-func (t InflictStatusTransaction) BattleLog() string {
-	// TODO: add status string representation
-	return "REMOVE(inflict status)"
 }
 
 func (t InflictStatusTransaction) Mutate(b *Battle) {
@@ -122,10 +98,6 @@ type CureStatusTransaction struct {
 	StatusEffect StatusCondition
 }
 
-func (t CureStatusTransaction) BattleLog() string {
-	return "REMOVE(cure status)"
-}
-
 func (t CureStatusTransaction) Mutate(b *Battle) {
 	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 	receiver.StatusEffects.clear(t.StatusEffect)
@@ -134,10 +106,6 @@ func (t CureStatusTransaction) Mutate(b *Battle) {
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
 type FaintTransaction struct {
 	Target target
-}
-
-func (t FaintTransaction) BattleLog() string {
-	return "REMOVE(faint)"
 }
 
 func (t FaintTransaction) Mutate(b *Battle) {
@@ -171,10 +139,6 @@ type SendOutTransaction struct {
 	Target target
 }
 
-func (t SendOutTransaction) BattleLog() string {
-	return "REMOVE(send out)"
-}
-
 func (t SendOutTransaction) Mutate(b *Battle) {
 	p := b.parties[t.Target.party]
 	p.SetActive(t.Target.partySlot)
@@ -185,22 +149,12 @@ type WeatherTransaction struct {
 	Weather Weather
 }
 
-func (t WeatherTransaction) BattleLog() string {
-	// TODO: add weather stringer
-	return fmt.Sprintf("The weather changed to %v.", t.Weather)
-}
-
 func (t WeatherTransaction) Mutate(b *Battle) {
 	b.Weather = t.Weather
 }
 
 // A transaction that ends the battle.
 type EndBattleTransaction struct{}
-
-func (t EndBattleTransaction) BattleLog() string {
-	// TODO: include reason the battle ended
-	return "REMOVE(end battle)"
-}
 
 func (t EndBattleTransaction) Mutate(b *Battle) {
 	b.State = BattleEnd
@@ -212,10 +166,6 @@ type ImmobilizeTransaction struct {
 	StatusEffect StatusCondition
 }
 
-func (t ImmobilizeTransaction) BattleLog() string {
-	return "REMOVE(immobilize)"
-}
-
 func (t ImmobilizeTransaction) Mutate(b *Battle) {
 	// currently a no-op.
 }
@@ -223,10 +173,6 @@ func (t ImmobilizeTransaction) Mutate(b *Battle) {
 // Handles evasion, misses, dodging, etc. when using moves
 type EvadeTransaction struct {
 	User *Pokemon
-}
-
-func (t EvadeTransaction) BattleLog() string {
-	return "REMOVE(evade)"
 }
 
 func (t EvadeTransaction) Mutate(b *Battle) {
