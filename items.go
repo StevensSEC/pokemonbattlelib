@@ -109,6 +109,8 @@ func (p *Pokemon) UseItem(i *Item) []Transaction {
 	switch i.Category {
 	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
 		return p.UseMedicine(i)
+	case ItemCategoryInAPinch:
+		return p.UseBerryInAPinch(i)
 	}
 	return make([]Transaction, 0)
 }
@@ -118,6 +120,21 @@ func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
 	switch i.ID {
 	case ItemPotion:
 		t = append(t, p.RestoreHP(20))
+	}
+	return t
+}
+
+func (p *Pokemon) UseBerryInAPinch(i *Item) (t []Transaction) {
+	switch i.ID {
+	case ItemApicotBerry:
+	case ItemCustapBerry:
+	case ItemGanlonBerry:
+	case ItemLansatBerry:
+	case ItemLiechiBerry:
+	case ItemMicleBerry:
+	case ItemPetayaBerry:
+	case ItemSalacBerry:
+	case ItemStarfBerry:
 	}
 	return t
 }
