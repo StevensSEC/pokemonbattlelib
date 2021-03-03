@@ -1007,6 +1007,24 @@ var _ = Describe("Status Conditions", func() {
 		a2 = Agent(dumbAgent{})
 	})
 
+	It("should cause status effects from moves", func() {
+		p1 := GeneratePokemon(1, WithMoves(GetMove(MoveSplash)))
+		p2 := GeneratePokemon(1, WithMoves(GetMove(MoveStunSpore)))
+		party1 := NewOccupiedParty(&a1, 0, p1)
+		party2 := NewOccupiedParty(&a2, 1, p2)
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		b.rng = &AlwaysRNG
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(
+			InflictStatusTransaction{
+				Target:       p1,
+				StatusEffect: StatusParalyze,
+			},
+		))
+	})
+
 	It("should inflict burn and poison damage", func() {
 		p1 := GeneratePokemon(1, WithMoves(GetMove(MovePound)))
 		p1.StatusEffects = StatusPoison
