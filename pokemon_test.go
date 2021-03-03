@@ -9,12 +9,12 @@ import (
 
 var _ = Describe("Pokemon generation", func() {
 	It("generates a Pokemon given just a dex number", func() {
-		p := GeneratePokemon(8)
+		p := GeneratePokemon(PkmnWartortle)
 		Expect(int(p.NatDex)).To(Equal(8))
 	})
 
 	It("gets the name of a generated Pokemon", func() {
-		p := GeneratePokemon(1)
+		p := GeneratePokemon(PkmnBulbasaur)
 		Expect(p.GetName()).To(Equal("Bulbasaur"))
 	})
 
@@ -122,7 +122,7 @@ var _ = Describe("Pokemon generation", func() {
 	})
 
 	It("panics when computing stats of illegal Pokemon", func() {
-		p := GeneratePokemon(1)
+		p := GeneratePokemon(PkmnBulbasaur)
 		p.Level = 105
 		Expect(func() { p.computeStats() }).To(Panic())
 	})

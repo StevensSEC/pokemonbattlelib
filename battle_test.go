@@ -50,8 +50,8 @@ var _ = Describe("RC Agent", func() {
 	a2 := newRcAgent()
 	_a1 := Agent(a1)
 	_a2 := Agent(a2)
-	pkmn1 := GeneratePokemon(4, WithMoves(GetMove(MovePound)))
-	pkmn2 := GeneratePokemon(7, WithMoves(GetMove(MovePound)))
+	pkmn1 := GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MovePound)))
+	pkmn2 := GeneratePokemon(PkmnSquirtle, WithMoves(GetMove(MovePound)))
 	party1 := NewOccupiedParty(&_a1, 0, pkmn1)
 	party2 := NewOccupiedParty(&_a2, 1, pkmn2)
 	b := NewBattle()
@@ -86,8 +86,8 @@ var _ = Describe("Battle", func() {
 
 	Context("Battle setup", func() {
 		It("runs without panicking", func() {
-			party1 := NewOccupiedParty(&agent1, 0, GeneratePokemon(4))
-			party2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(7))
+			party1 := NewOccupiedParty(&agent1, 0, GeneratePokemon(PkmnCharmander))
+			party2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(PkmnSquirtle))
 			b := NewBattle()
 			b.AddParty(party1, party2)
 			b.SetSeed(849823)
@@ -96,15 +96,15 @@ var _ = Describe("Battle", func() {
 		It("panics when adding too many Pokemon to a party", func() {
 			party := NewParty(&agent1, 0)
 			for i := 0; i < MaxPartySize; i += 1 {
-				party.AddPokemon(GeneratePokemon(1))
+				party.AddPokemon(GeneratePokemon(PkmnBulbasaur))
 			}
 			Expect(func() {
-				party.AddPokemon(GeneratePokemon(1))
+				party.AddPokemon(GeneratePokemon(PkmnBulbasaur))
 			}).To(Panic())
 		})
 
 		It("panics when getting an invalid Pokemon", func() {
-			party := NewOccupiedParty(&agent1, 0, GeneratePokemon(1))
+			party := NewOccupiedParty(&agent1, 0, GeneratePokemon(PkmnBulbasaur))
 			b := NewBattle()
 			b.AddParty(party)
 			Expect(func() {
@@ -277,7 +277,7 @@ var _ = Describe("Active pokemon in battle", func() {
 
 	BeforeEach(func() {
 		agent = Agent(dumbAgent{})
-		party = NewOccupiedParty(&agent, 0, GeneratePokemon(7), GeneratePokemon(9))
+		party = NewOccupiedParty(&agent, 0, GeneratePokemon(PkmnSquirtle), GeneratePokemon(PkmnBlastoise))
 	})
 
 	It("should add an active Pokemon when SetActive is called", func() {
@@ -326,8 +326,12 @@ var _ = Describe("Getting party Pokemon", func() {
 	BeforeEach(func() {
 		agent1 = Agent(dumbAgent{})
 		agent2 = Agent(dumbAgent{})
-		party1 = NewOccupiedParty(&agent1, 0, GeneratePokemon(4), GeneratePokemon(7), GeneratePokemon(11))
-		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(15))
+		party1 = NewOccupiedParty(&agent1, 0,
+			GeneratePokemon(PkmnCharmander),
+			GeneratePokemon(PkmnSquirtle),
+			GeneratePokemon(PkmnMetapod),
+		)
+		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(PkmnBeedrill))
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
 	})

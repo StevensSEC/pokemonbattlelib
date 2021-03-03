@@ -16,7 +16,7 @@ var _ = Describe("Using items", func() {
 
 	It("should use the item and produce transactions", func() {
 		i := GetItem(ItemPotion)
-		p := GeneratePokemon(1)
+		p := GeneratePokemon(PkmnBulbasaur)
 		p.Stats[StatHP] = 100
 		logs := p.UseItem(&i)
 		Expect(logs).To(HaveLen(1))
