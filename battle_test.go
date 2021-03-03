@@ -1151,7 +1151,7 @@ var _ = Describe("Status Conditions", func() {
 				partySlot: 0,
 				Team:      0,
 			},
-			Status: StatusParalyze,
+			StatusEffect: StatusParalyze,
 		})
 		b.ProcessQueue()
 		t, _ := b.SimulateRound()
@@ -1163,7 +1163,7 @@ var _ = Describe("Status Conditions", func() {
 					partySlot: 0,
 					Team:      0,
 				},
-				Status: StatusParalyze,
+				StatusEffect: StatusParalyze,
 			},
 		))
 	})

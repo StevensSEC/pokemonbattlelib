@@ -104,8 +104,8 @@ func (t HealTransaction) Mutate(b *Battle) {
 
 // A transaction to apply a status effect to a Pokemon.
 type InflictStatusTransaction struct {
-	Target *Pokemon
-	Status StatusCondition
+	Target       *Pokemon
+	StatusEffect StatusCondition
 }
 
 func (t InflictStatusTransaction) BattleLog() string {
@@ -114,12 +114,12 @@ func (t InflictStatusTransaction) BattleLog() string {
 }
 
 func (t InflictStatusTransaction) Mutate(b *Battle) {
-	t.Target.StatusEffects.apply(t.Status)
+	t.Target.StatusEffects.apply(t.StatusEffect)
 }
 
 type CureStatusTransaction struct {
-	Target target
-	Status StatusCondition
+	Target       target
+	StatusEffect StatusCondition
 }
 
 func (t CureStatusTransaction) BattleLog() string {
@@ -128,7 +128,7 @@ func (t CureStatusTransaction) BattleLog() string {
 
 func (t CureStatusTransaction) Mutate(b *Battle) {
 	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-	receiver.StatusEffects.clear(t.Status)
+	receiver.StatusEffects.clear(t.StatusEffect)
 }
 
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
