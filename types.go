@@ -10,67 +10,68 @@ import (
 // Constants for looking up Pokemon stats
 const (
 	// Base stats
-	STAT_HP = iota
-	STAT_ATK
-	STAT_DEF
-	STAT_SPATK
-	STAT_SPDEF
-	STAT_SPD
+	StatHP = iota
+	StatAtk
+	StatDef
+	StatSpAtk
+	StatSpDef
+	StatSpeed
 	// Fighting stats
-	STAT_CRIT_CHANCE
-	STAT_ACCURACY
-	STAT_EVASION
+	StatCritChance
+	StatAccuracy
+	StatEvasion
 )
 
 // Table of critical hit chances (denominator of 1/X)
-var CRIT_CHANCE = [5]int{16, 8, 4, 3, 2}
+var CritChances = [5]int{16, 8, 4, 3, 2}
 
+// The min and max number of stages that a stat can be modified is [-6, 6]
 const (
-	MAX_STAT_MODIFIER = 6
-	MIN_STAT_MODIFIER = -6
+	MaxStatModifier = 6
+	MinStatModifier = -6
 )
 
 // Represents a bit mask of all elemental types
-type ElementalType uint32
+type Type uint32
 
 const (
-	Normal ElementalType = 1 << iota
-	Fighting
-	Flying
-	Poison
-	Ground
-	Rock
-	Bug
-	Ghost
-	Steel
-	Fire
-	Water
-	Grass
-	Electric
-	Psychic
-	Ice
-	Dragon
-	Dark
+	TypeNormal Type = 1 << iota
+	TypeFighting
+	TypeFlying
+	TypePoison
+	TypeGround
+	TypeRock
+	TypeBug
+	TypeGhost
+	TypeSteel
+	TypeFire
+	TypeWater
+	TypeGrass
+	TypeElectric
+	TypePsychic
+	TypeIce
+	TypeDragon
+	TypeDark
 )
 
-var elementalTypeStrings = map[ElementalType]string{
-	Normal:   "Normal",
-	Fighting: "Fighting",
-	Flying:   "Flying",
-	Poison:   "Poison",
-	Ground:   "Ground",
-	Rock:     "Rock",
-	Bug:      "Bug",
-	Ghost:    "Ghost",
-	Steel:    "Steel",
-	Fire:     "Fire",
-	Water:    "Water",
-	Grass:    "Grass",
-	Electric: "Electric",
-	Psychic:  "Psychic",
-	Ice:      "Ice",
-	Dragon:   "Dragon",
-	Dark:     "Dark",
+var typeStrings = map[Type]string{
+	TypeNormal:   "Normal",
+	TypeFighting: "Fighting",
+	TypeFlying:   "Flying",
+	TypePoison:   "Poison",
+	TypeGround:   "Ground",
+	TypeRock:     "Rock",
+	TypeBug:      "Bug",
+	TypeGhost:    "Ghost",
+	TypeSteel:    "Steel",
+	TypeFire:     "Fire",
+	TypeWater:    "Water",
+	TypeGrass:    "Grass",
+	TypeElectric: "Electric",
+	TypePsychic:  "Psychic",
+	TypeIce:      "Ice",
+	TypeDragon:   "Dragon",
+	TypeDark:     "Dark",
 }
 
 // Represents effectiveness of an elemental type matchup.
@@ -85,57 +86,57 @@ const (
 	VerySuperEffective Effectiveness = 4
 )
 
-var noEffect = map[ElementalType]ElementalType{
-	Normal:   Ghost,
-	Fighting: Ghost,
-	Poison:   Steel,
-	Ground:   Flying,
-	Ghost:    Normal,
-	Electric: Ground,
-	Psychic:  Dark,
+var noEffect = map[Type]Type{
+	TypeNormal:   TypeGhost,
+	TypeFighting: TypeGhost,
+	TypePoison:   TypeSteel,
+	TypeGround:   TypeFlying,
+	TypeGhost:    TypeNormal,
+	TypeElectric: TypeGround,
+	TypePsychic:  TypeDark,
 }
 
-var halfEffect = map[ElementalType]ElementalType{
-	Normal:   Rock | Steel,
-	Fighting: Flying | Poison | Bug | Psychic,
-	Flying:   Rock | Steel | Electric,
-	Poison:   Poison | Ground | Rock | Ghost,
-	Ground:   Bug | Grass,
-	Rock:     Fighting | Ground | Steel,
-	Bug:      Fighting | Flying | Poison | Ghost | Steel | Fire,
-	Ghost:    Steel | Dark,
-	Steel:    Steel | Fire | Water | Electric,
-	Fire:     Rock | Fire | Water | Dragon,
-	Water:    Water | Grass | Dragon,
-	Grass:    Flying | Poison | Bug | Steel | Fire | Grass | Dragon,
-	Electric: Grass | Electric | Dragon,
-	Psychic:  Steel | Psychic,
-	Ice:      Steel | Fire | Water | Ice,
-	Dragon:   Steel,
-	Dark:     Fighting | Steel | Dark,
+var halfEffect = map[Type]Type{
+	TypeNormal:   TypeRock | TypeSteel,
+	TypeFighting: TypeFlying | TypePoison | TypeBug | TypePsychic,
+	TypeFlying:   TypeRock | TypeSteel | TypeElectric,
+	TypePoison:   TypePoison | TypeGround | TypeRock | TypeGhost,
+	TypeGround:   TypeBug | TypeGrass,
+	TypeRock:     TypeFighting | TypeGround | TypeSteel,
+	TypeBug:      TypeFighting | TypeFlying | TypePoison | TypeGhost | TypeSteel | TypeFire,
+	TypeGhost:    TypeSteel | TypeDark,
+	TypeSteel:    TypeSteel | TypeFire | TypeWater | TypeElectric,
+	TypeFire:     TypeRock | TypeFire | TypeWater | TypeDragon,
+	TypeWater:    TypeWater | TypeGrass | TypeDragon,
+	TypeGrass:    TypeFlying | TypePoison | TypeBug | TypeSteel | TypeFire | TypeGrass | TypeDragon,
+	TypeElectric: TypeGrass | TypeElectric | TypeDragon,
+	TypePsychic:  TypeSteel | TypePsychic,
+	TypeIce:      TypeSteel | TypeFire | TypeWater | TypeIce,
+	TypeDragon:   TypeSteel,
+	TypeDark:     TypeFighting | TypeSteel | TypeDark,
 }
 
-var doubleEffect = map[ElementalType]ElementalType{
-	Fighting: Normal | Rock | Steel | Ice | Dark,
-	Flying:   Fighting | Bug | Grass,
-	Poison:   Grass,
-	Ground:   Poison | Rock | Steel | Fire | Electric,
-	Rock:     Flying | Bug | Fire | Ice,
-	Bug:      Grass | Psychic | Dark,
-	Ghost:    Ghost | Psychic,
-	Steel:    Rock | Ice,
-	Fire:     Bug | Steel | Grass | Ice,
-	Water:    Ground | Rock | Fire,
-	Grass:    Ground | Rock | Water,
-	Electric: Flying | Water,
-	Psychic:  Fighting | Poison,
-	Ice:      Flying | Ground | Grass | Dragon,
-	Dragon:   Dragon,
-	Dark:     Ghost | Psychic,
+var doubleEffect = map[Type]Type{
+	TypeFighting: TypeNormal | TypeRock | TypeSteel | TypeIce | TypeDark,
+	TypeFlying:   TypeFighting | TypeBug | TypeGrass,
+	TypePoison:   TypeGrass,
+	TypeGround:   TypePoison | TypeRock | TypeSteel | TypeFire | TypeElectric,
+	TypeRock:     TypeFlying | TypeBug | TypeFire | TypeIce,
+	TypeBug:      TypeGrass | TypePsychic | TypeDark,
+	TypeGhost:    TypeGhost | TypePsychic,
+	TypeSteel:    TypeRock | TypeIce,
+	TypeFire:     TypeBug | TypeSteel | TypeGrass | TypeIce,
+	TypeWater:    TypeGround | TypeRock | TypeFire,
+	TypeGrass:    TypeGround | TypeRock | TypeWater,
+	TypeElectric: TypeFlying | TypeWater,
+	TypePsychic:  TypeFighting | TypePoison,
+	TypeIce:      TypeFlying | TypeGround | TypeGrass | TypeDragon,
+	TypeDragon:   TypeDragon,
+	TypeDark:     TypeGhost | TypePsychic,
 }
 
 // Get effectiveness of a given elemental type matchup.
-func GetElementalEffect(move, def ElementalType) Effectiveness {
+func GetElementalEffect(move, def Type) Effectiveness {
 	if noEffect[move]&def > 0 {
 		return NoEffect
 	}
@@ -152,11 +153,11 @@ func GetElementalEffect(move, def ElementalType) Effectiveness {
 	}
 }
 
-func (e ElementalType) String() string {
+func (t Type) String() string {
 	result := ""
-	for i := Normal; i <= Dark; i <<= 1 {
-		if e&i > 0 {
-			result += fmt.Sprintf("[%s]", elementalTypeStrings[i])
+	for i := TypeNormal; i <= TypeDark; i <<= 1 {
+		if t&i > 0 {
+			result += fmt.Sprintf("[%s]", typeStrings[i])
 		}
 	}
 	return result
@@ -165,17 +166,17 @@ func (e ElementalType) String() string {
 type Gender int
 
 const (
-	Genderless Gender = iota
-	Female
-	Male
+	GenderGenderless Gender = iota
+	GenderFemale
+	GenderMale
 )
 
 func (g Gender) String() string {
-	if g == Genderless {
+	if g == GenderGenderless {
 		return ""
-	} else if g == Female {
+	} else if g == GenderFemale {
 		return "♀"
-	} else if g == Male {
+	} else if g == GenderMale {
 		return "♂"
 	} else {
 		panic("Stringing gender reached unhandled condition")
@@ -240,14 +241,14 @@ var statusStrings = map[StatusCondition]string{
 }
 
 const (
-	NONVOLATILE_STATUS_MASK StatusCondition = 0b111
-	VOLATILE_STATUS_MASK    StatusCondition = math.MaxUint32 ^ NONVOLATILE_STATUS_MASK
+	StatusNonvolatileMask StatusCondition = 0b111
+	StatusVolatileMask    StatusCondition = math.MaxUint32 ^ StatusNonvolatileMask
 )
 
 func (s *StatusCondition) check(c StatusCondition) bool {
-	vCheck := (*s&VOLATILE_STATUS_MASK)&(c&VOLATILE_STATUS_MASK) == c&VOLATILE_STATUS_MASK
-	if c&NONVOLATILE_STATUS_MASK > 0 {
-		nvCheck := (*s&NONVOLATILE_STATUS_MASK)^(c&NONVOLATILE_STATUS_MASK) == 0
+	vCheck := (*s&StatusVolatileMask)&(c&StatusVolatileMask) == c&StatusVolatileMask
+	if c&StatusNonvolatileMask > 0 {
+		nvCheck := (*s&StatusNonvolatileMask)^(c&StatusNonvolatileMask) == 0
 		return nvCheck && vCheck
 	} else {
 		return vCheck
@@ -256,11 +257,11 @@ func (s *StatusCondition) check(c StatusCondition) bool {
 
 // Applies the given status conditions to this status condition. Non-volatile status conditions are overwritten.
 func (s *StatusCondition) apply(c StatusCondition) {
-	nv := c & NONVOLATILE_STATUS_MASK
+	nv := c & StatusNonvolatileMask
 	if nv == 0 {
-		nv = *s & NONVOLATILE_STATUS_MASK
+		nv = *s & StatusNonvolatileMask
 	}
-	v := VOLATILE_STATUS_MASK & (*s | c)
+	v := StatusVolatileMask & (*s | c)
 	*s = nv | v
 }
 
@@ -303,44 +304,44 @@ type Nature struct {
 
 // Constants for looking up natures
 const (
-	HARDY = iota + 1
-	LONELY
-	ADAMANT
-	NAUGHTY
-	BRAVE
-	BOLD
-	DOCILE
-	IMPISH
-	LAX
-	RELAXED
-	MODEST
-	MILD
-	BASHFUL
-	RASH
-	QUIET
-	CALM
-	GENTLE
-	CAREFUL
-	QUIRKY
-	SASSY
-	TIMID
-	HASTY
-	JOLLY
-	NAIVE
-	SERIOUS
+	NatureHardy = iota + 1
+	NatureLonely
+	NatureAdamant
+	NatureNaughty
+	NatureBrave
+	NatureBold
+	NatureDocile
+	NatureImpish
+	NatureLax
+	NatureRelaxed
+	NatureModest
+	NatureMild
+	NatureBashful
+	NatureRash
+	NatureQuiet
+	NatureCalm
+	NatureGentle
+	NatureCareful
+	NatureQuirky
+	NatureSassy
+	NatureTimid
+	NatureHasty
+	NatureJolly
+	NatureNaive
+	NatureSerious
 )
 
 func GetNature(nature int) *Nature {
 	natures := map[int]*Nature{
 		//TODO: add all natures
-		HARDY: {
-			StatUp:   STAT_ATK,
-			StatDown: STAT_ATK,
+		NatureHardy: {
+			StatUp:   StatAtk,
+			StatDown: StatAtk,
 			name:     "Hardy",
 		},
-		ADAMANT: {
-			StatUp:   STAT_ATK,
-			StatDown: STAT_SPATK,
+		NatureAdamant: {
+			StatUp:   StatAtk,
+			StatDown: StatSpAtk,
 			name:     "Adamant",
 		},
 	}
@@ -359,3 +360,15 @@ func (n Nature) getNatureModifers() [6]float64 {
 
 	return natureModifiers
 }
+
+// Weather effects
+type Weather int
+
+const (
+	WeatherClearSkies Weather = iota
+	WeatherHarshSunlight
+	WeatherRain
+	WeatherSandstorm
+	WeatherHail
+	WeatherFog
+)

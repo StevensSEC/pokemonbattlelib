@@ -9,8 +9,8 @@ import (
 
 // A Pokemon battle. Enforces rules of the battle, and queries `Agent`s for turns.
 type Battle struct {
-	Weather  int  // one of the 6 in-battle weather conditions
-	ShiftSet bool // shift or set battle style for NPC trainer battles
+	Weather  Weather // one of the 6 in-battle weather conditions
+	ShiftSet bool    // shift or set battle style for NPC trainer battles
 	State    BattleState
 	rng      RNG
 
@@ -23,16 +23,16 @@ type Battle struct {
 type BattleState int
 
 const (
-	BEFORE_START BattleState = iota
-	BATTLE_IN_PROGRESS
-	BATTLE_END
+	BattleBeforeStart BattleState = iota
+	BattleInProgress
+	BattleEnd
 )
 
 // Creates a new battle instance, setting initial conditions
 func NewBattle() *Battle {
 	rng := LCRNG(rand.Uint32())
 	b := Battle{
-		State: BEFORE_START,
+		State: BattleBeforeStart,
 		rng:   RNG(&rng),
 	}
 	return &b
@@ -89,7 +89,7 @@ func (b *Battle) Start() error {
 	// TODO: validate the battle, return error if invalid
 
 	// Initiate the battle! Send out the first pokemon in the parties.
-	b.State = BATTLE_IN_PROGRESS
+	b.State = BattleInProgress
 	for _, party := range b.parties {
 		party.SetActive(0)
 	}
@@ -98,7 +98,7 @@ func (b *Battle) Start() error {
 
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
 func (b *Battle) SimulateRound() ([]Transaction, bool) {
-	if b.State != BATTLE_IN_PROGRESS {
+	if b.State != BattleInProgress {
 		log.Panic("battle is not currently in progress")
 	}
 	// Collects all turn info from each active Pokemon
@@ -136,7 +136,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					return mvA.Priority > mvB.Priority
 				}
 				// speedy pokemon should go first
-				return ctxA.Pokemon.Stats[STAT_SPD] > ctxB.Pokemon.Stats[STAT_SPD]
+				return ctxA.Pokemon.Stats[StatSpeed] > ctxB.Pokemon.Stats[StatSpeed]
 			}
 		} else {
 			// make higher priority turns go first
@@ -150,8 +150,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		turn := turns[0]
 		turns = turns[1:]
 		// here, we can't use the turn context's reference to the pokemon, because it is a copy of the ground truth pokemon
-		user := b.getPokemon(turn.User.party, turn.User.partySlot)
-		if user.CurrentHP == 0 {
+		self := b.getPokemon(turn.User.party, turn.User.partySlot)
+		if self.CurrentHP == 0 {
 			continue
 		}
 		switch t := turn.Turn.(type) {
@@ -171,7 +171,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Target: target{
 							Pokemon: user,
 						},
-						StatusEffect: user.StatusEffects & NONVOLATILE_STATUS_MASK,
+						StatusEffect: user.StatusEffects & StatusNonvolatileMask,
 					})
 					continue // forfeit turn
 				}
@@ -187,43 +187,90 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 			// use the move
 			move := user.Moves[t.Move]
-			accuracy := move.Accuracy
+			accuracy := float64(move.Accuracy)
+			if b.Weather == WeatherFog {
+				accuracy *= 3. / 5.
+			}
 			// Todo: account for receiver's evasion
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-			if !b.rng.Roll(accuracy, 100) {
+			if move.Accuracy != 0 && !b.rng.Roll(int(accuracy), 100) {
 				b.QueueTransaction(EvadeTransaction{
 					User: &user,
 				})
 				continue
 			}
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
-			if move.Category == Status {
-				if move.ID == MOVE_STUN_SPORE {
+			if move.Category == MoveCategoryStatus {
+				if move.ID == MoveStunSpore {
 					b.QueueTransaction(InflictStatusTransaction{
 						Target: receiver,
 						Status: StatusParalyze,
 					})
 				}
+				if move.ID == MoveDefog {
+					if b.Weather == WeatherFog {
+						b.QueueTransaction(WeatherTransaction{
+							Weather: WeatherClearSkies,
+						})
+					}
+				}
+				if b.Weather == WeatherFog {
+					if move.ID == MoveMoonlight || move.ID == MoveSynthesis || move.ID == MoveMorningSun {
+						b.QueueTransaction(HealTransaction{
+							Target: self,
+							Amount: self.Stats[StatHP] / 4,
+						})
+					}
+				}
 			} else {
+				weather := 1.0
+				if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Type == TypeWater) || (sun && move.Type == TypeFire) {
+					weather = 1.5
+				} else if (rain && move.Type == TypeFire) || (sun && move.Type == TypeWater) {
+					weather = 0.5
+				}
 				crit := 1.0
-				if b.rng.Roll(1, CRIT_CHANCE[user.StatModifiers[STAT_CRIT_CHANCE]]) {
+				if b.rng.Roll(1, CritChances[user.StatModifiers[StatCritChance]]) {
 					crit = 2.0
 				}
 				stab := 1.0
-				if move != nil && user.Elemental&move.Type != 0 {
+				if move != nil && user.Type&move.Type != 0 {
 					stab = 1.5
 					if user.Ability != nil && user.Ability.ID == 91 { // Adaptability
 						stab = 2.0
 					}
 				}
-				modifier := crit * stab // TODO: damage multiplers
+				modifier := weather * crit * stab
 				levelEffect := float64((2 * user.Level / 5) + 2)
 				movePower := float64(move.Power)
-				statRatio := float64(user.Stats[STAT_ATK] / receiver.Stats[STAT_DEF])
-				if move.Category == Special {
-					statRatio = float64(user.Stats[STAT_SPATK] / receiver.Stats[STAT_SPDEF])
+				attack := float64(user.Stats[StatAtk])
+				defense := float64(receiver.Stats[StatDef])
+				// Move modifiers
+				if move.Category == MoveCategorySpecial {
+					attack = float64(user.Stats[StatSpAtk])
+					defense = float64(receiver.Stats[StatSpDef])
 				}
-				damage := (((levelEffect * movePower * statRatio) / 50) + 2) * modifier
+				// Weather modifiers
+				if b.Weather == WeatherSandstorm {
+					if receiver.Type&TypeRock != 0 {
+						defense *= 1.5
+					}
+					if move.ID == MoveSolarBeam {
+						movePower /= 2
+					}
+				}
+				if b.Weather == WeatherHail && move.ID == MoveSolarBeam {
+					movePower /= 2
+				}
+				if b.Weather == WeatherFog {
+					if move.ID == MoveWeatherBall {
+						movePower *= 2
+					}
+					if move.ID == MoveSolarBeam {
+						movePower /= 2
+					}
+				}
+				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
 				b.QueueTransaction(DamageTransaction{
 					User:   &user,
 					Target: t.Target,
@@ -245,7 +292,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		}
 
 		b.ProcessQueue()
-		if b.State == BATTLE_END {
+		if b.State == BattleEnd {
 			break
 		}
 	}
@@ -253,27 +300,46 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	// handle post turn status effects
 	for a, party := range b.parties {
 		for ap, pkmn := range party.activePokemon {
+			t := target{
+				party:     a,
+				partySlot: ap,
+				Pokemon:   *pkmn,
+				Team:      party.team,
+			}
 			if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
-				t := target{
-					party:     a,
-					partySlot: ap,
-					Pokemon:   *pkmn,
-					Team:      party.team,
-				}
-				cond := pkmn.StatusEffects & NONVOLATILE_STATUS_MASK
+				cond := pkmn.StatusEffects & StatusNonvolatileMask
 				var damage uint
 				switch cond {
 				case StatusBurn, StatusPoison:
-					damage = pkmn.Stats[STAT_HP] / 8
+					damage = pkmn.Stats[StatHP] / 8
 				case StatusBadlyPoison:
 					// TODO: implement counter for increasing bad poison damage
-					damage = pkmn.Stats[STAT_HP] / 16
+					damage = pkmn.Stats[StatHP] / 16
 				}
 				b.QueueTransaction(DamageTransaction{
 					Target:       t,
 					Damage:       damage,
 					StatusEffect: cond,
 				})
+			}
+			// damage from weather
+			// TODO: check for weather resisting abilities
+			if b.Weather == WeatherSandstorm {
+				if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
+					damage := pkmn.Stats[StatHP] / 16
+					b.QueueTransaction(DamageTransaction{
+						Target: t,
+						Damage: damage,
+					})
+				}
+			} else if b.Weather == WeatherHail {
+				if pkmn.Type&TypeIce == 0 {
+					damage := pkmn.Stats[StatHP] / 16
+					b.QueueTransaction(DamageTransaction{
+						Target: t,
+						Damage: damage,
+					})
+				}
 			}
 		}
 	}
@@ -284,7 +350,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	}
 	transactions := b.tProcessed
 	b.tProcessed = []Transaction{}
-	return transactions, b.State == BATTLE_END
+	return transactions, b.State == BattleEnd
 }
 
 // Add Transactions to the queue.
@@ -301,7 +367,7 @@ func (b *Battle) ProcessQueue() {
 
 		// add to the list of processed transactions
 		b.tProcessed = append(b.tProcessed, t)
-		if b.State == BATTLE_END {
+		if b.State == BattleEnd {
 			break
 		}
 	}

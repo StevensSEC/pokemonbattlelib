@@ -13,7 +13,8 @@ type party struct {
 	team          int              // The team that this party belongs to
 }
 
-const MAX_PARTY_SIZE = 6
+// Maximum number of Pokemon in a party
+const MaxPartySize = 6
 
 var PartyIndexError = errors.New("invalid index for party")
 
@@ -36,8 +37,8 @@ func NewOccupiedParty(agent *Agent, team int, pkmn ...*Pokemon) *party {
 
 // Adds 1 or more Pokemon to a Party
 func (p *party) AddPokemon(pkmn ...*Pokemon) {
-	if len(p.pokemon)+len(pkmn) > MAX_PARTY_SIZE {
-		log.Panicf("party size cannot exceed max of %v Pokemon\n", MAX_PARTY_SIZE)
+	if len(p.pokemon)+len(pkmn) > MaxPartySize {
+		log.Panicf("party size cannot exceed max of %v Pokemon\n", MaxPartySize)
 	}
 	p.pokemon = append(p.pokemon, pkmn...)
 }

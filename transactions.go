@@ -1,5 +1,7 @@
 package pokemonbattlelib
 
+import "fmt"
+
 // Transactions describes a change to battle state.
 // A sequence of transactions should be able to describe an entire battle.
 type Transaction interface {
@@ -21,6 +23,10 @@ func (t DamageTransaction) BattleLog() string {
 }
 
 func (t DamageTransaction) Mutate(b *Battle) {
+	// Minimum 1HP attack
+	if t.Damage == 0 {
+		t.Damage = 1
+	}
 	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 	if receiver.CurrentHP >= t.Damage {
 		receiver.CurrentHP -= t.Damage
@@ -174,6 +180,20 @@ func (t SendOutTransaction) Mutate(b *Battle) {
 	p.SetActive(t.Target.partySlot)
 }
 
+// Changes the current weather in a battle
+type WeatherTransaction struct {
+	Weather Weather
+}
+
+func (t WeatherTransaction) BattleLog() string {
+	// TODO: add weather stringer
+	return fmt.Sprintf("The weather changed to %v.", t.Weather)
+}
+
+func (t WeatherTransaction) Mutate(b *Battle) {
+	b.Weather = t.Weather
+}
+
 // A transaction that ends the battle.
 type EndBattleTransaction struct{}
 
@@ -183,7 +203,7 @@ func (t EndBattleTransaction) BattleLog() string {
 }
 
 func (t EndBattleTransaction) Mutate(b *Battle) {
-	b.State = BATTLE_END
+	b.State = BattleEnd
 }
 
 // Handles pre-turn status checks. (Paralysis, Sleeping, etc.)
