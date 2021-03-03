@@ -216,6 +216,30 @@ var _ = Describe("Status conditions", func() {
 				clear: StatusBound,
 				want:  StatusSleep | StatusLeechSeed,
 			},
+			{
+				name:  "Should not clear status that does not exist",
+				from:  StatusNone,
+				clear: StatusBurn,
+				want:  StatusNone,
+			},
+			{
+				name:  "Should not clear freeze",
+				from:  StatusParalyze,
+				clear: StatusFreeze,
+				want:  StatusParalyze,
+			},
+			{
+				name:  "Should clear only existing effects",
+				from:  StatusParalyze | StatusBound | StatusCantEscape,
+				clear: StatusConfusion | StatusBound | StatusCantEscape,
+				want:  StatusParalyze,
+			},
+			{
+				name:  "Should clear all non-volatile effects",
+				from:  StatusBurn | StatusConfusion,
+				clear: StatusNonvolatileMask,
+				want:  StatusConfusion,
+			},
 		}
 		for _, tt := range tests {
 			tt.from.clear(tt.clear)

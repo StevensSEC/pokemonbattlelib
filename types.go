@@ -267,7 +267,10 @@ func (s *StatusCondition) apply(c StatusCondition) {
 
 // Clears the given status conditions from this status condition.
 func (s *StatusCondition) clear(c StatusCondition) {
-	*s ^= c
+	if c != StatusNonvolatileMask && *s&StatusNonvolatileMask != c&StatusNonvolatileMask {
+		c &= StatusVolatileMask
+	}
+	*s &= ^c
 }
 
 func (s StatusCondition) String() string {
