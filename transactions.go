@@ -178,3 +178,28 @@ type EvadeTransaction struct {
 func (t EvadeTransaction) Mutate(b *Battle) {
 	// currently a no-op.
 }
+
+// Modifies a stat's stages in the interval [-6, 6]
+type ModifyStatTransaction struct {
+	Target *Pokemon
+	Stat   int
+	Stages int
+}
+
+func (t ModifyStatTransaction) Mutate(b *Battle) {
+	stage := t.Target.StatModifiers[t.Stat] + t.Stages
+	min := MinStatModifier
+	max := MaxStatModifier
+	// Bounds for crit chance are [0, 4]
+	if t.Stat == StatCritChance {
+		min = 0
+		max = len(CritChances) - 1
+	}
+	if stage < min {
+		stage = min
+	}
+	if stage > max {
+		stage = max
+	}
+	t.Target.StatModifiers[t.Stat] = stage
+}

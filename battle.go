@@ -200,22 +200,28 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				continue
 			}
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
+			// Status Moves
 			if move.Category == MoveCategoryStatus {
-				if move.ID == MoveStunSpore {
+				switch move.ID {
+				case MoveStunSpore:
 					b.QueueTransaction(InflictStatusTransaction{
 						Target:       receiver,
 						StatusEffect: StatusParalyze,
 					})
-				}
-				if move.ID == MoveDefog {
+				case MoveHowl:
+					b.QueueTransaction(ModifyStatTransaction{
+						Target: &user,
+						Stat:   StatAtk,
+						Stages: +1,
+					})
+				case MoveDefog:
 					if b.Weather == WeatherFog {
 						b.QueueTransaction(WeatherTransaction{
 							Weather: WeatherClearSkies,
 						})
 					}
-				}
-				if b.Weather == WeatherFog {
-					if move.ID == MoveMoonlight || move.ID == MoveSynthesis || move.ID == MoveMorningSun {
+				case MoveMoonlight, MoveSynthesis, MoveMorningSun:
+					if b.Weather == WeatherFog {
 						b.QueueTransaction(HealTransaction{
 							Target: self,
 							Amount: self.Stats[StatHP] / 4,
@@ -223,6 +229,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					}
 				}
 			} else {
+				// Physical/Special Moves
 				weather := 1.0
 				if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Type == TypeWater) || (sun && move.Type == TypeFire) {
 					weather = 1.5

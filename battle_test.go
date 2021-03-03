@@ -230,6 +230,28 @@ var _ = Describe("One round of battle", func() {
 			}))
 		})
 	})
+
+	Context("Interacts with StatModifiers in battle", func() {
+		It("should increase stat modifiers from certain moves", func() {
+			charmander.Moves[0] = GetMove(MoveHowl)
+			Expect(battle.Start()).To(Succeed())
+			t, _ := battle.SimulateRound()
+			Expect(t).To(HaveTransaction(ModifyStatTransaction{
+				Target: charmander,
+				Stat:   StatAtk,
+				Stages: +1,
+			}))
+			// Bound by min/max stat modifier
+			charmander.StatModifiers[StatAtk] = MaxStatModifier
+			t, _ = battle.SimulateRound()
+			Expect(t).To(HaveTransaction(ModifyStatTransaction{
+				Target: charmander,
+				Stat:   StatAtk,
+				Stages: +1,
+			}))
+			Expect(charmander.StatModifiers[StatAtk]).To(BeEquivalentTo(MaxStatModifier))
+		})
+	})
 })
 
 var _ = Describe("Using items in battle", func() {
