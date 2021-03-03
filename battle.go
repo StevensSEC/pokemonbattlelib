@@ -286,7 +286,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Item:   t.Item,
 				Move:   move,
 			})
-			b.QueueTransaction(receiver.UseItem(t.Item)...)
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
