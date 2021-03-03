@@ -1096,9 +1096,18 @@ var _ = Describe("Status Conditions", func() {
 		b.AddParty(party1, party2)
 		b.SetSeed(34987)
 		Expect(b.Start()).To(Succeed())
-		transactions, _ := b.SimulateRound()
-
-		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is frozen and is unable to move."))
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(
+			ImmobilizeTransaction{
+				Target: target{
+					Pokemon:   *p1,
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+				StatusEffect: StatusFreeze,
+			},
+		))
 	})
 
 	Specify("Sleep", func() {
@@ -1111,9 +1120,18 @@ var _ = Describe("Status Conditions", func() {
 		b.AddParty(party1, party2)
 		b.SetSeed(1337)
 		Expect(b.Start()).To(Succeed())
-		transactions, _ := b.SimulateRound()
-
-		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is asleep and is unable to move."))
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(
+			ImmobilizeTransaction{
+				Target: target{
+					Pokemon:   *p1,
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+				StatusEffect: StatusSleep,
+			},
+		))
 	})
 
 	It("Should cure paralysis", func() {
@@ -1136,8 +1154,17 @@ var _ = Describe("Status Conditions", func() {
 			Status: StatusParalyze,
 		})
 		b.ProcessQueue()
-		transactions, _ := b.SimulateRound()
-
-		Expect(transactions[0].BattleLog()).To(Equal("Bulbasaur is no longer paralyzed."))
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(
+			CureStatusTransaction{
+				Target: target{
+					Pokemon:   *p1,
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+				Status: StatusParalyze,
+			},
+		))
 	})
 })
