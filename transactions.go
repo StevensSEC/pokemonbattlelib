@@ -67,9 +67,14 @@ type ItemTransaction struct {
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
-	// TODO: do not consume certain items
-	if t.Target.HeldItem == t.Item {
-		t.Target.HeldItem = nil
+	if t.Item.Flags&FlagConsumable > 0 {
+		if t.Target.HeldItem == t.Item {
+			t.Target.HeldItem = nil
+		}
+		// TODO: remove consumed item from party's inventory
+	}
+	if t.Item.Flags&FlagUsableInBattle > 0 {
+		b.QueueTransaction(t.Target.UseItem(t.Item)...)
 	}
 }
 
