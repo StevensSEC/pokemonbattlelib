@@ -78,6 +78,16 @@ func (t ItemTransaction) Mutate(b *Battle) {
 	}
 }
 
+// A transaction to change the held item of a Pokemon
+type SwapItemTransaction struct {
+	Target *Pokemon
+	Item   *Item
+}
+
+func (t SwapItemTransaction) Mutate(b *Battle) {
+	t.Target.HeldItem = t.Item
+}
+
 // A transaction to restore HP to a Pokemon.
 type HealTransaction struct {
 	Target *Pokemon

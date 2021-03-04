@@ -138,7 +138,10 @@ func (p *Pokemon) UseMiscItem(i *Item) (t []Transaction) {
 	case ItemIronBall:
 		// TODO: set PokemonMeta[MetaIronBall]
 	case ItemStickyBarb:
-		// TODO: set PokemonMeta[MetaStickyBarb]
+		// TODO: get target info somehow (pass in battle?)
+		t = append(t, DamageTransaction{
+			Damage: p.Stats[StatHP] / 8,
+		})
 	case ItemToxicOrb:
 		t = append(t, InflictStatusTransaction{
 			Target:       p,

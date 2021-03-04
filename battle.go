@@ -247,7 +247,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						stab = 2.0
 					}
 				}
-				modifier := weather * crit * stab
 				levelEffect := float64((2 * user.Level / 5) + 2)
 				movePower := float64(move.Power)
 				attack := float64(user.Stats[StatAtk])
@@ -277,6 +276,36 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						movePower /= 2
 					}
 				}
+				// Item modifiers
+				if self.HeldItem != nil {
+					switch self.HeldItem.ID {
+					case ItemIronBall:
+						// TODO: make flying not immune to ground
+					}
+				}
+				if receiver.HeldItem != nil {
+					switch receiver.HeldItem.ID {
+					case ItemStickyBarb:
+						b.QueueTransaction(DamageTransaction{
+							Target: turn.User,
+							Damage: self.Stats[StatHP] / 8,
+						})
+						if self.HeldItem == nil {
+							b.QueueTransaction(
+								SwapItemTransaction{
+									Target: self,
+									Item:   receiver.HeldItem,
+								},
+								SwapItemTransaction{
+									Target: receiver,
+									Item:   nil,
+								},
+							)
+						}
+					}
+				}
+				// Item modifiers (target)
+				modifier := weather * crit * stab
 				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
 				b.QueueTransaction(DamageTransaction{
 					User:   &user,
@@ -302,7 +331,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		}
 	}
 
-	// handle post turn status effects
+	// All post turn effects
 	for a, party := range b.parties {
 		for ap, pkmn := range party.activePokemon {
 			t := target{
@@ -311,6 +340,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Pokemon:   *pkmn,
 				Team:      party.team,
 			}
+			// Status effects
 			if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
 				cond := pkmn.StatusEffects & StatusNonvolatileMask
 				var damage uint
@@ -327,7 +357,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					StatusEffect: cond,
 				})
 			}
-			// damage from weather
+			// Weather effects
 			// TODO: check for weather resisting abilities
 			if b.Weather == WeatherSandstorm {
 				if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
@@ -346,7 +376,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				}
 			}
-			// Held-item effects
+			// Held item effects
 			if pkmn.HeldItem != nil {
 				b.QueueTransaction(ItemTransaction{
 					Target: pkmn,
