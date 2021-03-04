@@ -128,42 +128,42 @@ var _ = Describe("Pokemon generation", func() {
 	})
 
 	It("panics when trying to create a Pokemon out of level bounds", func() {
-		Expect(func() { GeneratePokemon(396, WithLevel(MaxLevel+1)) }).To(Panic())
-		Expect(func() { GeneratePokemon(396, WithLevel(MinLevel-1)) }).To(Panic())
+		Expect(func() { GeneratePokemon(PkmnStarly, WithLevel(MaxLevel+1)) }).To(Panic())
+		Expect(func() { GeneratePokemon(PkmnStarly, WithLevel(MinLevel-1)) }).To(Panic())
 	})
 
 	It("panics when creating a Pokemon with higher than max IVs", func() {
-		Expect(func() { GeneratePokemon(396, WithIVs([6]uint8{32, 32, 32, 32, 32, 32})) }).To(Panic())
+		Expect(func() { GeneratePokemon(PkmnStarly, WithIVs([6]uint8{32, 32, 32, 32, 32, 32})) }).To(Panic())
 	})
 
 	It("panics when creating a Pokemon with higher than max EVs", func() {
-		Expect(func() { GeneratePokemon(396, WithEVs([6]uint8{255, 255, 255, 255, 255, 255})) }).To(Panic())
+		Expect(func() { GeneratePokemon(PkmnStarly, WithEVs([6]uint8{255, 255, 255, 255, 255, 255})) }).To(Panic())
 	})
 
 	It("panics when creating a Pokemon with more than the maximum allowed moves", func() {
 		pound := GetMove(MovePound)
-		Expect(func() { GeneratePokemon(396, WithMoves(pound, pound, pound, pound, pound)) }).To(Panic())
+		Expect(func() { GeneratePokemon(PkmnStarly, WithMoves(pound, pound, pound, pound, pound)) }).To(Panic())
 	})
 })
 
 var _ = Describe("Test leveling methods", func() {
 	It("panics when leveling beyond the max level", func() {
-		pkmn := GeneratePokemon(6, WithLevel(MaxLevel))
+		pkmn := GeneratePokemon(PkmnCharizard, WithLevel(MaxLevel))
 		Expect(func() { pkmn.GainLevels(1) }).To(Panic())
 	})
 
 	It("panics when trying to level down", func() {
-		pkmn := GeneratePokemon(393, WithLevel(5))
+		pkmn := GeneratePokemon(PkmnPiplup, WithLevel(5))
 		Expect(func() { pkmn.GainLevels(-1) }).To(Panic())
 	})
 
 	It("panics when trying to lose experience", func() {
-		pkmn := GeneratePokemon(393, WithLevel(5))
+		pkmn := GeneratePokemon(PkmnPiplup, WithLevel(5))
 		Expect(func() { pkmn.GainExperience(-135) }).To(Panic())
 	})
 
 	It("prevents a Pokemon from gaining experience beyond the max", func() {
-		pkmn := GeneratePokemon(493, WithLevel(MaxLevel))
+		pkmn := GeneratePokemon(PkmnArceus, WithLevel(MaxLevel))
 		pkmn.GainExperience(100000000000)
 		Expect(int(pkmn.Level)).To(Equal(MaxLevel))
 	})
@@ -176,7 +176,7 @@ var _ = Describe("Stringer interface", func() {
 	)
 
 	It("prints as expected", func() {
-		pkmn = GeneratePokemon(1, WithLevel(5))
+		pkmn = GeneratePokemon(PkmnBulbasaur, WithLevel(5))
 		pkmn.Gender = GenderFemale
 		want = "Bulbasaur♀\tLv5\nHP: 19/19\n"
 		Expect(fmt.Sprintf("%s", pkmn)).To(Equal(want))
