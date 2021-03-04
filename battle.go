@@ -105,6 +105,14 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	turns := make([]TurnContext, 0)
 	for i, party := range b.parties {
 		for j, pokemon := range party.activePokemon {
+			// Pre-turn effects
+			// Held item effects
+			if pokemon.HeldItem != nil {
+				switch pokemon.HeldItem.ID {
+				case ItemFullIncense, ItemLaggingTail:
+					// TODO: set PokemonMeta[MetaPriorityLast]
+				}
+			}
 			ctx := b.getContext(party, pokemon)
 			turn := (*party.Agent).Act(ctx)
 			turns = append(turns, TurnContext{
@@ -130,6 +138,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			case FightTurn:
 				ftA := turnA.(FightTurn)
 				ftB := turnB.(FightTurn)
+				// _, lastA := ctxA.Pokemon.metadata[MetaPriorityLast]
+				// _, lastB := ctxB.Pokemon.metadata[MetaPriorityLast]
+				// if lastA && !lastB {
+				// 	return false
+				// } else if lastB && !lastA {
+				// 	return true
+				// }
 				mvA := ctxA.Pokemon.Moves[ftA.Move]
 				mvB := ctxB.Pokemon.Moves[ftB.Move]
 				if mvA.Priority != mvB.Priority {

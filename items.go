@@ -133,8 +133,6 @@ func (p *Pokemon) UseMiscItem(i *Item) (t []Transaction) {
 			Target:       p,
 			StatusEffect: StatusBurn,
 		})
-	case ItemFullIncense, ItemLaggingTail:
-		// TODO: set PokemonMeta[MetaPriorityLast]
 	case ItemIronBall:
 		// TODO: set PokemonMeta[MetaIronBall]
 	case ItemStickyBarb:
