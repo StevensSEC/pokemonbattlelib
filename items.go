@@ -109,6 +109,8 @@ func (p *Pokemon) UseItem(i *Item) []Transaction {
 	switch i.Category {
 	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
 		return p.UseMedicine(i)
+	case ItemCategoryBadHeldItems:
+		return p.UseMiscItem(i)
 	}
 	return make([]Transaction, 0)
 }
@@ -118,6 +120,30 @@ func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
 	switch i.ID {
 	case ItemPotion:
 		t = append(t, p.RestoreHP(20))
+	}
+	return t
+}
+
+// Uses a miscellaneous item
+// Includes bad held items, choice items, EV training, and more
+func (p *Pokemon) UseMiscItem(i *Item) (t []Transaction) {
+	switch i.ID {
+	case ItemFlameOrb:
+		t = append(t, InflictStatusTransaction{
+			Target:       p,
+			StatusEffect: StatusBurn,
+		})
+	case ItemFullIncense, ItemLaggingTail:
+		// TODO: set PokemonMeta[MetaPriorityLast]
+	case ItemIronBall:
+		// TODO: set PokemonMeta[MetaIronBall]
+	case ItemStickyBarb:
+		// TODO: set PokemonMeta[MetaStickyBarb]
+	case ItemToxicOrb:
+		t = append(t, InflictStatusTransaction{
+			Target:       p,
+			StatusEffect: StatusPoison,
+		})
 	}
 	return t
 }

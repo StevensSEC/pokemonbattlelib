@@ -296,7 +296,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
-
 		b.ProcessQueue()
 		if b.State == BattleEnd {
 			break
@@ -346,6 +345,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Damage: damage,
 					})
 				}
+			}
+			// Held-item effects
+			if pkmn.HeldItem != nil {
+				b.QueueTransaction(ItemTransaction{
+					Target: pkmn,
+					Item:   pkmn.HeldItem,
+				})
 			}
 		}
 	}
