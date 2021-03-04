@@ -326,6 +326,35 @@ var _ = Describe("Turn priority", func() {
 			turn := ItemTurn{}
 			Expect(turn.Priority()).To(Equal(1))
 		})
+
+		It("should order turns properly based on priority", func() {
+			a2 := Agent(new(healAgent))
+			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MovePound)))
+			charmander := GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MovePound)))
+			p1 := NewOccupiedParty(&a1, 0, bulbasaur)
+			p2 := NewOccupiedParty(&a2, 1, charmander)
+			b := NewBattle()
+			b.AddParty(p1, p2)
+			Expect(b.Start()).To(Succeed())
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransactionsInOrder(
+				HealTransaction{
+					Target: charmander,
+					Amount: 0,
+				},
+				DamageTransaction{
+					User: bulbasaur,
+					Target: target{
+						Pokemon:   *charmander,
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+					},
+					Move:   GetMove(MovePound),
+					Damage: 3,
+				},
+			))
+		})
 	})
 
 	Context("when determining priority for equal turn types", func() {
