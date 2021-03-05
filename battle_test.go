@@ -849,6 +849,29 @@ var _ = Describe("Battle end", func() {
 	})
 })
 
+var _ = Describe("Battle metadata", func() {
+	Context("Pokemon metadata", func() {
+		It("should record the last used move of Pokemon in battle", func() {
+			a1 := Agent(new(dumbAgent))
+			razorLeaf := GetMove(MoveRazorLeaf)
+			p1 := NewOccupiedParty(&a1, 0,
+				GeneratePokemon(PkmnBulbasaur, WithMoves(razorLeaf)),
+			)
+			ember := GetMove(MoveEmber)
+			p2 := NewOccupiedParty(&a1, 1, GeneratePokemon(
+				PkmnCharmander, WithMoves(ember)),
+			)
+			b := NewBattle()
+			b.AddParty(p1, p2)
+			Expect(b.Start()).To(Succeed())
+			Expect(p1.pokemon[0].metadata).ToNot(HaveKeyWithValue(MetaLastMove, razorLeaf))
+			b.SimulateRound()
+			Expect(p1.pokemon[0].metadata).To(HaveKeyWithValue(MetaLastMove, razorLeaf))
+			Expect(p2.pokemon[0].metadata).To(HaveKeyWithValue(MetaLastMove, ember))
+		})
+	})
+})
+
 var _ = Describe("Status Conditions", func() {
 	a1 := Agent(new(dumbAgent))
 	a2 := Agent(new(dumbAgent))
