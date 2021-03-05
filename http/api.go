@@ -22,7 +22,7 @@ func buildRouter() *http.ServeMux {
 
 // List all available moves.
 func HandleListMoves(w http.ResponseWriter, r *http.Request) {
-	bytes, err := json.Marshal(ALL_MOVES)
+	bytes, err := json.Marshal(AllMoves)
 	if err != nil {
 		log.Fatalf("Failed to marshal moves into JSON: %s", err)
 	}
