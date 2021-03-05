@@ -36,6 +36,12 @@ const (
 	MetaLastMove PokemonMeta = iota
 )
 
+// Keeps track of base stats and EV yield for a Pokemon
+type PokemonBaseStats struct {
+	Stats   [6]int // base stats of a Pokemon
+	EVYield [6]int // effort points gained when Pokemon is defeated
+}
+
 // Constants for growth rates of a Pokemon
 const (
 	GrowthSlow = iota + 1
@@ -130,7 +136,11 @@ func (p *Pokemon) GetGrowthRate() int {
 }
 
 func (p *Pokemon) GetBaseStats() [6]int {
-	return pokemonBaseStats[int(p.NatDex)]
+	return pokemonBaseStats[int(p.NatDex)].Stats
+}
+
+func (p *Pokemon) GetEVYield() [6]int {
+	return pokemonBaseStats[int(p.NatDex)].EVYield
 }
 
 func (p *Pokemon) HasValidLevel() bool {

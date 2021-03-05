@@ -60,6 +60,18 @@ type data_item struct {
 	Flags         []string
 }
 
+type baseStat struct {
+	stats []int
+	ev    []int
+}
+
+func (b baseStat) String() string {
+	return fmt.Sprintf("{[6]int%s, [6]int%s}",
+		getIntArrayCodeOutput(b.stats),
+		getIntArrayCodeOutput(b.ev),
+	)
+}
+
 func parseInt(s string) (n int) {
 	if s == "" {
 		return 0
@@ -550,18 +562,18 @@ func main() {
 	}
 	output += "}\n\n"
 
-	// pokemon base stat
-	log.Println("Creating base stat table")
-	output += "// A map of national pokedex numbers to Pokemon base stats\n"
-	output += "var pokemonBaseStats = map[int][6]int{\n"
-
-	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
-	base_stat_array := make([][]int, HighestDexNum+1)
-	for i := range base_stat_array {
-		number_of_stats := 6
-		base_stat_array[i] = make([]int, number_of_stats)
+	// pokemon base stat + EV yield
+	log.Println("Creating base stat table + EV yield table")
+	output += "// Table of Pokemon base stats and EV yield\n"
+	output += "var pokemonBaseStats = map[int]PokemonBaseStats{\n"
+	baseStats := make(map[int]baseStat)
+	for i := 0; i < HighestDexNum+1; i += 1 {
+		baseStats[i] = baseStat{
+			stats: make([]int, 6),
+			ev:    make([]int, 6),
+		}
 	}
-
+	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
 	for {
 		record, err := pokemon_stats_csv.Read()
 
@@ -577,20 +589,18 @@ func main() {
 
 		stat_id := parseInt(record[1]) - 1
 		stat_value := parseInt(record[2])
-
-		base_stat_array[dex_num][stat_id] = stat_value
+		ev := parseInt(record[3])
+		baseStats[dex_num].stats[stat_id] = stat_value
+		baseStats[dex_num].ev[stat_id] = ev
 	}
 
-	for dex_num, stats := range base_stat_array {
-
+	for dex_num, v := range baseStats {
 		if dex_num == 0 {
 			continue
 		}
-
-		output += fmt.Sprintf("%d: %s,\n", dex_num, getIntArrayCodeOutput(stats))
+		output += fmt.Sprintf("%d: %s,\n", dex_num, v)
 	}
 	output += "}\n\n"
-
 	createCodeOutput(output)
 
 	// run gofmt on generated code
