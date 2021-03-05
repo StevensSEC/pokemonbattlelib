@@ -34,6 +34,7 @@ type PokemonMeta int
 
 const (
 	MetaLastMove PokemonMeta = iota
+	MetaPriorityLast
 )
 
 // Constants for growth rates of a Pokemon
@@ -241,7 +242,17 @@ func (p *Pokemon) computeStats() {
 	}
 }
 
-// implement Stringer
+// Stat getters
+func (p *Pokemon) GetSpeed() uint {
+	speed := float64(p.Stats[StatSpeed])
+	if p.HeldItem != nil {
+		switch p.HeldItem.ID {
+		case ItemIronBall:
+			speed *= 0.5
+		}
+	}
+	return uint(speed)
+}
 
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {

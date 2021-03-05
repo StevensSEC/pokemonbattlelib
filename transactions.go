@@ -77,7 +77,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		// TODO: remove consumed item from party's inventory
 	}
 	if t.Item.Flags&FlagUsableInBattle > 0 {
-		b.QueueTransaction(t.Target.UseItem(t.Item)...)
+		b.QueueTransaction(t.Target.UseItem(t.Item, b)...)
 	}
 }
 

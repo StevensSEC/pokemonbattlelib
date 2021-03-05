@@ -105,12 +105,12 @@ func GetItem(itemID int) Item {
 }
 
 // Dispatches the correct item handler based on its category
-func (p *Pokemon) UseItem(i *Item) []Transaction {
+func (p *Pokemon) UseItem(i *Item, b *Battle) []Transaction {
 	switch i.Category {
 	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
 		return p.UseMedicine(i)
 	case ItemCategoryBadHeldItems:
-		return p.UseMiscItem(i)
+		return p.UseMiscItem(i, b)
 	}
 	return make([]Transaction, 0)
 }
@@ -126,7 +126,7 @@ func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
 
 // Uses a miscellaneous item
 // Includes bad held items, choice items, EV training, and more
-func (p *Pokemon) UseMiscItem(i *Item) (t []Transaction) {
+func (p *Pokemon) UseMiscItem(i *Item, b *Battle) (t []Transaction) {
 	switch i.ID {
 	case ItemFlameOrb:
 		t = append(t, InflictStatusTransaction{
@@ -136,10 +136,14 @@ func (p *Pokemon) UseMiscItem(i *Item) (t []Transaction) {
 	case ItemIronBall:
 		// TODO: set PokemonMeta[MetaIronBall]
 	case ItemStickyBarb:
-		// TODO: get target info somehow (pass in battle?)
-		t = append(t, DamageTransaction{
-			Damage: p.Stats[StatHP] / 8,
-		})
+		for _, target := range b.GetTargets() {
+			if b.getPokemon(target.party, target.partySlot) == p {
+				t = append(t, DamageTransaction{
+					Target: target,
+					Damage: p.Stats[StatHP] / 8,
+				})
+			}
+		}
 	case ItemToxicOrb:
 		t = append(t, InflictStatusTransaction{
 			Target:       p,

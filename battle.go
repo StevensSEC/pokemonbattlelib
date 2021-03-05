@@ -96,23 +96,32 @@ func (b *Battle) Start() error {
 	return nil
 }
 
+// Handles all pre-turn logic
+func (b *Battle) preRound() {
+	// Set Pokemon meta tags
+	for _, party := range b.parties {
+		for _, p := range party.activePokemon {
+			// Held item effects
+			if p.HeldItem != nil {
+				switch p.HeldItem.ID {
+				case ItemFullIncense, ItemLaggingTail:
+					p.metadata[MetaPriorityLast] = true
+				}
+			}
+		}
+	}
+}
+
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
 func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	if b.State != BattleInProgress {
 		log.Panic("battle is not currently in progress")
 	}
+	b.preRound()
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
 	for i, party := range b.parties {
 		for j, pokemon := range party.activePokemon {
-			// Pre-turn effects
-			// Held item effects
-			if pokemon.HeldItem != nil {
-				switch pokemon.HeldItem.ID {
-				case ItemFullIncense, ItemLaggingTail:
-					// TODO: set PokemonMeta[MetaPriorityLast]
-				}
-			}
 			ctx := b.getContext(party, pokemon)
 			turn := (*party.Agent).Act(ctx)
 			turns = append(turns, TurnContext{
@@ -138,20 +147,21 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			case FightTurn:
 				ftA := turnA.(FightTurn)
 				ftB := turnB.(FightTurn)
-				// _, lastA := ctxA.Pokemon.metadata[MetaPriorityLast]
-				// _, lastB := ctxB.Pokemon.metadata[MetaPriorityLast]
-				// if lastA && !lastB {
-				// 	return false
-				// } else if lastB && !lastA {
-				// 	return true
-				// }
+				// Pokemon move last in their priority bracket
+				_, lastA := ctxA.Pokemon.metadata[MetaPriorityLast]
+				_, lastB := ctxB.Pokemon.metadata[MetaPriorityLast]
+				if lastA && !lastB {
+					return false
+				} else if lastB && !lastA {
+					return true
+				}
 				mvA := ctxA.Pokemon.Moves[ftA.Move]
 				mvB := ctxB.Pokemon.Moves[ftB.Move]
 				if mvA.Priority != mvB.Priority {
 					return mvA.Priority > mvB.Priority
 				}
 				// speedy pokemon should go first
-				return ctxA.Pokemon.Stats[StatSpeed] > ctxB.Pokemon.Stats[StatSpeed]
+				return ctxA.Pokemon.GetSpeed() > ctxB.Pokemon.GetSpeed()
 			}
 		} else {
 			// make higher priority turns go first
@@ -345,8 +355,20 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			break
 		}
 	}
+	b.postRound()
 
-	// All post turn effects
+	b.ProcessQueue()
+	if len(b.tQueue) > 0 {
+		log.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
+	}
+	transactions := b.tProcessed
+	b.tProcessed = []Transaction{}
+	return transactions, b.State == BattleEnd
+}
+
+// Handles all post-round logic
+func (b *Battle) postRound() {
+	// Effects on every Pokemon
 	for a, party := range b.parties {
 		for ap, pkmn := range party.activePokemon {
 			t := target{
@@ -400,14 +422,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 		}
 	}
-	b.ProcessQueue()
-
-	if len(b.tQueue) > 0 {
-		log.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
-	}
-	transactions := b.tProcessed
-	b.tProcessed = []Transaction{}
-	return transactions, b.State == BattleEnd
 }
 
 // Add Transactions to the queue.
