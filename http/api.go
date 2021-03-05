@@ -30,19 +30,6 @@ func HandleListMoves(w http.ResponseWriter, r *http.Request) {
 	w.Write(bytes)
 }
 
-type httpPokemon struct {
-	Pokemon
-	Name string
-}
-
-// Convert a Pokemon into an httpPokemon, suitable for JSON marshalling for HTTP responses that contain pokemon.
-func convertPokemon(p *Pokemon) *httpPokemon {
-	return &httpPokemon{
-		Pokemon: *p,
-		Name:    p.GetName(),
-	}
-}
-
 type pokemonGenerateArgs struct {
 	NatDex int
 	Opts   []GeneratePokemonOption
@@ -97,7 +84,7 @@ func HandleGeneratePokemon(w http.ResponseWriter, r *http.Request) {
 
 	pkmn := args.Generate()
 
-	bytes, err := json.Marshal(convertPokemon(pkmn))
+	bytes, err := json.Marshal(pkmn)
 	if err != nil {
 		log.Fatalf("Failed to marshal generated pokemon into JSON: %s", err)
 	}

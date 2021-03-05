@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 )
@@ -255,4 +256,28 @@ func (p *Pokemon) RestoreHP(amount uint) Transaction {
 		amount = diff
 	}
 	return HealTransaction{Target: p, Amount: amount}
+}
+
+func (p *Pokemon) MarshalJSON() ([]byte, error) {
+	type alias Pokemon // required to not enter infinite recursive loop
+	return json.Marshal(&struct {
+		Name string
+		*alias
+	}{
+		Name:  p.GetName(),
+		alias: (*alias)(p),
+	})
+}
+
+func (p *Pokemon) UnmarshalJSON(data []byte) error {
+	type alias Pokemon // required to not enter infinite recursive loop
+	aux := &struct {
+		*alias
+	}{
+		alias: (*alias)(p),
+	}
+	if p.metadata == nil {
+		p.metadata = make(map[PokemonMeta]interface{})
+	}
+	return json.Unmarshal(data, &aux)
 }
