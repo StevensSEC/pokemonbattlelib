@@ -96,11 +96,17 @@ func (b *Battle) Start() error {
 	return nil
 }
 
+// Handles all pre-turn logic
+func (b *Battle) preRound() {
+	// TODO
+}
+
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
 func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	if b.State != BattleInProgress {
 		log.Panic("battle is not currently in progress")
 	}
+	b.preRound()
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
 	for i, party := range b.parties {
@@ -302,8 +308,20 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			break
 		}
 	}
+	b.postRound()
 
-	// handle post turn status effects
+	b.ProcessQueue()
+	if len(b.tQueue) > 0 {
+		log.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
+	}
+	transactions := b.tProcessed
+	b.tProcessed = []Transaction{}
+	return transactions, b.State == BattleEnd
+}
+
+// Handles all post-round logic
+func (b *Battle) postRound() {
+	// Effects on every Pokemon
 	for a, party := range b.parties {
 		for ap, pkmn := range party.activePokemon {
 			t := target{
@@ -312,6 +330,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Pokemon:   *pkmn,
 				Team:      party.team,
 			}
+			// Status effects
 			if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
 				cond := pkmn.StatusEffects & StatusNonvolatileMask
 				var damage uint
@@ -328,7 +347,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					StatusEffect: cond,
 				})
 			}
-			// damage from weather
+			// Weather effects
 			// TODO: check for weather resisting abilities
 			if b.Weather == WeatherSandstorm {
 				if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
@@ -349,14 +368,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 		}
 	}
-	b.ProcessQueue()
-
-	if len(b.tQueue) > 0 {
-		log.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
-	}
-	transactions := b.tProcessed
-	b.tProcessed = []Transaction{}
-	return transactions, b.State == BattleEnd
 }
 
 // Add Transactions to the queue.
