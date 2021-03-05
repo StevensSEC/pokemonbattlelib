@@ -249,6 +249,8 @@ func (p *Pokemon) GetSpeed() uint {
 		switch p.HeldItem.ID {
 		case ItemIronBall:
 			speed *= 0.5
+		case ItemChoiceScarf:
+			speed *= 1.5
 		}
 	}
 	return uint(speed)

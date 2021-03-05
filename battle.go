@@ -306,6 +306,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					switch self.HeldItem.ID {
 					case ItemIronBall:
 						// TODO: make flying not immune to ground
+					case ItemChoiceBand, ItemChoiceScarf, ItemChoiceSpecs:
+						// TODO: boost attack by 50% (in p.GetAttack)
+						// TODO: boost special attak by 50% (in p.GetSpAtk)
+						if lastMove := self.metadata[MetaLastMove]; lastMove != nil && lastMove != move {
+							log.Panicf("cannot use move blocked by %s", self.HeldItem.Name)
+						}
 					}
 				}
 				if receiver.HeldItem != nil {
