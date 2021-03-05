@@ -163,7 +163,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
-
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
 				immobilize := false

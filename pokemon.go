@@ -230,29 +230,75 @@ func (p *Pokemon) computeStats() {
 	if !p.HasValidEVs() {
 		panic(fmt.Sprintf("Failed to compute stats for %s, evs %d invalid", p.GetName(), p.EVs))
 	}
-
-	// get base stats
-	base_stats := p.GetBaseStats()
-
-	// compute HP
-	hp_ev_term := math.Floor(float64(p.EVs[StatHP]) / 4)
-	base_iv_ev_level_hp_term := (2*uint(base_stats[StatHP]) + uint(p.IVs[StatHP]) + uint(hp_ev_term)) * uint(p.Level)
-	hp_floor_term := math.Floor(float64(base_iv_ev_level_hp_term) / 100)
-	p.Stats[StatHP] = uint(hp_floor_term + float64(p.Level) + 10)
-	p.CurrentHP = p.HP()
-
-	// compute all other stats
-	natureModifiers := p.Nature.getNatureModifers()
-	for _, stat := range [5]int{StatAtk, StatDef, StatSpAtk, StatSpDef, StatSpeed} {
-		ev_term := math.Floor(float64(p.EVs[stat]) / 4)
-		base_iv_ev_level_term := (2*uint(base_stats[stat]) + uint(p.IVs[stat]) + uint(ev_term)) * uint(p.Level)
-		floor_term := math.Floor(float64(base_iv_ev_level_term) / 100)
-		nature_term := float64(floor_term+5) * natureModifiers[stat]
-		p.Stats[stat] = uint(math.Floor(nature_term))
-	}
+	// Set stats given base values
+	baseStats := p.GetBaseStats()
+	p.setHP(baseStats[StatHP])
+	p.setAttack(baseStats[StatAtk])
+	p.setDefense(baseStats[StatDef])
+	p.setSpecialAttack(baseStats[StatSpAtk])
+	p.setSpecialDefense(baseStats[StatSpDef])
+	p.setSpeed(baseStats[StatSpeed])
 }
 
-// Stat getters
+func (p *Pokemon) getOtherStat(base, stat int) float64 {
+	// Other stat formula
+	ev_term := math.Floor(float64(p.EVs[stat]) / 4)
+	base_iv_ev_level_term := (2*uint(base) + uint(p.IVs[stat]) + uint(ev_term)) * uint(p.Level)
+	effective := math.Floor(float64(base_iv_ev_level_term)/100 + 5)
+	n := p.Nature
+	if n.StatUp != n.StatDown {
+		if n.StatUp == stat {
+			effective *= 1.1
+		}
+		if n.StatDown == stat {
+			effective *= 0.9
+		}
+	}
+	return effective
+}
+
+// Stat setters (helpers for computeStats)
+func (p *Pokemon) setHP(base int) {
+	// Base calculation
+	hp_ev_term := math.Floor(float64(p.EVs[StatHP]) / 4)
+	base_iv_ev_level_hp_term := (2*uint(base) + uint(p.IVs[StatHP]) + uint(hp_ev_term)) * uint(p.Level)
+	hp_floor_term := math.Floor(float64(base_iv_ev_level_hp_term) / 100)
+	effective := uint(hp_floor_term + float64(p.Level) + 10)
+	p.Stats[StatHP] = effective
+	p.CurrentHP = effective
+}
+
+func (p *Pokemon) setAttack(base int) {
+	effective := p.getOtherStat(base, StatAtk)
+	// Set effective stat
+	p.Stats[StatAtk] = uint(effective)
+}
+
+func (p *Pokemon) setDefense(base int) {
+	effective := p.getOtherStat(base, StatDef)
+	// Set effective stat
+	p.Stats[StatDef] = uint(effective)
+}
+
+func (p *Pokemon) setSpecialAttack(base int) {
+	effective := p.getOtherStat(base, StatSpAtk)
+	// Set effective stat
+	p.Stats[StatSpAtk] = uint(effective)
+}
+
+func (p *Pokemon) setSpecialDefense(base int) {
+	effective := p.getOtherStat(base, StatSpDef)
+	// Set effective stat
+	p.Stats[StatSpDef] = uint(effective)
+}
+
+func (p *Pokemon) setSpeed(base int) {
+	effective := p.getOtherStat(base, StatSpeed)
+	// Set effective stat
+	p.Stats[StatSpeed] = uint(effective)
+}
+
+// Stat getters (aliases)
 func (p *Pokemon) HP() uint {
 	return p.Stats[StatHP]
 }
