@@ -33,6 +33,14 @@
 			"mode": "debug",
 			"program": "${workspaceFolder}/data/gen.go",
 			"cwd": "${workspaceFolder}"
+		},
+		{
+			"name": "Debug HTTP API",
+			"type": "go",
+			"request": "launch",
+			"mode": "debug",
+			"program": "${workspaceFolder}/http",
+			"cwd": "${workspaceFolder}"
 		}
 	]
 }
