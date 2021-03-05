@@ -239,7 +239,7 @@ func (p *Pokemon) computeStats() {
 	base_iv_ev_level_hp_term := (2*uint(base_stats[StatHP]) + uint(p.IVs[StatHP]) + uint(hp_ev_term)) * uint(p.Level)
 	hp_floor_term := math.Floor(float64(base_iv_ev_level_hp_term) / 100)
 	p.Stats[StatHP] = uint(hp_floor_term + float64(p.Level) + 10)
-	p.CurrentHP = p.Stats[StatHP]
+	p.CurrentHP = p.HP()
 
 	// compute all other stats
 	natureModifiers := p.Nature.getNatureModifers()
@@ -252,17 +252,40 @@ func (p *Pokemon) computeStats() {
 	}
 }
 
-// implement Stringer
+// Stat getters
+func (p *Pokemon) HP() uint {
+	return p.Stats[StatHP]
+}
+
+func (p *Pokemon) Attack() uint {
+	return p.Stats[StatAtk]
+}
+
+func (p *Pokemon) Defense() uint {
+	return p.Stats[StatDef]
+}
+
+func (p *Pokemon) SpecialAttack() uint {
+	return p.Stats[StatSpAtk]
+}
+
+func (p *Pokemon) SpecialDefense() uint {
+	return p.Stats[StatSpDef]
+}
+
+func (p *Pokemon) Speed() uint {
+	return p.Stats[StatSpeed]
+}
 
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
-		p.Gender, p.Level, p.CurrentHP, p.Stats[StatHP])
+		p.Gender, p.Level, p.CurrentHP, p.HP())
 }
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
 func (p *Pokemon) RestoreHP(amount uint) Transaction {
-	if diff := p.Stats[StatHP] - p.CurrentHP; diff <= amount {
+	if diff := p.HP() - p.CurrentHP; diff <= amount {
 		amount = diff
 	}
 	return HealTransaction{Target: p, Amount: amount}
