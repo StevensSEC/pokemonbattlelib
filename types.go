@@ -299,66 +299,19 @@ type Ability struct {
 	ID int // The ID of the ability
 }
 
-type Nature struct {
-	StatUp   int
-	StatDown int
-	name     string
-}
+// Natures can affect a Pokemon's stats, increasing one and decreasing another.
+// *Constants, GetStatModifiers(), and String() are auto-generated.*
+type Nature uint8
 
-// Constants for looking up natures
-const (
-	NatureHardy = iota + 1
-	NatureLonely
-	NatureAdamant
-	NatureNaughty
-	NatureBrave
-	NatureBold
-	NatureDocile
-	NatureImpish
-	NatureLax
-	NatureRelaxed
-	NatureModest
-	NatureMild
-	NatureBashful
-	NatureRash
-	NatureQuiet
-	NatureCalm
-	NatureGentle
-	NatureCareful
-	NatureQuirky
-	NatureSassy
-	NatureTimid
-	NatureHasty
-	NatureJolly
-	NatureNaive
-	NatureSerious
-)
-
-func GetNature(nature int) *Nature {
-	natures := map[int]*Nature{
-		//TODO: add all natures
-		NatureHardy: {
-			StatUp:   StatAtk,
-			StatDown: StatAtk,
-			name:     "Hardy",
-		},
-		NatureAdamant: {
-			StatUp:   StatAtk,
-			StatDown: StatSpAtk,
-			name:     "Adamant",
-		},
-	}
-	return natures[nature]
-}
-
+// Deprecated: getNatureModifers is deprecated. Use Nature.GetStatModifiers() instead.
 func (n Nature) getNatureModifers() [6]float64 {
+	up, down := n.GetStatModifiers()
 	natureModifiers := [6]float64{-1, 1, 1, 1, 1, 1} // hp is not affected by nature
-	natureModifiers[n.StatUp] = 1.1
-	natureModifiers[n.StatDown] = 0.9
 
 	// tried to multiply natureModifiers by both 1.1 and 0.9, caused rounding errors
-	if n.StatUp == n.StatDown {
-		natureModifiers[n.StatUp] = 1
+	if up != down {
+		natureModifiers[up] = 1.1
+		natureModifiers[down] = 0.9
 	}
 
 	return natureModifiers

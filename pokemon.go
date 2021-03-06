@@ -17,7 +17,7 @@ type Pokemon struct {
 	Gender            Gender                      // this Pokemon's gender
 	IVs               [6]uint8                    // values from 0-31 that represents a Pokemon's 'genetic' potential
 	EVs               [6]uint8                    // values from 0-255 that represents a Pokemon's training in a particular stat
-	Nature            *Nature                     // represents a Pokemon's disposition and affects stats
+	Nature            Nature                      // represents a Pokemon's disposition and affects stats
 	Stats             [6]uint                     // the actual stats of a Pokemon determined from the above data
 	StatModifiers     [9]int                      // ranges from +6 (buffing) to -6 (debuffing) a stat
 	StatusEffects     StatusCondition             // the current status effects inflicted on a Pokemon
@@ -75,7 +75,7 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 		StatModifiers:   [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0},
 		Stats:           [6]uint{1, 4, 4, 4, 4, 4},
-		Nature:          GetNature(NatureHardy), // this nature is neutral and has no effect
+		Nature:          NatureHardy, // this nature is neutral and has no effect
 		metadata:        make(map[PokemonMeta]interface{}),
 	}
 	for _, opt := range opts {
@@ -109,7 +109,7 @@ func WithEVs(evs [6]uint8) GeneratePokemonOption {
 	}
 }
 
-func WithNature(nature *Nature) GeneratePokemonOption {
+func WithNature(nature Nature) GeneratePokemonOption {
 	return func(p *Pokemon) {
 		p.Nature = nature
 	}
