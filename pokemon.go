@@ -35,6 +35,11 @@ type PokemonMeta int
 
 const (
 	MetaLastMove PokemonMeta = iota
+	MetaUpdateAttack
+	MetaUpdateDefense
+	MetaUpdateSpecialAttack
+	MetaUpdateSpecialDefense
+	MetaUpdateSpeed
 )
 
 // Keeps track of base stats and EV yield for a Pokemon
@@ -232,7 +237,14 @@ func (p *Pokemon) computeStats() {
 	}
 	// Set stats given base values
 	baseStats := p.GetBaseStats()
-	p.updateMaxHP(baseStats[StatHP])
+	// Calculate base for HP
+	hp_ev_term := math.Floor(float64(p.EVs[StatHP]) / 4)
+	base_iv_ev_level_hp_term := (2*uint(baseStats[StatHP]) + uint(p.IVs[StatHP]) + uint(hp_ev_term)) * uint(p.Level)
+	hp_floor_term := math.Floor(float64(base_iv_ev_level_hp_term) / 100)
+	effective := uint(hp_floor_term + float64(p.Level) + 10)
+	p.Stats[StatHP] = effective
+	p.CurrentHP = effective
+	// Calculate base for all other stats
 	for _, stat := range []int{StatAtk, StatDef, StatSpAtk, StatSpDef, StatSpeed} {
 		base := float64(baseStats[stat])
 		// Other stat formula
@@ -248,85 +260,65 @@ func (p *Pokemon) computeStats() {
 				base *= 0.9
 			}
 		}
-		switch stat {
-		case StatAtk:
-			p.updateAttack(base)
-		case StatDef:
-			p.updateDefense(base)
-		case StatSpAtk:
-			p.updateSpecialAttack(base)
-		case StatSpDef:
-			p.updateSpecialDefense(base)
-		case StatSpeed:
-			p.updateSpeed(base)
-		}
+		p.Stats[stat] = uint(base)
+		// TODO: set meta flag to recompute
+		// p.metadata[MetaUpdateStat___] = true
 	}
 }
 
-// Stat setters (helpers for computeStats)
-func (p *Pokemon) updateMaxHP(base int) {
-	// Base calculation
-	hp_ev_term := math.Floor(float64(p.EVs[StatHP]) / 4)
-	base_iv_ev_level_hp_term := (2*uint(base) + uint(p.IVs[StatHP]) + uint(hp_ev_term)) * uint(p.Level)
-	hp_floor_term := math.Floor(float64(base_iv_ev_level_hp_term) / 100)
-	effective := uint(hp_floor_term + float64(p.Level) + 10)
-	// TODO: Max HP modifiers
-	p.Stats[StatHP] = effective
-	p.CurrentHP = effective
-}
-
-func (p *Pokemon) updateAttack(base float64) {
-	effective := base
-	// TODO: attack modifiers
-	p.Stats[StatAtk] = uint(effective)
-}
-
-func (p *Pokemon) updateDefense(base float64) {
-	effective := base
-	// TODO: defense modifiers
-	p.Stats[StatDef] = uint(effective)
-}
-
-func (p *Pokemon) updateSpecialAttack(base float64) {
-	effective := base
-	// TODO: special attack modifiers
-	p.Stats[StatSpAtk] = uint(effective)
-}
-
-func (p *Pokemon) updateSpecialDefense(base float64) {
-	effective := base
-	// TODO: special defense modifiers
-	p.Stats[StatSpDef] = uint(effective)
-}
-
-func (p *Pokemon) updateSpeed(base float64) {
-	effective := base
-	// TODO: speed modifiers
-	p.Stats[StatSpeed] = uint(effective)
-}
-
-// Stat getters (aliases)
+// Stat getters recompute the stat "as needed"
 func (p *Pokemon) MaxHP() uint {
+	// MaxHP is never modified by items/moves in battle?
 	return p.Stats[StatHP]
 }
 
 func (p *Pokemon) Attack() uint {
+	if p.metadata[MetaUpdateAttack] == true {
+		p.metadata[MetaUpdateAttack] = false
+		effective := float64(p.Stats[StatAtk])
+		// TODO: attack modifiers
+		p.Stats[StatAtk] = uint(effective)
+	}
 	return p.Stats[StatAtk]
 }
 
 func (p *Pokemon) Defense() uint {
+	if p.metadata[MetaUpdateDefense] == true {
+		p.metadata[MetaUpdateDefense] = false
+		effective := float64(p.Stats[StatDef])
+		// TODO: defense modifiers
+		p.Stats[StatDef] = uint(effective)
+	}
 	return p.Stats[StatDef]
 }
 
 func (p *Pokemon) SpecialAttack() uint {
+	if p.metadata[MetaUpdateSpecialAttack] == true {
+		p.metadata[MetaUpdateSpecialAttack] = false
+		effective := float64(p.Stats[StatSpAtk])
+		// TODO: special attack modifiers
+		p.Stats[StatSpAtk] = uint(effective)
+	}
 	return p.Stats[StatSpAtk]
 }
 
 func (p *Pokemon) SpecialDefense() uint {
+	if p.metadata[MetaUpdateSpecialDefense] == true {
+		p.metadata[MetaUpdateSpecialDefense] = false
+		effective := float64(p.Stats[StatSpDef])
+		// TODO: special defense modifiers
+		p.Stats[StatDef] = uint(effective)
+	}
 	return p.Stats[StatSpDef]
 }
 
 func (p *Pokemon) Speed() uint {
+	if p.metadata[MetaUpdateSpeed] == true {
+		p.metadata[MetaUpdateSpeed] = false
+		effective := float64(p.Stats[StatSpeed])
+		// TODO: speed modifiers
+		p.Stats[StatSpeed] = uint(effective)
+	}
 	return p.Stats[StatSpeed]
 }
 
