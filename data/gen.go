@@ -594,11 +594,8 @@ func main() {
 		baseStats[dex_num].ev[stat_id] = ev
 	}
 
-	for dex_num, v := range baseStats {
-		if dex_num == 0 {
-			continue
-		}
-		output += fmt.Sprintf("%d: %s,\n", dex_num, v)
+	for n := 1; n < HighestDexNum+1; n += 1 {
+		output += fmt.Sprintf("%d: %s,\n", n, baseStats[n])
 	}
 	output += "}\n\n"
 	createCodeOutput(output)
