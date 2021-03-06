@@ -232,69 +232,76 @@ func (p *Pokemon) computeStats() {
 	}
 	// Set stats given base values
 	baseStats := p.GetBaseStats()
-	p.setHP(baseStats[StatHP])
-	p.setAttack(baseStats[StatAtk])
-	p.setDefense(baseStats[StatDef])
-	p.setSpecialAttack(baseStats[StatSpAtk])
-	p.setSpecialDefense(baseStats[StatSpDef])
-	p.setSpeed(baseStats[StatSpeed])
-}
-
-func (p *Pokemon) getOtherStat(base, stat int) float64 {
-	// Other stat formula
-	ev_term := math.Floor(float64(p.EVs[stat]) / 4)
-	base_iv_ev_level_term := (2*uint(base) + uint(p.IVs[stat]) + uint(ev_term)) * uint(p.Level)
-	effective := math.Floor(float64(base_iv_ev_level_term)/100 + 5)
-	n := p.Nature
-	if n.StatUp != n.StatDown {
-		if n.StatUp == stat {
-			effective *= 1.1
+	p.updateMaxHP(baseStats[StatHP])
+	for _, stat := range []int{StatAtk, StatDef, StatSpAtk, StatSpDef, StatSpeed} {
+		base := float64(baseStats[stat])
+		// Other stat formula
+		ev_term := math.Floor(float64(p.EVs[stat]) / 4)
+		base_iv_ev_level_term := (2*uint(base) + uint(p.IVs[stat]) + uint(ev_term)) * uint(p.Level)
+		base = math.Floor(float64(base_iv_ev_level_term)/100 + 5)
+		n := p.Nature
+		if n.StatUp != n.StatDown {
+			if n.StatUp == stat {
+				base *= 1.1
+			}
+			if n.StatDown == stat {
+				base *= 0.9
+			}
 		}
-		if n.StatDown == stat {
-			effective *= 0.9
+		switch stat {
+		case StatAtk:
+			p.updateAttack(base)
+		case StatDef:
+			p.updateDefense(base)
+		case StatSpAtk:
+			p.updateSpecialAttack(base)
+		case StatSpDef:
+			p.updateSpecialDefense(base)
+		case StatSpeed:
+			p.updateSpeed(base)
 		}
 	}
-	return effective
 }
 
 // Stat setters (helpers for computeStats)
-func (p *Pokemon) setHP(base int) {
+func (p *Pokemon) updateMaxHP(base int) {
 	// Base calculation
 	hp_ev_term := math.Floor(float64(p.EVs[StatHP]) / 4)
 	base_iv_ev_level_hp_term := (2*uint(base) + uint(p.IVs[StatHP]) + uint(hp_ev_term)) * uint(p.Level)
 	hp_floor_term := math.Floor(float64(base_iv_ev_level_hp_term) / 100)
 	effective := uint(hp_floor_term + float64(p.Level) + 10)
+	// TODO: Max HP modifiers
 	p.Stats[StatHP] = effective
 	p.CurrentHP = effective
 }
 
-func (p *Pokemon) setAttack(base int) {
-	effective := p.getOtherStat(base, StatAtk)
-	// Set effective stat
+func (p *Pokemon) updateAttack(base float64) {
+	effective := base
+	// TODO: attack modifiers
 	p.Stats[StatAtk] = uint(effective)
 }
 
-func (p *Pokemon) setDefense(base int) {
-	effective := p.getOtherStat(base, StatDef)
-	// Set effective stat
+func (p *Pokemon) updateDefense(base float64) {
+	effective := base
+	// TODO: defense modifiers
 	p.Stats[StatDef] = uint(effective)
 }
 
-func (p *Pokemon) setSpecialAttack(base int) {
-	effective := p.getOtherStat(base, StatSpAtk)
-	// Set effective stat
+func (p *Pokemon) updateSpecialAttack(base float64) {
+	effective := base
+	// TODO: special attack modifiers
 	p.Stats[StatSpAtk] = uint(effective)
 }
 
-func (p *Pokemon) setSpecialDefense(base int) {
-	effective := p.getOtherStat(base, StatSpDef)
-	// Set effective stat
+func (p *Pokemon) updateSpecialDefense(base float64) {
+	effective := base
+	// TODO: special defense modifiers
 	p.Stats[StatSpDef] = uint(effective)
 }
 
-func (p *Pokemon) setSpeed(base int) {
-	effective := p.getOtherStat(base, StatSpeed)
-	// Set effective stat
+func (p *Pokemon) updateSpeed(base float64) {
+	effective := base
+	// TODO: speed modifiers
 	p.Stats[StatSpeed] = uint(effective)
 }
 
