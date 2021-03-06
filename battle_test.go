@@ -161,8 +161,8 @@ var _ = Describe("One round of battle", func() {
 		It("should cause Pokemon to have reduced HP", func() {
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(charmander.CurrentHP < charmander.HP()).To(BeTrue())
-			Expect(squirtle.CurrentHP < squirtle.HP()).To(BeTrue())
+			Expect(charmander.CurrentHP < charmander.MaxHP()).To(BeTrue())
+			Expect(squirtle.CurrentHP < squirtle.MaxHP()).To(BeTrue())
 		})
 	})
 

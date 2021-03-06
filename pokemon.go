@@ -299,7 +299,7 @@ func (p *Pokemon) setSpeed(base int) {
 }
 
 // Stat getters (aliases)
-func (p *Pokemon) HP() uint {
+func (p *Pokemon) MaxHP() uint {
 	return p.Stats[StatHP]
 }
 
@@ -326,12 +326,12 @@ func (p *Pokemon) Speed() uint {
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
-		p.Gender, p.Level, p.CurrentHP, p.HP())
+		p.Gender, p.Level, p.CurrentHP, p.MaxHP())
 }
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
 func (p *Pokemon) RestoreHP(amount uint) Transaction {
-	if diff := p.HP() - p.CurrentHP; diff <= amount {
+	if diff := p.MaxHP() - p.CurrentHP; diff <= amount {
 		amount = diff
 	}
 	return HealTransaction{Target: p, Amount: amount}

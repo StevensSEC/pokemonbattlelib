@@ -229,7 +229,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					if b.Weather == WeatherFog {
 						b.QueueTransaction(HealTransaction{
 							Target: self,
-							Amount: self.HP() / 4,
+							Amount: self.MaxHP() / 4,
 						})
 					}
 				}
@@ -335,10 +335,10 @@ func (b *Battle) postRound() {
 				var damage uint
 				switch cond {
 				case StatusBurn, StatusPoison:
-					damage = pkmn.HP() / 8
+					damage = pkmn.MaxHP() / 8
 				case StatusBadlyPoison:
 					// TODO: implement counter for increasing bad poison damage
-					damage = pkmn.HP() / 16
+					damage = pkmn.MaxHP() / 16
 				}
 				b.QueueTransaction(DamageTransaction{
 					Target:       t,
@@ -350,7 +350,7 @@ func (b *Battle) postRound() {
 			// TODO: check for weather resisting abilities
 			if b.Weather == WeatherSandstorm {
 				if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
-					damage := pkmn.HP() / 16
+					damage := pkmn.MaxHP() / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
 						Damage: damage,
@@ -358,7 +358,7 @@ func (b *Battle) postRound() {
 				}
 			} else if b.Weather == WeatherHail {
 				if pkmn.Type&TypeIce == 0 {
-					damage := pkmn.HP() / 16
+					damage := pkmn.MaxHP() / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
 						Damage: damage,
