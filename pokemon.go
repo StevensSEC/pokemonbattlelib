@@ -116,14 +116,13 @@ func WithNature(nature Nature) GeneratePokemonOption {
 }
 
 func WithMoves(moves ...*Move) GeneratePokemonOption {
-	if len(moves) > MaxMoves {
-		panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MaxMoves))
-	}
-
-	var limited_moves [4]*Move
-	copy(limited_moves[:], moves)
-
 	return func(p *Pokemon) {
+		if len(moves) > MaxMoves {
+			panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MaxMoves))
+		}
+
+		var limited_moves [4]*Move
+		copy(limited_moves[:], moves)
 		p.Moves = limited_moves
 	}
 }

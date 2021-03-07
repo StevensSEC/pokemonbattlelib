@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -68,23 +69,16 @@ var _ = Describe("Pokemon generation", func() {
 		Expect(func() { p.computeStats() }).To(Panic())
 	})
 
-	It("panics when trying to create a Pokemon out of level bounds", func() {
-		Expect(func() { GeneratePokemon(PkmnStarly, WithLevel(MaxLevel+1)) }).To(Panic())
-		Expect(func() { GeneratePokemon(PkmnStarly, WithLevel(MinLevel-1)) }).To(Panic())
-	})
-
-	It("panics when creating a Pokemon with higher than max IVs", func() {
-		Expect(func() { GeneratePokemon(PkmnStarly, WithIVs([6]uint8{32, 32, 32, 32, 32, 32})) }).To(Panic())
-	})
-
-	It("panics when creating a Pokemon with higher than max EVs", func() {
-		Expect(func() { GeneratePokemon(PkmnStarly, WithEVs([6]uint8{255, 255, 255, 255, 255, 255})) }).To(Panic())
-	})
-
-	It("panics when creating a Pokemon with more than the maximum allowed moves", func() {
-		pound := GetMove(MovePound)
-		Expect(func() { GeneratePokemon(PkmnStarly, WithMoves(pound, pound, pound, pound, pound)) }).To(Panic())
-	})
+	DescribeTable("Panic when given invalid options",
+		func(opts ...GeneratePokemonOption) {
+			Expect(func() { GeneratePokemon(PkmnStarly, opts...) }).To(Panic())
+		},
+		Entry("level too high", WithLevel(MaxLevel+1)),
+		Entry("level too low", WithLevel(MinLevel-1)),
+		Entry("IVs too high", WithIVs([6]uint8{32, 32, 32, 32, 32, 32})),
+		Entry("EVs too high", WithEVs([6]uint8{255, 255, 255, 255, 255, 255})),
+		Entry("too many moves", WithMoves(GetMove(MoveFly), GetMove(MoveAerialAce), GetMove(MoveRoost), GetMove(MovePeck), GetMove(MovePound))),
+	)
 })
 
 var _ = Describe("Test leveling methods", func() {
