@@ -2,6 +2,7 @@ package pokemonbattlelib
 
 import (
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -317,15 +318,13 @@ var _ = Describe("Turn priority", func() {
 	a2 := Agent(new(dumbAgent))
 
 	Context("each turn type should have a priority level", func() {
-		It("should have a priority of 0 for FightTurn", func() {
-			turn := FightTurn{}
-			Expect(turn.Priority()).To(Equal(0))
-		})
-
-		It("should have a priority of 1 for ItemTurn", func() {
-			turn := ItemTurn{}
-			Expect(turn.Priority()).To(Equal(1))
-		})
+		DescribeTable("Turn priority",
+			func(turn Turn, want int) {
+				Expect(turn.Priority()).To(Equal(want))
+			},
+			Entry("FightTurn", FightTurn{}, 0),
+			Entry("ItemTurn", ItemTurn{}, 1),
+		)
 
 		It("should order turns properly based on priority", func() {
 			a2 := Agent(new(healAgent))
