@@ -8,78 +8,29 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Type effectiveness", func() {
-	tests := []struct {
-		move Type
-		def  Type
-		want Effectiveness
-	}{
-		{
-			move: TypeWater,
-			def:  TypeFire,
-			want: SuperEffective,
-		},
-		{
-			move: TypeGrass,
-			def:  TypeWater,
-			want: SuperEffective,
-		},
-		{
-			move: TypeFire,
-			def:  TypeWater,
-			want: Ineffective,
-		},
-		{
-			move: TypeGhost,
-			def:  TypeNormal,
-			want: NoEffect,
-		},
-		{
-			move: TypeSteel,
-			def:  TypeGround,
-			want: NormalEffect,
-		},
-		{
-			move: TypeFire,
-			def:  TypeFire | TypeWater,
-			want: VeryIneffective,
-		},
-		{
-			move: TypeWater,
-			def:  TypeGround | TypeRock,
-			want: VerySuperEffective,
-		},
-	}
-	for _, tt := range tests {
-		Expect(GetElementalEffect(tt.move, tt.def)).To(Equal(tt.want))
-	}
-})
-
 var _ = Describe("Elemental types", func() {
-	tests := []struct {
-		value Type
-		want  string
-	}{
-		{
-			value: TypeWater,
-			want:  "[Water]",
+	DescribeTable("GetElementalEffect()",
+		func(move, def Type, want Effectiveness) {
+			Expect(GetElementalEffect(move, def)).To(Equal(want))
 		},
-		{
-			value: TypeNormal,
-			want:  "[Normal]",
+		Entry("Water -> Fire", TypeWater, TypeFire, SuperEffective),
+		Entry("Grass -> Water", TypeGrass, TypeWater, SuperEffective),
+		Entry("Fire -> Water", TypeFire, TypeWater, Ineffective),
+		Entry("Ghost -> Normal", TypeGhost, TypeNormal, NoEffect),
+		Entry("Steel -> Ground", TypeSteel, TypeGround, NormalEffect),
+		Entry("Fire -> Fire and Water", TypeFire, TypeFire|TypeWater, VeryIneffective),
+		Entry("Water -> Ground and Rock", TypeWater, TypeGround|TypeRock, VerySuperEffective),
+	)
+
+	DescribeTable("Stringer",
+		func(value Type, want string) {
+			Expect(fmt.Sprintf("%s", value)).To(Equal(want))
 		},
-		{
-			value: TypeFire,
-			want:  "[Fire]",
-		},
-		{
-			value: TypeFire | TypeGrass,
-			want:  "[Fire][Grass]",
-		},
-	}
-	for _, tt := range tests {
-		Expect(fmt.Sprintf("%s", tt.value)).To(Equal(tt.want))
-	}
+		Entry("Normal", TypeNormal, "[Normal]"),
+		Entry("Water", TypeWater, "[Water]"),
+		Entry("Fire", TypeFire, "[Fire]"),
+		Entry("Fire and Grass", TypeFire|TypeGrass, "[Fire][Grass]"),
+	)
 })
 
 var _ = Describe("Gender", func() {
