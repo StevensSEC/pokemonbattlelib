@@ -142,7 +142,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					return mvA.Priority > mvB.Priority
 				}
 				// speedy pokemon should go first
-				return ctxA.Pokemon.Stats[StatSpeed] > ctxB.Pokemon.Stats[StatSpeed]
+				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
 			}
 		} else {
 			// make higher priority turns go first
@@ -163,7 +163,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
-
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
 				immobilize := false
@@ -230,7 +229,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					if b.Weather == WeatherFog {
 						b.QueueTransaction(HealTransaction{
 							Target: self,
-							Amount: self.Stats[StatHP] / 4,
+							Amount: self.MaxHP() / 4,
 						})
 					}
 				}
@@ -256,12 +255,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				modifier := weather * crit * stab
 				levelEffect := float64((2 * user.Level / 5) + 2)
 				movePower := float64(move.Power)
-				attack := float64(user.Stats[StatAtk])
-				defense := float64(receiver.Stats[StatDef])
+				attack := float64(user.Attack())
+				defense := float64(receiver.Defense())
 				// Move modifiers
 				if move.Category == MoveCategorySpecial {
-					attack = float64(user.Stats[StatSpAtk])
-					defense = float64(receiver.Stats[StatSpDef])
+					attack = float64(user.SpecialAttack())
+					defense = float64(receiver.SpecialDefense())
 				}
 				// Weather modifiers
 				if b.Weather == WeatherSandstorm {
@@ -336,10 +335,10 @@ func (b *Battle) postRound() {
 				var damage uint
 				switch cond {
 				case StatusBurn, StatusPoison:
-					damage = pkmn.Stats[StatHP] / 8
+					damage = pkmn.MaxHP() / 8
 				case StatusBadlyPoison:
 					// TODO: implement counter for increasing bad poison damage
-					damage = pkmn.Stats[StatHP] / 16
+					damage = pkmn.MaxHP() / 16
 				}
 				b.QueueTransaction(DamageTransaction{
 					Target:       t,
@@ -351,7 +350,7 @@ func (b *Battle) postRound() {
 			// TODO: check for weather resisting abilities
 			if b.Weather == WeatherSandstorm {
 				if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
-					damage := pkmn.Stats[StatHP] / 16
+					damage := pkmn.MaxHP() / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
 						Damage: damage,
@@ -359,7 +358,7 @@ func (b *Battle) postRound() {
 				}
 			} else if b.Weather == WeatherHail {
 				if pkmn.Type&TypeIce == 0 {
-					damage := pkmn.Stats[StatHP] / 16
+					damage := pkmn.MaxHP() / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
 						Damage: damage,

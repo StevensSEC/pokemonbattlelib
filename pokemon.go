@@ -252,17 +252,51 @@ func (p *Pokemon) computeStats() {
 	}
 }
 
-// implement Stringer
+// Stat getters return the effective stat values from modifiers
+func (p *Pokemon) MaxHP() uint {
+	// MaxHP is never modified by items/moves in battle?
+	return p.Stats[StatHP]
+}
+
+func (p *Pokemon) Attack() uint {
+	effective := float64(p.Stats[StatAtk])
+	// TODO: attack modifiers
+	return uint(effective)
+}
+
+func (p *Pokemon) Defense() uint {
+	effective := float64(p.Stats[StatDef])
+	// TODO: defense modifiers
+	return uint(effective)
+}
+
+func (p *Pokemon) SpecialAttack() uint {
+	effective := float64(p.Stats[StatSpAtk])
+	// TODO: special attack modifiers
+	return uint(effective)
+}
+
+func (p *Pokemon) SpecialDefense() uint {
+	effective := float64(p.Stats[StatSpDef])
+	// TODO: special defense modifiers
+	return uint(effective)
+}
+
+func (p *Pokemon) Speed() uint {
+	effective := float64(p.Stats[StatSpeed])
+	// TODO: speed modifiers
+	return uint(effective)
+}
 
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
-		p.Gender, p.Level, p.CurrentHP, p.Stats[StatHP])
+		p.Gender, p.Level, p.CurrentHP, p.MaxHP())
 }
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
 func (p *Pokemon) RestoreHP(amount uint) Transaction {
-	if diff := p.Stats[StatHP] - p.CurrentHP; diff <= amount {
+	if diff := p.MaxHP() - p.CurrentHP; diff <= amount {
 		amount = diff
 	}
 	return HealTransaction{Target: p, Amount: amount}
