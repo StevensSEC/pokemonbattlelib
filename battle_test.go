@@ -689,7 +689,7 @@ var _ = Describe("Fainting", func() {
 		It("should switch to the next available Pokemon", func() {
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(5))
+			Expect(t).To(HaveLen(6))
 			// Charmander smashed his nubby little fist into Squirtle as
 			// hard as he could. Spectators gasped and winced when the
 			// impact created a very audible crack. But it was not
@@ -733,7 +733,7 @@ var _ = Describe("Fainting", func() {
 			Expect(b.Start()).To(Succeed())
 			t, ended := b.SimulateRound()
 			Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
-			Expect(t).To(HaveLen(4), "Expected 4 transactions to occur")
+			Expect(t).To(HaveLen(5), "Expected 4 transactions to occur")
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
@@ -792,6 +792,24 @@ var _ = Describe("Fainting", func() {
 			b.SimulateRound()
 			Expect(dies2.Friendship).To(Equal(190))
 		})
+
+		It("should gain EVs when defeating Pokemon", func() {
+			winner := GeneratePokemon(PkmnBulbasaur, WithLevel(100), WithMoves(GetMove(MovePound)))
+			loser := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MovePound)))
+			p1 = NewOccupiedParty(&a1, 0, winner)
+			p2 = NewOccupiedParty(&a2, 1, loser)
+			b = NewBattle()
+			b.AddParty(p1, p2)
+			Expect(b.Start()).To(Succeed())
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(
+				EVTransaction{
+					Target: winner,
+					Stat:   StatSpAtk,
+					Amount: 1,
+				},
+			))
+		})
 	})
 })
 
@@ -822,7 +840,7 @@ var _ = Describe("Battle end", func() {
 			Expect(b.Start()).To(Succeed())
 			t, ended := b.SimulateRound()
 			Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
-			Expect(t).To(HaveLen(4))
+			Expect(t).To(HaveLen(5))
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{

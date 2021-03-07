@@ -49,6 +49,18 @@ func (t DamageTransaction) Mutate(b *Battle) {
 			Target: receiver,
 			Amount: loss,
 		})
+		// EVs are gained based on EV yield of defeated Pokemon
+		evGain := receiver.GetEVYield()
+		for stat, amount := range evGain {
+			if amount == 0 {
+				continue
+			}
+			b.QueueTransaction(EVTransaction{
+				Target: t.User,
+				Stat:   stat,
+				Amount: uint8(amount),
+			})
+		}
 	}
 }
 
@@ -60,6 +72,17 @@ type FriendshipTransaction struct {
 
 func (t FriendshipTransaction) Mutate(b *Battle) {
 	t.Target.Friendship += t.Amount
+}
+
+// A transaction to change the EVs of a Pokemon.
+type EVTransaction struct {
+	Target *Pokemon
+	Stat   int
+	Amount uint8
+}
+
+func (t EVTransaction) Mutate(b *Battle) {
+	t.Target.EVs[t.Stat] += t.Amount
 }
 
 // A transaction to use and possibly consume an item.
