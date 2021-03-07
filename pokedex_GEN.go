@@ -4037,3 +4037,145 @@ var pokemonBaseStats = map[int]PokemonBaseStats{
 	492: {[6]int{100, 100, 100, 100, 100, 100}, [6]int{3, 0, 0, 0, 0, 0}},
 	493: {[6]int{120, 120, 120, 120, 120, 120}, [6]int{3, 0, 0, 0, 0, 0}},
 }
+
+const (
+	NatureAdamant Nature = iota
+	NatureBashful
+	NatureBold
+	NatureBrave
+	NatureCalm
+	NatureCareful
+	NatureDocile
+	NatureGentle
+	NatureHardy
+	NatureHasty
+	NatureImpish
+	NatureJolly
+	NatureLax
+	NatureLonely
+	NatureMild
+	NatureModest
+	NatureNaive
+	NatureNaughty
+	NatureQuiet
+	NatureQuirky
+	NatureRash
+	NatureRelaxed
+	NatureSassy
+	NatureSerious
+	NatureTimid
+)
+
+// Get the stat modifiers that this nature gives.
+func (n Nature) GetStatModifiers() (statUp, statDown int) {
+	switch n {
+	case NatureAdamant:
+		return StatAtk, StatSpAtk
+	case NatureBashful:
+		return StatSpAtk, StatSpAtk
+	case NatureBold:
+		return StatDef, StatAtk
+	case NatureBrave:
+		return StatAtk, StatSpeed
+	case NatureCalm:
+		return StatSpDef, StatAtk
+	case NatureCareful:
+		return StatSpDef, StatSpAtk
+	case NatureDocile:
+		return StatDef, StatDef
+	case NatureGentle:
+		return StatSpDef, StatDef
+	case NatureHardy:
+		return StatAtk, StatAtk
+	case NatureHasty:
+		return StatSpeed, StatDef
+	case NatureImpish:
+		return StatDef, StatSpAtk
+	case NatureJolly:
+		return StatSpeed, StatSpAtk
+	case NatureLax:
+		return StatDef, StatSpDef
+	case NatureLonely:
+		return StatAtk, StatDef
+	case NatureMild:
+		return StatSpAtk, StatDef
+	case NatureModest:
+		return StatSpAtk, StatAtk
+	case NatureNaive:
+		return StatSpeed, StatSpDef
+	case NatureNaughty:
+		return StatAtk, StatSpDef
+	case NatureQuiet:
+		return StatSpAtk, StatSpeed
+	case NatureQuirky:
+		return StatSpDef, StatSpDef
+	case NatureRash:
+		return StatSpAtk, StatSpDef
+	case NatureRelaxed:
+		return StatDef, StatSpeed
+	case NatureSassy:
+		return StatSpDef, StatSpeed
+	case NatureSerious:
+		return StatSpeed, StatSpeed
+	case NatureTimid:
+		return StatSpeed, StatAtk
+	}
+	panic("Unknown nature")
+}
+
+// Get the string name of this Nature.
+func (n Nature) String() string {
+	switch n {
+	case NatureAdamant:
+		return "Adamant"
+	case NatureBashful:
+		return "Bashful"
+	case NatureBold:
+		return "Bold"
+	case NatureBrave:
+		return "Brave"
+	case NatureCalm:
+		return "Calm"
+	case NatureCareful:
+		return "Careful"
+	case NatureDocile:
+		return "Docile"
+	case NatureGentle:
+		return "Gentle"
+	case NatureHardy:
+		return "Hardy"
+	case NatureHasty:
+		return "Hasty"
+	case NatureImpish:
+		return "Impish"
+	case NatureJolly:
+		return "Jolly"
+	case NatureLax:
+		return "Lax"
+	case NatureLonely:
+		return "Lonely"
+	case NatureMild:
+		return "Mild"
+	case NatureModest:
+		return "Modest"
+	case NatureNaive:
+		return "Naive"
+	case NatureNaughty:
+		return "Naughty"
+	case NatureQuiet:
+		return "Quiet"
+	case NatureQuirky:
+		return "Quirky"
+	case NatureRash:
+		return "Rash"
+	case NatureRelaxed:
+		return "Relaxed"
+	case NatureSassy:
+		return "Sassy"
+	case NatureSerious:
+		return "Serious"
+	case NatureTimid:
+		return "Timid"
+	}
+	panic("Unknown nature")
+}

@@ -40,8 +40,8 @@ var _ = Describe("Pokemon generation", func() {
 	})
 
 	It("generates a Pokemon with a given Nature", func() {
-		p := GeneratePokemon(PkmnPiplup, WithNature(GetNature(NatureAdamant)))
-		Expect(p.Nature).To(Equal(GetNature(NatureAdamant)))
+		p := GeneratePokemon(PkmnPiplup, WithNature(NatureAdamant))
+		Expect(p.Nature).To(Equal(NatureAdamant))
 	})
 
 	It("generates a Pokemon with a given moveset", func() {

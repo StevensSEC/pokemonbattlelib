@@ -19,7 +19,7 @@ func comparePokemon(a, b *Pokemon) bool {
 		return false
 	}
 	return a.NatDex == b.NatDex &&
-		a.Nature.name == b.Nature.name &&
+		a.Nature == b.Nature &&
 		a.Gender == b.Gender &&
 		a.Type == b.Type
 }

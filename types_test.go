@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -287,5 +288,40 @@ var _ = Describe("Status conditions", func() {
 		for _, tt := range tests {
 			Expect(fmt.Sprintf("%s", tt.cond)).To(Equal(tt.want))
 		}
+	})
+})
+
+var _ = Describe("Natures", func() {
+	Context("Auto-generated functions", func() {
+		var entries []TableEntry
+		for i := NatureAdamant; i <= NatureTimid; i++ {
+			entries = append(entries, Entry(fmt.Sprintf("Nature #%d", i), i))
+		}
+
+		DescribeTable("GetStatModifiers() doesn't output StatHP",
+			func(n Nature) {
+				gotUp, gotDown := n.GetStatModifiers()
+				// Testing the exact results doesn't really make sense, since the function is auto-generated.
+				// So I'm just to make sure the generated code didn't didn't fuck up.
+				Expect(gotUp).ToNot(Equal(StatHP))
+				Expect(gotDown).ToNot(Equal(StatHP))
+			},
+			entries...,
+		)
+
+		DescribeTable("Stringer doesn't output \"Nature\"",
+			func(n Nature) {
+				got := fmt.Sprintf("%s", n)
+				// Testing the exact results doesn't really make sense, since the function is auto-generated.
+				// So I'm just to make sure the generated code doesn't produce unnecessary text.
+				Expect(got).ToNot(ContainSubstring("Nature"))
+			},
+			entries...,
+		)
+
+		It("should panic if given an invalid Nature", func() {
+			Expect(func() { _ = Nature(255).String() }).To(Panic())
+			Expect(func() { _, _ = Nature(255).GetStatModifiers() }).To(Panic())
+		})
 	})
 })
