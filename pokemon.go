@@ -230,32 +230,25 @@ func (p *Pokemon) computeStats() {
 	if !p.HasValidEVs() {
 		panic(fmt.Sprintf("Failed to compute stats for %s, evs %d invalid", p.GetName(), p.EVs))
 	}
-	// Set stats given base values (IV, EV, Level, Nature)
-	baseStats := p.GetBaseStats()
-	// Calculate base for HP
+
+	// get base stats
+	base_stats := p.GetBaseStats()
+
+	// compute HP
 	hp_ev_term := math.Floor(float64(p.EVs[StatHP]) / 4)
-	base_iv_ev_level_hp_term := (2*uint(baseStats[StatHP]) + uint(p.IVs[StatHP]) + uint(hp_ev_term)) * uint(p.Level)
+	base_iv_ev_level_hp_term := (2*uint(base_stats[StatHP]) + uint(p.IVs[StatHP]) + uint(hp_ev_term)) * uint(p.Level)
 	hp_floor_term := math.Floor(float64(base_iv_ev_level_hp_term) / 100)
-	effective := uint(hp_floor_term + float64(p.Level) + 10)
-	p.Stats[StatHP] = effective
-	p.CurrentHP = effective
-	// Calculate base for all other stats
-	for _, stat := range []int{StatAtk, StatDef, StatSpAtk, StatSpDef, StatSpeed} {
-		base := float64(baseStats[stat])
-		// Other stat formula
+	p.Stats[StatHP] = uint(hp_floor_term + float64(p.Level) + 10)
+	p.CurrentHP = p.Stats[StatHP]
+
+	// compute all other stats
+	natureModifiers := p.Nature.getNatureModifers()
+	for _, stat := range [5]int{StatAtk, StatDef, StatSpAtk, StatSpDef, StatSpeed} {
 		ev_term := math.Floor(float64(p.EVs[stat]) / 4)
-		base_iv_ev_level_term := (2*uint(base) + uint(p.IVs[stat]) + uint(ev_term)) * uint(p.Level)
-		base = math.Floor(float64(base_iv_ev_level_term)/100 + 5)
-		n := p.Nature
-		if n.StatUp != n.StatDown {
-			if n.StatUp == stat {
-				base *= 1.1
-			}
-			if n.StatDown == stat {
-				base *= 0.9
-			}
-		}
-		p.Stats[stat] = uint(base)
+		base_iv_ev_level_term := (2*uint(base_stats[stat]) + uint(p.IVs[stat]) + uint(ev_term)) * uint(p.Level)
+		floor_term := math.Floor(float64(base_iv_ev_level_term) / 100)
+		nature_term := float64(floor_term+5) * natureModifiers[stat]
+		p.Stats[stat] = uint(math.Floor(nature_term))
 	}
 }
 
