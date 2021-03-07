@@ -35,11 +35,6 @@ type PokemonMeta int
 
 const (
 	MetaLastMove PokemonMeta = iota
-	MetaUpdateAttack
-	MetaUpdateDefense
-	MetaUpdateSpecialAttack
-	MetaUpdateSpecialDefense
-	MetaUpdateSpeed
 )
 
 // Keeps track of base stats and EV yield for a Pokemon
@@ -235,7 +230,7 @@ func (p *Pokemon) computeStats() {
 	if !p.HasValidEVs() {
 		panic(fmt.Sprintf("Failed to compute stats for %s, evs %d invalid", p.GetName(), p.EVs))
 	}
-	// Set stats given base values
+	// Set stats given base values (IV, EV, Level, Nature)
 	baseStats := p.GetBaseStats()
 	// Calculate base for HP
 	hp_ev_term := math.Floor(float64(p.EVs[StatHP]) / 4)
@@ -261,65 +256,43 @@ func (p *Pokemon) computeStats() {
 			}
 		}
 		p.Stats[stat] = uint(base)
-		// TODO: set meta flag to recompute
-		// p.metadata[MetaUpdateStat___] = true
 	}
 }
 
-// Stat getters recompute the stat "as needed"
+// Stat getters return the effective stat values from modifiers
 func (p *Pokemon) MaxHP() uint {
 	// MaxHP is never modified by items/moves in battle?
 	return p.Stats[StatHP]
 }
 
 func (p *Pokemon) Attack() uint {
-	if p.metadata[MetaUpdateAttack] == true {
-		p.metadata[MetaUpdateAttack] = false
-		effective := float64(p.Stats[StatAtk])
-		// TODO: attack modifiers
-		p.Stats[StatAtk] = uint(effective)
-	}
-	return p.Stats[StatAtk]
+	effective := float64(p.Stats[StatAtk])
+	// TODO: attack modifiers
+	return uint(effective)
 }
 
 func (p *Pokemon) Defense() uint {
-	if p.metadata[MetaUpdateDefense] == true {
-		p.metadata[MetaUpdateDefense] = false
-		effective := float64(p.Stats[StatDef])
-		// TODO: defense modifiers
-		p.Stats[StatDef] = uint(effective)
-	}
-	return p.Stats[StatDef]
+	effective := float64(p.Stats[StatDef])
+	// TODO: defense modifiers
+	return uint(effective)
 }
 
 func (p *Pokemon) SpecialAttack() uint {
-	if p.metadata[MetaUpdateSpecialAttack] == true {
-		p.metadata[MetaUpdateSpecialAttack] = false
-		effective := float64(p.Stats[StatSpAtk])
-		// TODO: special attack modifiers
-		p.Stats[StatSpAtk] = uint(effective)
-	}
-	return p.Stats[StatSpAtk]
+	effective := float64(p.Stats[StatSpAtk])
+	// TODO: special attack modifiers
+	return uint(effective)
 }
 
 func (p *Pokemon) SpecialDefense() uint {
-	if p.metadata[MetaUpdateSpecialDefense] == true {
-		p.metadata[MetaUpdateSpecialDefense] = false
-		effective := float64(p.Stats[StatSpDef])
-		// TODO: special defense modifiers
-		p.Stats[StatDef] = uint(effective)
-	}
-	return p.Stats[StatSpDef]
+	effective := float64(p.Stats[StatSpDef])
+	// TODO: special defense modifiers
+	return uint(effective)
 }
 
 func (p *Pokemon) Speed() uint {
-	if p.metadata[MetaUpdateSpeed] == true {
-		p.metadata[MetaUpdateSpeed] = false
-		effective := float64(p.Stats[StatSpeed])
-		// TODO: speed modifiers
-		p.Stats[StatSpeed] = uint(effective)
-	}
-	return p.Stats[StatSpeed]
+	effective := float64(p.Stats[StatSpeed])
+	// TODO: speed modifiers
+	return uint(effective)
 }
 
 // display a Pokemon close to how it would appear in a Pokemon battle
