@@ -108,6 +108,29 @@ func findCountTransactionIdxWithMatchingType(transactions []Transaction, a Trans
 	return first, count
 }
 
+// Gets the closest transaction to the desired one, and return a diff in fields
+func getClosestTransaction(check []Transaction, want Transaction) map[string]string {
+	var best map[string]string
+	bestDiff := 999
+	expected := reflect.ValueOf(want)
+	for _, t := range check {
+		result := make(map[string]string)
+		v := reflect.ValueOf(t)
+		for j := 0; j < v.NumField(); j += 1 {
+			a := v.Field(j).Interface()
+			b := expected.Field(j).Interface()
+			if !reflect.DeepEqual(a, b) {
+				result[v.Type().Field(j).Name] = fmt.Sprintf("%v", a)
+			}
+		}
+		if len(result) < bestDiff {
+			bestDiff = len(result)
+			best = result
+		}
+	}
+	return best
+}
+
 // Given a sequence of transactions, match if a given transaction is present in the sequence.
 type singleTransactionMatcher struct {
 	expected Transaction
@@ -151,11 +174,13 @@ func (matcher *singleTransactionMatcher) FailureMessage(actual interface{}) (mes
 				transactions[first],
 			)
 		} else {
-			// TODO: maybe show transaction that is closest to matching?
-			return fmt.Sprintf("Expected the sequence of transactions to include: %T. %d of the same type were found, but none of them matched.",
-				matcher.expected,
-				count,
-			)
+			expected := ""
+			closest := getClosestTransaction(transactions, matcher.expected)
+			for name, val := range closest {
+				expected += fmt.Sprintf("- %s\n%s\n", name, val)
+			}
+			return fmt.Sprintf("Closest %T (from %d total) has %d fields that do not match:\n%s",
+				matcher.expected, count, len(closest), expected)
 		}
 	default:
 		return fmt.Sprintf("Actual's type is %T, when it should be []Transaction", actual)
