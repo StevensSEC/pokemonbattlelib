@@ -21,6 +21,9 @@ func (t DamageTransaction) Mutate(b *Battle) {
 		t.Damage = 1
 	}
 	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+	if t.Move != nil {
+		t.User.metadata[MetaLastMove] = t.Move
+	}
 	if receiver.CurrentHP >= t.Damage {
 		receiver.CurrentHP -= t.Damage
 	} else {
@@ -46,6 +49,18 @@ func (t DamageTransaction) Mutate(b *Battle) {
 			Target: receiver,
 			Amount: loss,
 		})
+		// EVs are gained based on EV yield of defeated Pokemon
+		evGain := receiver.GetEVYield()
+		for stat, amount := range evGain {
+			if amount == 0 {
+				continue
+			}
+			b.QueueTransaction(EVTransaction{
+				Target: t.User,
+				Stat:   stat,
+				Amount: uint8(amount),
+			})
+		}
 	}
 }
 
@@ -59,6 +74,17 @@ func (t FriendshipTransaction) Mutate(b *Battle) {
 	t.Target.Friendship += t.Amount
 }
 
+// A transaction to change the EVs of a Pokemon.
+type EVTransaction struct {
+	Target *Pokemon
+	Stat   int
+	Amount uint8
+}
+
+func (t EVTransaction) Mutate(b *Battle) {
+	t.Target.EVs[t.Stat] += t.Amount
+}
+
 // A transaction to use and possibly consume an item.
 type ItemTransaction struct {
 	Target *Pokemon
@@ -67,10 +93,13 @@ type ItemTransaction struct {
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
-	// TODO: do not consume certain items
-	if t.Target.HeldItem == t.Item {
-		t.Target.HeldItem = nil
+	if t.Item.Flags&FlagConsumable > 0 {
+		if t.Target.HeldItem == t.Item {
+			t.Target.HeldItem = nil
+		}
+		// TODO: remove consumed item from party's inventory
 	}
+	b.QueueTransaction(t.Target.UseItem(t.Item)...)
 }
 
 // A transaction to change the PP of a move.
@@ -193,4 +222,29 @@ type EvadeTransaction struct {
 
 func (t EvadeTransaction) Mutate(b *Battle) {
 	// currently a no-op.
+}
+
+// Modifies a stat's stages in the interval [-6, 6]
+type ModifyStatTransaction struct {
+	Target *Pokemon
+	Stat   int
+	Stages int
+}
+
+func (t ModifyStatTransaction) Mutate(b *Battle) {
+	stage := t.Target.StatModifiers[t.Stat] + t.Stages
+	min := MinStatModifier
+	max := MaxStatModifier
+	// Bounds for crit chance are [0, 4]
+	if t.Stat == StatCritChance {
+		min = 0
+		max = len(CritChances) - 1
+	}
+	if stage < min {
+		stage = min
+	}
+	if stage > max {
+		stage = max
+	}
+	t.Target.StatModifiers[t.Stat] = stage
 }

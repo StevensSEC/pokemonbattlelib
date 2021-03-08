@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 )
@@ -9,23 +10,37 @@ import (
 const MaxMoves = 4
 
 type Pokemon struct {
-	NatDex            uint16          // National Pokedex Number
-	Level             uint8           // value from 1-100 influencing stats
-	Ability           *Ability        // name of this Pokemon's ability
-	TotalExperience   uint            // the total amount of exp this Pokemon has gained, influencing its level
-	Gender            Gender          // this Pokemon's gender
-	IVs               [6]uint8        // values from 0-31 that represents a Pokemon's 'genetic' potential
-	EVs               [6]uint8        // values from 0-255 that represents a Pokemon's training in a particular stat
-	Nature            *Nature         // represents a Pokemon's disposition and affects stats
-	Stats             [6]uint         // the actual stats of a Pokemon determined from the above data
-	StatModifiers     [9]int          // ranges from +6 (buffing) to -6 (debuffing) a stat
-	StatusEffects     StatusCondition // the current status effects inflicted on a Pokemon
-	CurrentHP         uint            // the remaining HP of this Pokemon
-	HeldItem          *Item           // the item a Pokemon is holding
-	Moves             [MaxMoves]*Move // the moves the Pokemon currenly knows
-	Friendship        int             // how close this Pokemon is to its Trainer
-	OriginalTrainerID uint16          // a number associated with the first Trainer who caught this Pokemon
-	Type              Type            // Indicates what type(s) (up to 2 simultaneously) this pokemon has
+	NatDex            uint16                      // National Pokedex Number
+	Level             uint8                       // value from 1-100 influencing stats
+	Ability           *Ability                    // name of this Pokemon's ability
+	TotalExperience   uint                        // the total amount of exp this Pokemon has gained, influencing its level
+	Gender            Gender                      // this Pokemon's gender
+	IVs               [6]uint8                    // values from 0-31 that represents a Pokemon's 'genetic' potential
+	EVs               [6]uint8                    // values from 0-255 that represents a Pokemon's training in a particular stat
+	Nature            Nature                      // represents a Pokemon's disposition and affects stats
+	Stats             [6]uint                     // the actual stats of a Pokemon determined from the above data
+	StatModifiers     [9]int                      // ranges from +6 (buffing) to -6 (debuffing) a stat
+	StatusEffects     StatusCondition             // the current status effects inflicted on a Pokemon
+	CurrentHP         uint                        // the remaining HP of this Pokemon
+	HeldItem          *Item                       // the item a Pokemon is holding
+	Moves             [MaxMoves]*Move             // the moves the Pokemon currenly knows
+	Friendship        int                         // how close this Pokemon is to its Trainer
+	OriginalTrainerID uint16                      // a number associated with the first Trainer who caught this Pokemon
+	Type              Type                        // Indicates what type(s) (up to 2 simultaneously) this pokemon has
+	metadata          map[PokemonMeta]interface{} // Data that is conditionally needed in a battle
+}
+
+// Metadata for a Pokemon to keep track of
+type PokemonMeta int
+
+const (
+	MetaLastMove PokemonMeta = iota
+)
+
+// Keeps track of base stats and EV yield for a Pokemon
+type PokemonBaseStats struct {
+	Stats   [6]int // base stats of a Pokemon
+	EVYield [6]int // effort points gained when Pokemon is defeated
 }
 
 // Constants for growth rates of a Pokemon
@@ -60,7 +75,8 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		EVs:             [6]uint8{0, 0, 0, 0, 0, 0},
 		StatModifiers:   [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0},
 		Stats:           [6]uint{1, 4, 4, 4, 4, 4},
-		Nature:          GetNature(NatureHardy), // this nature is neutral and has no effect
+		Nature:          NatureHardy, // this nature is neutral and has no effect
+		metadata:        make(map[PokemonMeta]interface{}),
 	}
 	for _, opt := range opts {
 		opt(p)
@@ -93,21 +109,20 @@ func WithEVs(evs [6]uint8) GeneratePokemonOption {
 	}
 }
 
-func WithNature(nature *Nature) GeneratePokemonOption {
+func WithNature(nature Nature) GeneratePokemonOption {
 	return func(p *Pokemon) {
 		p.Nature = nature
 	}
 }
 
 func WithMoves(moves ...*Move) GeneratePokemonOption {
-	if len(moves) > MaxMoves {
-		panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MaxMoves))
-	}
-
-	var limited_moves [4]*Move
-	copy(limited_moves[:], moves)
-
 	return func(p *Pokemon) {
+		if len(moves) > MaxMoves {
+			panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MaxMoves))
+		}
+
+		var limited_moves [4]*Move
+		copy(limited_moves[:], moves)
 		p.Moves = limited_moves
 	}
 }
@@ -121,7 +136,11 @@ func (p *Pokemon) GetGrowthRate() int {
 }
 
 func (p *Pokemon) GetBaseStats() [6]int {
-	return pokemonBaseStats[int(p.NatDex)]
+	return pokemonBaseStats[int(p.NatDex)].Stats
+}
+
+func (p *Pokemon) GetEVYield() [6]int {
+	return pokemonBaseStats[int(p.NatDex)].EVYield
 }
 
 func (p *Pokemon) HasValidLevel() bool {
@@ -232,18 +251,76 @@ func (p *Pokemon) computeStats() {
 	}
 }
 
-// implement Stringer
+// Stat getters return the effective stat values from modifiers
+func (p *Pokemon) MaxHP() uint {
+	// MaxHP is never modified by items/moves in battle?
+	return p.Stats[StatHP]
+}
+
+func (p *Pokemon) Attack() uint {
+	effective := float64(p.Stats[StatAtk])
+	// TODO: attack modifiers
+	return uint(effective)
+}
+
+func (p *Pokemon) Defense() uint {
+	effective := float64(p.Stats[StatDef])
+	// TODO: defense modifiers
+	return uint(effective)
+}
+
+func (p *Pokemon) SpecialAttack() uint {
+	effective := float64(p.Stats[StatSpAtk])
+	// TODO: special attack modifiers
+	return uint(effective)
+}
+
+func (p *Pokemon) SpecialDefense() uint {
+	effective := float64(p.Stats[StatSpDef])
+	// TODO: special defense modifiers
+	return uint(effective)
+}
+
+func (p *Pokemon) Speed() uint {
+	effective := float64(p.Stats[StatSpeed])
+	// TODO: speed modifiers
+	return uint(effective)
+}
 
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {
 	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
-		p.Gender, p.Level, p.CurrentHP, p.Stats[StatHP])
+		p.Gender, p.Level, p.CurrentHP, p.MaxHP())
 }
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
 func (p *Pokemon) RestoreHP(amount uint) Transaction {
-	if diff := p.Stats[StatHP] - p.CurrentHP; diff <= amount {
+	if diff := p.MaxHP() - p.CurrentHP; diff <= amount {
 		amount = diff
 	}
 	return HealTransaction{Target: p, Amount: amount}
+}
+
+func (p *Pokemon) MarshalJSON() ([]byte, error) {
+	type alias Pokemon // required to not enter infinite recursive loop
+	return json.Marshal(&struct {
+		Name string
+		*alias
+	}{
+		Name:  p.GetName(),
+		alias: (*alias)(p),
+	})
+}
+
+func (p *Pokemon) UnmarshalJSON(data []byte) error {
+	type alias Pokemon // required to not enter infinite recursive loop
+	aux := &struct {
+		*alias
+	}{
+		alias: (*alias)(p),
+	}
+	if p.metadata == nil {
+		p.metadata = make(map[PokemonMeta]interface{})
+	}
+	return json.Unmarshal(data, &aux)
 }

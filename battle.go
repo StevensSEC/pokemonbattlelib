@@ -96,11 +96,17 @@ func (b *Battle) Start() error {
 	return nil
 }
 
+// Handles all pre-turn logic
+func (b *Battle) preRound() {
+	// TODO
+}
+
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
 func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	if b.State != BattleInProgress {
 		log.Panic("battle is not currently in progress")
 	}
+	b.preRound()
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
 	for i, party := range b.parties {
@@ -136,7 +142,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					return mvA.Priority > mvB.Priority
 				}
 				// speedy pokemon should go first
-				return ctxA.Pokemon.Stats[StatSpeed] > ctxB.Pokemon.Stats[StatSpeed]
+				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
 			}
 		} else {
 			// make higher priority turns go first
@@ -157,7 +163,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
-
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
 				immobilize := false
@@ -200,29 +205,36 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				continue
 			}
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
+			// Status Moves
 			if move.Category == MoveCategoryStatus {
-				if move.ID == MoveStunSpore {
+				switch move.ID {
+				case MoveStunSpore:
 					b.QueueTransaction(InflictStatusTransaction{
 						Target:       receiver,
 						StatusEffect: StatusParalyze,
 					})
-				}
-				if move.ID == MoveDefog {
+				case MoveHowl:
+					b.QueueTransaction(ModifyStatTransaction{
+						Target: &user,
+						Stat:   StatAtk,
+						Stages: +1,
+					})
+				case MoveDefog:
 					if b.Weather == WeatherFog {
 						b.QueueTransaction(WeatherTransaction{
 							Weather: WeatherClearSkies,
 						})
 					}
-				}
-				if b.Weather == WeatherFog {
-					if move.ID == MoveMoonlight || move.ID == MoveSynthesis || move.ID == MoveMorningSun {
+				case MoveMoonlight, MoveSynthesis, MoveMorningSun:
+					if b.Weather == WeatherFog {
 						b.QueueTransaction(HealTransaction{
 							Target: self,
-							Amount: self.Stats[StatHP] / 4,
+							Amount: self.MaxHP() / 4,
 						})
 					}
 				}
 			} else {
+				// Physical/Special Moves
 				weather := 1.0
 				if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Type == TypeWater) || (sun && move.Type == TypeFire) {
 					weather = 1.5
@@ -243,12 +255,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				modifier := weather * crit * stab
 				levelEffect := float64((2 * user.Level / 5) + 2)
 				movePower := float64(move.Power)
-				attack := float64(user.Stats[StatAtk])
-				defense := float64(receiver.Stats[StatDef])
+				attack := float64(user.Attack())
+				defense := float64(receiver.Defense())
 				// Move modifiers
 				if move.Category == MoveCategorySpecial {
-					attack = float64(user.Stats[StatSpAtk])
-					defense = float64(receiver.Stats[StatSpDef])
+					attack = float64(user.SpecialAttack())
+					defense = float64(receiver.SpecialDefense())
 				}
 				// Weather modifiers
 				if b.Weather == WeatherSandstorm {
@@ -286,7 +298,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Item:   t.Item,
 				Move:   move,
 			})
-			b.QueueTransaction(receiver.UseItem(t.Item)...)
 		default:
 			log.Panicf("Unknown turn of type %v", t)
 		}
@@ -296,8 +307,20 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			break
 		}
 	}
+	b.postRound()
 
-	// handle post turn status effects
+	b.ProcessQueue()
+	if len(b.tQueue) > 0 {
+		log.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
+	}
+	transactions := b.tProcessed
+	b.tProcessed = []Transaction{}
+	return transactions, b.State == BattleEnd
+}
+
+// Handles all post-round logic
+func (b *Battle) postRound() {
+	// Effects on every Pokemon
 	for a, party := range b.parties {
 		for ap, pkmn := range party.activePokemon {
 			t := target{
@@ -306,15 +329,16 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Pokemon:   *pkmn,
 				Team:      party.team,
 			}
+			// Status effects
 			if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
 				cond := pkmn.StatusEffects & StatusNonvolatileMask
 				var damage uint
 				switch cond {
 				case StatusBurn, StatusPoison:
-					damage = pkmn.Stats[StatHP] / 8
+					damage = pkmn.MaxHP() / 8
 				case StatusBadlyPoison:
 					// TODO: implement counter for increasing bad poison damage
-					damage = pkmn.Stats[StatHP] / 16
+					damage = pkmn.MaxHP() / 16
 				}
 				b.QueueTransaction(DamageTransaction{
 					Target:       t,
@@ -322,11 +346,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					StatusEffect: cond,
 				})
 			}
-			// damage from weather
+			// Weather effects
 			// TODO: check for weather resisting abilities
 			if b.Weather == WeatherSandstorm {
 				if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
-					damage := pkmn.Stats[StatHP] / 16
+					damage := pkmn.MaxHP() / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
 						Damage: damage,
@@ -334,23 +358,22 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else if b.Weather == WeatherHail {
 				if pkmn.Type&TypeIce == 0 {
-					damage := pkmn.Stats[StatHP] / 16
+					damage := pkmn.MaxHP() / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
 						Damage: damage,
 					})
 				}
 			}
+
+			if pkmn.HeldItem != nil && pkmn.HeldItem.Category == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
+				b.QueueTransaction(ItemTransaction{
+					Target: pkmn,
+					Item:   pkmn.HeldItem,
+				})
+			}
 		}
 	}
-	b.ProcessQueue()
-
-	if len(b.tQueue) > 0 {
-		log.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
-	}
-	transactions := b.tProcessed
-	b.tProcessed = []Transaction{}
-	return transactions, b.State == BattleEnd
 }
 
 // Add Transactions to the queue.

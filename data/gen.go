@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -16,6 +17,15 @@ const EnglishLanguageID = 9
 const NationalDexID = 1
 const HighestGen = 4
 const HighestDexNum = 493
+
+var statNames = map[int]string{
+	1: "StatHP",
+	2: "StatAtk",
+	3: "StatDef",
+	4: "StatSpAtk",
+	5: "StatSpDef",
+	6: "StatSpeed",
+}
 
 type data_pokemon struct {
 	Identifier     string
@@ -58,6 +68,25 @@ type data_item struct {
 	FlingPower    int
 	FlingEffectID int
 	Flags         []string
+}
+
+type baseStat struct {
+	stats []int
+	ev    []int
+}
+
+type data_nature struct {
+	id       int
+	name     string
+	statup   int
+	statdown int
+}
+
+func (b baseStat) String() string {
+	return fmt.Sprintf("{[6]int%s, [6]int%s}",
+		getIntArrayCodeOutput(b.stats),
+		getIntArrayCodeOutput(b.ev),
+	)
 }
 
 func parseInt(s string) (n int) {
@@ -550,18 +579,18 @@ func main() {
 	}
 	output += "}\n\n"
 
-	// pokemon base stat
-	log.Println("Creating base stat table")
-	output += "// A map of national pokedex numbers to Pokemon base stats\n"
-	output += "var pokemonBaseStats = map[int][6]int{\n"
-
-	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
-	base_stat_array := make([][]int, HighestDexNum+1)
-	for i := range base_stat_array {
-		number_of_stats := 6
-		base_stat_array[i] = make([]int, number_of_stats)
+	// pokemon base stat + EV yield
+	log.Println("Creating base stat table + EV yield table")
+	output += "// Table of Pokemon base stats and EV yield\n"
+	output += "var pokemonBaseStats = map[int]PokemonBaseStats{\n"
+	baseStats := make(map[int]baseStat)
+	for i := 0; i < HighestDexNum+1; i += 1 {
+		baseStats[i] = baseStat{
+			stats: make([]int, 6),
+			ev:    make([]int, 6),
+		}
 	}
-
+	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
 	for {
 		record, err := pokemon_stats_csv.Read()
 
@@ -577,19 +606,72 @@ func main() {
 
 		stat_id := parseInt(record[1]) - 1
 		stat_value := parseInt(record[2])
-
-		base_stat_array[dex_num][stat_id] = stat_value
+		ev := parseInt(record[3])
+		baseStats[dex_num].stats[stat_id] = stat_value
+		baseStats[dex_num].ev[stat_id] = ev
 	}
 
-	for dex_num, stats := range base_stat_array {
-
-		if dex_num == 0 {
-			continue
-		}
-
-		output += fmt.Sprintf("%d: %s,\n", dex_num, getIntArrayCodeOutput(stats))
+	for n := 1; n < HighestDexNum+1; n += 1 {
+		output += fmt.Sprintf("%d: %s,\n", n, baseStats[n])
 	}
 	output += "}\n\n"
+
+	// Natures
+	log.Println("Generating code for Natures")
+	// read natures data
+	natures_csv := getCsvReader("data/natures.csv")
+	natures := []data_nature{}
+	for {
+		record, err := natures_csv.Read()
+		if err == io.EOF {
+			break
+		}
+
+		natures = append(natures, data_nature{
+			id:       parseInt(record[0]),
+			name:     strings.Title(record[1]),
+			statdown: parseInt(record[2]),
+			statup:   parseInt(record[3]),
+		})
+	}
+	sort.Slice(natures, func(i, j int) bool {
+		return natures[i].name < natures[j].name
+	})
+	// generate Nature Constants
+	log.Println("Generating Nature constants")
+	output += "const (\n"
+	for i, n := range natures {
+		if i == 0 {
+			output += fmt.Sprintf("Nature%s Nature = iota\n", n.name)
+		} else {
+			output += fmt.Sprintf("Nature%s\n", n.name)
+		}
+	}
+	output += ")\n\n"
+	// generate Nature GetStatModifiers()
+	log.Println("Generating Nature GetStatModifiers()")
+	output += "// Get the stat modifiers that this nature gives.\n" +
+		"func (n Nature) GetStatModifiers() (statUp, statDown int) {\n" +
+		"switch n {\n"
+	for _, n := range natures {
+		output += fmt.Sprintf("case Nature%s:\n", n.name)
+		output += fmt.Sprintf("return %s, %s\n", statNames[n.statup], statNames[n.statdown])
+	}
+	output += "}\n" +
+		"panic(\"Unknown nature\")" +
+		"}\n\n"
+	// generate Nature String()
+	log.Println("Generating Nature String()")
+	output += "// Get the string name of this Nature.\n" +
+		"func (n Nature) String() string {\n" +
+		"switch n {\n"
+	for _, n := range natures {
+		output += fmt.Sprintf("case Nature%s:\n", n.name)
+		output += fmt.Sprintf("return \"%s\"\n", n.name)
+	}
+	output += "}\n" +
+		"panic(\"Unknown nature\")" +
+		"}\n\n"
 
 	createCodeOutput(output)
 

@@ -109,6 +109,8 @@ func (p *Pokemon) UseItem(i *Item) []Transaction {
 	switch i.Category {
 	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
 		return p.UseMedicine(i)
+	case ItemCategoryInAPinch:
+		return p.UseBerryInAPinch(i)
 	}
 	return make([]Transaction, 0)
 }
@@ -118,6 +120,54 @@ func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
 	switch i.ID {
 	case ItemPotion:
 		t = append(t, p.RestoreHP(20))
+	}
+	return t
+}
+
+func (p *Pokemon) UseBerryInAPinch(i *Item) (t []Transaction) {
+	switch i.ID {
+	case ItemApicotBerry:
+		t = append(t, ModifyStatTransaction{
+			Target: p,
+			Stat:   StatSpDef,
+			Stages: 1,
+		})
+	case ItemCustapBerry:
+		// TODO: Force pokemon to go first
+	case ItemGanlonBerry:
+		t = append(t, ModifyStatTransaction{
+			Target: p,
+			Stat:   StatDef,
+			Stages: 1,
+		})
+	case ItemLansatBerry:
+		t = append(t, ModifyStatTransaction{
+			Target: p,
+			Stat:   StatCritChance,
+			Stages: 2,
+		})
+	case ItemLiechiBerry:
+		t = append(t, ModifyStatTransaction{
+			Target: p,
+			Stat:   StatAtk,
+			Stages: 1,
+		})
+	case ItemMicleBerry:
+		// TODO: Perfect accuracy for next move
+	case ItemPetayaBerry:
+		t = append(t, ModifyStatTransaction{
+			Target: p,
+			Stat:   StatSpAtk,
+			Stages: 1,
+		})
+	case ItemSalacBerry:
+		t = append(t, ModifyStatTransaction{
+			Target: p,
+			Stat:   StatSpeed,
+			Stages: 1,
+		})
+	case ItemStarfBerry:
+		// TODO: boost random stat, requires battle RNG to be available.
 	}
 	return t
 }
