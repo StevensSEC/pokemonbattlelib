@@ -1100,9 +1100,7 @@ var _ = Describe("In-a-pinch Berries", func() {
 		p1 := NewOccupiedParty(&a1, 0, GeneratePokemon(
 			PkmnCombusken,
 			WithLevel(25),
-			WithMoves(
-				GetMove(MoveSplash),
-			),
+			WithMoves(GetMove(MoveSplash)),
 		))
 		holder = GeneratePokemon(
 			PkmnGrotle,
