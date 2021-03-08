@@ -78,6 +78,7 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		Nature:          NatureHardy, // this nature is neutral and has no effect
 		metadata:        make(map[PokemonMeta]interface{}),
 	}
+	p.Type = pokemonData[p.NatDex].Type
 	for _, opt := range opts {
 		opt(p)
 	}
@@ -128,7 +129,7 @@ func WithMoves(moves ...*Move) GeneratePokemonOption {
 }
 
 func (p *Pokemon) GetName() string {
-	return pokemonNames[p.NatDex]
+	return pokemonData[p.NatDex].Name
 }
 
 func (p *Pokemon) GetGrowthRate() int {
