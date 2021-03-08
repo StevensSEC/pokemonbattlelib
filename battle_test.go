@@ -1079,3 +1079,61 @@ var _ = Describe("Status Conditions", func() {
 		})
 	})
 })
+
+var _ = Describe("In-a-pinch Berries", func() {
+	a1 := Agent(new(dumbAgent))
+	a2 := Agent(new(dumbAgent))
+	var holder *Pokemon
+
+	setup := func(itemId int) *Battle {
+		p1 := NewOccupiedParty(&a1, 0, GeneratePokemon(
+			PkmnCombusken,
+			WithLevel(25),
+			WithMoves(
+				GetMove(MoveFlamethrower),
+				GetMove(MoveDoubleKick),
+			),
+		))
+		holder = GeneratePokemon(
+			PkmnGrotle,
+			WithLevel(25),
+			WithMoves(
+				GetMove(MoveRazorLeaf),
+				GetMove(MoveBite),
+			),
+			WithIVs([6]uint8{1, 1, 1, 20, 1, 1}),
+		)
+		i := GetItem(itemId)
+		holder.HeldItem = &i
+		holder.CurrentHP = holder.Stats[StatHP] / 2
+		p2 := NewOccupiedParty(&a2, 1, holder)
+		b := NewBattle()
+		b.rng = &SimpleRNG
+		b.AddParty(p1, p2)
+		b.Start()
+		return b
+	}
+
+	DescribeTable("Stat changing in-a-pinch berries",
+		func(item, stat, stages int) {
+			b := setup(item)
+			t, _ := b.SimulateRound()
+
+			Expect(t).To(HaveTransaction(ItemTransaction{
+				Target: holder,
+				Item:   holder.HeldItem,
+			}))
+			Expect(t).To(HaveTransaction(ModifyStatTransaction{
+				Target: holder,
+				Stat:   stat,
+				Stages: stages,
+			}))
+		},
+		Entry("Apicot Berry", ItemApicotBerry, StatSpDef, 1),
+		Entry("Ganlon Berry", ItemGanlonBerry, StatDef, 1),
+		Entry("Lansat Berry", ItemLansatBerry, StatCritChance, 2),
+		Entry("Liechi Berry", ItemLiechiBerry, StatAtk, 1),
+		Entry("Petaya Berry", ItemPetayaBerry, StatSpAtk, 1),
+		Entry("Salac Berry", ItemSalacBerry, StatSpeed, 1),
+	)
+})

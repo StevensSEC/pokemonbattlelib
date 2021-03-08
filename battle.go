@@ -365,6 +365,13 @@ func (b *Battle) postRound() {
 					})
 				}
 			}
+
+			if pkmn.HeldItem != nil && pkmn.HeldItem.Category == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
+				b.QueueTransaction(ItemTransaction{
+					Target: pkmn,
+					Item:   pkmn.HeldItem,
+				})
+			}
 		}
 	}
 }
