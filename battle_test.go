@@ -224,6 +224,20 @@ var _ = Describe("One round of battle", func() {
 			}))
 			Expect(charmander.StatModifiers[StatAtk]).To(BeEquivalentTo(MaxStatModifier))
 		})
+		It("should change a move's PP", func() {
+			battle.rng = &AlwaysRNG
+			charmander.Moves[0] = GetMove(MoveSpite)
+			Expect(battle.Start()).To(Succeed())
+			battle.SimulateRound() // set Pokemon's last move
+			squirtle.Moves[0].CurrentPP = 1
+			t, _ := battle.SimulateRound()
+			Expect(t).To(HaveTransaction(PPTransaction{
+				Move:   squirtle.Moves[0],
+				Amount: -4,
+			}))
+			// Ensure that PP stays in bounds
+			Expect(squirtle.Moves[0].CurrentPP).To(Equal(0))
+		})
 	})
 })
 
