@@ -334,6 +334,7 @@ var _ = Describe("Turn priority", func() {
 			p2 := NewOccupiedParty(&a2, 1, charmander)
 			b := NewBattle()
 			b.AddParty(p1, p2)
+			b.rng = &SimpleRNG
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
@@ -832,6 +833,7 @@ var _ = Describe("Battle end", func() {
 		party2.AddPokemon(pkmn2)
 		b = NewBattle()
 		b.AddParty(party1, party2)
+		b.rng = &SimpleRNG
 	})
 
 	Context("when all Pokemon faint on one team", func() {
@@ -880,6 +882,7 @@ var _ = Describe("Battle metadata", func() {
 			)
 			b := NewBattle()
 			b.AddParty(p1, p2)
+			b.rng = &SimpleRNG
 			Expect(b.Start()).To(Succeed())
 			Expect(p1.pokemon[0].metadata).ToNot(HaveKeyWithValue(MetaLastMove, razorLeaf))
 			b.SimulateRound()
@@ -892,21 +895,29 @@ var _ = Describe("Battle metadata", func() {
 var _ = Describe("Status Conditions", func() {
 	a1 := Agent(new(dumbAgent))
 	a2 := Agent(new(dumbAgent))
+	var (
+		p1 *party
+		p2 *party
+		b  *Battle
+	)
+
+	BeforeEach(func() {
+		b = NewBattle()
+		b.rng = &AlwaysRNG
+	})
 
 	Context("when using certain moves in battle causes status effects", func() {
 		It("should inflict paralysis from MoveStunSpore", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveSplash)))
-			p2 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveStunSpore)))
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.rng = &AlwaysRNG
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveSplash)))
+			pkmn2 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveStunSpore)))
+			p1 = NewOccupiedParty(&a1, 0, pkmn1)
+			p2 = NewOccupiedParty(&a2, 1, pkmn2)
+			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				InflictStatusTransaction{
-					Target:       p1,
+					Target:       pkmn1,
 					StatusEffect: StatusParalyze,
 				},
 			))
@@ -915,21 +926,19 @@ var _ = Describe("Status Conditions", func() {
 
 	Context("when a Pokemon has a status effect, it affects the Pokemon in battle", func() {
 		It("should inflict burn and poison damage", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusPoison
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnIvysaur, WithMoves(GetMove(MovePound)))
-			p2.StatusEffects = StatusBurn
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.SetSeed(1337)
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MovePound)))
+			pkmn1.StatusEffects = StatusPoison
+			p1 = NewOccupiedParty(&a1, 0, pkmn1)
+			pkmn2 := GeneratePokemon(PkmnIvysaur, WithMoves(GetMove(MovePound)))
+			pkmn2.StatusEffects = StatusBurn
+			p2 = NewOccupiedParty(&a2, 1, pkmn2)
+			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveLen(4), "Expected only 4 transactions to occur in a round")
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
-					Pokemon:   *p1,
+					Pokemon:   *pkmn1,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -939,7 +948,7 @@ var _ = Describe("Status Conditions", func() {
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
-					Pokemon:   *p2,
+					Pokemon:   *pkmn2,
 					party:     1,
 					partySlot: 0,
 					Team:      1,
@@ -950,20 +959,18 @@ var _ = Describe("Status Conditions", func() {
 		})
 
 		It("should inflict badly poisoned damage", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(100), WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusBadlyPoison
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnIvysaur, WithLevel(100), WithMoves(GetMove(MovePound)))
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.rng = &AlwaysRNG
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(100), WithMoves(GetMove(MovePound)))
+			pkmn1.StatusEffects = StatusBadlyPoison
+			p1 = NewOccupiedParty(&a1, 0, pkmn1)
+			pkmn2 := GeneratePokemon(PkmnIvysaur, WithLevel(100), WithMoves(GetMove(MovePound)))
+			p2 = NewOccupiedParty(&a2, 1, pkmn2)
+			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveLen(3), "Expected only 3 transactions to occur in a round")
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
-					Pokemon:   *p1,
+					Pokemon:   *pkmn1,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -974,20 +981,18 @@ var _ = Describe("Status Conditions", func() {
 		})
 
 		It("should immobilize paralyzed Pokemon", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusParalyze
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.rng = &AlwaysRNG
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
+			pkmn1.StatusEffects = StatusParalyze
+			p1 = NewOccupiedParty(&a1, 0, pkmn1)
+			pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+			p2 = NewOccupiedParty(&a2, 1, pkmn2)
+			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				ImmobilizeTransaction{
 					Target: target{
-						Pokemon:   *p1,
+						Pokemon:   *pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -998,20 +1003,18 @@ var _ = Describe("Status Conditions", func() {
 		})
 
 		It("should immobilize frozen Pokemon", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusFreeze
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.rng = &AlwaysRNG
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
+			pkmn1.StatusEffects = StatusFreeze
+			p1 = NewOccupiedParty(&a1, 0, pkmn1)
+			pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+			p2 = NewOccupiedParty(&a2, 1, pkmn2)
+			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				ImmobilizeTransaction{
 					Target: target{
-						Pokemon:   *p1,
+						Pokemon:   *pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -1022,20 +1025,18 @@ var _ = Describe("Status Conditions", func() {
 		})
 
 		It("should immobilize sleeping Pokemon", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusSleep
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.SetSeed(1337)
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
+			pkmn1.StatusEffects = StatusSleep
+			p1 = NewOccupiedParty(&a1, 0, pkmn1)
+			pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+			p2 = NewOccupiedParty(&a2, 1, pkmn2)
+			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				ImmobilizeTransaction{
 					Target: target{
-						Pokemon:   *p1,
+						Pokemon:   *pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -1046,17 +1047,16 @@ var _ = Describe("Status Conditions", func() {
 		})
 
 		It("should cure paralysis", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusParalyze
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
+			pkmn1.StatusEffects = StatusParalyze
+			p1 = NewOccupiedParty(&a1, 0, pkmn1)
+			pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+			p2 = NewOccupiedParty(&a2, 1, pkmn2)
+			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			b.QueueTransaction(CureStatusTransaction{
 				Target: target{
-					Pokemon:   *p1,
+					Pokemon:   *pkmn1,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -1068,7 +1068,7 @@ var _ = Describe("Status Conditions", func() {
 			Expect(t).To(HaveTransaction(
 				CureStatusTransaction{
 					Target: target{
-						Pokemon:   *p1,
+						Pokemon:   *pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
