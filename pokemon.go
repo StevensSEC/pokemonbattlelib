@@ -35,6 +35,7 @@ type PokemonMeta int
 
 const (
 	MetaLastMove PokemonMeta = iota
+	MetaSleepTime
 )
 
 // Keeps track of base stats and EV yield for a Pokemon

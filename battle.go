@@ -108,7 +108,22 @@ func (b *Battle) Start() error {
 
 // Handles all pre-turn logic
 func (b *Battle) preRound() {
-	// TODO
+	for a, party := range b.parties {
+		for ap, pkmn := range party.activePokemon {
+			t := target{
+				party:     a,
+				partySlot: ap,
+				Pokemon:   *pkmn,
+				Team:      party.team,
+			}
+			if v, ok := pkmn.metadata[MetaSleepTime]; ok && v.(int) == 0 && pkmn.StatusEffects.check(StatusSleep) {
+				b.QueueTransaction(CureStatusTransaction{
+					Target:       t,
+					StatusEffect: StatusSleep,
+				})
+			}
+		}
+	}
 }
 
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
@@ -117,6 +132,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		log.Panic("battle is not currently in progress")
 	}
 	b.preRound()
+	b.ProcessQueue()
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
 	for i, party := range b.parties {

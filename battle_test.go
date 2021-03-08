@@ -1067,26 +1067,61 @@ var _ = Describe("Status Conditions", func() {
 			))
 		})
 
-		It("should immobilize sleeping Pokemon", func() {
-			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
-			pkmn1.StatusEffects = StatusSleep
-			p1 = NewOccupiedParty(&a1, 0, pkmn1)
-			pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-			p2 = NewOccupiedParty(&a2, 1, pkmn2)
-			b.AddParty(p1, p2)
-			Expect(b.Start()).To(Succeed())
-			t, _ := b.SimulateRound()
-			Expect(t).To(HaveTransaction(
-				ImmobilizeTransaction{
-					Target: target{
-						Pokemon:   *pkmn1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+		Context("when a pokemon is asleep", func() {
+			It("should immobilize sleeping Pokemon", func() {
+				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
+				p1 = NewOccupiedParty(&a1, 0, pkmn1)
+				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+				p2 = NewOccupiedParty(&a2, 1, pkmn2)
+				b.AddParty(p1, p2)
+				Expect(b.Start()).To(Succeed())
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       pkmn1,
 					StatusEffect: StatusSleep,
-				},
-			))
+				})
+				b.ProcessQueue()
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(
+					ImmobilizeTransaction{
+						Target: target{
+							Pokemon:   *pkmn1,
+							party:     0,
+							partySlot: 0,
+							Team:      0,
+						},
+						StatusEffect: StatusSleep,
+					},
+				))
+
+			})
+
+			It("should allow sleeping Pokemon to wake up", func() {
+				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
+				p1 = NewOccupiedParty(&a1, 0, pkmn1)
+				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+				p2 = NewOccupiedParty(&a2, 1, pkmn2)
+				b.AddParty(p1, p2)
+				Expect(b.Start()).To(Succeed())
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       pkmn1,
+					StatusEffect: StatusSleep,
+				})
+				b.ProcessQueue()
+				pkmn1.metadata[MetaSleepTime] = 0
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(
+					CureStatusTransaction{
+						Target: target{
+							Pokemon:   *pkmn1,
+							party:     0,
+							partySlot: 0,
+							Team:      0,
+						},
+						StatusEffect: StatusSleep,
+					},
+				))
+				Expect(pkmn1.StatusEffects.check(StatusSleep)).To(BeFalse())
+			})
 		})
 
 		It("should cure paralysis", func() {
