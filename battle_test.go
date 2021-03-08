@@ -169,8 +169,6 @@ var _ = Describe("One round of battle", func() {
 
 	Context("when dealing damage to a Pokemon", func() {
 		It("should account for same-type attack bonus", func() {
-			// TODO: remove when elemental type added
-			charmander.Type = TypeFire
 			charmander.Moves[0] = GetMove(MoveEmber)
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
@@ -497,9 +495,9 @@ var _ = Describe("Weather", func() {
 			p2.AddPokemon(squirtle)
 			b.Weather = WeatherHarshSunlight
 			Expect(b.Start()).To(Succeed())
-			transactions, _ := b.SimulateRound()
+			t, _ := b.SimulateRound()
 			// Fire boosted
-			Expect(transactions).To(HaveTransaction(
+			Expect(t).To(HaveTransaction(
 				DamageTransaction{
 					User: charmander,
 					Target: target{
@@ -509,11 +507,11 @@ var _ = Describe("Weather", func() {
 						Team:      1,
 					},
 					Move:   ember,
-					Damage: 50,
+					Damage: 75,
 				},
 			))
 			// Water weakened
-			Expect(transactions).To(HaveTransaction(
+			Expect(t).To(HaveTransaction(
 				DamageTransaction{
 					User: squirtle,
 					Target: target{
@@ -523,7 +521,7 @@ var _ = Describe("Weather", func() {
 						Team:      0,
 					},
 					Move:   bubble,
-					Damage: 17,
+					Damage: 26,
 				},
 			))
 		})
@@ -534,9 +532,9 @@ var _ = Describe("Weather", func() {
 			p2.AddPokemon(squirtle)
 			b.Weather = WeatherRain
 			Expect(b.Start()).To(Succeed())
-			transactions, _ := b.SimulateRound()
+			t, _ := b.SimulateRound()
 			// Fire weakened
-			Expect(transactions).To(HaveTransaction(
+			Expect(t).To(HaveTransaction(
 				DamageTransaction{
 					User: charmander,
 					Target: target{
@@ -546,11 +544,11 @@ var _ = Describe("Weather", func() {
 						Team:      1,
 					},
 					Move:   ember,
-					Damage: 16,
+					Damage: 25,
 				},
 			))
 			// Water boosted
-			Expect(transactions).To(HaveTransaction(
+			Expect(t).To(HaveTransaction(
 				DamageTransaction{
 					User: squirtle,
 					Target: target{
@@ -560,22 +558,21 @@ var _ = Describe("Weather", func() {
 						Team:      0,
 					},
 					Move:   bubble,
-					Damage: 53,
+					Damage: 80,
 				},
 			))
 		})
 		It("should damage/cause side effects during sandstorm", func() {
 			geodude := GeneratePokemon(PkmnGeodude, WithLevel(50), WithMoves(tackle))
-			geodude.Type = TypeRock | TypeGround
 			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithLevel(50), WithMoves(solarBeam))
 			p1.AddPokemon(geodude)
 			p2.AddPokemon(bulbasaur)
 			b.Weather = WeatherSandstorm
 			Expect(b.Start()).To(Succeed())
-			transactions, _ := b.SimulateRound()
-			Expect(transactions).To(HaveLen(3))
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveLen(3))
 			// Weaken solar beam, SPDEF of rock type
-			Expect(transactions).To(HaveTransaction(DamageTransaction{
+			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: bulbasaur,
 				Target: target{
 					Pokemon:   *geodude,
@@ -584,10 +581,10 @@ var _ = Describe("Weather", func() {
 					Team:      0,
 				},
 				Move:   solarBeam,
-				Damage: 37,
+				Damage: 55,
 			}))
 			// Damage from sandstorm
-			Expect(transactions).To(HaveTransaction(DamageTransaction{
+			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: nil,
 				Target: target{
 					Pokemon:   *bulbasaur,
@@ -601,16 +598,15 @@ var _ = Describe("Weather", func() {
 		})
 		It("should damage/cause side effects during hail", func() {
 			articuno := GeneratePokemon(PkmnArticuno, WithMoves(tackle))
-			articuno.Type = TypeIce
 			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(solarBeam))
 			p1.AddPokemon(articuno)
 			p2.AddPokemon(bulbasaur)
 			b.Weather = WeatherHail
 			Expect(b.Start()).To(Succeed())
-			transactions, _ := b.SimulateRound()
-			Expect(transactions).To(HaveLen(3))
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveLen(3))
 			// Weaken solar beam
-			Expect(transactions).To(HaveTransaction(DamageTransaction{
+			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: bulbasaur,
 				Target: target{
 					Pokemon:   *articuno,
@@ -619,10 +615,10 @@ var _ = Describe("Weather", func() {
 					Team:      0,
 				},
 				Move:   solarBeam,
-				Damage: 4,
+				Damage: 6,
 			}))
 			// Damage from hail
-			Expect(transactions).To(HaveTransaction(DamageTransaction{
+			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: nil,
 				Target: target{
 					Pokemon:   *bulbasaur,
@@ -635,8 +631,8 @@ var _ = Describe("Weather", func() {
 			}))
 		})
 		It("should cause side effects during fog", func() {
-			castform := GeneratePokemon(PkmnCastform, WithLevel(50), WithMoves(weatherBall))
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithLevel(50), WithMoves(solarBeam))
+			castform := GeneratePokemon(PkmnCastform, WithLevel(10), WithMoves(weatherBall))
+			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithLevel(10), WithMoves(solarBeam))
 			p1.AddPokemon(castform)
 			p2.AddPokemon(bulbasaur)
 			b.Weather = WeatherFog
@@ -653,11 +649,12 @@ var _ = Describe("Weather", func() {
 					Team:      0,
 				},
 				Move:   solarBeam,
-				Damage: 26,
+				Damage: 13,
 			}))
 			bulbasaur.Moves[0] = moonlight
+			bulbasaur.CurrentHP = bulbasaur.MaxHP()
 			t, _ = b.SimulateRound()
-			// Moonlight heals 1/4 max HP
+			// Moonlight heals 1/4 max HP, weather ball boosted
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: castform,
 				Target: target{
@@ -667,11 +664,11 @@ var _ = Describe("Weather", func() {
 					Team:      1,
 				},
 				Move:   weatherBall,
-				Damage: 49,
+				Damage: 22,
 			}))
 			Expect(t).To(HaveTransaction(HealTransaction{
 				Target: bulbasaur,
-				Amount: 26,
+				Amount: 7,
 			}))
 		})
 	})
@@ -1105,23 +1102,17 @@ var _ = Describe("In-a-pinch Berries", func() {
 		p1 := NewOccupiedParty(&a1, 0, GeneratePokemon(
 			PkmnCombusken,
 			WithLevel(25),
-			WithMoves(
-				GetMove(MoveFlamethrower),
-				GetMove(MoveDoubleKick),
-			),
+			WithMoves(GetMove(MoveSplash)),
 		))
 		holder = GeneratePokemon(
 			PkmnGrotle,
 			WithLevel(25),
-			WithMoves(
-				GetMove(MoveRazorLeaf),
-				GetMove(MoveBite),
-			),
+			WithMoves(GetMove(MoveSplash)),
 			WithIVs([6]uint8{1, 1, 1, 20, 1, 1}),
 		)
 		i := GetItem(itemId)
 		holder.HeldItem = &i
-		holder.CurrentHP = holder.Stats[StatHP] / 2
+		holder.CurrentHP = holder.MaxHP() / 4
 		p2 := NewOccupiedParty(&a2, 1, holder)
 		b := NewBattle()
 		b.rng = &SimpleRNG
