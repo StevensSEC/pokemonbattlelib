@@ -213,6 +213,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Target:       receiver,
 						StatusEffect: StatusParalyze,
 					})
+				case MoveSpite:
+					if m := receiver.metadata[MetaLastMove]; m != nil {
+						b.QueueTransaction(PPTransaction{
+							Move:   m.(*Move),
+							Amount: -4,
+						})
+					}
 				case MoveHowl:
 					b.QueueTransaction(ModifyStatTransaction{
 						Target: &user,

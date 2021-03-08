@@ -102,6 +102,21 @@ func (t ItemTransaction) Mutate(b *Battle) {
 	b.QueueTransaction(t.Target.UseItem(t.Item)...)
 }
 
+// A transaction to change the PP of a move.
+type PPTransaction struct {
+	Move   *Move
+	Amount int
+}
+
+func (t PPTransaction) Mutate(b *Battle) {
+	t.Move.CurrentPP += t.Amount
+	if t.Move.CurrentPP < 0 {
+		t.Move.CurrentPP = 0
+	} else if t.Move.CurrentPP > t.Move.MaxPP {
+		t.Move.CurrentPP = t.Move.MaxPP
+	}
+}
+
 // A transaction to restore HP to a Pokemon.
 type HealTransaction struct {
 	Target *Pokemon
