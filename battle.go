@@ -387,7 +387,6 @@ func (b *Battle) postRound() {
 					})
 				}
 			}
-
 			if pkmn.HeldItem != nil && pkmn.HeldItem.Category == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
 				b.QueueTransaction(ItemTransaction{
 					Target: pkmn,
@@ -395,6 +394,16 @@ func (b *Battle) postRound() {
 				})
 			}
 		}
+	}
+	// Effects on the battle
+	// Decrease weather counter/clear weather over time
+	if b.Weather != WeatherClearSkies && b.metadata[MetaWeatherTurns] == 0 {
+		b.QueueTransaction(WeatherTransaction{
+			Weather: WeatherClearSkies,
+		})
+	}
+	if turns := b.metadata[MetaWeatherTurns].(int); turns > 0 {
+		b.metadata[MetaWeatherTurns] = turns - 1
 	}
 }
 

@@ -490,7 +490,7 @@ var _ = Describe("Weather", func() {
 				Weather: WeatherHarshSunlight,
 				Turns:   5,
 			}))
-			Expect(b.metadata[MetaWeatherTurns]).To(Equal(5))
+			Expect(b.metadata[MetaWeatherTurns]).To(Equal(4))
 		})
 	})
 
@@ -501,6 +501,22 @@ var _ = Describe("Weather", func() {
 		solarBeam := GetMove(MoveSolarBeam)
 		weatherBall := GetMove(MoveWeatherBall)
 		moonlight := GetMove(MoveMoonlight)
+		It("should use metadata to track weather and clear weather over time", func() {
+			p1.AddPokemon(GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MoveSunnyDay))))
+			p2.AddPokemon(GeneratePokemon(PkmnMagikarp, WithMoves(GetMove(MoveSplash))))
+			Expect(b.Start()).To(Succeed())
+			b.SimulateRound()
+			Expect(b.metadata[MetaWeatherTurns]).To(Equal(4))
+			Expect(b.Weather != WeatherFog)
+			p1.pokemon[0].Moves[0] = GetMove(MoveSplash)
+			b.SimulateRound()
+			Expect(b.metadata[MetaWeatherTurns]).To(Equal(3))
+			b.metadata[MetaWeatherTurns] = 0
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(WeatherTransaction{
+				Weather: WeatherClearSkies,
+			}))
+		})
 		It("should affect fire/water attacks during harsh sunlight", func() {
 			charmander := GeneratePokemon(PkmnCharmander, WithLevel(100), WithMoves(ember))
 			squirtle := GeneratePokemon(PkmnSquirtle, WithLevel(100), WithMoves(bubble))
@@ -582,6 +598,7 @@ var _ = Describe("Weather", func() {
 			p1.AddPokemon(geodude)
 			p2.AddPokemon(bulbasaur)
 			b.Weather = WeatherSandstorm
+			b.metadata[MetaWeatherTurns] = 5
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			Expect(transactions).To(HaveLen(3))
@@ -617,6 +634,7 @@ var _ = Describe("Weather", func() {
 			p1.AddPokemon(articuno)
 			p2.AddPokemon(bulbasaur)
 			b.Weather = WeatherHail
+			b.metadata[MetaWeatherTurns] = 5
 			Expect(b.Start()).To(Succeed())
 			transactions, _ := b.SimulateRound()
 			Expect(transactions).To(HaveLen(3))
@@ -651,6 +669,7 @@ var _ = Describe("Weather", func() {
 			p1.AddPokemon(castform)
 			p2.AddPokemon(bulbasaur)
 			b.Weather = WeatherFog
+			b.metadata[MetaWeatherTurns] = 5
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			// TODO: Accuracy decreases from fog
