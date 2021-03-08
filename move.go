@@ -61,6 +61,20 @@ type Move struct {
 	Priority  int
 	Power     int
 	Accuracy  int
+	metadata  MoveMeta
+}
+
+type MoveMeta struct {
+	MinHits       int
+	MaxHits       int
+	MinTurns      int
+	MaxTurns      int
+	Drain         int
+	Healing       int
+	CritRate      int
+	AilmentChance int
+	FlinchChance  int
+	StatChance    int
 }
 
 // Retrieves a Pokemon move given its move ID

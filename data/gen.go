@@ -39,6 +39,23 @@ type data_pokemon struct {
 }
 
 type data_move_flags uint32
+type data_move_meta struct {
+	minHits       int
+	maxHits       int
+	minTurns      int
+	maxTurns      int
+	drain         int
+	healing       int
+	critRate      int
+	ailmentChance int
+	flinchChance  int
+	statChance    int
+}
+
+func (d data_move_meta) String() string {
+	return fmt.Sprintf("MoveMeta{MinHits: %d, MaxHits: %d, MinTurns: %d, MaxTurns: %d, Drain: %d, Healing: %d, CritRate: %d, AilmentChance: %d, FlinchChance: %d, StatChance: %d}",
+		d.minHits, d.maxHits, d.minTurns, d.maxTurns, d.drain, d.healing, d.critRate, d.ailmentChance, d.flinchChance, d.statChance)
+}
 
 type data_move struct {
 	Id             int
@@ -59,6 +76,7 @@ type data_move struct {
 	DamageClass string
 	Effect      int
 	Flags       data_move_flags
+	Meta        data_move_meta
 }
 
 type data_item struct {
@@ -400,10 +418,36 @@ func main() {
 			break
 		}
 	}
+	// Getting move metadata
+	log.Println("Getting move metadata")
+	move_meta_csv := getCsvReader("data/move_meta.csv")
+	records, err := move_meta_csv.ReadAll()
+	if err != nil {
+		panic(err)
+	}
+	for _, v := range records {
+		mid := parseInt(v[0])
+		minHits := parseInt(v[3])
+		maxHits := parseInt(v[4])
+		minTurns := parseInt(v[5])
+		maxTurns := parseInt(v[6])
+		drain := parseInt(v[7])
+		healing := parseInt(v[8])
+		critRate := parseInt(v[9])
+		ailmentChance := parseInt(v[10])
+		flinchChance := parseInt(v[11])
+		statChance := parseInt(v[12])
+		for i, m := range moves {
+			if m.Id != mid {
+				continue
+			}
+			moves[i].Meta = data_move_meta{minHits, maxHits, minTurns, maxTurns, drain, healing, critRate, ailmentChance, flinchChance, statChance}
+		}
+	}
 	output += "var AllMoves = []Move{\n"
 	for _, p := range moves {
 		output += fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, CurrentPP: %d, MaxPP: %d,"+
-			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Targets, p.Priority, p.Power, p.Accuracy)
+			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d, metadata: %s},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Targets, p.Priority, p.Power, p.Accuracy, p.Meta)
 	}
 	output += "}\n\n"
 	// Add move constants
@@ -425,7 +469,7 @@ func main() {
 	8,underground */
 	log.Println("Getting all items/item flags")
 	item_flags_csv := getCsvReader("data/item_flag_map.csv")
-	records, err := item_flags_csv.ReadAll()
+	records, err = item_flags_csv.ReadAll()
 	if err != nil {
 		log.Panicln(err)
 	}
