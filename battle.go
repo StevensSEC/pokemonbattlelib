@@ -379,12 +379,28 @@ func (b *Battle) postRound() {
 					})
 				}
 			}
-
-			if pkmn.HeldItem != nil && pkmn.HeldItem.Category == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
-				b.QueueTransaction(ItemTransaction{
-					Target: pkmn,
-					Item:   pkmn.HeldItem,
-				})
+			// Held item effects
+			if pkmn.HeldItem != nil {
+				if pkmn.HeldItem.Category == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
+					b.QueueTransaction(ItemTransaction{
+						Target: pkmn,
+						Item:   pkmn.HeldItem,
+					})
+				}
+				switch pkmn.HeldItem.ID {
+				case ItemBlackSludge:
+					if pkmn.Type&TypePoison != 0 {
+						b.QueueTransaction(HealTransaction{
+							Target: pkmn,
+							Amount: pkmn.MaxHP() / 16,
+						})
+					} else {
+						b.QueueTransaction(DamageTransaction{
+							Target: t,
+							Damage: pkmn.MaxHP() / 8,
+						})
+					}
+				}
 			}
 		}
 	}
