@@ -191,10 +191,12 @@ func (t SendOutTransaction) Mutate(b *Battle) {
 // Changes the current weather in a battle
 type WeatherTransaction struct {
 	Weather Weather
+	Turns   int
 }
 
 func (t WeatherTransaction) Mutate(b *Battle) {
 	b.Weather = t.Weather
+	b.metadata[MetaWeatherTurns] = t.Turns
 }
 
 // A transaction that ends the battle.

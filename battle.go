@@ -14,11 +14,18 @@ type Battle struct {
 	State    BattleState
 	rng      RNG
 
-	parties []*party // All parties participating in the battle
+	parties  []*party                   // All parties participating in the battle
+	metadata map[BattleMeta]interface{} // Metadata to be tracked during a battle
 
 	tQueue     []Transaction
 	tProcessed []Transaction
 }
+
+type BattleMeta int
+
+const (
+	MetaWeatherTurns BattleMeta = iota
+)
 
 type BattleState int
 
@@ -34,6 +41,9 @@ func NewBattle() *Battle {
 	b := Battle{
 		State: BattleBeforeStart,
 		rng:   RNG(&rng),
+		metadata: map[BattleMeta]interface{}{
+			MetaWeatherTurns: 0,
+		},
 	}
 	return &b
 }
@@ -220,6 +230,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 							Amount: -4,
 						})
 					}
+				case MoveSunnyDay:
+					b.QueueTransaction(WeatherTransaction{
+						Weather: WeatherHarshSunlight,
+						Turns:   5,
+					})
 				case MoveHowl:
 					b.QueueTransaction(ModifyStatTransaction{
 						Target: &user,
