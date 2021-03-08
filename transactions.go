@@ -174,7 +174,7 @@ func (t FaintTransaction) Mutate(b *Battle) {
 	}
 	if !anyAlive {
 		// cause the battle to end by knockout
-		b.QueueTransaction(EndBattleTransaction{})
+		b.QueueTransaction(EndBattleTransaction{Reason: EndKnockout})
 	}
 }
 
@@ -198,7 +198,17 @@ func (t WeatherTransaction) Mutate(b *Battle) {
 }
 
 // A transaction that ends the battle.
-type EndBattleTransaction struct{}
+type EndReason int
+
+const (
+	EndKnockout EndReason = iota
+	EndForfeit
+	EndFlee
+)
+
+type EndBattleTransaction struct {
+	Reason EndReason
+}
 
 func (t EndBattleTransaction) Mutate(b *Battle) {
 	b.State = BattleEnd

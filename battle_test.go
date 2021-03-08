@@ -865,7 +865,9 @@ var _ = Describe("Battle end", func() {
 						Team:      0,
 					},
 				},
-				EndBattleTransaction{},
+				EndBattleTransaction{
+					Reason: EndKnockout,
+				},
 			))
 			Expect(t).ToNot(HaveTransaction(
 				DamageTransaction{
