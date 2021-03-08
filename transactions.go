@@ -112,8 +112,7 @@ func (t PPTransaction) Mutate(b *Battle) {
 	t.Move.CurrentPP += t.Amount
 	if t.Move.CurrentPP < 0 {
 		t.Move.CurrentPP = 0
-	}
-	if t.Move.CurrentPP > t.Move.MaxPP {
+	} else if t.Move.CurrentPP > t.Move.MaxPP {
 		t.Move.CurrentPP = t.Move.MaxPP
 	}
 }
