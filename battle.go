@@ -289,6 +289,20 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					Move:   user.Moves[t.Move],
 					Damage: uint(damage),
 				})
+				if move.metadata.Drain != 0 {
+					drain := damage * float64(move.metadata.Drain) / 100
+					if user.HeldItem != nil && user.HeldItem.ID == ItemBigRoot {
+						drain *= 1.30 // 30% more HP than normal
+					}
+					if drain == 0 {
+						// Min 1 HP drain
+						drain = 1
+					}
+					b.QueueTransaction(HealTransaction{
+						Target: &user,
+						Amount: uint(drain),
+					})
+				}
 			}
 		case ItemTurn:
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
