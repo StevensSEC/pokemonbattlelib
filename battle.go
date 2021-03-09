@@ -107,7 +107,14 @@ func (b *Battle) Start() error {
 
 // Handles all pre-turn logic
 func (b *Battle) preRound() {
-	// TODO
+	for _, t := range b.GetTargets() {
+		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
+			b.QueueTransaction(CureStatusTransaction{
+				Target:       t,
+				StatusEffect: StatusSleep,
+			})
+		}
+	}
 }
 
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
@@ -116,6 +123,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		blog.Panic("battle is not currently in progress")
 	}
 	b.preRound()
+	b.ProcessQueue()
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
 	for i, party := range b.parties {
@@ -176,6 +184,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
+			move := user.Moves[t.Move]
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
 				immobilize := false
@@ -193,7 +202,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 					continue // forfeit turn
 				}
-			} else if user.StatusEffects.check(StatusSleep) {
+			} else if user.StatusEffects.check(StatusSleep) && move.ID != MoveSnore && move.ID != MoveSleepTalk {
 				b.QueueTransaction(ImmobilizeTransaction{
 					Target: target{
 						Pokemon: user,
@@ -204,7 +213,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 
 			// use the move
-			move := user.Moves[t.Move]
 			accuracy := float64(move.Accuracy)
 			if b.Weather == WeatherFog {
 				accuracy *= 3. / 5.
@@ -437,6 +445,11 @@ type target struct {
 	partySlot int     // The slot of the active Pokemon
 	Team      int     // The team that the Pokemon belongs to
 	Pokemon   Pokemon // Pokemon that is a candidate target
+}
+
+func (t target) String() string {
+	return fmt.Sprintf("Party %d (Slot %d) | Team %d | Pokemon:\n%s",
+		t.party, t.partySlot, t.Team, t.Pokemon)
 }
 
 type BattleContext struct {

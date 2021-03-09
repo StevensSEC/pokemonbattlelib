@@ -19,7 +19,6 @@ var _ = Describe("Using items", func() {
 		p := GeneratePokemon(PkmnBulbasaur)
 		p.Stats[StatHP] = 100
 		t := p.UseItem(&i)
-		Expect(t).To(HaveLen(1))
 		Expect(t).To(HaveTransaction(
 			HealTransaction{
 				Target: p,

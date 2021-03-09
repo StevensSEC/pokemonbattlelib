@@ -35,7 +35,7 @@ var _ = Describe("Move string representation", func() {
 				Power:    80,
 				Accuracy: 100,
 			},
-			want: "Shadow Ball\nType: [Ghost], Power: 80, Accuracy: 100\n",
+			want: "Shadow Ball",
 		},
 	}
 	It("should show the correct string for moves", func() {
