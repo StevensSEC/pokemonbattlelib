@@ -291,8 +291,10 @@ func (p *Pokemon) Speed() uint {
 // Returns denominator for critical hit chance
 func (p *Pokemon) CritChance() int {
 	stage := p.StatModifiers[StatCritChance]
-	if p.HeldItem != nil && p.HeldItem.ID == ItemRazorClaw && stage < len(CritChances)-1 {
-		stage += 1
+	if p.HeldItem != nil && (p.HeldItem.ID == ItemRazorClaw || p.HeldItem.ID == ItemScopeLens) {
+		if stage < len(CritChances)-1 {
+			stage += 1
+		}
 	}
 	return CritChances[stage]
 }
