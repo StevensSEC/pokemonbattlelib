@@ -20,6 +20,7 @@ func (a HttpCallbackAgent) Act(ctx *BattleContext) Turn {
 		log.Fatalf("Failed to marshal into JSON: %s", err)
 	}
 	r := bytes.NewReader(ctxBytes)
+	log.Println("Requesting turn from agent callback")
 	resp, err := http.Post(a.CallbackUrl, "application/json", r)
 
 	var hT HttpTurn

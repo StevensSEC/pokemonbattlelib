@@ -121,7 +121,13 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 		}
 		battles[nextBattleId] = b
 
-		b.Start()
+		err = b.Start()
+		if err != nil {
+			log.Printf("Failed to start battle: %s", err)
+			w.WriteHeader(500)
+			w.Write([]byte("Internal server error: Failed to start battle"))
+			return
+		}
 
 		log.Printf("Battle created: %v", b)
 		w.WriteHeader(200)
@@ -135,6 +141,7 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 
 func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
 	battleId := parseNumberArg(r, "id")
+	log.Printf("Simulating round: id %d", battleId)
 	b := battles[battleId]
 	transactions, ended := b.SimulateRound()
 
