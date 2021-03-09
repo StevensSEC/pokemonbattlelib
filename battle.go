@@ -400,11 +400,13 @@ func (b *Battle) postRound() {
 					})
 				}
 			}
-			if pkmn.HeldItem != nil && pkmn.HeldItem.Category == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
-				b.QueueTransaction(ItemTransaction{
-					Target: pkmn,
-					Item:   pkmn.HeldItem,
-				})
+			if pkmn.HeldItem != 0 && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
+				if i := GetItem(pkmn.HeldItem); i.Category == ItemCategoryInAPinch {
+					b.QueueTransaction(ItemTransaction{
+						Target: pkmn,
+						Item:   i,
+					})
+				}
 			}
 		}
 	}
@@ -517,7 +519,7 @@ func (turn FightTurn) Priority() int {
 type ItemTurn struct {
 	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
 	Target target // Info containing data determining the target of
-	Item   *Item  // Which item is being consumed
+	Item   Item   // Which item is being consumed
 }
 
 func (turn ItemTurn) Priority() int {

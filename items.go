@@ -105,7 +105,7 @@ func GetItem(itemID int) Item {
 }
 
 // Dispatches the correct item handler based on its category
-func (p *Pokemon) UseItem(i *Item) []Transaction {
+func (p *Pokemon) UseItem(i Item) []Transaction {
 	switch i.Category {
 	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
 		return p.UseMedicine(i)
@@ -116,7 +116,7 @@ func (p *Pokemon) UseItem(i *Item) []Transaction {
 }
 
 // Uses a medicine item which affects HP and status effects
-func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
+func (p *Pokemon) UseMedicine(i Item) (t []Transaction) {
 	switch i.ID {
 	case ItemPotion:
 		t = append(t, p.RestoreHP(20))
@@ -124,7 +124,7 @@ func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
 	return t
 }
 
-func (p *Pokemon) UseBerryInAPinch(i *Item) (t []Transaction) {
+func (p *Pokemon) UseBerryInAPinch(i Item) (t []Transaction) {
 	switch i.ID {
 	case ItemApicotBerry:
 		t = append(t, ModifyStatTransaction{

@@ -27,7 +27,7 @@ func (a healAgent) Act(ctx *BattleContext) Turn {
 	item := GetItem(ItemPotion)
 	for _, target := range ctx.Allies {
 		return ItemTurn{
-			Item:   &item,
+			Item:   item,
 			Target: target,
 		}
 	}
@@ -263,7 +263,7 @@ var _ = Describe("Using items in battle", func() {
 			Expect(t).To(HaveTransaction(
 				ItemTransaction{
 					Target: pkmn,
-					Item:   &potion,
+					Item:   potion,
 					Move:   nil,
 				},
 			))
@@ -1214,8 +1214,7 @@ var _ = Describe("In-a-pinch Berries", func() {
 			WithMoves(GetMove(MoveSplash)),
 			WithIVs([6]uint8{1, 1, 1, 20, 1, 1}),
 		)
-		i := GetItem(itemId)
-		holder.HeldItem = &i
+		holder.HeldItem = itemId
 		holder.CurrentHP = holder.MaxHP() / 4
 		p2 := NewOccupiedParty(&a2, 1, holder)
 		b := NewBattle()
@@ -1229,10 +1228,9 @@ var _ = Describe("In-a-pinch Berries", func() {
 		func(item, stat, stages int) {
 			b := setup(item)
 			t, _ := b.SimulateRound()
-
 			Expect(t).To(HaveTransaction(ItemTransaction{
 				Target: holder,
-				Item:   holder.HeldItem,
+				Item:   GetItem(item),
 			}))
 			Expect(t).To(HaveTransaction(ModifyStatTransaction{
 				Target: holder,

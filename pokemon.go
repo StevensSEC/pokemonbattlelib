@@ -22,7 +22,7 @@ type Pokemon struct {
 	StatModifiers     [9]int                      // ranges from +6 (buffing) to -6 (debuffing) a stat
 	StatusEffects     StatusCondition             // the current status effects inflicted on a Pokemon
 	CurrentHP         uint                        // the remaining HP of this Pokemon
-	HeldItem          *Item                       // the item a Pokemon is holding
+	HeldItem          int                         // the ID (or 0) of the item a Pokemon is holding
 	Moves             [MaxMoves]*Move             // the moves the Pokemon currenly knows
 	Friendship        int                         // how close this Pokemon is to its Trainer
 	OriginalTrainerID uint16                      // a number associated with the first Trainer who caught this Pokemon
