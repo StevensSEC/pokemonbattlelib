@@ -376,7 +376,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 				if user.HeldItem != nil {
 					switch user.HeldItem.ID {
-					case ItemKingsRock:
+					case ItemKingsRock, ItemRazorFang:
 						// King's Rock makes non-flinching moves have a 10% to cause flinch
 						// TODO: ensure only certain moves are affected -> https://bulbapedia.bulbagarden.net/wiki/King%27s_Rock
 						if move.metadata.FlinchChance == 0 && b.rng.Roll(1, 10) {
