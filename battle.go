@@ -341,6 +341,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						movePower /= 2
 					}
 				}
+				// Item modifiers
+				if user.HeldItem != nil {
+					switch user.HeldItem.ID {
+					case ItemLifeOrb:
+						modifier *= 1.30
+					}
+				}
 				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
 				b.QueueTransaction(DamageTransaction{
 					User:   &user,
@@ -363,13 +370,21 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Amount: uint(drain),
 					})
 				}
-				// King's Rock makes non-flinching moves have a 10% to cause flinch
-				// TODO: ensure only certain moves are affected -> https://bulbapedia.bulbagarden.net/wiki/King%27s_Rock
-				if user.HeldItem != nil && user.HeldItem.ID == ItemKingsRock {
-					if move.metadata.FlinchChance == 0 && b.rng.Roll(1, 10) {
-						b.QueueTransaction(InflictStatusTransaction{
-							Target:       receiver,
-							StatusEffect: StatusFlinch,
+				if user.HeldItem != nil {
+					switch user.HeldItem.ID {
+					case ItemKingsRock:
+						// King's Rock makes non-flinching moves have a 10% to cause flinch
+						// TODO: ensure only certain moves are affected -> https://bulbapedia.bulbagarden.net/wiki/King%27s_Rock
+						if move.metadata.FlinchChance == 0 && b.rng.Roll(1, 10) {
+							b.QueueTransaction(InflictStatusTransaction{
+								Target:       receiver,
+								StatusEffect: StatusFlinch,
+							})
+						}
+					case ItemLifeOrb:
+						b.QueueTransaction(DamageTransaction{
+							Target: turn.User,
+							Damage: self.MaxHP() / 10,
 						})
 					}
 				}
