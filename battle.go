@@ -344,6 +344,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				// Item modifiers
 				if user.HeldItem != nil {
 					switch user.HeldItem.ID {
+					case ItemMuscleBand:
+						if move.Category == MoveCategoryPhysical {
+							modifier *= 1.10
+						}
 					case ItemLifeOrb:
 						modifier *= 1.30
 					}
