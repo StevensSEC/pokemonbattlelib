@@ -251,7 +251,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
-						Weather: WeatherHarshSunlight,
+						Weather: WeatherRain,
 						Turns:   turns,
 					})
 				case MoveSunnyDay:
@@ -269,7 +269,16 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
-						Weather: WeatherHarshSunlight,
+						Weather: WeatherHail,
+						Turns:   turns,
+					})
+				case MoveSandstorm:
+					turns := 5
+					if self.HeldItem != nil && self.HeldItem.ID == ItemSmoothRock {
+						turns = 8
+					}
+					b.QueueTransaction(WeatherTransaction{
+						Weather: WeatherSandstorm,
 						Turns:   turns,
 					})
 				case MoveHowl:
