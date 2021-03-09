@@ -31,6 +31,15 @@ func (t DamageTransaction) Mutate(b *Battle) {
 		receiver.CurrentHP = 0
 	}
 	if receiver.CurrentHP == 0 {
+		// Prevent OHKO with Focus Sash
+		if receiver.HeldItem != nil && receiver.HeldItem.ID == ItemFocusSash {
+			receiver.CurrentHP = 1
+			b.QueueTransaction(ItemTransaction{
+				Target: receiver,
+				Item:   receiver.HeldItem,
+			})
+			return
+		}
 		// pokemon has fainted
 		b.QueueTransaction(FaintTransaction{
 			Target: t.Target,
