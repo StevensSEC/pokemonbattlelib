@@ -230,9 +230,24 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 							Amount: -4,
 						})
 					}
+				case MoveAttract:
+					g1, g2 := user.Gender, receiver.Gender
+					// Only applies when Pokemon are opposite gender
+					if g1 != GenderGenderless && g2 != GenderGenderless && g1 != g2 {
+						b.QueueTransaction(InflictStatusTransaction{
+							Target:       receiver,
+							StatusEffect: StatusInfatuation,
+						})
+						if receiver.HeldItem != nil && receiver.HeldItem.ID == ItemDestinyKnot {
+							b.QueueTransaction(InflictStatusTransaction{
+								Target:       self,
+								StatusEffect: StatusInfatuation,
+							})
+						}
+					}
 				case MoveRainDance:
 					turns := 5
-					if user.HeldItem != nil && user.HeldItem.ID == ItemDampRock {
+					if self.HeldItem != nil && self.HeldItem.ID == ItemDampRock {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
@@ -246,7 +261,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				case MoveHowl:
 					b.QueueTransaction(ModifyStatTransaction{
-						Target: &user,
+						Target: self,
 						Stat:   StatAtk,
 						Stages: +1,
 					})
