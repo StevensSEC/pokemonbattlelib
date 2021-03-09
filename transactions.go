@@ -102,6 +102,21 @@ func (t ItemTransaction) Mutate(b *Battle) {
 	b.QueueTransaction(t.Target.UseItem(t.Item)...)
 }
 
+// A transaction to change the PP of a move.
+type PPTransaction struct {
+	Move   *Move
+	Amount int
+}
+
+func (t PPTransaction) Mutate(b *Battle) {
+	t.Move.CurrentPP += t.Amount
+	if t.Move.CurrentPP < 0 {
+		t.Move.CurrentPP = 0
+	} else if t.Move.CurrentPP > t.Move.MaxPP {
+		t.Move.CurrentPP = t.Move.MaxPP
+	}
+}
+
 // A transaction to restore HP to a Pokemon.
 type HealTransaction struct {
 	Target *Pokemon
@@ -159,7 +174,7 @@ func (t FaintTransaction) Mutate(b *Battle) {
 	}
 	if !anyAlive {
 		// cause the battle to end by knockout
-		b.QueueTransaction(EndBattleTransaction{})
+		b.QueueTransaction(EndBattleTransaction{Reason: EndKnockout})
 	}
 }
 
@@ -176,14 +191,26 @@ func (t SendOutTransaction) Mutate(b *Battle) {
 // Changes the current weather in a battle
 type WeatherTransaction struct {
 	Weather Weather
+	Turns   int
 }
 
 func (t WeatherTransaction) Mutate(b *Battle) {
 	b.Weather = t.Weather
+	b.metadata[MetaWeatherTurns] = t.Turns
 }
 
 // A transaction that ends the battle.
-type EndBattleTransaction struct{}
+type EndReason int
+
+const (
+	EndKnockout EndReason = iota
+	EndForfeit
+	EndFlee
+)
+
+type EndBattleTransaction struct {
+	Reason EndReason
+}
 
 func (t EndBattleTransaction) Mutate(b *Battle) {
 	b.State = BattleEnd

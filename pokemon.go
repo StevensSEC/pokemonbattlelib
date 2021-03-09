@@ -78,6 +78,7 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		Nature:          NatureHardy, // this nature is neutral and has no effect
 		metadata:        make(map[PokemonMeta]interface{}),
 	}
+	p.Type = pokemonData[p.NatDex].Type
 	for _, opt := range opts {
 		opt(p)
 	}
@@ -128,7 +129,7 @@ func WithMoves(moves ...*Move) GeneratePokemonOption {
 }
 
 func (p *Pokemon) GetName() string {
-	return pokemonNames[p.NatDex]
+	return pokemonData[p.NatDex].Name
 }
 
 func (p *Pokemon) GetGrowthRate() int {
@@ -289,8 +290,7 @@ func (p *Pokemon) Speed() uint {
 
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {
-	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
-		p.Gender, p.Level, p.CurrentHP, p.MaxHP())
+	return p.GetName()
 }
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.

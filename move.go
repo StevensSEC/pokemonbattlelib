@@ -1,7 +1,5 @@
 package pokemonbattlelib
 
-import "fmt"
-
 type MoveCategory uint8
 
 const (
@@ -88,5 +86,5 @@ func GetMove(id int) *Move {
 }
 
 func (m Move) String() string {
-	return fmt.Sprintf("%v\nType: %v, Power: %v, Accuracy: %v\n", m.Name, m.Type, m.Power, m.Accuracy)
+	return m.Name
 }

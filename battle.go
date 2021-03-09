@@ -14,11 +14,18 @@ type Battle struct {
 	State    BattleState
 	rng      RNG
 
-	parties []*party // All parties participating in the battle
+	parties  []*party                   // All parties participating in the battle
+	metadata map[BattleMeta]interface{} // Metadata to be tracked during a battle
 
 	tQueue     []Transaction
 	tProcessed []Transaction
 }
+
+type BattleMeta int
+
+const (
+	MetaWeatherTurns BattleMeta = iota
+)
 
 type BattleState int
 
@@ -34,6 +41,9 @@ func NewBattle() *Battle {
 	b := Battle{
 		State: BattleBeforeStart,
 		rng:   RNG(&rng),
+		metadata: map[BattleMeta]interface{}{
+			MetaWeatherTurns: 0,
+		},
 	}
 	return &b
 }
@@ -213,6 +223,27 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Target:       receiver,
 						StatusEffect: StatusParalyze,
 					})
+				case MoveSpite:
+					if m := receiver.metadata[MetaLastMove]; m != nil {
+						b.QueueTransaction(PPTransaction{
+							Move:   m.(*Move),
+							Amount: -4,
+						})
+					}
+				case MoveRainDance:
+					turns := 5
+					if user.HeldItem != nil && user.HeldItem.ID == ItemDampRock {
+						turns = 8
+					}
+					b.QueueTransaction(WeatherTransaction{
+						Weather: WeatherHarshSunlight,
+						Turns:   turns,
+					})
+				case MoveSunnyDay:
+					b.QueueTransaction(WeatherTransaction{
+						Weather: WeatherHarshSunlight,
+						Turns:   5,
+					})
 				case MoveHowl:
 					b.QueueTransaction(ModifyStatTransaction{
 						Target: &user,
@@ -289,6 +320,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					Move:   user.Moves[t.Move],
 					Damage: uint(damage),
 				})
+				// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
 				if move.metadata.Drain != 0 {
 					drain := damage * float64(move.metadata.Drain) / 100
 					if user.HeldItem != nil && user.HeldItem.ID == ItemBigRoot {
@@ -335,74 +367,77 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 // Handles all post-round logic
 func (b *Battle) postRound() {
 	// Effects on every Pokemon
-	for a, party := range b.parties {
-		for ap, pkmn := range party.activePokemon {
-			t := target{
-				party:     a,
-				partySlot: ap,
-				Pokemon:   *pkmn,
-				Team:      party.team,
+	for _, t := range b.GetTargets() {
+		pkmn := b.getPokemon(t.party, t.partySlot)
+		// Status effects
+		if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
+			cond := pkmn.StatusEffects & StatusNonvolatileMask
+			var damage uint
+			switch cond {
+			case StatusBurn, StatusPoison:
+				damage = pkmn.MaxHP() / 8
+			case StatusBadlyPoison:
+				// TODO: implement counter for increasing bad poison damage
+				damage = pkmn.MaxHP() / 16
 			}
-			// Status effects
-			if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
-				cond := pkmn.StatusEffects & StatusNonvolatileMask
-				var damage uint
-				switch cond {
-				case StatusBurn, StatusPoison:
-					damage = pkmn.MaxHP() / 8
-				case StatusBadlyPoison:
-					// TODO: implement counter for increasing bad poison damage
-					damage = pkmn.MaxHP() / 16
-				}
+			b.QueueTransaction(DamageTransaction{
+				Target:       t,
+				Damage:       damage,
+				StatusEffect: cond,
+			})
+		}
+		// Weather effects
+		// TODO: check for weather resisting abilities
+		if b.Weather == WeatherSandstorm {
+			if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
+				damage := pkmn.MaxHP() / 16
 				b.QueueTransaction(DamageTransaction{
-					Target:       t,
-					Damage:       damage,
-					StatusEffect: cond,
+					Target: t,
+					Damage: damage,
 				})
 			}
-			// Weather effects
-			// TODO: check for weather resisting abilities
-			if b.Weather == WeatherSandstorm {
-				if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
-					damage := pkmn.MaxHP() / 16
-					b.QueueTransaction(DamageTransaction{
-						Target: t,
-						Damage: damage,
-					})
-				}
-			} else if b.Weather == WeatherHail {
-				if pkmn.Type&TypeIce == 0 {
-					damage := pkmn.MaxHP() / 16
-					b.QueueTransaction(DamageTransaction{
-						Target: t,
-						Damage: damage,
-					})
-				}
+		} else if b.Weather == WeatherHail {
+			if pkmn.Type&TypeIce == 0 {
+				damage := pkmn.MaxHP() / 16
+				b.QueueTransaction(DamageTransaction{
+					Target: t,
+					Damage: damage,
+				})
 			}
-			// Held item effects
-			if pkmn.HeldItem != nil {
-				if pkmn.HeldItem.Category == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
-					b.QueueTransaction(ItemTransaction{
+		}
+		// Held item effects
+		if pkmn.HeldItem != nil {
+			if pkmn.HeldItem.Category == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
+				b.QueueTransaction(ItemTransaction{
+					Target: pkmn,
+					Item:   pkmn.HeldItem,
+				})
+			}
+			switch pkmn.HeldItem.ID {
+			case ItemBlackSludge:
+				if pkmn.Type&TypePoison != 0 {
+					b.QueueTransaction(HealTransaction{
 						Target: pkmn,
-						Item:   pkmn.HeldItem,
+						Amount: pkmn.MaxHP() / 16,
 					})
-				}
-				switch pkmn.HeldItem.ID {
-				case ItemBlackSludge:
-					if pkmn.Type&TypePoison != 0 {
-						b.QueueTransaction(HealTransaction{
-							Target: pkmn,
-							Amount: pkmn.MaxHP() / 16,
-						})
-					} else {
-						b.QueueTransaction(DamageTransaction{
-							Target: t,
-							Damage: pkmn.MaxHP() / 8,
-						})
-					}
+				} else {
+					b.QueueTransaction(DamageTransaction{
+						Target: t,
+						Damage: pkmn.MaxHP() / 8,
+					})
 				}
 			}
 		}
+	}
+	// Effects on the battle
+	// Decrease weather counter/clear weather over time
+	if b.Weather != WeatherClearSkies && b.metadata[MetaWeatherTurns] == 0 {
+		b.QueueTransaction(WeatherTransaction{
+			Weather: WeatherClearSkies,
+		})
+	}
+	if turns := b.metadata[MetaWeatherTurns].(int); turns > 0 {
+		b.metadata[MetaWeatherTurns] = turns - 1
 	}
 }
 

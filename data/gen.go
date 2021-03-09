@@ -36,6 +36,7 @@ type data_pokemon struct {
 
 	Name   string
 	NatDex uint16
+	Type   int
 }
 
 type data_move_flags uint32
@@ -190,6 +191,7 @@ func createCodeOutput(s string) {
 }
 
 func main() {
+	var records [][]string
 	var err error
 	path, err := os.Getwd()
 	if err != nil {
@@ -297,6 +299,41 @@ func main() {
 			break
 		}
 	}
+	// get all Pokemon types
+	log.Println("Getting Pokemon types")
+	pkmn_types_csv := getCsvReader("data/pokemon_types.csv")
+	records, err = pkmn_types_csv.ReadAll()
+	if err != nil {
+		panic(err)
+	}
+	for _, r := range records {
+		id := parseInt(r[0])
+		pType := parseInt(r[1])
+		for i, p := range pokemon {
+			if p.SpeciesId != id {
+				continue
+			}
+			pokemon[i].Type |= (1 << (pType - 1))
+		}
+	}
+	for {
+		record, err := pkmn_names_csv.Read()
+		if err == io.EOF {
+			break
+		}
+		lang := parseInt(record[1])
+		if lang != EnglishLanguageID {
+			continue
+		}
+		sid := parseInt(record[0])
+		for i, p := range pokemon {
+			if p.SpeciesId != sid {
+				continue
+			}
+			(&pokemon[i]).Name = record[2]
+			break
+		}
+	}
 
 	// find national dex numbers
 	log.Println("Getting Pokemon dex numbers")
@@ -321,13 +358,14 @@ func main() {
 		}
 	}
 	output += "\n\n" +
-		"// A map of national pokedex numbers to pokemon names.\n" +
-		"var pokemonNames = map[uint16]string{\n"
+		"// A map of national pokedex numbers to pokemon data.\n" +
+		"type pData struct {\nName string\nType Type}\n" +
+		"var pokemonData = map[uint16]pData{\n"
 	for _, p := range pokemon {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("\t%d: \"%s\",\n", p.NatDex, p.Name)
+		output += fmt.Sprintf("\t%d: {Name: \"%s\", Type: %v},\n", p.NatDex, p.Name, p.Type)
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"
@@ -421,7 +459,7 @@ func main() {
 	// Getting move metadata
 	log.Println("Getting move metadata")
 	move_meta_csv := getCsvReader("data/move_meta.csv")
-	records, err := move_meta_csv.ReadAll()
+	records, err = move_meta_csv.ReadAll()
 	if err != nil {
 		panic(err)
 	}
