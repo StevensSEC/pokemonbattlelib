@@ -301,7 +301,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					weather = 0.5
 				}
 				crit := 1.0
-				if b.rng.Roll(1, CritChances[user.StatModifiers[StatCritChance]]) {
+				if b.rng.Roll(1, user.CritChance()) {
 					crit = 2.0
 				}
 				stab := 1.0

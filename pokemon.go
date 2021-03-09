@@ -288,6 +288,15 @@ func (p *Pokemon) Speed() uint {
 	return uint(effective)
 }
 
+// Returns denominator for critical hit chance
+func (p *Pokemon) CritChance() int {
+	stage := p.StatModifiers[StatCritChance]
+	if p.HeldItem != nil && p.HeldItem.ID == ItemRazorClaw && stage < len(CritChances)-1 {
+		stage += 1
+	}
+	return CritChances[stage]
+}
+
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {
 	return p.GetName()
