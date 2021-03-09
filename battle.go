@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"reflect"
@@ -432,6 +433,11 @@ type target struct {
 	partySlot int     // The slot of the active Pokemon
 	Team      int     // The team that the Pokemon belongs to
 	Pokemon   Pokemon // Pokemon that is a candidate target
+}
+
+func (t target) String() string {
+	return fmt.Sprintf("Party %d (Slot %d) | Team %d | Pokemon:\n%s",
+		t.party, t.partySlot, t.Team, t.Pokemon)
 }
 
 type BattleContext struct {

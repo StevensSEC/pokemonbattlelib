@@ -32,16 +32,19 @@ func compareTargets(a, b target) bool {
 		a.Team == b.Team
 }
 
-// Used for custom gomega matchers.
-func compareTransaction(a, b Transaction) bool {
-	if reflect.TypeOf(a) != reflect.TypeOf(b) {
-		return false
-	}
+// Helper struct for finding differences in objects for testing
+type diff struct {
+	expected interface{} // The expected value
+	got      interface{} // The actual value received
+}
 
-	rA := reflect.ValueOf(a)
-	rB := reflect.ValueOf(b)
+// Creates a diff of expected fields vs received fields in same-type transactions
+// Also returns the number of fields that were compared
 
-	fieldsMatch := true
+func transactionDiff(expected, got Transaction) map[string]diff {
+	result := make(map[string]diff)
+	rA := reflect.ValueOf(expected)
+	rB := reflect.ValueOf(got)
 	for i := 0; i < rA.NumField(); i++ {
 		typeField := rA.Type().Field(i)
 		rfA := rA.Field(i)
@@ -51,22 +54,28 @@ func compareTransaction(a, b Transaction) bool {
 			a := rfA.Interface().(*Pokemon)
 			b := rfB.Interface().(*Pokemon)
 			if !comparePokemon(a, b) {
-				fieldsMatch = false
-				break
+				result[typeField.Name] = diff{
+					expected: a,
+					got:      b,
+				}
 			}
 			continue
 		} else if rfA.Type() == reflect.TypeOf(target{}) {
 			a := rfA.Interface().(target)
 			b := rfB.Interface().(target)
 			if !compareTargets(a, b) {
-				fieldsMatch = false
-				break
+				result[typeField.Name] = diff{
+					expected: a,
+					got:      b,
+				}
 			}
 			continue
 		} else if rfA.Kind() == reflect.Struct || rfA.Kind() == reflect.Interface || rfA.Kind() == reflect.Map || rfA.Kind() == reflect.Array || rfA.Kind() == reflect.Slice {
 			if !reflect.DeepEqual(rfA.Interface(), rfB.Interface()) {
-				fieldsMatch = false
-				break
+				result[typeField.Name] = diff{
+					expected: rfA.Interface(),
+					got:      rfB.Interface(),
+				}
 			}
 		} else {
 			// Special case to allow fields with primitive types or nil pointers to be ignored when comparing.
@@ -77,20 +86,31 @@ func compareTransaction(a, b Transaction) bool {
 			if rfA.Kind() == reflect.Ptr {
 				if !rfA.IsNil() && !rfB.IsNil() {
 					if !reflect.DeepEqual(rfA.Interface(), rfB.Interface()) {
-						fieldsMatch = false
-						break
+						result[typeField.Name] = diff{
+							expected: rfA.Interface(),
+							got:      rfB.Interface(),
+						}
 					}
 				}
 			} else if rfA.Interface() != reflect.Zero(rfA.Type()).Interface() && rfB.Interface() != reflect.Zero(rfB.Type()).Interface() {
 				if !reflect.DeepEqual(rfA.Interface(), rfB.Interface()) {
-					fieldsMatch = false
-					break
+					result[typeField.Name] = diff{
+						expected: rfA.Interface(),
+						got:      rfB.Interface(),
+					}
 				}
 			}
 		}
 	}
+	return result
+}
 
-	return fieldsMatch
+// Used for custom gomega matchers.
+func compareTransaction(a, b Transaction) bool {
+	if reflect.TypeOf(a) != reflect.TypeOf(b) {
+		return false
+	}
+	return len(transactionDiff(a, b)) == 0
 }
 
 // Used for custom gomega matchers for failure messages. Uses reflection to find the index of the first
@@ -106,6 +126,20 @@ func findCountTransactionIdxWithMatchingType(transactions []Transaction, a Trans
 		}
 	}
 	return first, count
+}
+
+// Gets the closest transaction to the desired one, and return a diff in fields
+func getClosestTransaction(check []Transaction, want Transaction) map[string]diff {
+	var best map[string]diff
+	bestDiff := 999
+	for _, t := range check {
+		result := transactionDiff(want, t)
+		if len(result) < bestDiff {
+			bestDiff = len(result)
+			best = result
+		}
+	}
+	return best
 }
 
 // Given a sequence of transactions, match if a given transaction is present in the sequence.
@@ -151,11 +185,14 @@ func (matcher *singleTransactionMatcher) FailureMessage(actual interface{}) (mes
 				transactions[first],
 			)
 		} else {
-			// TODO: maybe show transaction that is closest to matching?
-			return fmt.Sprintf("Expected the sequence of transactions to include: %T. %d of the same type were found, but none of them matched.",
-				matcher.expected,
-				count,
-			)
+			diffText := ""
+			closest := getClosestTransaction(transactions, matcher.expected)
+			total := reflect.ValueOf(matcher.expected).NumField()
+			for name, val := range closest {
+				diffText += fmt.Sprintf("- %s\nExpected: %v\nReceived: %v\n", name, val.expected, val.got)
+			}
+			return fmt.Sprintf("Closest %T (%d total) has %d/%d fields that don't match:\n%s",
+				matcher.expected, count, len(closest), total, diffText)
 		}
 	default:
 		return fmt.Sprintf("Actual's type is %T, when it should be []Transaction", actual)

@@ -382,7 +382,6 @@ var _ = Describe("Turn priority", func() {
 			b.rng = &SimpleRNG
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(2))
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
 					User: p2,
@@ -598,7 +597,6 @@ var _ = Describe("Weather", func() {
 			b.metadata[MetaWeatherTurns] = 5
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(3))
 			// Weaken solar beam, SPDEF of rock type
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: bulbasaur,
@@ -730,7 +728,6 @@ var _ = Describe("Fainting", func() {
 		It("should switch to the next available Pokemon", func() {
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(6))
 			// Charmander smashed his nubby little fist into Squirtle as
 			// hard as he could. Spectators gasped and winced when the
 			// impact created a very audible crack. But it was not
@@ -774,7 +771,6 @@ var _ = Describe("Fainting", func() {
 			Expect(b.Start()).To(Succeed())
 			t, ended := b.SimulateRound()
 			Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
-			Expect(t).To(HaveLen(5), "Expected 4 transactions to occur")
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
@@ -882,7 +878,6 @@ var _ = Describe("Battle end", func() {
 			Expect(b.Start()).To(Succeed())
 			t, ended := b.SimulateRound()
 			Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
-			Expect(t).To(HaveLen(5))
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
@@ -978,7 +973,6 @@ var _ = Describe("Status Conditions", func() {
 			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(4), "Expected only 4 transactions to occur in a round")
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
 					Pokemon:   *pkmn1,
@@ -1010,7 +1004,6 @@ var _ = Describe("Status Conditions", func() {
 			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(3), "Expected only 3 transactions to occur in a round")
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
 					Pokemon:   *pkmn1,
