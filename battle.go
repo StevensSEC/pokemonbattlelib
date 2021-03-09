@@ -344,12 +344,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				// Item modifiers
 				if user.HeldItem != nil {
 					switch user.HeldItem.ID {
+					case ItemLifeOrb:
+						modifier *= 1.30
 					case ItemMuscleBand:
 						if move.Category == MoveCategoryPhysical {
 							modifier *= 1.10
 						}
-					case ItemLifeOrb:
-						modifier *= 1.30
 					}
 				}
 				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
@@ -389,6 +389,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						b.QueueTransaction(DamageTransaction{
 							Target: turn.User,
 							Damage: self.MaxHP() / 10,
+						})
+					case ItemShellBell:
+						b.QueueTransaction(DamageTransaction{
+							Target: turn.User,
+							Damage: uint(damage / 8),
 						})
 					}
 				}
@@ -471,22 +476,6 @@ func (b *Battle) postRound() {
 				})
 			}
 			switch pkmn.HeldItem.ID {
-			case ItemMentalHerb:
-				if pkmn.StatusEffects.check(StatusInfatuation) {
-					b.QueueTransaction(ItemTransaction{
-						Target: pkmn,
-						Item:   pkmn.HeldItem,
-					})
-					b.QueueTransaction(CureStatusTransaction{
-						Target:       pkmn,
-						StatusEffect: StatusInfatuation,
-					})
-				}
-			case ItemLeftovers:
-				b.QueueTransaction(HealTransaction{
-					Target: pkmn,
-					Amount: pkmn.MaxHP() / 16,
-				})
 			case ItemBlackSludge:
 				if pkmn.Type&TypePoison != 0 {
 					b.QueueTransaction(HealTransaction{
@@ -497,6 +486,22 @@ func (b *Battle) postRound() {
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
 						Damage: pkmn.MaxHP() / 8,
+					})
+				}
+			case ItemLeftovers:
+				b.QueueTransaction(HealTransaction{
+					Target: pkmn,
+					Amount: pkmn.MaxHP() / 16,
+				})
+			case ItemMentalHerb:
+				if pkmn.StatusEffects.check(StatusInfatuation) {
+					b.QueueTransaction(ItemTransaction{
+						Target: pkmn,
+						Item:   pkmn.HeldItem,
+					})
+					b.QueueTransaction(CureStatusTransaction{
+						Target:       pkmn,
+						StatusEffect: StatusInfatuation,
 					})
 				}
 			}
