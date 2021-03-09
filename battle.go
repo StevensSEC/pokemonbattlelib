@@ -108,20 +108,12 @@ func (b *Battle) Start() error {
 
 // Handles all pre-turn logic
 func (b *Battle) preRound() {
-	for a, party := range b.parties {
-		for ap, pkmn := range party.activePokemon {
-			t := target{
-				party:     a,
-				partySlot: ap,
-				Pokemon:   *pkmn,
-				Team:      party.team,
-			}
-			if v, ok := pkmn.metadata[MetaSleepTime]; ok && v.(int) == 0 && pkmn.StatusEffects.check(StatusSleep) {
-				b.QueueTransaction(CureStatusTransaction{
-					Target:       t,
-					StatusEffect: StatusSleep,
-				})
-			}
+	for _, t := range b.GetTargets() {
+		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
+			b.QueueTransaction(CureStatusTransaction{
+				Target:       t,
+				StatusEffect: StatusSleep,
+			})
 		}
 	}
 }

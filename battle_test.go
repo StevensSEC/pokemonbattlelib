@@ -1122,57 +1122,35 @@ var _ = Describe("Status Conditions", func() {
 				Expect(pkmn1.StatusEffects.check(StatusSleep)).To(BeFalse())
 			})
 
-			It("should allow sleeping Pokemon to use Snore", func() {
-				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MoveSnore)))
-				p1 = NewOccupiedParty(&a1, 0, pkmn1)
-				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-				p2 = NewOccupiedParty(&a2, 1, pkmn2)
-				b.AddParty(p1, p2)
-				Expect(b.Start()).To(Succeed())
-				b.QueueTransaction(InflictStatusTransaction{
-					Target:       pkmn1,
-					StatusEffect: StatusSleep,
-				})
-				b.ProcessQueue()
-				t, _ := b.SimulateRound()
-				Expect(t).ToNot(HaveTransaction(
-					ImmobilizeTransaction{
-						Target: target{
-							Pokemon:   *pkmn1,
-							party:     0,
-							partySlot: 0,
-							Team:      0,
-						},
+			DescribeTable("Sleep walking",
+				func(moveid int) {
+					pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(moveid), GetMove(MoveRazorLeaf)))
+					p1 = NewOccupiedParty(&a1, 0, pkmn1)
+					pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+					p2 = NewOccupiedParty(&a2, 1, pkmn2)
+					b.AddParty(p1, p2)
+					Expect(b.Start()).To(Succeed())
+					b.QueueTransaction(InflictStatusTransaction{
+						Target:       pkmn1,
 						StatusEffect: StatusSleep,
-					},
-				))
-			})
-
-			It("should allow sleeping Pokemon to use Sleep Talk", func() {
-				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MoveSleepTalk), GetMove(MoveRazorLeaf)))
-				p1 = NewOccupiedParty(&a1, 0, pkmn1)
-				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-				p2 = NewOccupiedParty(&a2, 1, pkmn2)
-				b.AddParty(p1, p2)
-				Expect(b.Start()).To(Succeed())
-				b.QueueTransaction(InflictStatusTransaction{
-					Target:       pkmn1,
-					StatusEffect: StatusSleep,
-				})
-				b.ProcessQueue()
-				t, _ := b.SimulateRound()
-				Expect(t).ToNot(HaveTransaction(
-					ImmobilizeTransaction{
-						Target: target{
-							Pokemon:   *pkmn1,
-							party:     0,
-							partySlot: 0,
-							Team:      0,
+					})
+					b.ProcessQueue()
+					t, _ := b.SimulateRound()
+					Expect(t).ToNot(HaveTransaction(
+						ImmobilizeTransaction{
+							Target: target{
+								Pokemon:   *pkmn1,
+								party:     0,
+								partySlot: 0,
+								Team:      0,
+							},
+							StatusEffect: StatusSleep,
 						},
-						StatusEffect: StatusSleep,
-					},
-				))
-			})
+					))
+				},
+				Entry("Snore", MoveSnore),
+				Entry("Sleep Talk", MoveSleepTalk),
+			)
 		})
 
 		It("should cure paralysis", func() {
