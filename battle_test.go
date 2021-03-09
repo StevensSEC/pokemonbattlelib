@@ -1098,24 +1098,14 @@ var _ = Describe("Status Conditions", func() {
 			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			b.QueueTransaction(CureStatusTransaction{
-				Target: target{
-					Pokemon:   *pkmn1,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
+				Target:       pkmn1,
 				StatusEffect: StatusParalyze,
 			})
 			b.ProcessQueue()
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				CureStatusTransaction{
-					Target: target{
-						Pokemon:   *pkmn1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					Target:       pkmn1,
 					StatusEffect: StatusParalyze,
 				},
 			))

@@ -147,13 +147,12 @@ func (t InflictStatusTransaction) Mutate(b *Battle) {
 }
 
 type CureStatusTransaction struct {
-	Target       target
+	Target       *Pokemon
 	StatusEffect StatusCondition
 }
 
 func (t CureStatusTransaction) Mutate(b *Battle) {
-	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-	receiver.StatusEffects.clear(t.StatusEffect)
+	t.Target.StatusEffects.clear(t.StatusEffect)
 }
 
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.

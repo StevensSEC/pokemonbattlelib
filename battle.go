@@ -467,6 +467,17 @@ func (b *Battle) postRound() {
 				})
 			}
 			switch pkmn.HeldItem.ID {
+			case ItemMentalHerb:
+				if pkmn.StatusEffects.check(StatusInfatuation) {
+					b.QueueTransaction(ItemTransaction{
+						Target: pkmn,
+						Item:   pkmn.HeldItem,
+					})
+					b.QueueTransaction(CureStatusTransaction{
+						Target:       pkmn,
+						StatusEffect: StatusInfatuation,
+					})
+				}
 			case ItemLeftovers:
 				b.QueueTransaction(HealTransaction{
 					Target: pkmn,
