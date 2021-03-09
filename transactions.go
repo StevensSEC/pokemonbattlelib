@@ -135,6 +135,9 @@ type InflictStatusTransaction struct {
 
 func (t InflictStatusTransaction) Mutate(b *Battle) {
 	t.Target.StatusEffects.apply(t.StatusEffect)
+	if t.StatusEffect.check(StatusSleep) {
+		t.Target.metadata[MetaSleepTime] = b.rng.Get(1, 5)
+	}
 }
 
 type CureStatusTransaction struct {
@@ -145,6 +148,9 @@ type CureStatusTransaction struct {
 func (t CureStatusTransaction) Mutate(b *Battle) {
 	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 	receiver.StatusEffects.clear(t.StatusEffect)
+	if t.StatusEffect.check(StatusSleep) {
+		delete(receiver.metadata, MetaSleepTime)
+	}
 }
 
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
@@ -223,7 +229,10 @@ type ImmobilizeTransaction struct {
 }
 
 func (t ImmobilizeTransaction) Mutate(b *Battle) {
-	// currently a no-op.
+	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+	if t.StatusEffect.check(StatusSleep) {
+		receiver.metadata[MetaSleepTime] = receiver.metadata[MetaSleepTime].(int) - 1
+	}
 }
 
 // Handles evasion, misses, dodging, etc. when using moves
