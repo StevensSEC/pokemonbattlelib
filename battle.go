@@ -1,7 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"log"
 	"math/rand"
 	"reflect"
 	"sort"
@@ -114,7 +113,7 @@ func (b *Battle) preRound() {
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
 func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	if b.State != BattleInProgress {
-		log.Panic("battle is not currently in progress")
+		blog.Panic("battle is not currently in progress")
 	}
 	b.preRound()
 	// Collects all turn info from each active Pokemon
@@ -122,6 +121,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	for i, party := range b.parties {
 		for j, pokemon := range party.activePokemon {
 			ctx := b.getContext(party, pokemon)
+			blog.Printf("Requesting turn from agent %d for pokemon %d (%s)", i, j, pokemon)
 			turn := (*party.Agent).Act(ctx)
 			turns = append(turns, TurnContext{
 				User: target{
@@ -135,6 +135,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			})
 		}
 	}
+
+	blog.Println("Sorting turns")
 	// Sort turns using an in-place stable sort
 	sort.SliceStable(turns, func(i, j int) bool {
 		turnA := turns[i].Turn
@@ -165,6 +167,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	for len(turns) > 0 {
 		turn := turns[0]
 		turns = turns[1:]
+		blog.Printf("Processing Turn %T for %s", turn.Turn, turn.User.Pokemon)
 		// here, we can't use the turn context's reference to the pokemon, because it is a copy of the ground truth pokemon
 		self := b.getPokemon(turn.User.party, turn.User.partySlot)
 		if self.CurrentHP == 0 {
@@ -321,7 +324,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Move:   move,
 			})
 		default:
-			log.Panicf("Unknown turn of type %v", t)
+			blog.Panicf("Unknown turn of type %v", t)
 		}
 
 		b.ProcessQueue()
@@ -333,7 +336,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 	b.ProcessQueue()
 	if len(b.tQueue) > 0 {
-		log.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
+		blog.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
 	}
 	transactions := b.tProcessed
 	b.tProcessed = []Transaction{}
@@ -342,6 +345,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 // Handles all post-round logic
 func (b *Battle) postRound() {
+	blog.Println("Post-round")
 	// Effects on every Pokemon
 	for a, party := range b.parties {
 		for ap, pkmn := range party.activePokemon {
@@ -416,6 +420,7 @@ func (b *Battle) QueueTransaction(t ...Transaction) {
 func (b *Battle) ProcessQueue() {
 	for len(b.tQueue) > 0 {
 		t := b.tQueue[0]
+		blog.Printf("Processing Transaction %T", t)
 		b.tQueue = b.tQueue[1:]
 		t.Mutate(b)
 
