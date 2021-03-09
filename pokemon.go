@@ -290,8 +290,7 @@ func (p *Pokemon) Speed() uint {
 
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {
-	return fmt.Sprintf("%v%v\tLv%d\nHP: %d/%d\n", p.GetName(),
-		p.Gender, p.Level, p.CurrentHP, p.MaxHP())
+	return p.GetName()
 }
 
 // Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.

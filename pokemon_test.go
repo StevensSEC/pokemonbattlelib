@@ -104,16 +104,15 @@ var _ = Describe("Test leveling methods", func() {
 	})
 })
 
-var _ = Describe("Stringer interface", func() {
+var _ = Describe("Pokemon string representation", func() {
 	var (
 		pkmn *Pokemon
 		want string
 	)
 
-	It("prints as expected", func() {
+	It("should show the correct string for Pokemon", func() {
 		pkmn = GeneratePokemon(PkmnBulbasaur, WithLevel(5))
-		pkmn.Gender = GenderFemale
-		want = "Bulbasaur♀\tLv5\nHP: 19/19\n"
+		want = "Bulbasaur"
 		Expect(fmt.Sprintf("%s", pkmn)).To(Equal(want))
 	})
 })
