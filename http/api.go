@@ -157,7 +157,10 @@ func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
 
 	bytes, err := json.Marshal(results)
 	if err != nil {
-		log.Fatalf("Failed to marshal into JSON: %s", err)
+		log.Printf("Failed to marshal into JSON: %s", err)
+		w.WriteHeader(500)
+		w.Write([]byte(`Internal server error: failed to marshal round results`))
+		return
 	}
 
 	w.WriteHeader(200)
