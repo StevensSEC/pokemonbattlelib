@@ -134,14 +134,6 @@ func getClosestTransaction(check []Transaction, want Transaction) map[string]dif
 	bestDiff := 999
 	for _, t := range check {
 		result := transactionDiff(want, t)
-		// v := reflect.ValueOf(t)
-		// for j := 0; j < v.NumField(); j += 1 {
-		// 	a := v.Field(j).Interface()
-		// 	b := expected.Field(j).Interface()
-		// 	if !reflect.DeepEqual(a, b) {
-		// 		result[v.Type().Field(j).Name] = fmt.Sprintf("%v", a)
-		// 	}
-		// }
 		if len(result) < bestDiff {
 			bestDiff = len(result)
 			best = result
