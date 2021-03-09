@@ -452,6 +452,11 @@ func (b *Battle) postRound() {
 				})
 			}
 			switch pkmn.HeldItem.ID {
+			case ItemLeftovers:
+				b.QueueTransaction(HealTransaction{
+					Target: pkmn,
+					Amount: pkmn.MaxHP() / 16,
+				})
 			case ItemBlackSludge:
 				if pkmn.Type&TypePoison != 0 {
 					b.QueueTransaction(HealTransaction{
