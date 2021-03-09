@@ -363,6 +363,16 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Amount: uint(drain),
 					})
 				}
+				// King's Rock makes non-flinching moves have a 10% to cause flinch
+				// TODO: ensure only certain moves are affected -> https://bulbapedia.bulbagarden.net/wiki/King%27s_Rock
+				if user.HeldItem != nil && user.HeldItem.ID == ItemKingsRock {
+					if move.metadata.FlinchChance == 0 && b.rng.Roll(1, 10) {
+						b.QueueTransaction(InflictStatusTransaction{
+							Target:       receiver,
+							StatusEffect: StatusFlinch,
+						})
+					}
+				}
 			}
 		case ItemTurn:
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
