@@ -1122,6 +1122,23 @@ var _ = Describe("Status Conditions", func() {
 				Expect(pkmn1.StatusEffects.check(StatusSleep)).To(BeFalse())
 			})
 
+			It("should decrement sleeping counter", func() {
+				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
+				p1 = NewOccupiedParty(&a1, 0, pkmn1)
+				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+				p2 = NewOccupiedParty(&a2, 1, pkmn2)
+				b.AddParty(p1, p2)
+				Expect(b.Start()).To(Succeed())
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       pkmn1,
+					StatusEffect: StatusSleep,
+				})
+				b.ProcessQueue()
+				counter := pkmn1.metadata[MetaSleepTime].(int)
+				b.SimulateRound()
+				Expect(pkmn1.metadata[MetaSleepTime].(int)).To(Equal(counter - 1))
+			})
+
 			DescribeTable("Sleep walking",
 				func(moveid int) {
 					pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(moveid), GetMove(MoveRazorLeaf)))
