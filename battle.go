@@ -189,6 +189,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		switch t := turn.Turn.(type) {
 		case FightTurn:
 			user := turn.Context.Pokemon
+			move := user.Moves[t.Move]
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
 				immobilize := false
@@ -206,7 +207,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 					continue // forfeit turn
 				}
-			} else if user.StatusEffects.check(StatusSleep) {
+			} else if user.StatusEffects.check(StatusSleep) && move.ID != MoveSnore && move.ID != MoveSleepTalk {
 				b.QueueTransaction(ImmobilizeTransaction{
 					Target: target{
 						Pokemon: user,
@@ -217,7 +218,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 
 			// use the move
-			move := user.Moves[t.Move]
 			accuracy := float64(move.Accuracy)
 			if b.Weather == WeatherFog {
 				accuracy *= 3. / 5.
