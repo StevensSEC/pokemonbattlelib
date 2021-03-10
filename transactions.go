@@ -94,7 +94,7 @@ type ItemTransaction struct {
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
-	if t.Item.Data().Flags&FlagConsumable > 0 {
+	if t.Item.Flags()&FlagConsumable > 0 {
 		if t.IsHeld {
 			t.Item = t.Target.HeldItem // auto-correct if the value is not present or does not match
 			t.Target.HeldItem = ItemNone

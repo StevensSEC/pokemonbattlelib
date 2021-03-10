@@ -9,7 +9,7 @@ import (
 var _ = Describe("Using items", func() {
 	DescribeTable("should correctly retrieve items by ID",
 		func(item Item, name string) {
-			Expect(item.Data().Name).To(Equal(name))
+			Expect(item.Name()).To(Equal(name))
 		},
 		Entry("No item", ItemNone, ""),
 		Entry("Potion", ItemPotion, "Potion"),

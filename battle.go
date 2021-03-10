@@ -400,7 +400,7 @@ func (b *Battle) postRound() {
 					})
 				}
 			}
-			if pkmn.HeldItem.Data().Category == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
+			if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
 				b.QueueTransaction(ItemTransaction{
 					Target: pkmn,
 					IsHeld: true,
