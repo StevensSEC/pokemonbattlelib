@@ -92,6 +92,14 @@ func transactionDiff(expected, got Transaction) map[string]diff {
 						}
 					}
 				}
+			} else if rfA.Kind() == reflect.Bool {
+				// booleans must always match
+				if !reflect.DeepEqual(rfA.Interface(), rfB.Interface()) {
+					result[typeField.Name] = diff{
+						expected: rfA.Interface(),
+						got:      rfB.Interface(),
+					}
+				}
 			} else if rfA.Interface() != reflect.Zero(rfA.Type()).Interface() && rfB.Interface() != reflect.Zero(rfB.Type()).Interface() {
 				if !reflect.DeepEqual(rfA.Interface(), rfB.Interface()) {
 					result[typeField.Name] = diff{

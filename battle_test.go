@@ -24,10 +24,9 @@ type healAgent struct{}
 
 // Always uses a potion on first Pokemon
 func (a healAgent) Act(ctx *BattleContext) Turn {
-	item := GetItem(ItemPotion)
 	for _, target := range ctx.Allies {
 		return ItemTurn{
-			Item:   &item,
+			Item:   ItemPotion,
 			Target: target,
 		}
 	}
@@ -259,11 +258,10 @@ var _ = Describe("Using items in battle", func() {
 		It("should create ItemTransaction(s) properly", func() {
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
-			potion := GetItem(ItemPotion)
 			Expect(t).To(HaveTransaction(
 				ItemTransaction{
 					Target: pkmn,
-					Item:   &potion,
+					Item:   ItemPotion,
 					Move:   nil,
 				},
 			))
@@ -1202,7 +1200,7 @@ var _ = Describe("In-a-pinch Berries", func() {
 	a2 := Agent(new(dumbAgent))
 	var holder *Pokemon
 
-	setup := func(itemId int) *Battle {
+	setup := func(item Item) *Battle {
 		p1 := NewOccupiedParty(&a1, 0, GeneratePokemon(
 			PkmnCombusken,
 			WithLevel(25),
@@ -1214,8 +1212,7 @@ var _ = Describe("In-a-pinch Berries", func() {
 			WithMoves(GetMove(MoveSplash)),
 			WithIVs([6]uint8{1, 1, 1, 20, 1, 1}),
 		)
-		i := GetItem(itemId)
-		holder.HeldItem = &i
+		holder.HeldItem = item
 		holder.CurrentHP = holder.MaxHP() / 4
 		p2 := NewOccupiedParty(&a2, 1, holder)
 		b := NewBattle()
@@ -1226,12 +1223,13 @@ var _ = Describe("In-a-pinch Berries", func() {
 	}
 
 	DescribeTable("Stat changing in-a-pinch berries",
-		func(item, stat, stages int) {
+		func(item Item, stat, stages int) {
 			b := setup(item)
 			t, _ := b.SimulateRound()
 
 			Expect(t).To(HaveTransaction(ItemTransaction{
 				Target: holder,
+				IsHeld: true,
 				Item:   holder.HeldItem,
 			}))
 			Expect(t).To(HaveTransaction(ModifyStatTransaction{
@@ -1239,6 +1237,8 @@ var _ = Describe("In-a-pinch Berries", func() {
 				Stat:   stat,
 				Stages: stages,
 			}))
+			Expect(b.parties[0].activePokemon[0].HeldItem).To(Equal(ItemNone))
+			Expect(b.parties[1].activePokemon[0].HeldItem).To(Equal(ItemNone))
 		},
 		Entry("Apicot Berry", ItemApicotBerry, StatSpDef, 1),
 		Entry("Ganlon Berry", ItemGanlonBerry, StatDef, 1),

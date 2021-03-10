@@ -88,14 +88,16 @@ func (t EVTransaction) Mutate(b *Battle) {
 // A transaction to use and possibly consume an item.
 type ItemTransaction struct {
 	Target *Pokemon
-	Item   *Item
+	IsHeld bool
+	Item   Item
 	Move   *Move
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
-	if t.Item.Flags&FlagConsumable > 0 {
-		if t.Target.HeldItem == t.Item {
-			t.Target.HeldItem = nil
+	if t.Item.Data().Flags&FlagConsumable > 0 {
+		if t.IsHeld {
+			t.Item = t.Target.HeldItem // auto-correct if the value is not present or does not match
+			t.Target.HeldItem = ItemNone
 		}
 		// TODO: remove consumed item from party's inventory
 	}
