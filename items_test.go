@@ -15,16 +15,4 @@ var _ = Describe("Using items", func() {
 		Entry("Potion", ItemPotion, "Potion"),
 		Entry("Flame orb", ItemFlameOrb, "Flame Orb"),
 	)
-
-	It("should use the item and produce transactions", func() {
-		p := GeneratePokemon(PkmnBulbasaur)
-		p.Stats[StatHP] = 100
-		t := p.UseItem(ItemPotion)
-		Expect(t).To(HaveTransaction(
-			HealTransaction{
-				Target: p,
-				Amount: 20,
-			},
-		))
-	})
 })
