@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"reflect"
@@ -453,6 +454,35 @@ func (t target) String() string {
 		t.party, t.partySlot, t.Team, t.Pokemon)
 }
 
+func (t *target) MarshalJSON() ([]byte, error) {
+	type alias target // required to not enter infinite recursive loop
+	return json.Marshal(&struct {
+		Party int
+		Slot  int
+		*alias
+	}{
+		alias: (*alias)(t),
+	})
+}
+
+func (t *target) UnmarshalJSON(data []byte) error {
+	type alias target // required to not enter infinite recursive loop
+	aux := &struct {
+		Party int
+		Slot  int
+		*alias
+	}{
+		alias: (*alias)(t),
+	}
+	err := json.Unmarshal(data, &aux)
+	t.party = aux.Party
+	t.partySlot = aux.Slot
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 type BattleContext struct {
 	Battle    Battle   // A copy of the current Battle, including weather, state, etc.
 	Pokemon   Pokemon  // A copy of the Pokemon that is acting in this context
@@ -491,7 +521,12 @@ func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 	}
 }
 
-// An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
+// Get the battle context that will be shared with the client
+func (b *Battle) GetRoundContext(party int, pokemon int) *BattleContext {
+	return b.getContext(b.parties[party], b.parties[party].activePokemon[pokemon])
+}
+
+// An abstraction over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
 type Turn interface {
 	Priority() int // Gets the turn's priority. Higher values go first. Not to be confused with Move priority.
 }
