@@ -96,6 +96,9 @@ const (
 // Retrieves an Item's data.
 // For item effects, see https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/item_prose.csv
 func (i Item) Data() *ItemData {
+	if int(i) >= len(AllItems)-1 {
+		blog.Panicf("%d is an invalid item", i)
+	}
 	if i == ItemNone {
 		return &ItemData{}
 	}

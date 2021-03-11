@@ -1,6 +1,8 @@
 package pokemonbattlelib
 
 import (
+	"math"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -15,4 +17,8 @@ var _ = Describe("Using items", func() {
 		Entry("Potion", ItemPotion, "Potion"),
 		Entry("Flame orb", ItemFlameOrb, "Flame Orb"),
 	)
+
+	It("should panic if item is invalid", func() {
+		Expect(func() { Item(math.MaxUint16).Data() }).To(Panic())
+	})
 })
