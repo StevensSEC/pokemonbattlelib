@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"reflect"
@@ -451,6 +452,35 @@ type target struct {
 func (t target) String() string {
 	return fmt.Sprintf("Party %d (Slot %d) | Team %d | Pokemon:\n%s",
 		t.party, t.partySlot, t.Team, t.Pokemon)
+}
+
+func (t *target) MarshalJSON() ([]byte, error) {
+	type alias target // required to not enter infinite recursive loop
+	return json.Marshal(&struct {
+		Party int
+		Slot  int
+		*alias
+	}{
+		alias: (*alias)(t),
+	})
+}
+
+func (t *target) UnmarshalJSON(data []byte) error {
+	type alias target // required to not enter infinite recursive loop
+	aux := &struct {
+		Party int
+		Slot  int
+		*alias
+	}{
+		alias: (*alias)(t),
+	}
+	err := json.Unmarshal(data, &aux)
+	t.party = aux.Party
+	t.partySlot = aux.Slot
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type BattleContext struct {
