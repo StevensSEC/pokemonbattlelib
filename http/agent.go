@@ -66,3 +66,22 @@ func (hT *HttpTurn) GetTurn() Turn {
 	}
 	return turn
 }
+
+// Blocks until it receives a turn on a channel.
+type WaiterAgent struct {
+	in chan Turn
+}
+
+func NewWaiterAgent() WaiterAgent {
+	return WaiterAgent{
+		in: make(chan Turn, 1),
+	}
+}
+
+func (a *WaiterAgent) Input() *chan Turn {
+	return &a.in
+}
+
+func (a WaiterAgent) Act(ctx *BattleContext) Turn {
+	return <-a.in
+}

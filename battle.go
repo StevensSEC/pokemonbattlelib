@@ -491,6 +491,11 @@ func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 	}
 }
 
+// Get the battle context that will be shraed with
+func (b *Battle) GetRoundContext(party int, pokemon int) *BattleContext {
+	return b.getContext(b.parties[party], b.parties[party].activePokemon[pokemon])
+}
+
 // An abstration over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
 type Turn interface {
 	Priority() int // Gets the turn's priority. Higher values go first. Not to be confused with Move priority.
