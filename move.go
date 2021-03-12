@@ -67,6 +67,8 @@ type Move struct {
 	MaxPP     uint8
 }
 
+//go:generate go run ./scripts/gen_getters.go -for Move -data AllMoves
+
 // Retrieves a Pokemon move given its move ID
 func GetMove(id MoveId) *Move {
 	m := Move{
