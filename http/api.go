@@ -67,15 +67,15 @@ func HandleGeneratePokemon(w http.ResponseWriter, r *http.Request) {
 		}
 		var moves []*Move
 		for _, id := range moveIds {
-			moves = append(moves, GetMove(id))
+			moves = append(moves, GetMove(MoveId(id)))
 		}
 		args.Opts = append(args.Opts, WithMoves(moves...))
 	} else {
 		args.Opts = append(args.Opts, WithMoves(
-			GetMove(1+rand.Intn(467)),
-			GetMove(1+rand.Intn(467)),
-			GetMove(1+rand.Intn(467)),
-			GetMove(1+rand.Intn(467)),
+			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
 		))
 	}
 

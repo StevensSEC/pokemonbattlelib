@@ -2,6 +2,7 @@ package pokemonbattlelib
 
 import (
 	"fmt"
+	"math"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -10,12 +11,12 @@ import (
 var _ = Describe("Get move by ID", func() {
 	It("should get the correct move", func() {
 		m := GetMove(MovePound)
-		Expect(m.Name).To(Equal("Pound"))
+		Expect(m.Data().Name).To(Equal("Pound"))
 	})
 
 	It("should panic when a move does not exist", func() {
 		Expect(func() {
-			GetMove(-1)
+			GetMove(MoveId(math.MaxUint16))
 		}).To(Panic())
 	})
 })
@@ -26,15 +27,7 @@ var _ = Describe("Move string representation", func() {
 		want string
 	}{
 		{
-			move: Move{
-				Name:     "Shadow Ball",
-				Type:     TypeGhost,
-				Category: MoveCategorySpecial,
-				MaxPP:    15,
-				Priority: 0,
-				Power:    80,
-				Accuracy: 100,
-			},
+			move: *GetMove(MoveShadowBall),
 			want: "Shadow Ball",
 		},
 	}

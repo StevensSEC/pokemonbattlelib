@@ -10,13 +10,13 @@ type smartAgent struct{}
 
 func (smartAgent) Act(ctx *BattleContext) Turn {
 	var strongestMove int
-	power := 0
+	var power uint
 	for i, move := range ctx.Pokemon.Moves {
 		if move == nil {
 			continue
 		}
-		if move.Power > power {
-			power = move.Power
+		if move.Data().Power > power {
+			power = move.Data().Power
 			strongestMove = i
 		}
 	}
@@ -37,11 +37,15 @@ func randParty() *party {
 	party := NewParty(&a1, 0)
 	count := rand.Intn(5) + 1
 	for j := 0; j < count; j++ {
-		p := GeneratePokemon(rand.Intn(493), WithLevel(uint8(47+rand.Intn(6))))
-		p.Moves[0] = &AllMoves[rand.Intn(len(AllMoves))]
-		p.Moves[1] = &AllMoves[rand.Intn(len(AllMoves))]
-		p.Moves[2] = &AllMoves[rand.Intn(len(AllMoves))]
-		p.Moves[3] = &AllMoves[rand.Intn(len(AllMoves))]
+		p := GeneratePokemon(rand.Intn(493),
+			WithLevel(uint8(47+rand.Intn(6))),
+			WithMoves(
+				GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+				GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+				GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+				GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+			),
+		)
 		party.AddPokemon(p)
 	}
 	return party

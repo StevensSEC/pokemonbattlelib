@@ -438,17 +438,18 @@ func main() {
 			break
 		}
 	}
-	output += "var AllMoves = []Move{\n"
+	output += "var AllMoves = []MoveData{\n"
 	for _, p := range moves {
-		output += fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, CurrentPP: %d, MaxPP: %d,"+
-			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Targets, p.Priority, p.Power, p.Accuracy)
+		output += fmt.Sprintf("\t{Name: %q, Type: %d, Category: %s,"+
+			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d},\n", p.Name, p.Type, p.DamageClass, p.Targets, p.Priority, p.Power, p.Accuracy)
 	}
 	output += "}\n\n"
 	// Add move constants
-	output += "// Create move constant enum for quick reference\nconst (\n"
+	output += "// Create move constant enum for quick reference\nconst (\n" +
+		"MoveNone MoveId = iota\n"
 	for _, m := range moves {
 		name := cleanName(m.Name)
-		output += fmt.Sprintf("\tMove%s = %v\n", name, m.Id)
+		output += fmt.Sprintf("\tMove%s\n", name)
 	}
 	output += ")\n\n"
 	// Generate hold item data

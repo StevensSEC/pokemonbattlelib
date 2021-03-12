@@ -233,7 +233,7 @@ var _ = Describe("One round of battle", func() {
 				Amount: -4,
 			}))
 			// Ensure that PP stays in bounds
-			Expect(squirtle.Moves[0].CurrentPP).To(Equal(0))
+			Expect(squirtle.Moves[0].CurrentPP).To(BeEquivalentTo(0))
 		})
 	})
 })
@@ -1131,7 +1131,7 @@ var _ = Describe("Status Conditions", func() {
 			})
 
 			DescribeTable("Sleep walking",
-				func(moveid int) {
+				func(moveid MoveId) {
 					pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(moveid), GetMove(MoveRazorLeaf)))
 					p1 = NewOccupiedParty(&a1, 0, pkmn1)
 					pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))

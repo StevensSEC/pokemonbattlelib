@@ -47,30 +47,47 @@ const (
 	MoveTargetAll
 )
 
+type MoveId uint16
+
+type MoveData struct {
+	Name         string
+	Type         Type
+	Category     MoveCategory
+	Targets      MoveTarget
+	Priority     int8
+	Power        uint
+	Accuracy     uint
+	InitialMaxPP uint8
+}
+
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
 type Move struct {
-	ID        int
-	Name      string
-	Type      Type
-	Category  MoveCategory
-	Targets   MoveTarget
-	CurrentPP int
-	MaxPP     int
-	Priority  int
-	Power     int
-	Accuracy  int
+	Id        MoveId
+	CurrentPP uint8
+	MaxPP     uint8
 }
 
 // Retrieves a Pokemon move given its move ID
-func GetMove(id int) *Move {
-	for _, m := range AllMoves {
-		if m.ID == id {
-			return &m
-		}
+func GetMove(id MoveId) *Move {
+	m := Move{
+		Id: id,
 	}
-	panic("move not found")
+	m.CurrentPP = m.Data().InitialMaxPP
+	m.MaxPP = m.Data().InitialMaxPP
+	return &m
+}
+
+// Grabs move's constant data
+func (m *Move) Data() *MoveData {
+	if m.Id >= MoveId(len(AllMoves)-1) {
+		blog.Panicf("Move (id: %d) is an invalid move", m.Id)
+	}
+	if m.Id == MoveNone {
+		return &MoveData{}
+	}
+	return &AllMoves[m.Id-1]
 }
 
 func (m Move) String() string {
-	return m.Name
+	return m.Data().Name
 }
