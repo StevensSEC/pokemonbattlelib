@@ -74,8 +74,8 @@ func GetMove(id MoveId) *Move {
 	m := Move{
 		Id: id,
 	}
-	m.CurrentPP = m.Data().InitialMaxPP
-	m.MaxPP = m.Data().InitialMaxPP
+	m.CurrentPP = m.InitialMaxPP()
+	m.MaxPP = m.InitialMaxPP()
 	return &m
 }
 
@@ -91,5 +91,5 @@ func (m *Move) Data() *MoveData {
 }
 
 func (m Move) String() string {
-	return m.Data().Name
+	return m.Name()
 }

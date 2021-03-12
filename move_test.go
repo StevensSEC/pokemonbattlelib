@@ -11,7 +11,7 @@ import (
 var _ = Describe("Get move by ID", func() {
 	It("should get the correct move", func() {
 		m := GetMove(MovePound)
-		Expect(m.Data().Name).To(Equal("Pound"))
+		Expect(m.Name()).To(Equal("Pound"))
 	})
 
 	It("should panic when a move does not exist", func() {

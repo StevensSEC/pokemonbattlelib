@@ -15,8 +15,8 @@ func (smartAgent) Act(ctx *BattleContext) Turn {
 		if move == nil {
 			continue
 		}
-		if move.Data().Power > power {
-			power = move.Data().Power
+		if move.Power() > power {
+			power = move.Power()
 			strongestMove = i
 		}
 	}

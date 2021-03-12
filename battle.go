@@ -160,8 +160,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				ftB := turnB.(FightTurn)
 				mvA := ctxA.Pokemon.Moves[ftA.Move]
 				mvB := ctxB.Pokemon.Moves[ftB.Move]
-				if mvA.Data().Priority != mvB.Data().Priority {
-					return mvA.Data().Priority > mvB.Data().Priority
+				if mvA.Priority() != mvB.Priority() {
+					return mvA.Priority() > mvB.Priority()
 				}
 				// speedy pokemon should go first
 				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
@@ -215,13 +215,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 
 			// use the move
-			accuracy := float64(move.Data().Accuracy)
+			accuracy := float64(move.Accuracy())
 			if b.Weather == WeatherFog {
 				accuracy *= 3. / 5.
 			}
 			// Todo: account for receiver's evasion
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-			if move.Data().Accuracy != 0 && !b.rng.Roll(int(accuracy), 100) {
+			if move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
 				b.QueueTransaction(EvadeTransaction{
 					User: &user,
 				})
@@ -229,7 +229,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			// Status Moves
-			if move.Data().Category == MoveCategoryStatus {
+			if move.Category() == MoveCategoryStatus {
 				switch move.Id {
 				case MoveStunSpore:
 					b.QueueTransaction(InflictStatusTransaction{
@@ -271,9 +271,9 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			} else {
 				// Physical/Special Moves
 				weather := 1.0
-				if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Data().Type == TypeWater) || (sun && move.Data().Type == TypeFire) {
+				if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Type() == TypeWater) || (sun && move.Type() == TypeFire) {
 					weather = 1.5
-				} else if (rain && move.Data().Type == TypeFire) || (sun && move.Data().Type == TypeWater) {
+				} else if (rain && move.Type() == TypeFire) || (sun && move.Type() == TypeWater) {
 					weather = 0.5
 				}
 				crit := 1.0
@@ -281,7 +281,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					crit = 2.0
 				}
 				stab := 1.0
-				if move != nil && user.Type&move.Data().Type != 0 {
+				if move != nil && user.Type&move.Type() != 0 {
 					stab = 1.5
 					if user.Ability != nil && user.Ability.ID == 91 { // Adaptability
 						stab = 2.0
@@ -289,11 +289,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 				modifier := weather * crit * stab
 				levelEffect := float64((2 * user.Level / 5) + 2)
-				movePower := float64(move.Data().Power)
+				movePower := float64(move.Power())
 				attack := float64(user.Attack())
 				defense := float64(receiver.Defense())
 				// Move modifiers
-				if move.Data().Category == MoveCategorySpecial {
+				if move.Category() == MoveCategorySpecial {
 					attack = float64(user.SpecialAttack())
 					defense = float64(receiver.SpecialDefense())
 				}
