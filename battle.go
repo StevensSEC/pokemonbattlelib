@@ -155,9 +155,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		ctxA := turns[i].Context
 		ctxB := turns[j].Context
 		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
-			if ctxA.Pokemon.HeldItem == ItemQuickClaw {
-				return b.rng.Roll(3, 16) // 3/16 chance to move first
-			}
 			switch turnA.(type) {
 			case FightTurn:
 				ftA := turnA.(FightTurn)
