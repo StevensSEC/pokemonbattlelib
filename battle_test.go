@@ -1206,7 +1206,7 @@ var _ = Describe("Misc/held items", func() {
 	}
 
 	Context("when Pokemon hold certain misc. items in battle", func() {
-		It("handles Black Sludge correctly", func() {
+		It("handles Black Sludge", func() {
 			// Heal poison types for 1/16 HP
 			b := setup(ItemBlackSludge, PkmnGrimer)
 			holder := b.getPokemon(1, 0)
@@ -1225,6 +1225,22 @@ var _ = Describe("Misc/held items", func() {
 			}))
 			// TODO: DamageTransaction check
 		})
+
+		DescribeTable("Weather duration boosting rocks",
+			func(item Item, weather Weather, move int) {
+				b := setup(item, PkmnCastform)
+				b.parties[1].pokemon[0].Moves[0] = GetMove(move)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(WeatherTransaction{
+					Weather: weather,
+					Turns:   8,
+				}))
+			},
+			Entry("Damp Rock", ItemDampRock, WeatherRain, MoveRainDance),
+			Entry("Heat Rock", ItemHeatRock, WeatherHarshSunlight, MoveSunnyDay),
+			Entry("Icy Rock", ItemIcyRock, WeatherHail, MoveHail),
+			Entry("Smooth Rock", ItemSmoothRock, WeatherSandstorm, MoveSandstorm),
+		)
 	})
 })
 
