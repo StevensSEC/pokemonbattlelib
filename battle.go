@@ -379,6 +379,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					if move.Category == MoveCategoryPhysical {
 						modifier *= 1.10
 					}
+				case ItemWiseGlasses:
+					if move.Category == MoveCategorySpecial {
+						modifier *= 1.10
+					}
 				}
 				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
 				b.QueueTransaction(DamageTransaction{
