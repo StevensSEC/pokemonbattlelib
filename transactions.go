@@ -32,7 +32,7 @@ func (t DamageTransaction) Mutate(b *Battle) {
 	}
 	if receiver.CurrentHP == 0 {
 		// Prevent OHKO with Focus Sash
-		if receiver.HeldItem != nil && receiver.HeldItem.ID == ItemFocusSash {
+		if receiver.HeldItem == ItemFocusSash {
 			receiver.CurrentHP = 1
 			b.QueueTransaction(ItemTransaction{
 				Target: receiver,
@@ -97,18 +97,115 @@ func (t EVTransaction) Mutate(b *Battle) {
 // A transaction to use and possibly consume an item.
 type ItemTransaction struct {
 	Target *Pokemon
-	Item   *Item
+	IsHeld bool
+	Item   Item
 	Move   *Move
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
-	if t.Item.Flags&FlagConsumable > 0 {
-		if t.Target.HeldItem == t.Item {
-			t.Target.HeldItem = nil
+	if t.Item.Flags()&FlagConsumable > 0 {
+		if t.IsHeld {
+			t.Item = t.Target.HeldItem // auto-correct if the value is not present or does not match
+			t.Target.HeldItem = ItemNone
 		}
 		// TODO: remove consumed item from party's inventory
 	}
-	b.QueueTransaction(t.Target.UseItem(t.Item)...)
+	switch t.Item {
+	// ItemCategoryMedicine
+	case ItemPotion:
+		b.QueueTransaction(t.Target.RestoreHP(20))
+
+	// ItemCategoryInAPinch
+	case ItemApicotBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatSpDef,
+			Stages: 1,
+		})
+	case ItemCustapBerry:
+		// TODO: Force pokemon to go first
+	case ItemGanlonBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatDef,
+			Stages: 1,
+		})
+	case ItemLansatBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatCritChance,
+			Stages: 2,
+		})
+	case ItemLiechiBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatAtk,
+			Stages: 1,
+		})
+	case ItemMicleBerry:
+		// TODO: Perfect accuracy for next move
+	case ItemPetayaBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatSpAtk,
+			Stages: 1,
+		})
+	case ItemSalacBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatSpeed,
+			Stages: 1,
+		})
+	case ItemStarfBerry:
+		// TODO: boost random stat, requires battle RNG to be available.
+	// ItemCategoryHeldItems
+	case ItemBlackSludge:
+		if t.Target.Type&TypePoison != 0 {
+			b.QueueTransaction(HealTransaction{
+				Target: t.Target,
+				Amount: t.Target.MaxHP() / 16,
+			})
+		} else {
+			// Need target, change ItemTransaction.Target from *Pokemon to target?
+			// b.QueueTransaction(DamageTransaction{
+			// 	Target: t,
+			// 	Damage: t.Target.MaxHP() / 8,
+			// })
+		}
+	case ItemLeftovers:
+		b.QueueTransaction(HealTransaction{
+			Target: t.Target,
+			Amount: t.Target.MaxHP() / 16,
+		})
+	case ItemMentalHerb:
+		if t.Target.StatusEffects.check(StatusInfatuation) {
+			b.QueueTransaction(ItemTransaction{
+				Target: t.Target,
+				Item:   t.Target.HeldItem,
+			})
+			b.QueueTransaction(CureStatusTransaction{
+				Target:       t.Target,
+				StatusEffect: StatusInfatuation,
+			})
+		}
+	case ItemWhiteHerb:
+		for stat, stages := range t.Target.StatModifiers {
+			if stages < 0 {
+				b.QueueTransaction(ModifyStatTransaction{
+					Target: t.Target,
+					Stat:   stat,
+					Stages: -stages,
+				})
+			}
+		}
+	}
+	if t.Target.HeldItem.Category() == ItemCategoryInAPinch && t.Target.CurrentHP <= t.Target.Stats[StatHP]/4 {
+		b.QueueTransaction(ItemTransaction{
+			Target: t.Target,
+			IsHeld: true,
+			Item:   t.Target.HeldItem,
+		})
+	}
 }
 
 // A transaction to change the PP of a move.
@@ -144,6 +241,9 @@ type InflictStatusTransaction struct {
 
 func (t InflictStatusTransaction) Mutate(b *Battle) {
 	t.Target.StatusEffects.apply(t.StatusEffect)
+	if t.StatusEffect.check(StatusSleep) {
+		t.Target.metadata[MetaSleepTime] = b.rng.Get(1, 5)
+	}
 }
 
 type CureStatusTransaction struct {
@@ -153,6 +253,9 @@ type CureStatusTransaction struct {
 
 func (t CureStatusTransaction) Mutate(b *Battle) {
 	t.Target.StatusEffects.clear(t.StatusEffect)
+	if t.StatusEffect.check(StatusSleep) {
+		delete(t.Target.metadata, MetaSleepTime)
+	}
 }
 
 // A transaction that makes a pokemon faint, and returns the pokemon to the pokeball.
@@ -231,7 +334,10 @@ type ImmobilizeTransaction struct {
 }
 
 func (t ImmobilizeTransaction) Mutate(b *Battle) {
-	// currently a no-op.
+	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+	if t.StatusEffect.check(StatusSleep) {
+		receiver.metadata[MetaSleepTime] = receiver.metadata[MetaSleepTime].(int) - 1
+	}
 }
 
 // Handles evasion, misses, dodging, etc. when using moves

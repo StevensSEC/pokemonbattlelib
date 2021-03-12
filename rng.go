@@ -24,5 +24,8 @@ func (g *LCRNG) Get(min, max int) int {
 
 // Rolls for a x/y chance, returning whether it was hit
 func (g *LCRNG) Roll(x, y int) bool {
+	if x >= y {
+		return true
+	}
 	return g.Get(1, y) <= x
 }

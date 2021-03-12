@@ -22,7 +22,7 @@ type Pokemon struct {
 	StatModifiers     [9]int                      // ranges from +6 (buffing) to -6 (debuffing) a stat
 	StatusEffects     StatusCondition             // the current status effects inflicted on a Pokemon
 	CurrentHP         uint                        // the remaining HP of this Pokemon
-	HeldItem          *Item                       // the item a Pokemon is holding
+	HeldItem          Item                        // the item a Pokemon is holding
 	Moves             [MaxMoves]*Move             // the moves the Pokemon currenly knows
 	Friendship        int                         // how close this Pokemon is to its Trainer
 	OriginalTrainerID uint16                      // a number associated with the first Trainer who caught this Pokemon
@@ -35,6 +35,7 @@ type PokemonMeta int
 
 const (
 	MetaLastMove PokemonMeta = iota
+	MetaSleepTime
 )
 
 // Keeps track of base stats and EV yield for a Pokemon
@@ -291,7 +292,7 @@ func (p *Pokemon) Speed() uint {
 // Returns denominator for critical hit chance
 func (p *Pokemon) CritChance() int {
 	stage := p.StatModifiers[StatCritChance]
-	if p.HeldItem != nil && (p.HeldItem.ID == ItemRazorClaw || p.HeldItem.ID == ItemScopeLens) {
+	if p.HeldItem == ItemRazorClaw || p.HeldItem == ItemScopeLens {
 		if stage < len(CritChances)-1 {
 			stage += 1
 		}

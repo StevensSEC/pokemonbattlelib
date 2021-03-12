@@ -24,10 +24,9 @@ type healAgent struct{}
 
 // Always uses a potion on first Pokemon
 func (a healAgent) Act(ctx *BattleContext) Turn {
-	item := GetItem(ItemPotion)
 	for _, target := range ctx.Allies {
 		return ItemTurn{
-			Item:   &item,
+			Item:   ItemPotion,
 			Target: target,
 		}
 	}
@@ -259,11 +258,10 @@ var _ = Describe("Using items in battle", func() {
 		It("should create ItemTransaction(s) properly", func() {
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
-			potion := GetItem(ItemPotion)
 			Expect(t).To(HaveTransaction(
 				ItemTransaction{
 					Target: pkmn,
-					Item:   &potion,
+					Item:   ItemPotion,
 					Move:   nil,
 				},
 			))
@@ -382,7 +380,6 @@ var _ = Describe("Turn priority", func() {
 			b.rng = &SimpleRNG
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(2))
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
 					User: p2,
@@ -598,7 +595,6 @@ var _ = Describe("Weather", func() {
 			b.metadata[MetaWeatherTurns] = 5
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(3))
 			// Weaken solar beam, SPDEF of rock type
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: bulbasaur,
@@ -730,7 +726,6 @@ var _ = Describe("Fainting", func() {
 		It("should switch to the next available Pokemon", func() {
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(6))
 			// Charmander smashed his nubby little fist into Squirtle as
 			// hard as he could. Spectators gasped and winced when the
 			// impact created a very audible crack. But it was not
@@ -774,7 +769,6 @@ var _ = Describe("Fainting", func() {
 			Expect(b.Start()).To(Succeed())
 			t, ended := b.SimulateRound()
 			Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
-			Expect(t).To(HaveLen(5), "Expected 4 transactions to occur")
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
@@ -882,7 +876,6 @@ var _ = Describe("Battle end", func() {
 			Expect(b.Start()).To(Succeed())
 			t, ended := b.SimulateRound()
 			Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
-			Expect(t).To(HaveLen(5))
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
@@ -978,7 +971,6 @@ var _ = Describe("Status Conditions", func() {
 			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(4), "Expected only 4 transactions to occur in a round")
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
 					Pokemon:   *pkmn1,
@@ -1010,7 +1002,6 @@ var _ = Describe("Status Conditions", func() {
 			b.AddParty(p1, p2)
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(3), "Expected only 3 transactions to occur in a round")
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
 					Pokemon:   *pkmn1,
@@ -1067,26 +1058,102 @@ var _ = Describe("Status Conditions", func() {
 			))
 		})
 
-		It("should immobilize sleeping Pokemon", func() {
-			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
-			pkmn1.StatusEffects = StatusSleep
-			p1 = NewOccupiedParty(&a1, 0, pkmn1)
-			pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-			p2 = NewOccupiedParty(&a2, 1, pkmn2)
-			b.AddParty(p1, p2)
-			Expect(b.Start()).To(Succeed())
-			t, _ := b.SimulateRound()
-			Expect(t).To(HaveTransaction(
-				ImmobilizeTransaction{
-					Target: target{
-						Pokemon:   *pkmn1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+		Context("when a pokemon is asleep", func() {
+			It("should immobilize sleeping Pokemon", func() {
+				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
+				p1 = NewOccupiedParty(&a1, 0, pkmn1)
+				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+				p2 = NewOccupiedParty(&a2, 1, pkmn2)
+				b.AddParty(p1, p2)
+				Expect(b.Start()).To(Succeed())
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       pkmn1,
 					StatusEffect: StatusSleep,
+				})
+				b.ProcessQueue()
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(
+					ImmobilizeTransaction{
+						Target: target{
+							Pokemon:   *pkmn1,
+							party:     0,
+							partySlot: 0,
+							Team:      0,
+						},
+						StatusEffect: StatusSleep,
+					},
+				))
+			})
+
+			It("should allow sleeping Pokemon to wake up", func() {
+				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
+				p1 = NewOccupiedParty(&a1, 0, pkmn1)
+				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+				p2 = NewOccupiedParty(&a2, 1, pkmn2)
+				b.AddParty(p1, p2)
+				Expect(b.Start()).To(Succeed())
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       pkmn1,
+					StatusEffect: StatusSleep,
+				})
+				b.ProcessQueue()
+				pkmn1.metadata[MetaSleepTime] = 0
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(
+					CureStatusTransaction{
+						Target:       pkmn1,
+						StatusEffect: StatusSleep,
+					},
+				))
+				Expect(pkmn1.StatusEffects.check(StatusSleep)).To(BeFalse())
+			})
+
+			It("should decrement sleeping counter", func() {
+				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
+				p1 = NewOccupiedParty(&a1, 0, pkmn1)
+				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+				p2 = NewOccupiedParty(&a2, 1, pkmn2)
+				b.AddParty(p1, p2)
+				Expect(b.Start()).To(Succeed())
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       pkmn1,
+					StatusEffect: StatusSleep,
+				})
+				b.ProcessQueue()
+				counter := pkmn1.metadata[MetaSleepTime].(int)
+				b.SimulateRound()
+				Expect(pkmn1.metadata[MetaSleepTime].(int)).To(Equal(counter - 1))
+			})
+
+			DescribeTable("Sleep walking",
+				func(moveid int) {
+					pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(moveid), GetMove(MoveRazorLeaf)))
+					p1 = NewOccupiedParty(&a1, 0, pkmn1)
+					pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
+					p2 = NewOccupiedParty(&a2, 1, pkmn2)
+					b.AddParty(p1, p2)
+					Expect(b.Start()).To(Succeed())
+					b.QueueTransaction(InflictStatusTransaction{
+						Target:       pkmn1,
+						StatusEffect: StatusSleep,
+					})
+					b.ProcessQueue()
+					t, _ := b.SimulateRound()
+					Expect(t).ToNot(HaveTransaction(
+						ImmobilizeTransaction{
+							Target: target{
+								Pokemon:   *pkmn1,
+								party:     0,
+								partySlot: 0,
+								Team:      0,
+							},
+							StatusEffect: StatusSleep,
+						},
+					))
 				},
-			))
+				Entry("Snore", MoveSnore),
+				Entry("Sleep Talk", MoveSleepTalk),
+			)
 		})
 
 		It("should cure paralysis", func() {
@@ -1118,7 +1185,7 @@ var _ = Describe("In-a-pinch Berries", func() {
 	a2 := Agent(new(dumbAgent))
 	var holder *Pokemon
 
-	setup := func(itemId int) *Battle {
+	setup := func(item Item) *Battle {
 		p1 := NewOccupiedParty(&a1, 0, GeneratePokemon(
 			PkmnCombusken,
 			WithLevel(25),
@@ -1130,8 +1197,7 @@ var _ = Describe("In-a-pinch Berries", func() {
 			WithMoves(GetMove(MoveSplash)),
 			WithIVs([6]uint8{1, 1, 1, 20, 1, 1}),
 		)
-		i := GetItem(itemId)
-		holder.HeldItem = &i
+		holder.HeldItem = item
 		holder.CurrentHP = holder.MaxHP() / 4
 		p2 := NewOccupiedParty(&a2, 1, holder)
 		b := NewBattle()
@@ -1142,12 +1208,13 @@ var _ = Describe("In-a-pinch Berries", func() {
 	}
 
 	DescribeTable("Stat changing in-a-pinch berries",
-		func(item, stat, stages int) {
+		func(item Item, stat, stages int) {
 			b := setup(item)
 			t, _ := b.SimulateRound()
 
 			Expect(t).To(HaveTransaction(ItemTransaction{
 				Target: holder,
+				IsHeld: true,
 				Item:   holder.HeldItem,
 			}))
 			Expect(t).To(HaveTransaction(ModifyStatTransaction{
@@ -1155,6 +1222,8 @@ var _ = Describe("In-a-pinch Berries", func() {
 				Stat:   stat,
 				Stages: stages,
 			}))
+			Expect(b.parties[0].activePokemon[0].HeldItem).To(Equal(ItemNone))
+			Expect(b.parties[1].activePokemon[0].HeldItem).To(Equal(ItemNone))
 		},
 		Entry("Apicot Berry", ItemApicotBerry, StatSpDef, 1),
 		Entry("Ganlon Berry", ItemGanlonBerry, StatDef, 1),
