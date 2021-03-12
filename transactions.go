@@ -88,18 +88,69 @@ func (t EVTransaction) Mutate(b *Battle) {
 // A transaction to use and possibly consume an item.
 type ItemTransaction struct {
 	Target *Pokemon
-	Item   *Item
+	IsHeld bool
+	Item   Item
 	Move   *Move
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
-	if t.Item.Flags&FlagConsumable > 0 {
-		if t.Target.HeldItem == t.Item {
-			t.Target.HeldItem = nil
+	if t.Item.Flags()&FlagConsumable > 0 {
+		if t.IsHeld {
+			t.Item = t.Target.HeldItem // auto-correct if the value is not present or does not match
+			t.Target.HeldItem = ItemNone
 		}
 		// TODO: remove consumed item from party's inventory
 	}
-	b.QueueTransaction(t.Target.UseItem(t.Item)...)
+
+	switch t.Item {
+	// ItemCategoryMedicine
+	case ItemPotion:
+		b.QueueTransaction(t.Target.RestoreHP(20))
+
+	// ItemCategoryInAPinch
+	case ItemApicotBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatSpDef,
+			Stages: 1,
+		})
+	case ItemCustapBerry:
+		// TODO: Force pokemon to go first
+	case ItemGanlonBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatDef,
+			Stages: 1,
+		})
+	case ItemLansatBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatCritChance,
+			Stages: 2,
+		})
+	case ItemLiechiBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatAtk,
+			Stages: 1,
+		})
+	case ItemMicleBerry:
+		// TODO: Perfect accuracy for next move
+	case ItemPetayaBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatSpAtk,
+			Stages: 1,
+		})
+	case ItemSalacBerry:
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatSpeed,
+			Stages: 1,
+		})
+	case ItemStarfBerry:
+		// TODO: boost random stat, requires battle RNG to be available.
+	}
 }
 
 // A transaction to change the PP of a move.

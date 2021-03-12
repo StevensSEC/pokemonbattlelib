@@ -481,14 +481,16 @@ func main() {
 			item_flags[r[0]] = append(item_flags[r[0]], itemFlagMap[v])
 		}
 	}
-	output += "// Create item constant enum for quick reference\nconst (\n"
+	output += "// Create item constant enum for quick reference\n"
 	item_names_csv := getCsvReader("data/item_names.csv")
+	item_vars := make(map[string]string) // data IDs to constants
 	item_names := make(map[string]string)
 	records, err = item_names_csv.ReadAll()
 	if err != nil {
 		log.Panicln(err)
 	}
 	// Add item names
+	output += "const (\nItemNone Item = iota\n"
 	for _, r := range records {
 		if _, ok := item_flags[r[0]]; !ok {
 			continue
@@ -496,9 +498,11 @@ func main() {
 		if parseInt(r[1]) != EnglishLanguageID {
 			continue
 		}
-		item_names[r[0]] = r[2]
-		name := cleanName(r[2])
-		output += fmt.Sprintf("\tItem%s = %v\n", name, r[0])
+		name := r[2]
+		item_names[r[0]] = name
+		varname := fmt.Sprintf("Item%s", cleanName(name))
+		item_vars[r[0]] = varname
+		output += fmt.Sprintf("%s\n", varname)
 	}
 	output += ")\n"
 	items := make([]data_item, 0)
@@ -519,13 +523,17 @@ func main() {
 			FlingEffectID: parseInt(r[5]),
 			Flags:         item_flags[r[0]],
 		}
+		// HACK: data is missing these flags for some reason
+		if item.CategoryID == 5 {
+			item.Flags = append(item.Flags, "FlagConsumable", "FlagHoldable")
+		}
 		items = append(items, item)
 	}
 	// Add item data to generated output
-	output += "// A collection of all items in the game\n" + "var AllItems = []Item{\n"
+	output += "// A collection of all items in the game\n" + "var AllItems = []ItemData{\n"
 	for _, item := range items {
-		output += fmt.Sprintf("\t{ID: %s, Name: \"%s\", Category: %d, FlingPower: %d, FlingEffect: %d, Flags: %s},\n",
-			item.ID, item_names[item.ID], item.CategoryID, item.FlingPower, item.FlingEffectID, strings.Join(item.Flags, " | "))
+		output += fmt.Sprintf("{Name: \"%s\", Category: %d, FlingPower: %d, FlingEffect: %d, Flags: %s},\n",
+			item_names[item.ID], item.CategoryID, item.FlingPower, item.FlingEffectID, strings.Join(item.Flags, " | "))
 	}
 	output += "}\n\n"
 
