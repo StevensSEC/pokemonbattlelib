@@ -1180,6 +1180,54 @@ var _ = Describe("Status Conditions", func() {
 	})
 })
 
+var _ = Describe("Misc/held items", func() {
+	a1 := Agent(new(dumbAgent))
+	a2 := Agent(new(dumbAgent))
+	var holder *Pokemon
+
+	setup := func(item Item, pkmn int) *Battle {
+		p1 := NewOccupiedParty(&a1, 0, GeneratePokemon(
+			PkmnSnorlax,
+			WithLevel(25),
+			WithMoves(GetMove(MoveSplash)),
+		))
+		holder = GeneratePokemon(
+			pkmn,
+			WithLevel(25),
+			WithMoves(GetMove(MoveSplash)),
+		)
+		holder.HeldItem = item
+		p2 := NewOccupiedParty(&a2, 1, holder)
+		b := NewBattle()
+		b.rng = &SimpleRNG
+		b.AddParty(p1, p2)
+		Expect(b.Start()).To(Succeed())
+		return b
+	}
+
+	Context("when Pokemon hold certain misc. items in battle", func() {
+		It("handles Black Sludge correctly", func() {
+			// Heal poison types for 1/16 HP
+			b := setup(ItemBlackSludge, PkmnGrimer)
+			holder := b.getPokemon(1, 0)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+			// Damage non-poison types for 1/8 HP
+			b = setup(ItemBlackSludge, PkmnAerodactyl)
+			holder = b.getPokemon(1, 0)
+			t, _ = b.SimulateRound()
+			Expect(t).ToNot(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+			// TODO: DamageTransaction check
+		})
+	})
+})
+
 var _ = Describe("In-a-pinch Berries", func() {
 	a1 := Agent(new(dumbAgent))
 	a2 := Agent(new(dumbAgent))
