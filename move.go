@@ -28,7 +28,7 @@ const (
 )
 
 // Targets that the move can specify
-type MoveTarget int
+type MoveTarget uint8
 
 const (
 	MoveTargetSpecificMove MoveTarget = iota + 1
