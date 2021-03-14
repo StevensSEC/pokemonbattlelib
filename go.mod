@@ -6,4 +6,5 @@ require (
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/onsi/ginkgo v1.15.0
 	github.com/onsi/gomega v1.10.5
+	golang.org/x/tools v0.1.0 // indirect
 )
