@@ -846,6 +846,61 @@ var _ = Describe("Fainting", func() {
 			))
 		})
 	})
+
+	When("holding Focus Sash", func() {
+		setup := func() *Battle {
+			holder := GeneratePokemon(PkmnMachoke, WithLevel(26), WithMoves(GetMove(MoveSplash)))
+			holder.CurrentHP = 4
+			holder.HeldItem = ItemFocusSash
+			party1 := NewOccupiedParty(&a1, 0, holder)
+			party2 := NewOccupiedParty(&a2, 1,
+				GeneratePokemon(PkmnGrotle, WithLevel(30), WithMoves(GetMove(MoveRazorLeaf))),
+			)
+			b = NewBattle()
+			b.AddParty(party1, party2)
+			b.rng = &SimpleRNG
+			Expect(b.Start()).To(Succeed())
+			return b
+		}
+
+		It("should not let the holder die", func() {
+			b := setup()
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: b.getPokemon(1, 0),
+				Target: target{
+					Pokemon:   *b.getPokemon(0, 0),
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+				},
+			}))
+			Expect(b.parties[0].activePokemon[0].CurrentHP).To(BeEquivalentTo(1))
+		})
+
+		It("should consume the focus sash after damage is applied", func() {
+			b := setup()
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransactionsInOrder(
+				DamageTransaction{
+					User: b.getPokemon(1, 0),
+					Target: target{
+						Pokemon:   *b.getPokemon(0, 0),
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+				},
+				ItemTransaction{
+					Target: b.getPokemon(0, 0),
+					IsHeld: true,
+					Item:   ItemFocusSash,
+				},
+			))
+			Expect(b.getPokemon(0, 0).HeldItem).To(Equal(ItemNone))
+			Expect(b.getPokemon(1, 0).HeldItem).To(Equal(ItemNone))
+		})
+	})
 })
 
 var _ = Describe("Battle end", func() {
