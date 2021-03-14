@@ -275,59 +275,15 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else {
 				// Physical/Special Moves
-				weather := 1.0
-				if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Type() == TypeWater) || (sun && move.Type() == TypeFire) {
-					weather = 1.5
-				} else if (rain && move.Type() == TypeFire) || (sun && move.Type() == TypeWater) {
-					weather = 0.5
-				}
-				crit := 1.0
+				damage := calcMoveDamage(b.Weather, &user, receiver, move)
 				if b.rng.Roll(1, CritChances[user.StatModifiers[StatCritChance]]) {
-					crit = 2.0
+					damage *= 2
 				}
-				stab := 1.0
-				if move != nil && user.Type&move.Type() != 0 {
-					stab = 1.5
-					if user.Ability != nil && user.Ability.ID == 91 { // Adaptability
-						stab = 2.0
-					}
-				}
-				modifier := weather * crit * stab
-				levelEffect := float64((2 * user.Level / 5) + 2)
-				movePower := float64(move.Power())
-				attack := float64(user.Attack())
-				defense := float64(receiver.Defense())
-				// Move modifiers
-				if move.Category() == MoveCategorySpecial {
-					attack = float64(user.SpecialAttack())
-					defense = float64(receiver.SpecialDefense())
-				}
-				// Weather modifiers
-				if b.Weather == WeatherSandstorm {
-					if receiver.Type&TypeRock != 0 {
-						defense *= 1.5
-					}
-					if move.Id == MoveSolarBeam {
-						movePower /= 2
-					}
-				}
-				if b.Weather == WeatherHail && move.Id == MoveSolarBeam {
-					movePower /= 2
-				}
-				if b.Weather == WeatherFog {
-					if move.Id == MoveWeatherBall {
-						movePower *= 2
-					}
-					if move.Id == MoveSolarBeam {
-						movePower /= 2
-					}
-				}
-				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
 				b.QueueTransaction(DamageTransaction{
 					User:   &user,
 					Target: t.Target,
 					Move:   user.Moves[t.Move],
-					Damage: uint(damage),
+					Damage: damage,
 				})
 			}
 		case ItemTurn:
