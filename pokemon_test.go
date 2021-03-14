@@ -116,3 +116,15 @@ var _ = Describe("Pokemon string representation", func() {
 		Expect(fmt.Sprintf("%s", pkmn)).To(Equal(want))
 	})
 })
+
+var _ = Describe("Pokemon stat boosts", func() {
+	DescribeTable("crit chance boosting items",
+		func(i Item) {
+			p := GeneratePokemon(PkmnPiplup, WithLevel(5), WithMoves(GetMove(MoveSplash)))
+			p.HeldItem = ItemRazorClaw
+			Expect(p.CritChance()).To(Equal(CritChances[p.StatModifiers[StatCritChance]+1]))
+		},
+		Entry("Razor Claw", ItemRazorClaw),
+		Entry("Scope Lens", ItemScopeLens),
+	)
+})
