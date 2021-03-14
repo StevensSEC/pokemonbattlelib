@@ -119,6 +119,34 @@ func (b *Battle) preRound() {
 	}
 }
 
+func (b *Battle) sortTurns(turns *[]TurnContext) {
+	sort.SliceStable(*turns, func(i, j int) bool {
+		turnA := (*turns)[i].Turn
+		turnB := (*turns)[j].Turn
+		ctxA := (*turns)[i].Context
+		ctxB := (*turns)[j].Context
+		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
+			switch turnA.(type) {
+			case FightTurn:
+				ftA := turnA.(FightTurn)
+				ftB := turnB.(FightTurn)
+				mvA := ctxA.Pokemon.Moves[ftA.Move]
+				mvB := ctxB.Pokemon.Moves[ftB.Move]
+				if mvA.Priority() != mvB.Priority() {
+					return mvA.Priority() > mvB.Priority()
+				}
+				// speedy pokemon should go first
+				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
+			}
+		} else {
+			// make higher priority turns go first
+			return turnA.Priority() > turnB.Priority()
+		}
+		// fallthrough
+		return false
+	})
+}
+
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
 func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	if b.State != BattleInProgress {
@@ -148,31 +176,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 	blog.Println("Sorting turns")
 	// Sort turns using an in-place stable sort
-	sort.SliceStable(turns, func(i, j int) bool {
-		turnA := turns[i].Turn
-		turnB := turns[j].Turn
-		ctxA := turns[i].Context
-		ctxB := turns[j].Context
-		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
-			switch turnA.(type) {
-			case FightTurn:
-				ftA := turnA.(FightTurn)
-				ftB := turnB.(FightTurn)
-				mvA := ctxA.Pokemon.Moves[ftA.Move]
-				mvB := ctxB.Pokemon.Moves[ftB.Move]
-				if mvA.Priority() != mvB.Priority() {
-					return mvA.Priority() > mvB.Priority()
-				}
-				// speedy pokemon should go first
-				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
-			}
-		} else {
-			// make higher priority turns go first
-			return turnA.Priority() > turnB.Priority()
-		}
-		// fallthrough
-		return false
-	})
+	b.sortTurns(&turns)
+
 	// Run turns in sorted order and update battle state
 	for len(turns) > 0 {
 		turn := turns[0]
