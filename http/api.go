@@ -28,6 +28,7 @@ func HandleListMoves(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Failed to marshal moves into JSON: %s", err)
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write(bytes)
 }
@@ -91,6 +92,7 @@ func HandleGeneratePokemon(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Failed to marshal generated pokemon into JSON: %s", err)
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write(bytes)
 }
@@ -175,6 +177,7 @@ func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write(bytes)
 }
@@ -192,6 +195,7 @@ func HandleBattleContext(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write(bytes)
 }
@@ -213,5 +217,6 @@ func HandleBattleAct(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleDumbAgent(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"type": 0, "args": {"target": {"party":0, "slot": 0}, "move": 0}}`))
 }
