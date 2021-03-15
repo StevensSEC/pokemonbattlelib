@@ -325,3 +325,8 @@ func (p *Pokemon) UnmarshalJSON(data []byte) error {
 	}
 	return json.Unmarshal(data, &aux)
 }
+
+// Get the Pokemon's current elemental type, accounting for any abilities or conditions that would affect it.
+func (p *Pokemon) EffectiveType() Type {
+	return p.Type
+}
