@@ -156,11 +156,11 @@ func (t ItemTransaction) Mutate(b *Battle) {
 // A transaction to change the PP of a move.
 type PPTransaction struct {
 	Move   *Move
-	Amount int
+	Amount int8
 }
 
 func (t PPTransaction) Mutate(b *Battle) {
-	t.Move.CurrentPP += t.Amount
+	t.Move.CurrentPP += uint8(t.Amount)
 	if t.Move.CurrentPP < 0 {
 		t.Move.CurrentPP = 0
 	} else if t.Move.CurrentPP > t.Move.MaxPP {
