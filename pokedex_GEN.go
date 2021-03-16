@@ -4186,3 +4186,382 @@ func (n Nature) String() string {
 	}
 	panic("Unknown nature")
 }
+
+const (
+	AbilityAdaptability Ability = iota + 1
+	AbilityAftermath
+	AbilityAirLock
+	AbilityAngerPoint
+	AbilityAnticipation
+	AbilityArenaTrap
+	AbilityBadDreams
+	AbilityBattleArmor
+	AbilityBlaze
+	AbilityChlorophyll
+	AbilityClearBody
+	AbilityCloudNine
+	AbilityColorChange
+	AbilityCompoundEyes
+	AbilityCuteCharm
+	AbilityDamp
+	AbilityDownload
+	AbilityDrizzle
+	AbilityDrought
+	AbilityDrySkin
+	AbilityEarlyBird
+	AbilityEffectSpore
+	AbilityFilter
+	AbilityFlameBody
+	AbilityFlashFire
+	AbilityFlowerGift
+	AbilityForecast
+	AbilityForewarn
+	AbilityFrisk
+	AbilityGluttony
+	AbilityGuts
+	AbilityHeatproof
+	AbilityHoneyGather
+	AbilityHugePower
+	AbilityHustle
+	AbilityHydration
+	AbilityHyperCutter
+	AbilityIceBody
+	AbilityIlluminate
+	AbilityImmunity
+	AbilityInnerFocus
+	AbilityInsomnia
+	AbilityIntimidate
+	AbilityIronFist
+	AbilityKeenEye
+	AbilityKlutz
+	AbilityLeafGuard
+	AbilityLevitate
+	AbilityLightningRod
+	AbilityLimber
+	AbilityLiquidOoze
+	AbilityMagicGuard
+	AbilityMagmaArmor
+	AbilityMagnetPull
+	AbilityMarvelScale
+	AbilityMinus
+	AbilityMoldBreaker
+	AbilityMotorDrive
+	AbilityMultitype
+	AbilityNaturalCure
+	AbilityNoGuard
+	AbilityNormalize
+	AbilityOblivious
+	AbilityOvergrow
+	AbilityOwnTempo
+	AbilityPickup
+	AbilityPlus
+	AbilityPoisonHeal
+	AbilityPoisonPoint
+	AbilityPressure
+	AbilityPurePower
+	AbilityQuickFeet
+	AbilityRainDish
+	AbilityReckless
+	AbilityRivalry
+	AbilityRockHead
+	AbilityRoughSkin
+	AbilityRunAway
+	AbilitySandStream
+	AbilitySandVeil
+	AbilityScrappy
+	AbilitySereneGrace
+	AbilityShadowTag
+	AbilityShedSkin
+	AbilityShellArmor
+	AbilityShieldDust
+	AbilitySimple
+	AbilitySkillLink
+	AbilitySlowStart
+	AbilitySniper
+	AbilitySnowCloak
+	AbilitySnowWarning
+	AbilitySolarPower
+	AbilitySolidRock
+	AbilitySoundproof
+	AbilitySpeedBoost
+	AbilityStall
+	AbilityStatic
+	AbilitySteadfast
+	AbilityStench
+	AbilityStickyHold
+	AbilityStormDrain
+	AbilitySturdy
+	AbilitySuctionCups
+	AbilitySuperLuck
+	AbilitySwarm
+	AbilitySwiftSwim
+	AbilitySynchronize
+	AbilityTangledFeet
+	AbilityTechnician
+	AbilityThickFat
+	AbilityTintedLens
+	AbilityTorrent
+	AbilityTrace
+	AbilityTruant
+	AbilityUnaware
+	AbilityUnburden
+	AbilityVitalSpirit
+	AbilityVoltAbsorb
+	AbilityWaterAbsorb
+	AbilityWaterVeil
+	AbilityWhiteSmoke
+	AbilityWonderGuard
+)
+
+// Get the string name of this Ability.
+func (n Ability) String() string {
+	switch n {
+	case AbilityAdaptability:
+		return "Adaptability"
+	case AbilityAftermath:
+		return "Aftermath"
+	case AbilityAirLock:
+		return "Air Lock"
+	case AbilityAngerPoint:
+		return "Anger Point"
+	case AbilityAnticipation:
+		return "Anticipation"
+	case AbilityArenaTrap:
+		return "Arena Trap"
+	case AbilityBadDreams:
+		return "Bad Dreams"
+	case AbilityBattleArmor:
+		return "Battle Armor"
+	case AbilityBlaze:
+		return "Blaze"
+	case AbilityChlorophyll:
+		return "Chlorophyll"
+	case AbilityClearBody:
+		return "Clear Body"
+	case AbilityCloudNine:
+		return "Cloud Nine"
+	case AbilityColorChange:
+		return "Color Change"
+	case AbilityCompoundEyes:
+		return "Compound Eyes"
+	case AbilityCuteCharm:
+		return "Cute Charm"
+	case AbilityDamp:
+		return "Damp"
+	case AbilityDownload:
+		return "Download"
+	case AbilityDrizzle:
+		return "Drizzle"
+	case AbilityDrought:
+		return "Drought"
+	case AbilityDrySkin:
+		return "Dry Skin"
+	case AbilityEarlyBird:
+		return "Early Bird"
+	case AbilityEffectSpore:
+		return "Effect Spore"
+	case AbilityFilter:
+		return "Filter"
+	case AbilityFlameBody:
+		return "Flame Body"
+	case AbilityFlashFire:
+		return "Flash Fire"
+	case AbilityFlowerGift:
+		return "Flower Gift"
+	case AbilityForecast:
+		return "Forecast"
+	case AbilityForewarn:
+		return "Forewarn"
+	case AbilityFrisk:
+		return "Frisk"
+	case AbilityGluttony:
+		return "Gluttony"
+	case AbilityGuts:
+		return "Guts"
+	case AbilityHeatproof:
+		return "Heatproof"
+	case AbilityHoneyGather:
+		return "Honey Gather"
+	case AbilityHugePower:
+		return "Huge Power"
+	case AbilityHustle:
+		return "Hustle"
+	case AbilityHydration:
+		return "Hydration"
+	case AbilityHyperCutter:
+		return "Hyper Cutter"
+	case AbilityIceBody:
+		return "Ice Body"
+	case AbilityIlluminate:
+		return "Illuminate"
+	case AbilityImmunity:
+		return "Immunity"
+	case AbilityInnerFocus:
+		return "Inner Focus"
+	case AbilityInsomnia:
+		return "Insomnia"
+	case AbilityIntimidate:
+		return "Intimidate"
+	case AbilityIronFist:
+		return "Iron Fist"
+	case AbilityKeenEye:
+		return "Keen Eye"
+	case AbilityKlutz:
+		return "Klutz"
+	case AbilityLeafGuard:
+		return "Leaf Guard"
+	case AbilityLevitate:
+		return "Levitate"
+	case AbilityLightningRod:
+		return "Lightning Rod"
+	case AbilityLimber:
+		return "Limber"
+	case AbilityLiquidOoze:
+		return "Liquid Ooze"
+	case AbilityMagicGuard:
+		return "Magic Guard"
+	case AbilityMagmaArmor:
+		return "Magma Armor"
+	case AbilityMagnetPull:
+		return "Magnet Pull"
+	case AbilityMarvelScale:
+		return "Marvel Scale"
+	case AbilityMinus:
+		return "Minus"
+	case AbilityMoldBreaker:
+		return "Mold Breaker"
+	case AbilityMotorDrive:
+		return "Motor Drive"
+	case AbilityMultitype:
+		return "Multitype"
+	case AbilityNaturalCure:
+		return "Natural Cure"
+	case AbilityNoGuard:
+		return "No Guard"
+	case AbilityNormalize:
+		return "Normalize"
+	case AbilityOblivious:
+		return "Oblivious"
+	case AbilityOvergrow:
+		return "Overgrow"
+	case AbilityOwnTempo:
+		return "Own Tempo"
+	case AbilityPickup:
+		return "Pickup"
+	case AbilityPlus:
+		return "Plus"
+	case AbilityPoisonHeal:
+		return "Poison Heal"
+	case AbilityPoisonPoint:
+		return "Poison Point"
+	case AbilityPressure:
+		return "Pressure"
+	case AbilityPurePower:
+		return "Pure Power"
+	case AbilityQuickFeet:
+		return "Quick Feet"
+	case AbilityRainDish:
+		return "Rain Dish"
+	case AbilityReckless:
+		return "Reckless"
+	case AbilityRivalry:
+		return "Rivalry"
+	case AbilityRockHead:
+		return "Rock Head"
+	case AbilityRoughSkin:
+		return "Rough Skin"
+	case AbilityRunAway:
+		return "Run Away"
+	case AbilitySandStream:
+		return "Sand Stream"
+	case AbilitySandVeil:
+		return "Sand Veil"
+	case AbilityScrappy:
+		return "Scrappy"
+	case AbilitySereneGrace:
+		return "Serene Grace"
+	case AbilityShadowTag:
+		return "Shadow Tag"
+	case AbilityShedSkin:
+		return "Shed Skin"
+	case AbilityShellArmor:
+		return "Shell Armor"
+	case AbilityShieldDust:
+		return "Shield Dust"
+	case AbilitySimple:
+		return "Simple"
+	case AbilitySkillLink:
+		return "Skill Link"
+	case AbilitySlowStart:
+		return "Slow Start"
+	case AbilitySniper:
+		return "Sniper"
+	case AbilitySnowCloak:
+		return "Snow Cloak"
+	case AbilitySnowWarning:
+		return "Snow Warning"
+	case AbilitySolarPower:
+		return "Solar Power"
+	case AbilitySolidRock:
+		return "Solid Rock"
+	case AbilitySoundproof:
+		return "Soundproof"
+	case AbilitySpeedBoost:
+		return "Speed Boost"
+	case AbilityStall:
+		return "Stall"
+	case AbilityStatic:
+		return "Static"
+	case AbilitySteadfast:
+		return "Steadfast"
+	case AbilityStench:
+		return "Stench"
+	case AbilityStickyHold:
+		return "Sticky Hold"
+	case AbilityStormDrain:
+		return "Storm Drain"
+	case AbilitySturdy:
+		return "Sturdy"
+	case AbilitySuctionCups:
+		return "Suction Cups"
+	case AbilitySuperLuck:
+		return "Super Luck"
+	case AbilitySwarm:
+		return "Swarm"
+	case AbilitySwiftSwim:
+		return "Swift Swim"
+	case AbilitySynchronize:
+		return "Synchronize"
+	case AbilityTangledFeet:
+		return "Tangled Feet"
+	case AbilityTechnician:
+		return "Technician"
+	case AbilityThickFat:
+		return "Thick Fat"
+	case AbilityTintedLens:
+		return "Tinted Lens"
+	case AbilityTorrent:
+		return "Torrent"
+	case AbilityTrace:
+		return "Trace"
+	case AbilityTruant:
+		return "Truant"
+	case AbilityUnaware:
+		return "Unaware"
+	case AbilityUnburden:
+		return "Unburden"
+	case AbilityVitalSpirit:
+		return "Vital Spirit"
+	case AbilityVoltAbsorb:
+		return "Volt Absorb"
+	case AbilityWaterAbsorb:
+		return "Water Absorb"
+	case AbilityWaterVeil:
+		return "Water Veil"
+	case AbilityWhiteSmoke:
+		return "White Smoke"
+	case AbilityWonderGuard:
+		return "Wonder Guard"
+	}
+	panic("Unknown ability")
+}

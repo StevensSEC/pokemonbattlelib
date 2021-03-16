@@ -720,6 +720,64 @@ func main() {
 		"panic(\"Unknown nature\")" +
 		"}\n\n"
 
+	// Abilities
+	log.Println("Generating code for Abilities")
+	// read natures data
+	abilities_csv := getCsvReader("data/abilities.csv")
+	abilities := []int{}
+	for {
+		record, err := abilities_csv.Read()
+		if err == io.EOF {
+			break
+		}
+
+		if parseInt(record[2]) > HighestGen {
+			continue
+		}
+
+		abilities = append(abilities, parseInt(record[0]))
+	}
+	ability_names_csv := getCsvReader("data/ability_names.csv")
+	ability_names := map[int]string{}
+	for {
+		record, err := ability_names_csv.Read()
+		if err == io.EOF {
+			break
+		}
+
+		if parseInt(record[1]) != EnglishLanguageID {
+			continue
+		}
+
+		ability_names[parseInt(record[0])] = record[2]
+	}
+	sort.Slice(abilities, func(i, j int) bool {
+		return ability_names[abilities[i]] < ability_names[abilities[j]]
+	})
+	// generate Nature Constants
+	log.Println("Generating Ability constants")
+	output += "const (\n"
+	for i, n := range abilities {
+		if i == 0 {
+			output += fmt.Sprintf("Ability%s Ability = iota + 1\n", cleanName(ability_names[n]))
+		} else {
+			output += fmt.Sprintf("Ability%s\n", cleanName(ability_names[n]))
+		}
+	}
+	output += ")\n\n"
+	// generate Nature String()
+	log.Println("Generating Ability String()")
+	output += "// Get the string name of this Ability.\n" +
+		"func (n Ability) String() string {\n" +
+		"switch n {\n"
+	for _, n := range abilities {
+		output += fmt.Sprintf("case Ability%s:\n", cleanName(ability_names[n]))
+		output += fmt.Sprintf("return \"%s\"\n", ability_names[n])
+	}
+	output += "}\n" +
+		"panic(\"Unknown ability\")" +
+		"}\n\n"
+
 	createCodeOutput(output)
 
 	// run gofmt on generated code
