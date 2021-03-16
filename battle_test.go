@@ -173,8 +173,8 @@ var _ = Describe("One round of battle", func() {
 			battle.SimulateRound()
 			Expect(squirtle.CurrentHP).To(BeEquivalentTo(6))
 			squirtle.CurrentHP = 100
-			adaptability := Ability{ID: 91}
-			charmander.Ability = &adaptability
+			adaptability := Ability(91)
+			charmander.Ability = adaptability
 			battle.SimulateRound()
 			Expect(squirtle.CurrentHP).To(BeEquivalentTo(93))
 		})
