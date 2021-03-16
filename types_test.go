@@ -2,6 +2,7 @@ package pokemonbattlelib
 
 import (
 	"fmt"
+	"math"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -274,5 +275,26 @@ var _ = Describe("Natures", func() {
 			Expect(func() { _ = Nature(255).String() }).To(Panic())
 			Expect(func() { _, _ = Nature(255).GetStatModifiers() }).To(Panic())
 		})
+	})
+})
+
+var _ = Describe("Abilities", func() {
+	var entries []TableEntry
+	for i := AbilityAdaptability; i <= AbilityWonderGuard; i++ {
+		entries = append(entries, Entry(fmt.Sprintf("Ability #%d", i), i))
+	}
+
+	DescribeTable("Stringer doesn't output \"Ability\"",
+		func(a Ability) {
+			got := fmt.Sprintf("%s", a)
+			// Testing the exact results doesn't really make sense, since the function is auto-generated.
+			// So I'm just to make sure the generated code doesn't produce unnecessary text.
+			Expect(got).ToNot(ContainSubstring("Ability"))
+		},
+		entries...,
+	)
+
+	It("should panic if given an invalid Ability", func() {
+		Expect(func() { _ = Ability(math.MaxUint16).String() }).To(Panic())
 	})
 })
