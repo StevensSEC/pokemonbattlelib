@@ -3,506 +3,886 @@
 
 package pokemonbattlelib
 
-// A map of national pokedex numbers to pokemon data.
-type pData struct {
-	Name string
-	Type Type
+const (
+	AbilityAdaptability Ability = iota + 1
+	AbilityAftermath
+	AbilityAirLock
+	AbilityAngerPoint
+	AbilityAnticipation
+	AbilityArenaTrap
+	AbilityBadDreams
+	AbilityBattleArmor
+	AbilityBlaze
+	AbilityChlorophyll
+	AbilityClearBody
+	AbilityCloudNine
+	AbilityColorChange
+	AbilityCompoundEyes
+	AbilityCuteCharm
+	AbilityDamp
+	AbilityDownload
+	AbilityDrizzle
+	AbilityDrought
+	AbilityDrySkin
+	AbilityEarlyBird
+	AbilityEffectSpore
+	AbilityFilter
+	AbilityFlameBody
+	AbilityFlashFire
+	AbilityFlowerGift
+	AbilityForecast
+	AbilityForewarn
+	AbilityFrisk
+	AbilityGluttony
+	AbilityGuts
+	AbilityHeatproof
+	AbilityHoneyGather
+	AbilityHugePower
+	AbilityHustle
+	AbilityHydration
+	AbilityHyperCutter
+	AbilityIceBody
+	AbilityIlluminate
+	AbilityImmunity
+	AbilityInnerFocus
+	AbilityInsomnia
+	AbilityIntimidate
+	AbilityIronFist
+	AbilityKeenEye
+	AbilityKlutz
+	AbilityLeafGuard
+	AbilityLevitate
+	AbilityLightningRod
+	AbilityLimber
+	AbilityLiquidOoze
+	AbilityMagicGuard
+	AbilityMagmaArmor
+	AbilityMagnetPull
+	AbilityMarvelScale
+	AbilityMinus
+	AbilityMoldBreaker
+	AbilityMotorDrive
+	AbilityMultitype
+	AbilityNaturalCure
+	AbilityNoGuard
+	AbilityNormalize
+	AbilityOblivious
+	AbilityOvergrow
+	AbilityOwnTempo
+	AbilityPickup
+	AbilityPlus
+	AbilityPoisonHeal
+	AbilityPoisonPoint
+	AbilityPressure
+	AbilityPurePower
+	AbilityQuickFeet
+	AbilityRainDish
+	AbilityReckless
+	AbilityRivalry
+	AbilityRockHead
+	AbilityRoughSkin
+	AbilityRunAway
+	AbilitySandStream
+	AbilitySandVeil
+	AbilityScrappy
+	AbilitySereneGrace
+	AbilityShadowTag
+	AbilityShedSkin
+	AbilityShellArmor
+	AbilityShieldDust
+	AbilitySimple
+	AbilitySkillLink
+	AbilitySlowStart
+	AbilitySniper
+	AbilitySnowCloak
+	AbilitySnowWarning
+	AbilitySolarPower
+	AbilitySolidRock
+	AbilitySoundproof
+	AbilitySpeedBoost
+	AbilityStall
+	AbilityStatic
+	AbilitySteadfast
+	AbilityStench
+	AbilityStickyHold
+	AbilityStormDrain
+	AbilitySturdy
+	AbilitySuctionCups
+	AbilitySuperLuck
+	AbilitySwarm
+	AbilitySwiftSwim
+	AbilitySynchronize
+	AbilityTangledFeet
+	AbilityTechnician
+	AbilityThickFat
+	AbilityTintedLens
+	AbilityTorrent
+	AbilityTrace
+	AbilityTruant
+	AbilityUnaware
+	AbilityUnburden
+	AbilityVitalSpirit
+	AbilityVoltAbsorb
+	AbilityWaterAbsorb
+	AbilityWaterVeil
+	AbilityWhiteSmoke
+	AbilityWonderGuard
+)
+
+// Get the string name of this Ability.
+func (n Ability) String() string {
+	switch n {
+	case AbilityAdaptability:
+		return "Adaptability"
+	case AbilityAftermath:
+		return "Aftermath"
+	case AbilityAirLock:
+		return "Air Lock"
+	case AbilityAngerPoint:
+		return "Anger Point"
+	case AbilityAnticipation:
+		return "Anticipation"
+	case AbilityArenaTrap:
+		return "Arena Trap"
+	case AbilityBadDreams:
+		return "Bad Dreams"
+	case AbilityBattleArmor:
+		return "Battle Armor"
+	case AbilityBlaze:
+		return "Blaze"
+	case AbilityChlorophyll:
+		return "Chlorophyll"
+	case AbilityClearBody:
+		return "Clear Body"
+	case AbilityCloudNine:
+		return "Cloud Nine"
+	case AbilityColorChange:
+		return "Color Change"
+	case AbilityCompoundEyes:
+		return "Compound Eyes"
+	case AbilityCuteCharm:
+		return "Cute Charm"
+	case AbilityDamp:
+		return "Damp"
+	case AbilityDownload:
+		return "Download"
+	case AbilityDrizzle:
+		return "Drizzle"
+	case AbilityDrought:
+		return "Drought"
+	case AbilityDrySkin:
+		return "Dry Skin"
+	case AbilityEarlyBird:
+		return "Early Bird"
+	case AbilityEffectSpore:
+		return "Effect Spore"
+	case AbilityFilter:
+		return "Filter"
+	case AbilityFlameBody:
+		return "Flame Body"
+	case AbilityFlashFire:
+		return "Flash Fire"
+	case AbilityFlowerGift:
+		return "Flower Gift"
+	case AbilityForecast:
+		return "Forecast"
+	case AbilityForewarn:
+		return "Forewarn"
+	case AbilityFrisk:
+		return "Frisk"
+	case AbilityGluttony:
+		return "Gluttony"
+	case AbilityGuts:
+		return "Guts"
+	case AbilityHeatproof:
+		return "Heatproof"
+	case AbilityHoneyGather:
+		return "Honey Gather"
+	case AbilityHugePower:
+		return "Huge Power"
+	case AbilityHustle:
+		return "Hustle"
+	case AbilityHydration:
+		return "Hydration"
+	case AbilityHyperCutter:
+		return "Hyper Cutter"
+	case AbilityIceBody:
+		return "Ice Body"
+	case AbilityIlluminate:
+		return "Illuminate"
+	case AbilityImmunity:
+		return "Immunity"
+	case AbilityInnerFocus:
+		return "Inner Focus"
+	case AbilityInsomnia:
+		return "Insomnia"
+	case AbilityIntimidate:
+		return "Intimidate"
+	case AbilityIronFist:
+		return "Iron Fist"
+	case AbilityKeenEye:
+		return "Keen Eye"
+	case AbilityKlutz:
+		return "Klutz"
+	case AbilityLeafGuard:
+		return "Leaf Guard"
+	case AbilityLevitate:
+		return "Levitate"
+	case AbilityLightningRod:
+		return "Lightning Rod"
+	case AbilityLimber:
+		return "Limber"
+	case AbilityLiquidOoze:
+		return "Liquid Ooze"
+	case AbilityMagicGuard:
+		return "Magic Guard"
+	case AbilityMagmaArmor:
+		return "Magma Armor"
+	case AbilityMagnetPull:
+		return "Magnet Pull"
+	case AbilityMarvelScale:
+		return "Marvel Scale"
+	case AbilityMinus:
+		return "Minus"
+	case AbilityMoldBreaker:
+		return "Mold Breaker"
+	case AbilityMotorDrive:
+		return "Motor Drive"
+	case AbilityMultitype:
+		return "Multitype"
+	case AbilityNaturalCure:
+		return "Natural Cure"
+	case AbilityNoGuard:
+		return "No Guard"
+	case AbilityNormalize:
+		return "Normalize"
+	case AbilityOblivious:
+		return "Oblivious"
+	case AbilityOvergrow:
+		return "Overgrow"
+	case AbilityOwnTempo:
+		return "Own Tempo"
+	case AbilityPickup:
+		return "Pickup"
+	case AbilityPlus:
+		return "Plus"
+	case AbilityPoisonHeal:
+		return "Poison Heal"
+	case AbilityPoisonPoint:
+		return "Poison Point"
+	case AbilityPressure:
+		return "Pressure"
+	case AbilityPurePower:
+		return "Pure Power"
+	case AbilityQuickFeet:
+		return "Quick Feet"
+	case AbilityRainDish:
+		return "Rain Dish"
+	case AbilityReckless:
+		return "Reckless"
+	case AbilityRivalry:
+		return "Rivalry"
+	case AbilityRockHead:
+		return "Rock Head"
+	case AbilityRoughSkin:
+		return "Rough Skin"
+	case AbilityRunAway:
+		return "Run Away"
+	case AbilitySandStream:
+		return "Sand Stream"
+	case AbilitySandVeil:
+		return "Sand Veil"
+	case AbilityScrappy:
+		return "Scrappy"
+	case AbilitySereneGrace:
+		return "Serene Grace"
+	case AbilityShadowTag:
+		return "Shadow Tag"
+	case AbilityShedSkin:
+		return "Shed Skin"
+	case AbilityShellArmor:
+		return "Shell Armor"
+	case AbilityShieldDust:
+		return "Shield Dust"
+	case AbilitySimple:
+		return "Simple"
+	case AbilitySkillLink:
+		return "Skill Link"
+	case AbilitySlowStart:
+		return "Slow Start"
+	case AbilitySniper:
+		return "Sniper"
+	case AbilitySnowCloak:
+		return "Snow Cloak"
+	case AbilitySnowWarning:
+		return "Snow Warning"
+	case AbilitySolarPower:
+		return "Solar Power"
+	case AbilitySolidRock:
+		return "Solid Rock"
+	case AbilitySoundproof:
+		return "Soundproof"
+	case AbilitySpeedBoost:
+		return "Speed Boost"
+	case AbilityStall:
+		return "Stall"
+	case AbilityStatic:
+		return "Static"
+	case AbilitySteadfast:
+		return "Steadfast"
+	case AbilityStench:
+		return "Stench"
+	case AbilityStickyHold:
+		return "Sticky Hold"
+	case AbilityStormDrain:
+		return "Storm Drain"
+	case AbilitySturdy:
+		return "Sturdy"
+	case AbilitySuctionCups:
+		return "Suction Cups"
+	case AbilitySuperLuck:
+		return "Super Luck"
+	case AbilitySwarm:
+		return "Swarm"
+	case AbilitySwiftSwim:
+		return "Swift Swim"
+	case AbilitySynchronize:
+		return "Synchronize"
+	case AbilityTangledFeet:
+		return "Tangled Feet"
+	case AbilityTechnician:
+		return "Technician"
+	case AbilityThickFat:
+		return "Thick Fat"
+	case AbilityTintedLens:
+		return "Tinted Lens"
+	case AbilityTorrent:
+		return "Torrent"
+	case AbilityTrace:
+		return "Trace"
+	case AbilityTruant:
+		return "Truant"
+	case AbilityUnaware:
+		return "Unaware"
+	case AbilityUnburden:
+		return "Unburden"
+	case AbilityVitalSpirit:
+		return "Vital Spirit"
+	case AbilityVoltAbsorb:
+		return "Volt Absorb"
+	case AbilityWaterAbsorb:
+		return "Water Absorb"
+	case AbilityWaterVeil:
+		return "Water Veil"
+	case AbilityWhiteSmoke:
+		return "White Smoke"
+	case AbilityWonderGuard:
+		return "Wonder Guard"
+	}
+	panic("Unknown ability")
 }
 
+type pData struct {
+	Name    string
+	Type    Type
+	Ability Ability
+}
+
+// A map of national pokedex numbers to pokemon data.
 var pokemonData = map[uint16]pData{
-	1:   {Name: "Bulbasaur", Type: 2056},
-	2:   {Name: "Ivysaur", Type: 2056},
-	3:   {Name: "Venusaur", Type: 2056},
-	4:   {Name: "Charmander", Type: 512},
-	5:   {Name: "Charmeleon", Type: 512},
-	6:   {Name: "Charizard", Type: 516},
-	7:   {Name: "Squirtle", Type: 1024},
-	8:   {Name: "Wartortle", Type: 1024},
-	9:   {Name: "Blastoise", Type: 1024},
-	10:  {Name: "Caterpie", Type: 64},
-	11:  {Name: "Metapod", Type: 64},
-	12:  {Name: "Butterfree", Type: 68},
-	13:  {Name: "Weedle", Type: 72},
-	14:  {Name: "Kakuna", Type: 72},
-	15:  {Name: "Beedrill", Type: 72},
-	16:  {Name: "Pidgey", Type: 5},
-	17:  {Name: "Pidgeotto", Type: 5},
-	18:  {Name: "Pidgeot", Type: 5},
-	19:  {Name: "Rattata", Type: 1},
-	20:  {Name: "Raticate", Type: 1},
-	21:  {Name: "Spearow", Type: 5},
-	22:  {Name: "Fearow", Type: 5},
-	23:  {Name: "Ekans", Type: 8},
-	24:  {Name: "Arbok", Type: 8},
-	25:  {Name: "Pikachu", Type: 4096},
-	26:  {Name: "Raichu", Type: 4096},
-	27:  {Name: "Sandshrew", Type: 16},
-	28:  {Name: "Sandslash", Type: 16},
-	29:  {Name: "Nidoran♀", Type: 8},
-	30:  {Name: "Nidorina", Type: 8},
-	31:  {Name: "Nidoqueen", Type: 24},
-	32:  {Name: "Nidoran♂", Type: 8},
-	33:  {Name: "Nidorino", Type: 8},
-	34:  {Name: "Nidoking", Type: 24},
-	35:  {Name: "Clefairy", Type: 131072},
-	36:  {Name: "Clefable", Type: 131072},
-	37:  {Name: "Vulpix", Type: 512},
-	38:  {Name: "Ninetales", Type: 512},
-	39:  {Name: "Jigglypuff", Type: 131073},
-	40:  {Name: "Wigglytuff", Type: 131073},
-	41:  {Name: "Zubat", Type: 12},
-	42:  {Name: "Golbat", Type: 12},
-	43:  {Name: "Oddish", Type: 2056},
-	44:  {Name: "Gloom", Type: 2056},
-	45:  {Name: "Vileplume", Type: 2056},
-	46:  {Name: "Paras", Type: 2112},
-	47:  {Name: "Parasect", Type: 2112},
-	48:  {Name: "Venonat", Type: 72},
-	49:  {Name: "Venomoth", Type: 72},
-	50:  {Name: "Diglett", Type: 16},
-	51:  {Name: "Dugtrio", Type: 16},
-	52:  {Name: "Meowth", Type: 1},
-	53:  {Name: "Persian", Type: 1},
-	54:  {Name: "Psyduck", Type: 1024},
-	55:  {Name: "Golduck", Type: 1024},
-	56:  {Name: "Mankey", Type: 2},
-	57:  {Name: "Primeape", Type: 2},
-	58:  {Name: "Growlithe", Type: 512},
-	59:  {Name: "Arcanine", Type: 512},
-	60:  {Name: "Poliwag", Type: 1024},
-	61:  {Name: "Poliwhirl", Type: 1024},
-	62:  {Name: "Poliwrath", Type: 1026},
-	63:  {Name: "Abra", Type: 8192},
-	64:  {Name: "Kadabra", Type: 8192},
-	65:  {Name: "Alakazam", Type: 8192},
-	66:  {Name: "Machop", Type: 2},
-	67:  {Name: "Machoke", Type: 2},
-	68:  {Name: "Machamp", Type: 2},
-	69:  {Name: "Bellsprout", Type: 2056},
-	70:  {Name: "Weepinbell", Type: 2056},
-	71:  {Name: "Victreebel", Type: 2056},
-	72:  {Name: "Tentacool", Type: 1032},
-	73:  {Name: "Tentacruel", Type: 1032},
-	74:  {Name: "Geodude", Type: 48},
-	75:  {Name: "Graveler", Type: 48},
-	76:  {Name: "Golem", Type: 48},
-	77:  {Name: "Ponyta", Type: 512},
-	78:  {Name: "Rapidash", Type: 512},
-	79:  {Name: "Slowpoke", Type: 9216},
-	80:  {Name: "Slowbro", Type: 9216},
-	81:  {Name: "Magnemite", Type: 4352},
-	82:  {Name: "Magneton", Type: 4352},
-	83:  {Name: "Farfetch’d", Type: 5},
-	84:  {Name: "Doduo", Type: 5},
-	85:  {Name: "Dodrio", Type: 5},
-	86:  {Name: "Seel", Type: 1024},
-	87:  {Name: "Dewgong", Type: 17408},
-	88:  {Name: "Grimer", Type: 8},
-	89:  {Name: "Muk", Type: 8},
-	90:  {Name: "Shellder", Type: 1024},
-	91:  {Name: "Cloyster", Type: 17408},
-	92:  {Name: "Gastly", Type: 136},
-	93:  {Name: "Haunter", Type: 136},
-	94:  {Name: "Gengar", Type: 136},
-	95:  {Name: "Onix", Type: 48},
-	96:  {Name: "Drowzee", Type: 8192},
-	97:  {Name: "Hypno", Type: 8192},
-	98:  {Name: "Krabby", Type: 1024},
-	99:  {Name: "Kingler", Type: 1024},
-	100: {Name: "Voltorb", Type: 4096},
-	101: {Name: "Electrode", Type: 4096},
-	102: {Name: "Exeggcute", Type: 10240},
-	103: {Name: "Exeggutor", Type: 10240},
-	104: {Name: "Cubone", Type: 16},
-	105: {Name: "Marowak", Type: 16},
-	106: {Name: "Hitmonlee", Type: 2},
-	107: {Name: "Hitmonchan", Type: 2},
-	108: {Name: "Lickitung", Type: 1},
-	109: {Name: "Koffing", Type: 8},
-	110: {Name: "Weezing", Type: 8},
-	111: {Name: "Rhyhorn", Type: 48},
-	112: {Name: "Rhydon", Type: 48},
-	113: {Name: "Chansey", Type: 1},
-	114: {Name: "Tangela", Type: 2048},
-	115: {Name: "Kangaskhan", Type: 1},
-	116: {Name: "Horsea", Type: 1024},
-	117: {Name: "Seadra", Type: 1024},
-	118: {Name: "Goldeen", Type: 1024},
-	119: {Name: "Seaking", Type: 1024},
-	120: {Name: "Staryu", Type: 1024},
-	121: {Name: "Starmie", Type: 9216},
-	122: {Name: "Mr. Mime", Type: 139264},
-	123: {Name: "Scyther", Type: 68},
-	124: {Name: "Jynx", Type: 24576},
-	125: {Name: "Electabuzz", Type: 4096},
-	126: {Name: "Magmar", Type: 512},
-	127: {Name: "Pinsir", Type: 64},
-	128: {Name: "Tauros", Type: 1},
-	129: {Name: "Magikarp", Type: 1024},
-	130: {Name: "Gyarados", Type: 1028},
-	131: {Name: "Lapras", Type: 17408},
-	132: {Name: "Ditto", Type: 1},
-	133: {Name: "Eevee", Type: 1},
-	134: {Name: "Vaporeon", Type: 1024},
-	135: {Name: "Jolteon", Type: 4096},
-	136: {Name: "Flareon", Type: 512},
-	137: {Name: "Porygon", Type: 1},
-	138: {Name: "Omanyte", Type: 1056},
-	139: {Name: "Omastar", Type: 1056},
-	140: {Name: "Kabuto", Type: 1056},
-	141: {Name: "Kabutops", Type: 1056},
-	142: {Name: "Aerodactyl", Type: 36},
-	143: {Name: "Snorlax", Type: 1},
-	144: {Name: "Articuno", Type: 16388},
-	145: {Name: "Zapdos", Type: 4100},
-	146: {Name: "Moltres", Type: 516},
-	147: {Name: "Dratini", Type: 32768},
-	148: {Name: "Dragonair", Type: 32768},
-	149: {Name: "Dragonite", Type: 32772},
-	150: {Name: "Mewtwo", Type: 8192},
-	151: {Name: "Mew", Type: 8192},
-	152: {Name: "Chikorita", Type: 2048},
-	153: {Name: "Bayleef", Type: 2048},
-	154: {Name: "Meganium", Type: 2048},
-	155: {Name: "Cyndaquil", Type: 512},
-	156: {Name: "Quilava", Type: 512},
-	157: {Name: "Typhlosion", Type: 512},
-	158: {Name: "Totodile", Type: 1024},
-	159: {Name: "Croconaw", Type: 1024},
-	160: {Name: "Feraligatr", Type: 1024},
-	161: {Name: "Sentret", Type: 1},
-	162: {Name: "Furret", Type: 1},
-	163: {Name: "Hoothoot", Type: 5},
-	164: {Name: "Noctowl", Type: 5},
-	165: {Name: "Ledyba", Type: 68},
-	166: {Name: "Ledian", Type: 68},
-	167: {Name: "Spinarak", Type: 72},
-	168: {Name: "Ariados", Type: 72},
-	169: {Name: "Crobat", Type: 12},
-	170: {Name: "Chinchou", Type: 5120},
-	171: {Name: "Lanturn", Type: 5120},
-	172: {Name: "Pichu", Type: 4096},
-	173: {Name: "Cleffa", Type: 131072},
-	174: {Name: "Igglybuff", Type: 131073},
-	175: {Name: "Togepi", Type: 131072},
-	176: {Name: "Togetic", Type: 131076},
-	177: {Name: "Natu", Type: 8196},
-	178: {Name: "Xatu", Type: 8196},
-	179: {Name: "Mareep", Type: 4096},
-	180: {Name: "Flaaffy", Type: 4096},
-	181: {Name: "Ampharos", Type: 4096},
-	182: {Name: "Bellossom", Type: 2048},
-	183: {Name: "Marill", Type: 132096},
-	184: {Name: "Azumarill", Type: 132096},
-	185: {Name: "Sudowoodo", Type: 32},
-	186: {Name: "Politoed", Type: 1024},
-	187: {Name: "Hoppip", Type: 2052},
-	188: {Name: "Skiploom", Type: 2052},
-	189: {Name: "Jumpluff", Type: 2052},
-	190: {Name: "Aipom", Type: 1},
-	191: {Name: "Sunkern", Type: 2048},
-	192: {Name: "Sunflora", Type: 2048},
-	193: {Name: "Yanma", Type: 68},
-	194: {Name: "Wooper", Type: 1040},
-	195: {Name: "Quagsire", Type: 1040},
-	196: {Name: "Espeon", Type: 8192},
-	197: {Name: "Umbreon", Type: 65536},
-	198: {Name: "Murkrow", Type: 65540},
-	199: {Name: "Slowking", Type: 9216},
-	200: {Name: "Misdreavus", Type: 128},
-	201: {Name: "Unown", Type: 8192},
-	202: {Name: "Wobbuffet", Type: 8192},
-	203: {Name: "Girafarig", Type: 8193},
-	204: {Name: "Pineco", Type: 64},
-	205: {Name: "Forretress", Type: 320},
-	206: {Name: "Dunsparce", Type: 1},
-	207: {Name: "Gligar", Type: 20},
-	208: {Name: "Steelix", Type: 272},
-	209: {Name: "Snubbull", Type: 131072},
-	210: {Name: "Granbull", Type: 131072},
-	211: {Name: "Qwilfish", Type: 1032},
-	212: {Name: "Scizor", Type: 320},
-	213: {Name: "Shuckle", Type: 96},
-	214: {Name: "Heracross", Type: 66},
-	215: {Name: "Sneasel", Type: 81920},
-	216: {Name: "Teddiursa", Type: 1},
-	217: {Name: "Ursaring", Type: 1},
-	218: {Name: "Slugma", Type: 512},
-	219: {Name: "Magcargo", Type: 544},
-	220: {Name: "Swinub", Type: 16400},
-	221: {Name: "Piloswine", Type: 16400},
-	222: {Name: "Corsola", Type: 1056},
-	223: {Name: "Remoraid", Type: 1024},
-	224: {Name: "Octillery", Type: 1024},
-	225: {Name: "Delibird", Type: 16388},
-	226: {Name: "Mantine", Type: 1028},
-	227: {Name: "Skarmory", Type: 260},
-	228: {Name: "Houndour", Type: 66048},
-	229: {Name: "Houndoom", Type: 66048},
-	230: {Name: "Kingdra", Type: 33792},
-	231: {Name: "Phanpy", Type: 16},
-	232: {Name: "Donphan", Type: 16},
-	233: {Name: "Porygon2", Type: 1},
-	234: {Name: "Stantler", Type: 1},
-	235: {Name: "Smeargle", Type: 1},
-	236: {Name: "Tyrogue", Type: 2},
-	237: {Name: "Hitmontop", Type: 2},
-	238: {Name: "Smoochum", Type: 24576},
-	239: {Name: "Elekid", Type: 4096},
-	240: {Name: "Magby", Type: 512},
-	241: {Name: "Miltank", Type: 1},
-	242: {Name: "Blissey", Type: 1},
-	243: {Name: "Raikou", Type: 4096},
-	244: {Name: "Entei", Type: 512},
-	245: {Name: "Suicune", Type: 1024},
-	246: {Name: "Larvitar", Type: 48},
-	247: {Name: "Pupitar", Type: 48},
-	248: {Name: "Tyranitar", Type: 65568},
-	249: {Name: "Lugia", Type: 8196},
-	250: {Name: "Ho-Oh", Type: 516},
-	251: {Name: "Celebi", Type: 10240},
-	252: {Name: "Treecko", Type: 2048},
-	253: {Name: "Grovyle", Type: 2048},
-	254: {Name: "Sceptile", Type: 2048},
-	255: {Name: "Torchic", Type: 512},
-	256: {Name: "Combusken", Type: 514},
-	257: {Name: "Blaziken", Type: 514},
-	258: {Name: "Mudkip", Type: 1024},
-	259: {Name: "Marshtomp", Type: 1040},
-	260: {Name: "Swampert", Type: 1040},
-	261: {Name: "Poochyena", Type: 65536},
-	262: {Name: "Mightyena", Type: 65536},
-	263: {Name: "Zigzagoon", Type: 1},
-	264: {Name: "Linoone", Type: 1},
-	265: {Name: "Wurmple", Type: 64},
-	266: {Name: "Silcoon", Type: 64},
-	267: {Name: "Beautifly", Type: 68},
-	268: {Name: "Cascoon", Type: 64},
-	269: {Name: "Dustox", Type: 72},
-	270: {Name: "Lotad", Type: 3072},
-	271: {Name: "Lombre", Type: 3072},
-	272: {Name: "Ludicolo", Type: 3072},
-	273: {Name: "Seedot", Type: 2048},
-	274: {Name: "Nuzleaf", Type: 67584},
-	275: {Name: "Shiftry", Type: 67584},
-	276: {Name: "Taillow", Type: 5},
-	277: {Name: "Swellow", Type: 5},
-	278: {Name: "Wingull", Type: 1028},
-	279: {Name: "Pelipper", Type: 1028},
-	280: {Name: "Ralts", Type: 139264},
-	281: {Name: "Kirlia", Type: 139264},
-	282: {Name: "Gardevoir", Type: 139264},
-	283: {Name: "Surskit", Type: 1088},
-	284: {Name: "Masquerain", Type: 68},
-	285: {Name: "Shroomish", Type: 2048},
-	286: {Name: "Breloom", Type: 2050},
-	287: {Name: "Slakoth", Type: 1},
-	288: {Name: "Vigoroth", Type: 1},
-	289: {Name: "Slaking", Type: 1},
-	290: {Name: "Nincada", Type: 80},
-	291: {Name: "Ninjask", Type: 68},
-	292: {Name: "Shedinja", Type: 192},
-	293: {Name: "Whismur", Type: 1},
-	294: {Name: "Loudred", Type: 1},
-	295: {Name: "Exploud", Type: 1},
-	296: {Name: "Makuhita", Type: 2},
-	297: {Name: "Hariyama", Type: 2},
-	298: {Name: "Azurill", Type: 131073},
-	299: {Name: "Nosepass", Type: 32},
-	300: {Name: "Skitty", Type: 1},
-	301: {Name: "Delcatty", Type: 1},
-	302: {Name: "Sableye", Type: 65664},
-	303: {Name: "Mawile", Type: 131328},
-	304: {Name: "Aron", Type: 288},
-	305: {Name: "Lairon", Type: 288},
-	306: {Name: "Aggron", Type: 288},
-	307: {Name: "Meditite", Type: 8194},
-	308: {Name: "Medicham", Type: 8194},
-	309: {Name: "Electrike", Type: 4096},
-	310: {Name: "Manectric", Type: 4096},
-	311: {Name: "Plusle", Type: 4096},
-	312: {Name: "Minun", Type: 4096},
-	313: {Name: "Volbeat", Type: 64},
-	314: {Name: "Illumise", Type: 64},
-	315: {Name: "Roselia", Type: 2056},
-	316: {Name: "Gulpin", Type: 8},
-	317: {Name: "Swalot", Type: 8},
-	318: {Name: "Carvanha", Type: 66560},
-	319: {Name: "Sharpedo", Type: 66560},
-	320: {Name: "Wailmer", Type: 1024},
-	321: {Name: "Wailord", Type: 1024},
-	322: {Name: "Numel", Type: 528},
-	323: {Name: "Camerupt", Type: 528},
-	324: {Name: "Torkoal", Type: 512},
-	325: {Name: "Spoink", Type: 8192},
-	326: {Name: "Grumpig", Type: 8192},
-	327: {Name: "Spinda", Type: 1},
-	328: {Name: "Trapinch", Type: 16},
-	329: {Name: "Vibrava", Type: 32784},
-	330: {Name: "Flygon", Type: 32784},
-	331: {Name: "Cacnea", Type: 2048},
-	332: {Name: "Cacturne", Type: 67584},
-	333: {Name: "Swablu", Type: 5},
-	334: {Name: "Altaria", Type: 32772},
-	335: {Name: "Zangoose", Type: 1},
-	336: {Name: "Seviper", Type: 8},
-	337: {Name: "Lunatone", Type: 8224},
-	338: {Name: "Solrock", Type: 8224},
-	339: {Name: "Barboach", Type: 1040},
-	340: {Name: "Whiscash", Type: 1040},
-	341: {Name: "Corphish", Type: 1024},
-	342: {Name: "Crawdaunt", Type: 66560},
-	343: {Name: "Baltoy", Type: 8208},
-	344: {Name: "Claydol", Type: 8208},
-	345: {Name: "Lileep", Type: 2080},
-	346: {Name: "Cradily", Type: 2080},
-	347: {Name: "Anorith", Type: 96},
-	348: {Name: "Armaldo", Type: 96},
-	349: {Name: "Feebas", Type: 1024},
-	350: {Name: "Milotic", Type: 1024},
-	351: {Name: "Castform", Type: 1},
-	352: {Name: "Kecleon", Type: 1},
-	353: {Name: "Shuppet", Type: 128},
-	354: {Name: "Banette", Type: 128},
-	355: {Name: "Duskull", Type: 128},
-	356: {Name: "Dusclops", Type: 128},
-	357: {Name: "Tropius", Type: 2052},
-	358: {Name: "Chimecho", Type: 8192},
-	359: {Name: "Absol", Type: 65536},
-	360: {Name: "Wynaut", Type: 8192},
-	361: {Name: "Snorunt", Type: 16384},
-	362: {Name: "Glalie", Type: 16384},
-	363: {Name: "Spheal", Type: 17408},
-	364: {Name: "Sealeo", Type: 17408},
-	365: {Name: "Walrein", Type: 17408},
-	366: {Name: "Clamperl", Type: 1024},
-	367: {Name: "Huntail", Type: 1024},
-	368: {Name: "Gorebyss", Type: 1024},
-	369: {Name: "Relicanth", Type: 1056},
-	370: {Name: "Luvdisc", Type: 1024},
-	371: {Name: "Bagon", Type: 32768},
-	372: {Name: "Shelgon", Type: 32768},
-	373: {Name: "Salamence", Type: 32772},
-	374: {Name: "Beldum", Type: 8448},
-	375: {Name: "Metang", Type: 8448},
-	376: {Name: "Metagross", Type: 8448},
-	377: {Name: "Regirock", Type: 32},
-	378: {Name: "Regice", Type: 16384},
-	379: {Name: "Registeel", Type: 256},
-	380: {Name: "Latias", Type: 40960},
-	381: {Name: "Latios", Type: 40960},
-	382: {Name: "Kyogre", Type: 1024},
-	383: {Name: "Groudon", Type: 16},
-	384: {Name: "Rayquaza", Type: 32772},
-	385: {Name: "Jirachi", Type: 8448},
-	386: {Name: "Deoxys", Type: 8192},
-	387: {Name: "Turtwig", Type: 2048},
-	388: {Name: "Grotle", Type: 2048},
-	389: {Name: "Torterra", Type: 2064},
-	390: {Name: "Chimchar", Type: 512},
-	391: {Name: "Monferno", Type: 514},
-	392: {Name: "Infernape", Type: 514},
-	393: {Name: "Piplup", Type: 1024},
-	394: {Name: "Prinplup", Type: 1024},
-	395: {Name: "Empoleon", Type: 1280},
-	396: {Name: "Starly", Type: 5},
-	397: {Name: "Staravia", Type: 5},
-	398: {Name: "Staraptor", Type: 5},
-	399: {Name: "Bidoof", Type: 1},
-	400: {Name: "Bibarel", Type: 1025},
-	401: {Name: "Kricketot", Type: 64},
-	402: {Name: "Kricketune", Type: 64},
-	403: {Name: "Shinx", Type: 4096},
-	404: {Name: "Luxio", Type: 4096},
-	405: {Name: "Luxray", Type: 4096},
-	406: {Name: "Budew", Type: 2056},
-	407: {Name: "Roserade", Type: 2056},
-	408: {Name: "Cranidos", Type: 32},
-	409: {Name: "Rampardos", Type: 32},
-	410: {Name: "Shieldon", Type: 288},
-	411: {Name: "Bastiodon", Type: 288},
-	412: {Name: "Burmy", Type: 64},
-	413: {Name: "Wormadam", Type: 2112},
-	414: {Name: "Mothim", Type: 68},
-	415: {Name: "Combee", Type: 68},
-	416: {Name: "Vespiquen", Type: 68},
-	417: {Name: "Pachirisu", Type: 4096},
-	418: {Name: "Buizel", Type: 1024},
-	419: {Name: "Floatzel", Type: 1024},
-	420: {Name: "Cherubi", Type: 2048},
-	421: {Name: "Cherrim", Type: 2048},
-	422: {Name: "Shellos", Type: 1024},
-	423: {Name: "Gastrodon", Type: 1040},
-	424: {Name: "Ambipom", Type: 1},
-	425: {Name: "Drifloon", Type: 132},
-	426: {Name: "Drifblim", Type: 132},
-	427: {Name: "Buneary", Type: 1},
-	428: {Name: "Lopunny", Type: 1},
-	429: {Name: "Mismagius", Type: 128},
-	430: {Name: "Honchkrow", Type: 65540},
-	431: {Name: "Glameow", Type: 1},
-	432: {Name: "Purugly", Type: 1},
-	433: {Name: "Chingling", Type: 8192},
-	434: {Name: "Stunky", Type: 65544},
-	435: {Name: "Skuntank", Type: 65544},
-	436: {Name: "Bronzor", Type: 8448},
-	437: {Name: "Bronzong", Type: 8448},
-	438: {Name: "Bonsly", Type: 32},
-	439: {Name: "Mime Jr.", Type: 139264},
-	440: {Name: "Happiny", Type: 1},
-	441: {Name: "Chatot", Type: 5},
-	442: {Name: "Spiritomb", Type: 65664},
-	443: {Name: "Gible", Type: 32784},
-	444: {Name: "Gabite", Type: 32784},
-	445: {Name: "Garchomp", Type: 32784},
-	446: {Name: "Munchlax", Type: 1},
-	447: {Name: "Riolu", Type: 2},
-	448: {Name: "Lucario", Type: 258},
-	449: {Name: "Hippopotas", Type: 16},
-	450: {Name: "Hippowdon", Type: 16},
-	451: {Name: "Skorupi", Type: 72},
-	452: {Name: "Drapion", Type: 65544},
-	453: {Name: "Croagunk", Type: 10},
-	454: {Name: "Toxicroak", Type: 10},
-	455: {Name: "Carnivine", Type: 2048},
-	456: {Name: "Finneon", Type: 1024},
-	457: {Name: "Lumineon", Type: 1024},
-	458: {Name: "Mantyke", Type: 1028},
-	459: {Name: "Snover", Type: 18432},
-	460: {Name: "Abomasnow", Type: 18432},
-	461: {Name: "Weavile", Type: 81920},
-	462: {Name: "Magnezone", Type: 4352},
-	463: {Name: "Lickilicky", Type: 1},
-	464: {Name: "Rhyperior", Type: 48},
-	465: {Name: "Tangrowth", Type: 2048},
-	466: {Name: "Electivire", Type: 4096},
-	467: {Name: "Magmortar", Type: 512},
-	468: {Name: "Togekiss", Type: 131076},
-	469: {Name: "Yanmega", Type: 68},
-	470: {Name: "Leafeon", Type: 2048},
-	471: {Name: "Glaceon", Type: 16384},
-	472: {Name: "Gliscor", Type: 20},
-	473: {Name: "Mamoswine", Type: 16400},
-	474: {Name: "Porygon-Z", Type: 1},
-	475: {Name: "Gallade", Type: 8194},
-	476: {Name: "Probopass", Type: 288},
-	477: {Name: "Dusknoir", Type: 128},
-	478: {Name: "Froslass", Type: 16512},
-	479: {Name: "Rotom", Type: 4224},
-	480: {Name: "Uxie", Type: 8192},
-	481: {Name: "Mesprit", Type: 8192},
-	482: {Name: "Azelf", Type: 8192},
-	483: {Name: "Dialga", Type: 33024},
-	484: {Name: "Palkia", Type: 33792},
-	485: {Name: "Heatran", Type: 768},
-	486: {Name: "Regigigas", Type: 1},
-	487: {Name: "Giratina", Type: 32896},
-	488: {Name: "Cresselia", Type: 8192},
-	489: {Name: "Phione", Type: 1024},
-	490: {Name: "Manaphy", Type: 1024},
-	491: {Name: "Darkrai", Type: 65536},
-	492: {Name: "Shaymin", Type: 2048},
-	493: {Name: "Arceus", Type: 1},
+	1:   {Name: "Bulbasaur", Type: 2056, Ability: AbilityOvergrow},
+	2:   {Name: "Ivysaur", Type: 2056, Ability: AbilityOvergrow},
+	3:   {Name: "Venusaur", Type: 2056, Ability: AbilityOvergrow},
+	4:   {Name: "Charmander", Type: 512, Ability: AbilityBlaze},
+	5:   {Name: "Charmeleon", Type: 512, Ability: AbilityBlaze},
+	6:   {Name: "Charizard", Type: 516, Ability: AbilityBlaze},
+	7:   {Name: "Squirtle", Type: 1024, Ability: AbilityTorrent},
+	8:   {Name: "Wartortle", Type: 1024, Ability: AbilityTorrent},
+	9:   {Name: "Blastoise", Type: 1024, Ability: AbilityTorrent},
+	10:  {Name: "Caterpie", Type: 64, Ability: AbilityShieldDust},
+	11:  {Name: "Metapod", Type: 64, Ability: AbilityShedSkin},
+	12:  {Name: "Butterfree", Type: 68, Ability: AbilityCompoundEyes},
+	13:  {Name: "Weedle", Type: 72, Ability: AbilityShieldDust},
+	14:  {Name: "Kakuna", Type: 72, Ability: AbilityShedSkin},
+	15:  {Name: "Beedrill", Type: 72, Ability: AbilitySwarm},
+	16:  {Name: "Pidgey", Type: 5, Ability: AbilityTangledFeet},
+	17:  {Name: "Pidgeotto", Type: 5, Ability: AbilityTangledFeet},
+	18:  {Name: "Pidgeot", Type: 5, Ability: AbilityTangledFeet},
+	19:  {Name: "Rattata", Type: 1, Ability: AbilityGuts},
+	20:  {Name: "Raticate", Type: 1, Ability: AbilityGuts},
+	21:  {Name: "Spearow", Type: 5, Ability: AbilityKeenEye},
+	22:  {Name: "Fearow", Type: 5, Ability: AbilityKeenEye},
+	23:  {Name: "Ekans", Type: 8, Ability: AbilityShedSkin},
+	24:  {Name: "Arbok", Type: 8, Ability: AbilityShedSkin},
+	25:  {Name: "Pikachu", Type: 4096, Ability: AbilityStatic},
+	26:  {Name: "Raichu", Type: 4096, Ability: AbilityStatic},
+	27:  {Name: "Sandshrew", Type: 16, Ability: AbilitySandVeil},
+	28:  {Name: "Sandslash", Type: 16, Ability: AbilitySandVeil},
+	29:  {Name: "Nidoran♀", Type: 8, Ability: AbilityRivalry},
+	30:  {Name: "Nidorina", Type: 8, Ability: AbilityRivalry},
+	31:  {Name: "Nidoqueen", Type: 24, Ability: AbilityRivalry},
+	32:  {Name: "Nidoran♂", Type: 8, Ability: AbilityRivalry},
+	33:  {Name: "Nidorino", Type: 8, Ability: AbilityRivalry},
+	34:  {Name: "Nidoking", Type: 24, Ability: AbilityRivalry},
+	35:  {Name: "Clefairy", Type: 131072, Ability: AbilityMagicGuard},
+	36:  {Name: "Clefable", Type: 131072, Ability: AbilityMagicGuard},
+	37:  {Name: "Vulpix", Type: 512, Ability: AbilityFlashFire},
+	38:  {Name: "Ninetales", Type: 512, Ability: AbilityFlashFire},
+	39:  {Name: "Jigglypuff", Type: 131073, Ability: AbilityCuteCharm},
+	40:  {Name: "Wigglytuff", Type: 131073, Ability: AbilityCuteCharm},
+	41:  {Name: "Zubat", Type: 12, Ability: AbilityInnerFocus},
+	42:  {Name: "Golbat", Type: 12, Ability: AbilityInnerFocus},
+	43:  {Name: "Oddish", Type: 2056, Ability: AbilityChlorophyll},
+	44:  {Name: "Gloom", Type: 2056, Ability: AbilityChlorophyll},
+	45:  {Name: "Vileplume", Type: 2056, Ability: AbilityChlorophyll},
+	46:  {Name: "Paras", Type: 2112, Ability: AbilityDrySkin},
+	47:  {Name: "Parasect", Type: 2112, Ability: AbilityDrySkin},
+	48:  {Name: "Venonat", Type: 72, Ability: AbilityTintedLens},
+	49:  {Name: "Venomoth", Type: 72, Ability: AbilityTintedLens},
+	50:  {Name: "Diglett", Type: 16, Ability: AbilityArenaTrap},
+	51:  {Name: "Dugtrio", Type: 16, Ability: AbilityArenaTrap},
+	52:  {Name: "Meowth", Type: 1, Ability: AbilityTechnician},
+	53:  {Name: "Persian", Type: 1, Ability: AbilityTechnician},
+	54:  {Name: "Psyduck", Type: 1024, Ability: AbilityCloudNine},
+	55:  {Name: "Golduck", Type: 1024, Ability: AbilityCloudNine},
+	56:  {Name: "Mankey", Type: 2, Ability: AbilityAngerPoint},
+	57:  {Name: "Primeape", Type: 2, Ability: AbilityAngerPoint},
+	58:  {Name: "Growlithe", Type: 512, Ability: AbilityFlashFire},
+	59:  {Name: "Arcanine", Type: 512, Ability: AbilityFlashFire},
+	60:  {Name: "Poliwag", Type: 1024, Ability: AbilityDamp},
+	61:  {Name: "Poliwhirl", Type: 1024, Ability: AbilityDamp},
+	62:  {Name: "Poliwrath", Type: 1026, Ability: AbilityDamp},
+	63:  {Name: "Abra", Type: 8192, Ability: AbilityInnerFocus},
+	64:  {Name: "Kadabra", Type: 8192, Ability: AbilityInnerFocus},
+	65:  {Name: "Alakazam", Type: 8192, Ability: AbilityInnerFocus},
+	66:  {Name: "Machop", Type: 2, Ability: AbilityNoGuard},
+	67:  {Name: "Machoke", Type: 2, Ability: AbilityNoGuard},
+	68:  {Name: "Machamp", Type: 2, Ability: AbilityNoGuard},
+	69:  {Name: "Bellsprout", Type: 2056, Ability: AbilityChlorophyll},
+	70:  {Name: "Weepinbell", Type: 2056, Ability: AbilityChlorophyll},
+	71:  {Name: "Victreebel", Type: 2056, Ability: AbilityChlorophyll},
+	72:  {Name: "Tentacool", Type: 1032, Ability: AbilityLiquidOoze},
+	73:  {Name: "Tentacruel", Type: 1032, Ability: AbilityLiquidOoze},
+	74:  {Name: "Geodude", Type: 48, Ability: AbilitySturdy},
+	75:  {Name: "Graveler", Type: 48, Ability: AbilitySturdy},
+	76:  {Name: "Golem", Type: 48, Ability: AbilitySturdy},
+	77:  {Name: "Ponyta", Type: 512, Ability: AbilityFlashFire},
+	78:  {Name: "Rapidash", Type: 512, Ability: AbilityFlashFire},
+	79:  {Name: "Slowpoke", Type: 9216, Ability: AbilityOwnTempo},
+	80:  {Name: "Slowbro", Type: 9216, Ability: AbilityOwnTempo},
+	81:  {Name: "Magnemite", Type: 4352, Ability: AbilitySturdy},
+	82:  {Name: "Magneton", Type: 4352, Ability: AbilitySturdy},
+	83:  {Name: "Farfetch’d", Type: 5, Ability: AbilityInnerFocus},
+	84:  {Name: "Doduo", Type: 5, Ability: AbilityEarlyBird},
+	85:  {Name: "Dodrio", Type: 5, Ability: AbilityEarlyBird},
+	86:  {Name: "Seel", Type: 1024, Ability: AbilityHydration},
+	87:  {Name: "Dewgong", Type: 17408, Ability: AbilityHydration},
+	88:  {Name: "Grimer", Type: 8, Ability: AbilityStickyHold},
+	89:  {Name: "Muk", Type: 8, Ability: AbilityStickyHold},
+	90:  {Name: "Shellder", Type: 1024, Ability: AbilitySkillLink},
+	91:  {Name: "Cloyster", Type: 17408, Ability: AbilitySkillLink},
+	92:  {Name: "Gastly", Type: 136, Ability: AbilityLevitate},
+	93:  {Name: "Haunter", Type: 136, Ability: AbilityLevitate},
+	94:  {Name: "Gengar", Type: 136, Ability: AbilityLevitate},
+	95:  {Name: "Onix", Type: 48, Ability: AbilitySturdy},
+	96:  {Name: "Drowzee", Type: 8192, Ability: AbilityForewarn},
+	97:  {Name: "Hypno", Type: 8192, Ability: AbilityForewarn},
+	98:  {Name: "Krabby", Type: 1024, Ability: AbilityShellArmor},
+	99:  {Name: "Kingler", Type: 1024, Ability: AbilityShellArmor},
+	100: {Name: "Voltorb", Type: 4096, Ability: AbilityStatic},
+	101: {Name: "Electrode", Type: 4096, Ability: AbilityStatic},
+	102: {Name: "Exeggcute", Type: 10240, Ability: AbilityChlorophyll},
+	103: {Name: "Exeggutor", Type: 10240, Ability: AbilityChlorophyll},
+	104: {Name: "Cubone", Type: 16, Ability: AbilityLightningRod},
+	105: {Name: "Marowak", Type: 16, Ability: AbilityLightningRod},
+	106: {Name: "Hitmonlee", Type: 2, Ability: AbilityReckless},
+	107: {Name: "Hitmonchan", Type: 2, Ability: AbilityIronFist},
+	108: {Name: "Lickitung", Type: 1, Ability: AbilityOblivious},
+	109: {Name: "Koffing", Type: 8, Ability: AbilityLevitate},
+	110: {Name: "Weezing", Type: 8, Ability: AbilityLevitate},
+	111: {Name: "Rhyhorn", Type: 48, Ability: AbilityRockHead},
+	112: {Name: "Rhydon", Type: 48, Ability: AbilityRockHead},
+	113: {Name: "Chansey", Type: 1, Ability: AbilitySereneGrace},
+	114: {Name: "Tangela", Type: 2048, Ability: AbilityLeafGuard},
+	115: {Name: "Kangaskhan", Type: 1, Ability: AbilityScrappy},
+	116: {Name: "Horsea", Type: 1024, Ability: AbilitySniper},
+	117: {Name: "Seadra", Type: 1024, Ability: AbilitySniper},
+	118: {Name: "Goldeen", Type: 1024, Ability: AbilityWaterVeil},
+	119: {Name: "Seaking", Type: 1024, Ability: AbilityWaterVeil},
+	120: {Name: "Staryu", Type: 1024, Ability: AbilityNaturalCure},
+	121: {Name: "Starmie", Type: 9216, Ability: AbilityNaturalCure},
+	122: {Name: "Mr. Mime", Type: 139264, Ability: AbilityFilter},
+	123: {Name: "Scyther", Type: 68, Ability: AbilityTechnician},
+	124: {Name: "Jynx", Type: 24576, Ability: AbilityForewarn},
+	125: {Name: "Electabuzz", Type: 4096, Ability: AbilityStatic},
+	126: {Name: "Magmar", Type: 512, Ability: AbilityFlameBody},
+	127: {Name: "Pinsir", Type: 64, Ability: AbilityMoldBreaker},
+	128: {Name: "Tauros", Type: 1, Ability: AbilityAngerPoint},
+	129: {Name: "Magikarp", Type: 1024, Ability: AbilitySwiftSwim},
+	130: {Name: "Gyarados", Type: 1028, Ability: AbilityIntimidate},
+	131: {Name: "Lapras", Type: 17408, Ability: AbilityShellArmor},
+	132: {Name: "Ditto", Type: 1, Ability: AbilityLimber},
+	133: {Name: "Eevee", Type: 1, Ability: AbilityAdaptability},
+	134: {Name: "Vaporeon", Type: 1024, Ability: AbilityWaterAbsorb},
+	135: {Name: "Jolteon", Type: 4096, Ability: AbilityVoltAbsorb},
+	136: {Name: "Flareon", Type: 512, Ability: AbilityFlashFire},
+	137: {Name: "Porygon", Type: 1, Ability: AbilityDownload},
+	138: {Name: "Omanyte", Type: 1056, Ability: AbilityShellArmor},
+	139: {Name: "Omastar", Type: 1056, Ability: AbilityShellArmor},
+	140: {Name: "Kabuto", Type: 1056, Ability: AbilityBattleArmor},
+	141: {Name: "Kabutops", Type: 1056, Ability: AbilityBattleArmor},
+	142: {Name: "Aerodactyl", Type: 36, Ability: AbilityPressure},
+	143: {Name: "Snorlax", Type: 1, Ability: AbilityThickFat},
+	144: {Name: "Articuno", Type: 16388, Ability: AbilityPressure},
+	145: {Name: "Zapdos", Type: 4100, Ability: AbilityPressure},
+	146: {Name: "Moltres", Type: 516, Ability: AbilityPressure},
+	147: {Name: "Dratini", Type: 32768, Ability: AbilityShedSkin},
+	148: {Name: "Dragonair", Type: 32768, Ability: AbilityShedSkin},
+	149: {Name: "Dragonite", Type: 32772, Ability: AbilityInnerFocus},
+	150: {Name: "Mewtwo", Type: 8192, Ability: AbilityPressure},
+	151: {Name: "Mew", Type: 8192, Ability: AbilitySynchronize},
+	152: {Name: "Chikorita", Type: 2048, Ability: AbilityOvergrow},
+	153: {Name: "Bayleef", Type: 2048, Ability: AbilityOvergrow},
+	154: {Name: "Meganium", Type: 2048, Ability: AbilityOvergrow},
+	155: {Name: "Cyndaquil", Type: 512, Ability: AbilityBlaze},
+	156: {Name: "Quilava", Type: 512, Ability: AbilityBlaze},
+	157: {Name: "Typhlosion", Type: 512, Ability: AbilityBlaze},
+	158: {Name: "Totodile", Type: 1024, Ability: AbilityTorrent},
+	159: {Name: "Croconaw", Type: 1024, Ability: AbilityTorrent},
+	160: {Name: "Feraligatr", Type: 1024, Ability: AbilityTorrent},
+	161: {Name: "Sentret", Type: 1, Ability: AbilityKeenEye},
+	162: {Name: "Furret", Type: 1, Ability: AbilityKeenEye},
+	163: {Name: "Hoothoot", Type: 5, Ability: AbilityKeenEye},
+	164: {Name: "Noctowl", Type: 5, Ability: AbilityKeenEye},
+	165: {Name: "Ledyba", Type: 68, Ability: AbilityEarlyBird},
+	166: {Name: "Ledian", Type: 68, Ability: AbilityEarlyBird},
+	167: {Name: "Spinarak", Type: 72, Ability: AbilityInsomnia},
+	168: {Name: "Ariados", Type: 72, Ability: AbilityInsomnia},
+	169: {Name: "Crobat", Type: 12, Ability: AbilityInnerFocus},
+	170: {Name: "Chinchou", Type: 5120, Ability: AbilityIlluminate},
+	171: {Name: "Lanturn", Type: 5120, Ability: AbilityIlluminate},
+	172: {Name: "Pichu", Type: 4096, Ability: AbilityStatic},
+	173: {Name: "Cleffa", Type: 131072, Ability: AbilityMagicGuard},
+	174: {Name: "Igglybuff", Type: 131073, Ability: AbilityCuteCharm},
+	175: {Name: "Togepi", Type: 131072, Ability: AbilitySereneGrace},
+	176: {Name: "Togetic", Type: 131076, Ability: AbilitySereneGrace},
+	177: {Name: "Natu", Type: 8196, Ability: AbilityEarlyBird},
+	178: {Name: "Xatu", Type: 8196, Ability: AbilityEarlyBird},
+	179: {Name: "Mareep", Type: 4096, Ability: AbilityStatic},
+	180: {Name: "Flaaffy", Type: 4096, Ability: AbilityStatic},
+	181: {Name: "Ampharos", Type: 4096, Ability: AbilityStatic},
+	182: {Name: "Bellossom", Type: 2048, Ability: AbilityChlorophyll},
+	183: {Name: "Marill", Type: 132096, Ability: AbilityHugePower},
+	184: {Name: "Azumarill", Type: 132096, Ability: AbilityHugePower},
+	185: {Name: "Sudowoodo", Type: 32, Ability: AbilityRockHead},
+	186: {Name: "Politoed", Type: 1024, Ability: AbilityDamp},
+	187: {Name: "Hoppip", Type: 2052, Ability: AbilityLeafGuard},
+	188: {Name: "Skiploom", Type: 2052, Ability: AbilityLeafGuard},
+	189: {Name: "Jumpluff", Type: 2052, Ability: AbilityLeafGuard},
+	190: {Name: "Aipom", Type: 1, Ability: AbilityPickup},
+	191: {Name: "Sunkern", Type: 2048, Ability: AbilitySolarPower},
+	192: {Name: "Sunflora", Type: 2048, Ability: AbilitySolarPower},
+	193: {Name: "Yanma", Type: 68, Ability: AbilityCompoundEyes},
+	194: {Name: "Wooper", Type: 1040, Ability: AbilityWaterAbsorb},
+	195: {Name: "Quagsire", Type: 1040, Ability: AbilityWaterAbsorb},
+	196: {Name: "Espeon", Type: 8192, Ability: AbilitySynchronize},
+	197: {Name: "Umbreon", Type: 65536, Ability: AbilitySynchronize},
+	198: {Name: "Murkrow", Type: 65540, Ability: AbilitySuperLuck},
+	199: {Name: "Slowking", Type: 9216, Ability: AbilityOwnTempo},
+	200: {Name: "Misdreavus", Type: 128, Ability: AbilityLevitate},
+	201: {Name: "Unown", Type: 8192, Ability: AbilityLevitate},
+	202: {Name: "Wobbuffet", Type: 8192, Ability: AbilityShadowTag},
+	203: {Name: "Girafarig", Type: 8193, Ability: AbilityEarlyBird},
+	204: {Name: "Pineco", Type: 64, Ability: AbilitySturdy},
+	205: {Name: "Forretress", Type: 320, Ability: AbilitySturdy},
+	206: {Name: "Dunsparce", Type: 1, Ability: AbilityRunAway},
+	207: {Name: "Gligar", Type: 20, Ability: AbilitySandVeil},
+	208: {Name: "Steelix", Type: 272, Ability: AbilitySturdy},
+	209: {Name: "Snubbull", Type: 131072, Ability: AbilityRunAway},
+	210: {Name: "Granbull", Type: 131072, Ability: AbilityQuickFeet},
+	211: {Name: "Qwilfish", Type: 1032, Ability: AbilitySwiftSwim},
+	212: {Name: "Scizor", Type: 320, Ability: AbilityTechnician},
+	213: {Name: "Shuckle", Type: 96, Ability: AbilityGluttony},
+	214: {Name: "Heracross", Type: 66, Ability: AbilityGuts},
+	215: {Name: "Sneasel", Type: 81920, Ability: AbilityKeenEye},
+	216: {Name: "Teddiursa", Type: 1, Ability: AbilityQuickFeet},
+	217: {Name: "Ursaring", Type: 1, Ability: AbilityQuickFeet},
+	218: {Name: "Slugma", Type: 512, Ability: AbilityFlameBody},
+	219: {Name: "Magcargo", Type: 544, Ability: AbilityFlameBody},
+	220: {Name: "Swinub", Type: 16400, Ability: AbilitySnowCloak},
+	221: {Name: "Piloswine", Type: 16400, Ability: AbilitySnowCloak},
+	222: {Name: "Corsola", Type: 1056, Ability: AbilityNaturalCure},
+	223: {Name: "Remoraid", Type: 1024, Ability: AbilitySniper},
+	224: {Name: "Octillery", Type: 1024, Ability: AbilitySniper},
+	225: {Name: "Delibird", Type: 16388, Ability: AbilityHustle},
+	226: {Name: "Mantine", Type: 1028, Ability: AbilityWaterAbsorb},
+	227: {Name: "Skarmory", Type: 260, Ability: AbilitySturdy},
+	228: {Name: "Houndour", Type: 66048, Ability: AbilityFlashFire},
+	229: {Name: "Houndoom", Type: 66048, Ability: AbilityFlashFire},
+	230: {Name: "Kingdra", Type: 33792, Ability: AbilitySniper},
+	231: {Name: "Phanpy", Type: 16, Ability: AbilityPickup},
+	232: {Name: "Donphan", Type: 16, Ability: AbilitySturdy},
+	233: {Name: "Porygon2", Type: 1, Ability: AbilityDownload},
+	234: {Name: "Stantler", Type: 1, Ability: AbilityFrisk},
+	235: {Name: "Smeargle", Type: 1, Ability: AbilityTechnician},
+	236: {Name: "Tyrogue", Type: 2, Ability: AbilitySteadfast},
+	237: {Name: "Hitmontop", Type: 2, Ability: AbilityTechnician},
+	238: {Name: "Smoochum", Type: 24576, Ability: AbilityForewarn},
+	239: {Name: "Elekid", Type: 4096, Ability: AbilityStatic},
+	240: {Name: "Magby", Type: 512, Ability: AbilityFlameBody},
+	241: {Name: "Miltank", Type: 1, Ability: AbilityScrappy},
+	242: {Name: "Blissey", Type: 1, Ability: AbilitySereneGrace},
+	243: {Name: "Raikou", Type: 4096, Ability: AbilityPressure},
+	244: {Name: "Entei", Type: 512, Ability: AbilityPressure},
+	245: {Name: "Suicune", Type: 1024, Ability: AbilityPressure},
+	246: {Name: "Larvitar", Type: 48, Ability: AbilityGuts},
+	247: {Name: "Pupitar", Type: 48, Ability: AbilityShedSkin},
+	248: {Name: "Tyranitar", Type: 65568, Ability: AbilitySandStream},
+	249: {Name: "Lugia", Type: 8196, Ability: AbilityPressure},
+	250: {Name: "Ho-Oh", Type: 516, Ability: AbilityPressure},
+	251: {Name: "Celebi", Type: 10240, Ability: AbilityNaturalCure},
+	252: {Name: "Treecko", Type: 2048, Ability: AbilityOvergrow},
+	253: {Name: "Grovyle", Type: 2048, Ability: AbilityOvergrow},
+	254: {Name: "Sceptile", Type: 2048, Ability: AbilityOvergrow},
+	255: {Name: "Torchic", Type: 512, Ability: AbilityBlaze},
+	256: {Name: "Combusken", Type: 514, Ability: AbilityBlaze},
+	257: {Name: "Blaziken", Type: 514, Ability: AbilityBlaze},
+	258: {Name: "Mudkip", Type: 1024, Ability: AbilityTorrent},
+	259: {Name: "Marshtomp", Type: 1040, Ability: AbilityTorrent},
+	260: {Name: "Swampert", Type: 1040, Ability: AbilityTorrent},
+	261: {Name: "Poochyena", Type: 65536, Ability: AbilityQuickFeet},
+	262: {Name: "Mightyena", Type: 65536, Ability: AbilityQuickFeet},
+	263: {Name: "Zigzagoon", Type: 1, Ability: AbilityGluttony},
+	264: {Name: "Linoone", Type: 1, Ability: AbilityGluttony},
+	265: {Name: "Wurmple", Type: 64, Ability: AbilityShieldDust},
+	266: {Name: "Silcoon", Type: 64, Ability: AbilityShedSkin},
+	267: {Name: "Beautifly", Type: 68, Ability: AbilitySwarm},
+	268: {Name: "Cascoon", Type: 64, Ability: AbilityShedSkin},
+	269: {Name: "Dustox", Type: 72, Ability: AbilityShieldDust},
+	270: {Name: "Lotad", Type: 3072, Ability: AbilityRainDish},
+	271: {Name: "Lombre", Type: 3072, Ability: AbilityRainDish},
+	272: {Name: "Ludicolo", Type: 3072, Ability: AbilityRainDish},
+	273: {Name: "Seedot", Type: 2048, Ability: AbilityEarlyBird},
+	274: {Name: "Nuzleaf", Type: 67584, Ability: AbilityEarlyBird},
+	275: {Name: "Shiftry", Type: 67584, Ability: AbilityEarlyBird},
+	276: {Name: "Taillow", Type: 5, Ability: AbilityGuts},
+	277: {Name: "Swellow", Type: 5, Ability: AbilityGuts},
+	278: {Name: "Wingull", Type: 1028, Ability: AbilityHydration},
+	279: {Name: "Pelipper", Type: 1028, Ability: AbilityDrizzle},
+	280: {Name: "Ralts", Type: 139264, Ability: AbilityTrace},
+	281: {Name: "Kirlia", Type: 139264, Ability: AbilityTrace},
+	282: {Name: "Gardevoir", Type: 139264, Ability: AbilityTrace},
+	283: {Name: "Surskit", Type: 1088, Ability: AbilitySwiftSwim},
+	284: {Name: "Masquerain", Type: 68, Ability: AbilityIntimidate},
+	285: {Name: "Shroomish", Type: 2048, Ability: AbilityPoisonHeal},
+	286: {Name: "Breloom", Type: 2050, Ability: AbilityPoisonHeal},
+	287: {Name: "Slakoth", Type: 1, Ability: AbilityTruant},
+	288: {Name: "Vigoroth", Type: 1, Ability: AbilityVitalSpirit},
+	289: {Name: "Slaking", Type: 1, Ability: AbilityTruant},
+	290: {Name: "Nincada", Type: 80, Ability: AbilityCompoundEyes},
+	291: {Name: "Ninjask", Type: 68, Ability: AbilitySpeedBoost},
+	292: {Name: "Shedinja", Type: 192, Ability: AbilityWonderGuard},
+	293: {Name: "Whismur", Type: 1, Ability: AbilitySoundproof},
+	294: {Name: "Loudred", Type: 1, Ability: AbilitySoundproof},
+	295: {Name: "Exploud", Type: 1, Ability: AbilitySoundproof},
+	296: {Name: "Makuhita", Type: 2, Ability: AbilityGuts},
+	297: {Name: "Hariyama", Type: 2, Ability: AbilityGuts},
+	298: {Name: "Azurill", Type: 131073, Ability: AbilityHugePower},
+	299: {Name: "Nosepass", Type: 32, Ability: AbilityMagnetPull},
+	300: {Name: "Skitty", Type: 1, Ability: AbilityNormalize},
+	301: {Name: "Delcatty", Type: 1, Ability: AbilityNormalize},
+	302: {Name: "Sableye", Type: 65664, Ability: AbilityStall},
+	303: {Name: "Mawile", Type: 131328, Ability: AbilityIntimidate},
+	304: {Name: "Aron", Type: 288, Ability: AbilityRockHead},
+	305: {Name: "Lairon", Type: 288, Ability: AbilityRockHead},
+	306: {Name: "Aggron", Type: 288, Ability: AbilityRockHead},
+	307: {Name: "Meditite", Type: 8194, Ability: AbilityPurePower},
+	308: {Name: "Medicham", Type: 8194, Ability: AbilityPurePower},
+	309: {Name: "Electrike", Type: 4096, Ability: AbilityLightningRod},
+	310: {Name: "Manectric", Type: 4096, Ability: AbilityLightningRod},
+	311: {Name: "Plusle", Type: 4096, Ability: AbilityPlus},
+	312: {Name: "Minun", Type: 4096, Ability: AbilityMinus},
+	313: {Name: "Volbeat", Type: 64, Ability: AbilitySwarm},
+	314: {Name: "Illumise", Type: 64, Ability: AbilityTintedLens},
+	315: {Name: "Roselia", Type: 2056, Ability: AbilityPoisonPoint},
+	316: {Name: "Gulpin", Type: 8, Ability: AbilityStickyHold},
+	317: {Name: "Swalot", Type: 8, Ability: AbilityStickyHold},
+	318: {Name: "Carvanha", Type: 66560, Ability: AbilityRoughSkin},
+	319: {Name: "Sharpedo", Type: 66560, Ability: AbilityRoughSkin},
+	320: {Name: "Wailmer", Type: 1024, Ability: AbilityOblivious},
+	321: {Name: "Wailord", Type: 1024, Ability: AbilityOblivious},
+	322: {Name: "Numel", Type: 528, Ability: AbilitySimple},
+	323: {Name: "Camerupt", Type: 528, Ability: AbilitySolidRock},
+	324: {Name: "Torkoal", Type: 512, Ability: AbilityDrought},
+	325: {Name: "Spoink", Type: 8192, Ability: AbilityOwnTempo},
+	326: {Name: "Grumpig", Type: 8192, Ability: AbilityOwnTempo},
+	327: {Name: "Spinda", Type: 1, Ability: AbilityTangledFeet},
+	328: {Name: "Trapinch", Type: 16, Ability: AbilityArenaTrap},
+	329: {Name: "Vibrava", Type: 32784, Ability: AbilityLevitate},
+	330: {Name: "Flygon", Type: 32784, Ability: AbilityLevitate},
+	331: {Name: "Cacnea", Type: 2048, Ability: AbilitySandVeil},
+	332: {Name: "Cacturne", Type: 67584, Ability: AbilitySandVeil},
+	333: {Name: "Swablu", Type: 5, Ability: AbilityNaturalCure},
+	334: {Name: "Altaria", Type: 32772, Ability: AbilityNaturalCure},
+	335: {Name: "Zangoose", Type: 1, Ability: AbilityImmunity},
+	336: {Name: "Seviper", Type: 8, Ability: AbilityShedSkin},
+	337: {Name: "Lunatone", Type: 8224, Ability: AbilityLevitate},
+	338: {Name: "Solrock", Type: 8224, Ability: AbilityLevitate},
+	339: {Name: "Barboach", Type: 1040, Ability: AbilityAnticipation},
+	340: {Name: "Whiscash", Type: 1040, Ability: AbilityAnticipation},
+	341: {Name: "Corphish", Type: 1024, Ability: AbilityShellArmor},
+	342: {Name: "Crawdaunt", Type: 66560, Ability: AbilityShellArmor},
+	343: {Name: "Baltoy", Type: 8208, Ability: AbilityLevitate},
+	344: {Name: "Claydol", Type: 8208, Ability: AbilityLevitate},
+	345: {Name: "Lileep", Type: 2080, Ability: AbilitySuctionCups},
+	346: {Name: "Cradily", Type: 2080, Ability: AbilitySuctionCups},
+	347: {Name: "Anorith", Type: 96, Ability: AbilityBattleArmor},
+	348: {Name: "Armaldo", Type: 96, Ability: AbilityBattleArmor},
+	349: {Name: "Feebas", Type: 1024, Ability: AbilityOblivious},
+	350: {Name: "Milotic", Type: 1024, Ability: AbilityMarvelScale},
+	351: {Name: "Castform", Type: 1, Ability: AbilityForecast},
+	352: {Name: "Kecleon", Type: 1, Ability: AbilityColorChange},
+	353: {Name: "Shuppet", Type: 128, Ability: AbilityFrisk},
+	354: {Name: "Banette", Type: 128, Ability: AbilityFrisk},
+	355: {Name: "Duskull", Type: 128, Ability: AbilityLevitate},
+	356: {Name: "Dusclops", Type: 128, Ability: AbilityPressure},
+	357: {Name: "Tropius", Type: 2052, Ability: AbilitySolarPower},
+	358: {Name: "Chimecho", Type: 8192, Ability: AbilityLevitate},
+	359: {Name: "Absol", Type: 65536, Ability: AbilitySuperLuck},
+	360: {Name: "Wynaut", Type: 8192, Ability: AbilityShadowTag},
+	361: {Name: "Snorunt", Type: 16384, Ability: AbilityIceBody},
+	362: {Name: "Glalie", Type: 16384, Ability: AbilityIceBody},
+	363: {Name: "Spheal", Type: 17408, Ability: AbilityIceBody},
+	364: {Name: "Sealeo", Type: 17408, Ability: AbilityIceBody},
+	365: {Name: "Walrein", Type: 17408, Ability: AbilityIceBody},
+	366: {Name: "Clamperl", Type: 1024, Ability: AbilityShellArmor},
+	367: {Name: "Huntail", Type: 1024, Ability: AbilitySwiftSwim},
+	368: {Name: "Gorebyss", Type: 1024, Ability: AbilitySwiftSwim},
+	369: {Name: "Relicanth", Type: 1056, Ability: AbilityRockHead},
+	370: {Name: "Luvdisc", Type: 1024, Ability: AbilitySwiftSwim},
+	371: {Name: "Bagon", Type: 32768, Ability: AbilityRockHead},
+	372: {Name: "Shelgon", Type: 32768, Ability: AbilityRockHead},
+	373: {Name: "Salamence", Type: 32772, Ability: AbilityIntimidate},
+	374: {Name: "Beldum", Type: 8448, Ability: AbilityClearBody},
+	375: {Name: "Metang", Type: 8448, Ability: AbilityClearBody},
+	376: {Name: "Metagross", Type: 8448, Ability: AbilityClearBody},
+	377: {Name: "Regirock", Type: 32, Ability: AbilityClearBody},
+	378: {Name: "Regice", Type: 16384, Ability: AbilityClearBody},
+	379: {Name: "Registeel", Type: 256, Ability: AbilityClearBody},
+	380: {Name: "Latias", Type: 40960, Ability: AbilityLevitate},
+	381: {Name: "Latios", Type: 40960, Ability: AbilityLevitate},
+	382: {Name: "Kyogre", Type: 1024, Ability: AbilityDrizzle},
+	383: {Name: "Groudon", Type: 16, Ability: AbilityDrought},
+	384: {Name: "Rayquaza", Type: 32772, Ability: AbilityAirLock},
+	385: {Name: "Jirachi", Type: 8448, Ability: AbilitySereneGrace},
+	386: {Name: "Deoxys", Type: 8192, Ability: AbilityPressure},
+	387: {Name: "Turtwig", Type: 2048, Ability: AbilityOvergrow},
+	388: {Name: "Grotle", Type: 2048, Ability: AbilityOvergrow},
+	389: {Name: "Torterra", Type: 2064, Ability: AbilityOvergrow},
+	390: {Name: "Chimchar", Type: 512, Ability: AbilityBlaze},
+	391: {Name: "Monferno", Type: 514, Ability: AbilityBlaze},
+	392: {Name: "Infernape", Type: 514, Ability: AbilityBlaze},
+	393: {Name: "Piplup", Type: 1024, Ability: AbilityTorrent},
+	394: {Name: "Prinplup", Type: 1024, Ability: AbilityTorrent},
+	395: {Name: "Empoleon", Type: 1280, Ability: AbilityTorrent},
+	396: {Name: "Starly", Type: 5, Ability: AbilityKeenEye},
+	397: {Name: "Staravia", Type: 5, Ability: AbilityIntimidate},
+	398: {Name: "Staraptor", Type: 5, Ability: AbilityIntimidate},
+	399: {Name: "Bidoof", Type: 1, Ability: AbilityUnaware},
+	400: {Name: "Bibarel", Type: 1025, Ability: AbilityUnaware},
+	401: {Name: "Kricketot", Type: 64, Ability: AbilityShedSkin},
+	402: {Name: "Kricketune", Type: 64, Ability: AbilitySwarm},
+	403: {Name: "Shinx", Type: 4096, Ability: AbilityIntimidate},
+	404: {Name: "Luxio", Type: 4096, Ability: AbilityIntimidate},
+	405: {Name: "Luxray", Type: 4096, Ability: AbilityIntimidate},
+	406: {Name: "Budew", Type: 2056, Ability: AbilityPoisonPoint},
+	407: {Name: "Roserade", Type: 2056, Ability: AbilityPoisonPoint},
+	408: {Name: "Cranidos", Type: 32, Ability: AbilityMoldBreaker},
+	409: {Name: "Rampardos", Type: 32, Ability: AbilityMoldBreaker},
+	410: {Name: "Shieldon", Type: 288, Ability: AbilitySturdy},
+	411: {Name: "Bastiodon", Type: 288, Ability: AbilitySturdy},
+	412: {Name: "Burmy", Type: 64, Ability: AbilityShedSkin},
+	413: {Name: "Wormadam", Type: 2112, Ability: AbilityAnticipation},
+	414: {Name: "Mothim", Type: 68, Ability: AbilitySwarm},
+	415: {Name: "Combee", Type: 68, Ability: AbilityHoneyGather},
+	416: {Name: "Vespiquen", Type: 68, Ability: AbilityPressure},
+	417: {Name: "Pachirisu", Type: 4096, Ability: AbilityPickup},
+	418: {Name: "Buizel", Type: 1024, Ability: AbilitySwiftSwim},
+	419: {Name: "Floatzel", Type: 1024, Ability: AbilitySwiftSwim},
+	420: {Name: "Cherubi", Type: 2048, Ability: AbilityChlorophyll},
+	421: {Name: "Cherrim", Type: 2048, Ability: AbilityFlowerGift},
+	422: {Name: "Shellos", Type: 1024, Ability: AbilityStormDrain},
+	423: {Name: "Gastrodon", Type: 1040, Ability: AbilityStormDrain},
+	424: {Name: "Ambipom", Type: 1, Ability: AbilityPickup},
+	425: {Name: "Drifloon", Type: 132, Ability: AbilityUnburden},
+	426: {Name: "Drifblim", Type: 132, Ability: AbilityUnburden},
+	427: {Name: "Buneary", Type: 1, Ability: AbilityKlutz},
+	428: {Name: "Lopunny", Type: 1, Ability: AbilityKlutz},
+	429: {Name: "Mismagius", Type: 128, Ability: AbilityLevitate},
+	430: {Name: "Honchkrow", Type: 65540, Ability: AbilitySuperLuck},
+	431: {Name: "Glameow", Type: 1, Ability: AbilityOwnTempo},
+	432: {Name: "Purugly", Type: 1, Ability: AbilityOwnTempo},
+	433: {Name: "Chingling", Type: 8192, Ability: AbilityLevitate},
+	434: {Name: "Stunky", Type: 65544, Ability: AbilityAftermath},
+	435: {Name: "Skuntank", Type: 65544, Ability: AbilityAftermath},
+	436: {Name: "Bronzor", Type: 8448, Ability: AbilityHeatproof},
+	437: {Name: "Bronzong", Type: 8448, Ability: AbilityHeatproof},
+	438: {Name: "Bonsly", Type: 32, Ability: AbilityRockHead},
+	439: {Name: "Mime Jr.", Type: 139264, Ability: AbilityFilter},
+	440: {Name: "Happiny", Type: 1, Ability: AbilitySereneGrace},
+	441: {Name: "Chatot", Type: 5, Ability: AbilityTangledFeet},
+	442: {Name: "Spiritomb", Type: 65664, Ability: AbilityPressure},
+	443: {Name: "Gible", Type: 32784, Ability: AbilitySandVeil},
+	444: {Name: "Gabite", Type: 32784, Ability: AbilitySandVeil},
+	445: {Name: "Garchomp", Type: 32784, Ability: AbilitySandVeil},
+	446: {Name: "Munchlax", Type: 1, Ability: AbilityThickFat},
+	447: {Name: "Riolu", Type: 2, Ability: AbilityInnerFocus},
+	448: {Name: "Lucario", Type: 258, Ability: AbilityInnerFocus},
+	449: {Name: "Hippopotas", Type: 16, Ability: AbilitySandStream},
+	450: {Name: "Hippowdon", Type: 16, Ability: AbilitySandStream},
+	451: {Name: "Skorupi", Type: 72, Ability: AbilitySniper},
+	452: {Name: "Drapion", Type: 65544, Ability: AbilitySniper},
+	453: {Name: "Croagunk", Type: 10, Ability: AbilityDrySkin},
+	454: {Name: "Toxicroak", Type: 10, Ability: AbilityDrySkin},
+	455: {Name: "Carnivine", Type: 2048, Ability: AbilityLevitate},
+	456: {Name: "Finneon", Type: 1024, Ability: AbilityStormDrain},
+	457: {Name: "Lumineon", Type: 1024, Ability: AbilityStormDrain},
+	458: {Name: "Mantyke", Type: 1028, Ability: AbilityWaterAbsorb},
+	459: {Name: "Snover", Type: 18432, Ability: AbilitySnowWarning},
+	460: {Name: "Abomasnow", Type: 18432, Ability: AbilitySnowWarning},
+	461: {Name: "Weavile", Type: 81920, Ability: AbilityPressure},
+	462: {Name: "Magnezone", Type: 4352, Ability: AbilitySturdy},
+	463: {Name: "Lickilicky", Type: 1, Ability: AbilityOblivious},
+	464: {Name: "Rhyperior", Type: 48, Ability: AbilitySolidRock},
+	465: {Name: "Tangrowth", Type: 2048, Ability: AbilityLeafGuard},
+	466: {Name: "Electivire", Type: 4096, Ability: AbilityMotorDrive},
+	467: {Name: "Magmortar", Type: 512, Ability: AbilityFlameBody},
+	468: {Name: "Togekiss", Type: 131076, Ability: AbilitySereneGrace},
+	469: {Name: "Yanmega", Type: 68, Ability: AbilityTintedLens},
+	470: {Name: "Leafeon", Type: 2048, Ability: AbilityLeafGuard},
+	471: {Name: "Glaceon", Type: 16384, Ability: AbilitySnowCloak},
+	472: {Name: "Gliscor", Type: 20, Ability: AbilitySandVeil},
+	473: {Name: "Mamoswine", Type: 16400, Ability: AbilitySnowCloak},
+	474: {Name: "Porygon-Z", Type: 1, Ability: AbilityDownload},
+	475: {Name: "Gallade", Type: 8194, Ability: AbilitySteadfast},
+	476: {Name: "Probopass", Type: 288, Ability: AbilityMagnetPull},
+	477: {Name: "Dusknoir", Type: 128, Ability: AbilityPressure},
+	478: {Name: "Froslass", Type: 16512, Ability: AbilitySnowCloak},
+	479: {Name: "Rotom", Type: 4224, Ability: AbilityLevitate},
+	480: {Name: "Uxie", Type: 8192, Ability: AbilityLevitate},
+	481: {Name: "Mesprit", Type: 8192, Ability: AbilityLevitate},
+	482: {Name: "Azelf", Type: 8192, Ability: AbilityLevitate},
+	483: {Name: "Dialga", Type: 33024, Ability: AbilityPressure},
+	484: {Name: "Palkia", Type: 33792, Ability: AbilityPressure},
+	485: {Name: "Heatran", Type: 768, Ability: AbilityFlashFire},
+	486: {Name: "Regigigas", Type: 1, Ability: AbilitySlowStart},
+	487: {Name: "Giratina", Type: 32896, Ability: AbilityPressure},
+	488: {Name: "Cresselia", Type: 8192, Ability: AbilityLevitate},
+	489: {Name: "Phione", Type: 1024, Ability: AbilityHydration},
+	490: {Name: "Manaphy", Type: 1024, Ability: AbilityHydration},
+	491: {Name: "Darkrai", Type: 65536, Ability: AbilityBadDreams},
+	492: {Name: "Shaymin", Type: 2048, Ability: AbilityNaturalCure},
+	493: {Name: "Arceus", Type: 1, Ability: AbilityMultitype},
 }
 
 // Pokemon const enum for quick lookup
@@ -4185,383 +4565,4 @@ func (n Nature) String() string {
 		return "Timid"
 	}
 	panic("Unknown nature")
-}
-
-const (
-	AbilityAdaptability Ability = iota + 1
-	AbilityAftermath
-	AbilityAirLock
-	AbilityAngerPoint
-	AbilityAnticipation
-	AbilityArenaTrap
-	AbilityBadDreams
-	AbilityBattleArmor
-	AbilityBlaze
-	AbilityChlorophyll
-	AbilityClearBody
-	AbilityCloudNine
-	AbilityColorChange
-	AbilityCompoundEyes
-	AbilityCuteCharm
-	AbilityDamp
-	AbilityDownload
-	AbilityDrizzle
-	AbilityDrought
-	AbilityDrySkin
-	AbilityEarlyBird
-	AbilityEffectSpore
-	AbilityFilter
-	AbilityFlameBody
-	AbilityFlashFire
-	AbilityFlowerGift
-	AbilityForecast
-	AbilityForewarn
-	AbilityFrisk
-	AbilityGluttony
-	AbilityGuts
-	AbilityHeatproof
-	AbilityHoneyGather
-	AbilityHugePower
-	AbilityHustle
-	AbilityHydration
-	AbilityHyperCutter
-	AbilityIceBody
-	AbilityIlluminate
-	AbilityImmunity
-	AbilityInnerFocus
-	AbilityInsomnia
-	AbilityIntimidate
-	AbilityIronFist
-	AbilityKeenEye
-	AbilityKlutz
-	AbilityLeafGuard
-	AbilityLevitate
-	AbilityLightningRod
-	AbilityLimber
-	AbilityLiquidOoze
-	AbilityMagicGuard
-	AbilityMagmaArmor
-	AbilityMagnetPull
-	AbilityMarvelScale
-	AbilityMinus
-	AbilityMoldBreaker
-	AbilityMotorDrive
-	AbilityMultitype
-	AbilityNaturalCure
-	AbilityNoGuard
-	AbilityNormalize
-	AbilityOblivious
-	AbilityOvergrow
-	AbilityOwnTempo
-	AbilityPickup
-	AbilityPlus
-	AbilityPoisonHeal
-	AbilityPoisonPoint
-	AbilityPressure
-	AbilityPurePower
-	AbilityQuickFeet
-	AbilityRainDish
-	AbilityReckless
-	AbilityRivalry
-	AbilityRockHead
-	AbilityRoughSkin
-	AbilityRunAway
-	AbilitySandStream
-	AbilitySandVeil
-	AbilityScrappy
-	AbilitySereneGrace
-	AbilityShadowTag
-	AbilityShedSkin
-	AbilityShellArmor
-	AbilityShieldDust
-	AbilitySimple
-	AbilitySkillLink
-	AbilitySlowStart
-	AbilitySniper
-	AbilitySnowCloak
-	AbilitySnowWarning
-	AbilitySolarPower
-	AbilitySolidRock
-	AbilitySoundproof
-	AbilitySpeedBoost
-	AbilityStall
-	AbilityStatic
-	AbilitySteadfast
-	AbilityStench
-	AbilityStickyHold
-	AbilityStormDrain
-	AbilitySturdy
-	AbilitySuctionCups
-	AbilitySuperLuck
-	AbilitySwarm
-	AbilitySwiftSwim
-	AbilitySynchronize
-	AbilityTangledFeet
-	AbilityTechnician
-	AbilityThickFat
-	AbilityTintedLens
-	AbilityTorrent
-	AbilityTrace
-	AbilityTruant
-	AbilityUnaware
-	AbilityUnburden
-	AbilityVitalSpirit
-	AbilityVoltAbsorb
-	AbilityWaterAbsorb
-	AbilityWaterVeil
-	AbilityWhiteSmoke
-	AbilityWonderGuard
-)
-
-// Get the string name of this Ability.
-func (n Ability) String() string {
-	switch n {
-	case AbilityAdaptability:
-		return "Adaptability"
-	case AbilityAftermath:
-		return "Aftermath"
-	case AbilityAirLock:
-		return "Air Lock"
-	case AbilityAngerPoint:
-		return "Anger Point"
-	case AbilityAnticipation:
-		return "Anticipation"
-	case AbilityArenaTrap:
-		return "Arena Trap"
-	case AbilityBadDreams:
-		return "Bad Dreams"
-	case AbilityBattleArmor:
-		return "Battle Armor"
-	case AbilityBlaze:
-		return "Blaze"
-	case AbilityChlorophyll:
-		return "Chlorophyll"
-	case AbilityClearBody:
-		return "Clear Body"
-	case AbilityCloudNine:
-		return "Cloud Nine"
-	case AbilityColorChange:
-		return "Color Change"
-	case AbilityCompoundEyes:
-		return "Compound Eyes"
-	case AbilityCuteCharm:
-		return "Cute Charm"
-	case AbilityDamp:
-		return "Damp"
-	case AbilityDownload:
-		return "Download"
-	case AbilityDrizzle:
-		return "Drizzle"
-	case AbilityDrought:
-		return "Drought"
-	case AbilityDrySkin:
-		return "Dry Skin"
-	case AbilityEarlyBird:
-		return "Early Bird"
-	case AbilityEffectSpore:
-		return "Effect Spore"
-	case AbilityFilter:
-		return "Filter"
-	case AbilityFlameBody:
-		return "Flame Body"
-	case AbilityFlashFire:
-		return "Flash Fire"
-	case AbilityFlowerGift:
-		return "Flower Gift"
-	case AbilityForecast:
-		return "Forecast"
-	case AbilityForewarn:
-		return "Forewarn"
-	case AbilityFrisk:
-		return "Frisk"
-	case AbilityGluttony:
-		return "Gluttony"
-	case AbilityGuts:
-		return "Guts"
-	case AbilityHeatproof:
-		return "Heatproof"
-	case AbilityHoneyGather:
-		return "Honey Gather"
-	case AbilityHugePower:
-		return "Huge Power"
-	case AbilityHustle:
-		return "Hustle"
-	case AbilityHydration:
-		return "Hydration"
-	case AbilityHyperCutter:
-		return "Hyper Cutter"
-	case AbilityIceBody:
-		return "Ice Body"
-	case AbilityIlluminate:
-		return "Illuminate"
-	case AbilityImmunity:
-		return "Immunity"
-	case AbilityInnerFocus:
-		return "Inner Focus"
-	case AbilityInsomnia:
-		return "Insomnia"
-	case AbilityIntimidate:
-		return "Intimidate"
-	case AbilityIronFist:
-		return "Iron Fist"
-	case AbilityKeenEye:
-		return "Keen Eye"
-	case AbilityKlutz:
-		return "Klutz"
-	case AbilityLeafGuard:
-		return "Leaf Guard"
-	case AbilityLevitate:
-		return "Levitate"
-	case AbilityLightningRod:
-		return "Lightning Rod"
-	case AbilityLimber:
-		return "Limber"
-	case AbilityLiquidOoze:
-		return "Liquid Ooze"
-	case AbilityMagicGuard:
-		return "Magic Guard"
-	case AbilityMagmaArmor:
-		return "Magma Armor"
-	case AbilityMagnetPull:
-		return "Magnet Pull"
-	case AbilityMarvelScale:
-		return "Marvel Scale"
-	case AbilityMinus:
-		return "Minus"
-	case AbilityMoldBreaker:
-		return "Mold Breaker"
-	case AbilityMotorDrive:
-		return "Motor Drive"
-	case AbilityMultitype:
-		return "Multitype"
-	case AbilityNaturalCure:
-		return "Natural Cure"
-	case AbilityNoGuard:
-		return "No Guard"
-	case AbilityNormalize:
-		return "Normalize"
-	case AbilityOblivious:
-		return "Oblivious"
-	case AbilityOvergrow:
-		return "Overgrow"
-	case AbilityOwnTempo:
-		return "Own Tempo"
-	case AbilityPickup:
-		return "Pickup"
-	case AbilityPlus:
-		return "Plus"
-	case AbilityPoisonHeal:
-		return "Poison Heal"
-	case AbilityPoisonPoint:
-		return "Poison Point"
-	case AbilityPressure:
-		return "Pressure"
-	case AbilityPurePower:
-		return "Pure Power"
-	case AbilityQuickFeet:
-		return "Quick Feet"
-	case AbilityRainDish:
-		return "Rain Dish"
-	case AbilityReckless:
-		return "Reckless"
-	case AbilityRivalry:
-		return "Rivalry"
-	case AbilityRockHead:
-		return "Rock Head"
-	case AbilityRoughSkin:
-		return "Rough Skin"
-	case AbilityRunAway:
-		return "Run Away"
-	case AbilitySandStream:
-		return "Sand Stream"
-	case AbilitySandVeil:
-		return "Sand Veil"
-	case AbilityScrappy:
-		return "Scrappy"
-	case AbilitySereneGrace:
-		return "Serene Grace"
-	case AbilityShadowTag:
-		return "Shadow Tag"
-	case AbilityShedSkin:
-		return "Shed Skin"
-	case AbilityShellArmor:
-		return "Shell Armor"
-	case AbilityShieldDust:
-		return "Shield Dust"
-	case AbilitySimple:
-		return "Simple"
-	case AbilitySkillLink:
-		return "Skill Link"
-	case AbilitySlowStart:
-		return "Slow Start"
-	case AbilitySniper:
-		return "Sniper"
-	case AbilitySnowCloak:
-		return "Snow Cloak"
-	case AbilitySnowWarning:
-		return "Snow Warning"
-	case AbilitySolarPower:
-		return "Solar Power"
-	case AbilitySolidRock:
-		return "Solid Rock"
-	case AbilitySoundproof:
-		return "Soundproof"
-	case AbilitySpeedBoost:
-		return "Speed Boost"
-	case AbilityStall:
-		return "Stall"
-	case AbilityStatic:
-		return "Static"
-	case AbilitySteadfast:
-		return "Steadfast"
-	case AbilityStench:
-		return "Stench"
-	case AbilityStickyHold:
-		return "Sticky Hold"
-	case AbilityStormDrain:
-		return "Storm Drain"
-	case AbilitySturdy:
-		return "Sturdy"
-	case AbilitySuctionCups:
-		return "Suction Cups"
-	case AbilitySuperLuck:
-		return "Super Luck"
-	case AbilitySwarm:
-		return "Swarm"
-	case AbilitySwiftSwim:
-		return "Swift Swim"
-	case AbilitySynchronize:
-		return "Synchronize"
-	case AbilityTangledFeet:
-		return "Tangled Feet"
-	case AbilityTechnician:
-		return "Technician"
-	case AbilityThickFat:
-		return "Thick Fat"
-	case AbilityTintedLens:
-		return "Tinted Lens"
-	case AbilityTorrent:
-		return "Torrent"
-	case AbilityTrace:
-		return "Trace"
-	case AbilityTruant:
-		return "Truant"
-	case AbilityUnaware:
-		return "Unaware"
-	case AbilityUnburden:
-		return "Unburden"
-	case AbilityVitalSpirit:
-		return "Vital Spirit"
-	case AbilityVoltAbsorb:
-		return "Volt Absorb"
-	case AbilityWaterAbsorb:
-		return "Water Absorb"
-	case AbilityWaterVeil:
-		return "Water Veil"
-	case AbilityWhiteSmoke:
-		return "White Smoke"
-	case AbilityWonderGuard:
-		return "Wonder Guard"
-	}
-	panic("Unknown ability")
 }
