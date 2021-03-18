@@ -97,7 +97,17 @@ func (b *Battle) GetOpponents(p *party) []target {
 
 // Start the battle.
 func (b *Battle) Start() error {
-	// TODO: validate the battle, return error if invalid
+	// validate
+	teams := map[int]int{}
+	for i, party := range b.parties {
+		if len(party.pokemon) == 0 {
+			return fmt.Errorf("Party (index: %d) has no pokemon.", i)
+		}
+		teams[party.team]++
+	}
+	if len(teams) != 2 {
+		return fmt.Errorf("Parties have invalid teams. There should be 2 teams with 1 party each, got %d teams", len(teams))
+	}
 
 	// Initiate the battle! Send out the first pokemon in the parties.
 	b.State = BattleInProgress
