@@ -105,22 +105,4 @@ func (i Item) Data() *ItemData {
 	return &AllItems[i-1]
 }
 
-func (i Item) Name() string {
-	return i.Data().Name
-}
-
-func (i Item) Category() ItemCategory {
-	return i.Data().Category
-}
-
-func (i Item) FlingPower() int {
-	return i.Data().FlingPower
-}
-
-func (i Item) FlingEffect() FlingEffect {
-	return i.Data().FlingEffect
-}
-
-func (i Item) Flags() ItemFlags {
-	return i.Data().Flags
-}
+//go:generate go run ./scripts/gen_getters.go -for Item -data ItemData
