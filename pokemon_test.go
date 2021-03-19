@@ -45,6 +45,11 @@ var _ = Describe("Pokemon generation", func() {
 		Expect(p.Nature).To(Equal(NatureAdamant))
 	})
 
+	It("generates a Pokemon with a given Ability", func() {
+		p := GeneratePokemon(PkmnPiplup, WithAbility(AbilityBadDreams))
+		Expect(p.Ability).To(Equal(AbilityBadDreams))
+	})
+
 	It("generates a Pokemon with a given moveset", func() {
 		pound := GetMove(MovePound)
 		pursuit := GetMove(MovePursuit)

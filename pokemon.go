@@ -77,6 +77,7 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		StatModifiers:   [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0},
 		Stats:           [6]uint{1, 4, 4, 4, 4, 4},
 		Nature:          NatureHardy, // this nature is neutral and has no effect
+		Ability:         pokemonData[uint16(natdex)].Ability,
 		metadata:        make(map[PokemonMeta]interface{}),
 	}
 	p.Type = pokemonData[p.NatDex].Type
@@ -114,6 +115,12 @@ func WithEVs(evs [6]uint8) GeneratePokemonOption {
 func WithNature(nature Nature) GeneratePokemonOption {
 	return func(p *Pokemon) {
 		p.Nature = nature
+	}
+}
+
+func WithAbility(ability Ability) GeneratePokemonOption {
+	return func(p *Pokemon) {
+		p.Ability = ability
 	}
 }
 
