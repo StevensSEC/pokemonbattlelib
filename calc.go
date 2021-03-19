@@ -11,7 +11,7 @@ func calcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	stab := 1.0
 	if move != nil && user.EffectiveType()&move.Type() != 0 {
 		stab = 1.5
-		if user.Ability != nil && user.Ability.ID == 91 { // Adaptability
+		if user.Ability == AbilityAdaptability {
 			stab = 2.0
 		}
 	}

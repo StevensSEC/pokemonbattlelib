@@ -34,9 +34,10 @@ type data_pokemon struct {
 	Weight         int
 	BaseExperience int
 
-	Name   string
-	NatDex uint16
-	Type   int
+	Name    string
+	NatDex  uint16
+	Type    int
+	Ability string
 }
 
 type data_move_flags uint32
@@ -219,6 +220,64 @@ func main() {
 		}
 	}
 
+	// Abilities
+	log.Println("Generating code for Abilities")
+	// read abilities data
+	abilities_csv := getCsvReader("data/abilities.csv")
+	abilities := []int{}
+	for {
+		record, err := abilities_csv.Read()
+		if err == io.EOF {
+			break
+		}
+
+		if parseInt(record[2]) > HighestGen {
+			continue
+		}
+
+		abilities = append(abilities, parseInt(record[0]))
+	}
+	ability_names_csv := getCsvReader("data/ability_names.csv")
+	ability_names := map[int]string{}
+	for {
+		record, err := ability_names_csv.Read()
+		if err == io.EOF {
+			break
+		}
+
+		if parseInt(record[1]) != EnglishLanguageID {
+			continue
+		}
+
+		ability_names[parseInt(record[0])] = record[2]
+	}
+	sort.Slice(abilities, func(i, j int) bool {
+		return ability_names[abilities[i]] < ability_names[abilities[j]]
+	})
+	// generate Ability Constants
+	log.Println("Generating Ability constants")
+	output += "const (\n"
+	for i, n := range abilities {
+		if i == 0 {
+			output += fmt.Sprintf("Ability%s Ability = iota + 1\n", cleanName(ability_names[n]))
+		} else {
+			output += fmt.Sprintf("Ability%s\n", cleanName(ability_names[n]))
+		}
+	}
+	output += ")\n\n"
+	// generate Ability String()
+	log.Println("Generating Ability String()")
+	output += "// Get the string name of this Ability.\n" +
+		"func (n Ability) String() string {\n" +
+		"switch n {\n"
+	for _, n := range abilities {
+		output += fmt.Sprintf("case Ability%s:\n", cleanName(ability_names[n]))
+		output += fmt.Sprintf("return \"%s\"\n", ability_names[n])
+	}
+	output += "}\n" +
+		"panic(\"Unknown ability\")" +
+		"}\n\n"
+
 	// get valid pokemon based on generation
 	valid_pkmn_ids := []int{}
 	pkmn_game_csv := getCsvReader("data/pokemon_game_indices.csv")
@@ -251,13 +310,18 @@ func main() {
 		height := parseInt(record[3])
 		weight := parseInt(record[4])
 		baseexp := parseInt(record[5])
-		pokemon = append(pokemon, data_pokemon{
+		dp := data_pokemon{
 			Identifier:     record[1],
 			SpeciesId:      species_id,
 			Height:         height,
 			Weight:         weight,
 			BaseExperience: baseexp,
-		})
+		}
+		if species_id == 94 { // gengar
+			// HACK: see #267
+			dp.Ability = "AbilityLevitate"
+		}
+		pokemon = append(pokemon, dp)
 	}
 
 	// find all the pokemon names
@@ -317,6 +381,34 @@ func main() {
 		}
 	}
 
+	// get all Pokemon abilities
+	log.Println("Getting Pokemon abilities")
+	pkmn_abilities_csv := getCsvReader("data/pokemon_abilities.csv")
+	for {
+		record, err := pkmn_abilities_csv.Read()
+		if err == io.EOF {
+			break
+		}
+		sid := parseInt(record[0])
+		aid := parseInt(record[1])
+		is_hidden := record[2] == "1"
+		if is_hidden {
+			// Hidden abilities were introduced in gen 5
+			continue
+		}
+		if !contains(abilities, aid) {
+			// skip abilities that aren't available in gen 4
+			continue
+		}
+		for i, p := range pokemon {
+			if p.SpeciesId != sid {
+				continue
+			}
+			(&pokemon[i]).Ability = fmt.Sprintf("Ability%s", cleanName(ability_names[aid]))
+			break
+		}
+	}
+
 	// find national dex numbers
 	log.Println("Getting Pokemon dex numbers")
 	pkmn_dex_nums_csv := getCsvReader("data/pokemon_dex_numbers.csv")
@@ -340,14 +432,14 @@ func main() {
 		}
 	}
 	output += "\n\n" +
+		"type pData struct {\nName string\nType Type\nAbility Ability}\n" +
 		"// A map of national pokedex numbers to pokemon data.\n" +
-		"type pData struct {\nName string\nType Type}\n" +
 		"var pokemonData = map[uint16]pData{\n"
 	for _, p := range pokemon {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("\t%d: {Name: \"%s\", Type: %v},\n", p.NatDex, p.Name, p.Type)
+		output += fmt.Sprintf("\t%d: {Name: \"%s\", Type: %v, Ability: %s},\n", p.NatDex, p.Name, p.Type, p.Ability)
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"

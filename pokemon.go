@@ -12,7 +12,7 @@ const MaxMoves = 4
 type Pokemon struct {
 	NatDex            uint16                      // National Pokedex Number
 	Level             uint8                       // value from 1-100 influencing stats
-	Ability           *Ability                    // name of this Pokemon's ability
+	Ability           Ability                     // name of this Pokemon's ability
 	TotalExperience   uint                        // the total amount of exp this Pokemon has gained, influencing its level
 	Gender            Gender                      // this Pokemon's gender
 	IVs               [6]uint8                    // values from 0-31 that represents a Pokemon's 'genetic' potential
@@ -77,6 +77,7 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		StatModifiers:   [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0},
 		Stats:           [6]uint{1, 4, 4, 4, 4, 4},
 		Nature:          NatureHardy, // this nature is neutral and has no effect
+		Ability:         pokemonData[uint16(natdex)].Ability,
 		metadata:        make(map[PokemonMeta]interface{}),
 	}
 	p.Type = pokemonData[p.NatDex].Type
@@ -114,6 +115,12 @@ func WithEVs(evs [6]uint8) GeneratePokemonOption {
 func WithNature(nature Nature) GeneratePokemonOption {
 	return func(p *Pokemon) {
 		p.Nature = nature
+	}
+}
+
+func WithAbility(ability Ability) GeneratePokemonOption {
+	return func(p *Pokemon) {
+		p.Ability = ability
 	}
 }
 
