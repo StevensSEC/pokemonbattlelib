@@ -98,6 +98,24 @@ var _ = Describe("Battle initialization", func() {
 			}).To(Panic())
 		})
 	})
+
+	Context("team validation", func() {
+		It("should fail when party has no pokemon", func() {
+			b := NewBattle()
+			party1 := NewOccupiedParty(&agent1, 0)
+			party2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(PkmnBulbasaur))
+			b.AddParty(party1, party2)
+			Expect(b.Start()).NotTo(Succeed())
+		})
+
+		It("should fail when both parties are on the same team", func() {
+			b := NewBattle()
+			party1 := NewOccupiedParty(&agent1, 0, GeneratePokemon(PkmnBulbasaur))
+			party2 := NewOccupiedParty(&agent2, 0, GeneratePokemon(PkmnBulbasaur))
+			b.AddParty(party1, party2)
+			Expect(b.Start()).NotTo(Succeed())
+		})
+	})
 })
 
 var _ = Describe("One round of battle", func() {
@@ -242,16 +260,20 @@ var _ = Describe("Using items in battle", func() {
 	agent := Agent(new(healAgent))
 	var (
 		pkmn   *Pokemon
-		party  *party
+		pkmn2  *Pokemon
+		party1 *party
+		party2 *party
 		battle *Battle
 	)
 
 	BeforeEach(func() {
 		pkmn = GeneratePokemon(PkmnVenusaur, WithLevel(50))
 		pkmn.CurrentHP = 10
-		party = NewOccupiedParty(&agent, 0, pkmn)
+		party1 = NewOccupiedParty(&agent, 0, pkmn)
+		pkmn2 = GeneratePokemon(PkmnWartortle, WithLevel(50))
+		party2 = NewOccupiedParty(&agent, 1, pkmn2)
 		battle = NewBattle()
-		battle.AddParty(party)
+		battle.AddParty(party1, party2)
 	})
 
 	Context("when the battle processes item turns", func() {
