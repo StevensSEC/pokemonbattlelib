@@ -356,7 +356,7 @@ func (b *Battle) postRound() {
 			// Weather effects
 			// TODO: check for weather resisting abilities
 			if b.Weather == WeatherSandstorm {
-				if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
+				if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
 					damage := pkmn.MaxHP() / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
@@ -364,7 +364,7 @@ func (b *Battle) postRound() {
 					})
 				}
 			} else if b.Weather == WeatherHail {
-				if pkmn.Type&TypeIce == 0 {
+				if pkmn.EffectiveType()&TypeIce == 0 {
 					damage := pkmn.MaxHP() / 16
 					b.QueueTransaction(DamageTransaction{
 						Target: t,
