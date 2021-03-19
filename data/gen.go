@@ -254,7 +254,7 @@ func main() {
 	sort.Slice(abilities, func(i, j int) bool {
 		return ability_names[abilities[i]] < ability_names[abilities[j]]
 	})
-	// generate Nature Constants
+	// generate Ability Constants
 	log.Println("Generating Ability constants")
 	output += "const (\n"
 	for i, n := range abilities {
@@ -265,7 +265,7 @@ func main() {
 		}
 	}
 	output += ")\n\n"
-	// generate Nature String()
+	// generate Ability String()
 	log.Println("Generating Ability String()")
 	output += "// Get the string name of this Ability.\n" +
 		"func (n Ability) String() string {\n" +
