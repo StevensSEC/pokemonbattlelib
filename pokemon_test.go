@@ -84,6 +84,42 @@ var _ = Describe("Pokemon generation", func() {
 		Entry("EVs too high", WithEVs([6]uint8{255, 255, 255, 255, 255, 255})),
 		Entry("too many moves", WithMoves(GetMove(MoveFly), GetMove(MoveAerialAce), GetMove(MoveRoost), GetMove(MovePeck), GetMove(MovePound))),
 	)
+
+	Describe("Validation", func() {
+		It("succeeds when the pokemon has moves", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
+			Expect(p.Validate()).To(Succeed())
+		})
+
+		It("fails when the pokemon has no moves", func() {
+			p := GeneratePokemon(PkmnPikachu)
+			Expect(p.Validate()).To(MatchError(ErrorValidationMissingMoves))
+		})
+
+		It("fails when the pokemon has invalid level", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
+			p.Ability = 0
+			Expect(p.Validate()).To(MatchError(ErrorValidationMissingAbility))
+		})
+
+		It("fails when the pokemon has invalid level", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
+			p.Level = 0
+			Expect(p.Validate()).To(MatchError(ErrorValidationInvalidLevel))
+		})
+
+		It("fails when the pokemon has invalid IVs", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
+			p.IVs[StatHP] = 255
+			Expect(p.Validate()).To(MatchError(ErrorValidationInvalidIvs))
+		})
+
+		It("fails when the pokemon has invalid EVs", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
+			p.EVs[StatHP] = 255
+			Expect(p.Validate()).To(MatchError(ErrorValidationInvalidEvs))
+		})
+	})
 })
 
 var _ = Describe("Test leveling methods", func() {

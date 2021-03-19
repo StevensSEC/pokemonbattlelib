@@ -2,6 +2,7 @@ package pokemonbattlelib
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 )
@@ -336,4 +337,41 @@ func (p *Pokemon) UnmarshalJSON(data []byte) error {
 // Get the Pokemon's current elemental type, accounting for any abilities or conditions that would affect it.
 func (p *Pokemon) EffectiveType() Type {
 	return p.Type
+}
+
+var ErrorValidationMissingMoves = errors.New("Pokemon needs at least 1 move.")
+var ErrorValidationMissingAbility = errors.New("Pokemon needs to have an ability.")
+var ErrorValidationInvalidLevel = errors.New("Pokemon has invalid level.")
+var ErrorValidationInvalidIvs = errors.New("Pokemon has invalid IVs.")
+var ErrorValidationInvalidEvs = errors.New("Pokemon has invalid EVs.")
+
+func (p *Pokemon) Validate() error {
+	hasMoves := false
+	for _, m := range p.Moves {
+		if m != nil {
+			hasMoves = true
+			break
+		}
+	}
+	if !hasMoves {
+		return ErrorValidationMissingMoves
+	}
+
+	if p.Ability == 0 {
+		return ErrorValidationMissingAbility
+	}
+
+	if !p.HasValidLevel() {
+		return ErrorValidationInvalidLevel
+	}
+
+	if !p.HasValidIVs() {
+		return ErrorValidationInvalidIvs
+	}
+
+	if !p.HasValidEVs() {
+		return ErrorValidationInvalidEvs
+	}
+
+	return nil
 }
