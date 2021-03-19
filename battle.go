@@ -119,6 +119,34 @@ func (b *Battle) preRound() {
 	}
 }
 
+func (b *Battle) sortTurns(turns *[]TurnContext) {
+	sort.SliceStable(*turns, func(i, j int) bool {
+		turnA := (*turns)[i].Turn
+		turnB := (*turns)[j].Turn
+		ctxA := (*turns)[i].Context
+		ctxB := (*turns)[j].Context
+		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
+			switch turnA.(type) {
+			case FightTurn:
+				ftA := turnA.(FightTurn)
+				ftB := turnB.(FightTurn)
+				mvA := ctxA.Pokemon.Moves[ftA.Move]
+				mvB := ctxB.Pokemon.Moves[ftB.Move]
+				if mvA.Priority() != mvB.Priority() {
+					return mvA.Priority() > mvB.Priority()
+				}
+				// speedy pokemon should go first
+				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
+			}
+		} else {
+			// make higher priority turns go first
+			return turnA.Priority() > turnB.Priority()
+		}
+		// fallthrough
+		return false
+	})
+}
+
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
 func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	if b.State != BattleInProgress {
@@ -148,31 +176,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 	blog.Println("Sorting turns")
 	// Sort turns using an in-place stable sort
-	sort.SliceStable(turns, func(i, j int) bool {
-		turnA := turns[i].Turn
-		turnB := turns[j].Turn
-		ctxA := turns[i].Context
-		ctxB := turns[j].Context
-		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
-			switch turnA.(type) {
-			case FightTurn:
-				ftA := turnA.(FightTurn)
-				ftB := turnB.(FightTurn)
-				mvA := ctxA.Pokemon.Moves[ftA.Move]
-				mvB := ctxB.Pokemon.Moves[ftB.Move]
-				if mvA.Priority() != mvB.Priority() {
-					return mvA.Priority() > mvB.Priority()
-				}
-				// speedy pokemon should go first
-				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
-			}
-		} else {
-			// make higher priority turns go first
-			return turnA.Priority() > turnB.Priority()
-		}
-		// fallthrough
-		return false
-	})
+	b.sortTurns(&turns)
+
 	// Run turns in sorted order and update battle state
 	for len(turns) > 0 {
 		turn := turns[0]
@@ -270,59 +275,15 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else {
 				// Physical/Special Moves
-				weather := 1.0
-				if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Type() == TypeWater) || (sun && move.Type() == TypeFire) {
-					weather = 1.5
-				} else if (rain && move.Type() == TypeFire) || (sun && move.Type() == TypeWater) {
-					weather = 0.5
-				}
-				crit := 1.0
+				damage := calcMoveDamage(b.Weather, &user, receiver, move)
 				if b.rng.Roll(1, CritChances[user.StatModifiers[StatCritChance]]) {
-					crit = 2.0
+					damage *= 2
 				}
-				stab := 1.0
-				if move != nil && user.Type&move.Type() != 0 {
-					stab = 1.5
-					if user.Ability != nil && user.Ability.ID == 91 { // Adaptability
-						stab = 2.0
-					}
-				}
-				modifier := weather * crit * stab
-				levelEffect := float64((2 * user.Level / 5) + 2)
-				movePower := float64(move.Power())
-				attack := float64(user.Attack())
-				defense := float64(receiver.Defense())
-				// Move modifiers
-				if move.Category() == MoveCategorySpecial {
-					attack = float64(user.SpecialAttack())
-					defense = float64(receiver.SpecialDefense())
-				}
-				// Weather modifiers
-				if b.Weather == WeatherSandstorm {
-					if receiver.Type&TypeRock != 0 {
-						defense *= 1.5
-					}
-					if move.Id == MoveSolarBeam {
-						movePower /= 2
-					}
-				}
-				if b.Weather == WeatherHail && move.Id == MoveSolarBeam {
-					movePower /= 2
-				}
-				if b.Weather == WeatherFog {
-					if move.Id == MoveWeatherBall {
-						movePower *= 2
-					}
-					if move.Id == MoveSolarBeam {
-						movePower /= 2
-					}
-				}
-				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
 				b.QueueTransaction(DamageTransaction{
 					User:   &user,
 					Target: t.Target,
 					Move:   user.Moves[t.Move],
-					Damage: uint(damage),
+					Damage: damage,
 				})
 			}
 		case ItemTurn:

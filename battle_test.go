@@ -183,7 +183,7 @@ var _ = Describe("One round of battle", func() {
 			battle.rng = &AlwaysRNG
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(4))
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(5))
 		})
 
 		It("should miss moves randomly based on accuracy/evasion", func() {
