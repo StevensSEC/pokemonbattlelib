@@ -345,31 +345,46 @@ var ErrorValidationInvalidLevel = errors.New("Pokemon has invalid level.")
 var ErrorValidationInvalidIvs = errors.New("Pokemon has invalid IVs.")
 var ErrorValidationInvalidEvs = errors.New("Pokemon has invalid EVs.")
 
-func (p *Pokemon) Validate() error {
-	hasMoves := false
-	for _, m := range p.Moves {
-		if m != nil {
-			hasMoves = true
-			break
+// Used to pick and choose which validation rules to enforce
+type PokemonValidationRules uint8
+
+const (
+	PkmnRuleHasMoves PokemonValidationRules = 1 << iota
+	PkmnRuleHasAbility
+	PkmnRuleValidLevel
+	PkmnRuleValidIvs
+	PkmnRuleValidEvs
+)
+
+const PkmnRuleSetDefault = PkmnRuleHasMoves | PkmnRuleHasAbility | PkmnRuleValidLevel | PkmnRuleValidIvs | PkmnRuleValidEvs
+
+func (p *Pokemon) Validate(rules PokemonValidationRules) error {
+	if rules&PkmnRuleHasMoves > 0 {
+		hasMoves := false
+		for _, m := range p.Moves {
+			if m != nil {
+				hasMoves = true
+				break
+			}
+		}
+		if !hasMoves {
+			return ErrorValidationMissingMoves
 		}
 	}
-	if !hasMoves {
-		return ErrorValidationMissingMoves
-	}
 
-	if p.Ability == 0 {
+	if rules&PkmnRuleHasAbility > 0 && p.Ability == 0 {
 		return ErrorValidationMissingAbility
 	}
 
-	if !p.HasValidLevel() {
+	if rules&PkmnRuleValidLevel > 0 && !p.HasValidLevel() {
 		return ErrorValidationInvalidLevel
 	}
 
-	if !p.HasValidIVs() {
+	if rules&PkmnRuleValidIvs > 0 && !p.HasValidIVs() {
 		return ErrorValidationInvalidIvs
 	}
 
-	if !p.HasValidEVs() {
+	if rules&PkmnRuleValidEvs > 0 && !p.HasValidEVs() {
 		return ErrorValidationInvalidEvs
 	}
 

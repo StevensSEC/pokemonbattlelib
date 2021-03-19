@@ -88,36 +88,36 @@ var _ = Describe("Pokemon generation", func() {
 	Describe("Validation", func() {
 		It("succeeds when the pokemon has moves", func() {
 			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
-			Expect(p.Validate()).To(Succeed())
+			Expect(p.Validate(PkmnRuleSetDefault)).To(Succeed())
 		})
 
 		It("fails when the pokemon has no moves", func() {
 			p := GeneratePokemon(PkmnPikachu)
-			Expect(p.Validate()).To(MatchError(ErrorValidationMissingMoves))
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationMissingMoves))
 		})
 
 		It("fails when the pokemon has invalid level", func() {
 			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
 			p.Ability = 0
-			Expect(p.Validate()).To(MatchError(ErrorValidationMissingAbility))
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationMissingAbility))
 		})
 
 		It("fails when the pokemon has invalid level", func() {
 			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
 			p.Level = 0
-			Expect(p.Validate()).To(MatchError(ErrorValidationInvalidLevel))
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidLevel))
 		})
 
 		It("fails when the pokemon has invalid IVs", func() {
 			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
 			p.IVs[StatHP] = 255
-			Expect(p.Validate()).To(MatchError(ErrorValidationInvalidIvs))
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidIvs))
 		})
 
 		It("fails when the pokemon has invalid EVs", func() {
 			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
 			p.EVs[StatHP] = 255
-			Expect(p.Validate()).To(MatchError(ErrorValidationInvalidEvs))
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidEvs))
 		})
 	})
 })
