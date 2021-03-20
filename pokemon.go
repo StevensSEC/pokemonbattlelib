@@ -82,6 +82,11 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		metadata:        make(map[PokemonMeta]interface{}),
 	}
 	p.Type = pokemonData[p.NatDex].Type
+	// // TODO: find if opts contains a WithMoves already
+	// if len(opts) == 0 {
+	// 	// TODO: generate random moves from learnset
+	// 	opts = append(opts, WithMoves(GetMove(MovePound)))
+	// }
 	for _, opt := range opts {
 		opt(p)
 	}
