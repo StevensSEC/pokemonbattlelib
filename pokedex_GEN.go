@@ -382,14 +382,8 @@ func (n Ability) String() string {
 	panic("Unknown ability")
 }
 
-type pData struct {
-	Name    string
-	Type    Type
-	Ability Ability
-}
-
 // A map of national pokedex numbers to pokemon data.
-var pokemonData = map[uint16]pData{
+var pokemonData = map[uint16]PokemonData{
 	1:   {Name: "Bulbasaur", Type: 2056, Ability: AbilityOvergrow},
 	2:   {Name: "Ivysaur", Type: 2056, Ability: AbilityOvergrow},
 	3:   {Name: "Venusaur", Type: 2056, Ability: AbilityOvergrow},

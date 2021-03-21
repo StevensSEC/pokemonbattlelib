@@ -30,6 +30,12 @@ type Pokemon struct {
 	metadata          map[PokemonMeta]interface{} // Data that is conditionally needed in a battle
 }
 
+type PokemonData struct {
+	Name    string
+	Type    Type
+	Ability Ability
+}
+
 // Metadata for a Pokemon to keep track of
 type PokemonMeta int
 

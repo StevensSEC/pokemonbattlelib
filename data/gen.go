@@ -432,9 +432,8 @@ func main() {
 		}
 	}
 	output += "\n\n" +
-		"type pData struct {\nName string\nType Type\nAbility Ability}\n" +
 		"// A map of national pokedex numbers to pokemon data.\n" +
-		"var pokemonData = map[uint16]pData{\n"
+		"var pokemonData = map[uint16]PokemonData{\n"
 	for _, p := range pokemon {
 		if p.NatDex == 0 {
 			continue
