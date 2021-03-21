@@ -31,9 +31,11 @@ type Pokemon struct {
 }
 
 type PokemonData struct {
-	Name    string
-	Type    Type
-	Ability Ability
+	Name      string
+	Type      Type
+	Ability   Ability
+	BaseStats [6]int // base stats of a Pokemon
+	EvYield   [6]int // effort points gained when Pokemon is defeated
 }
 
 // Metadata for a Pokemon to keep track of
@@ -43,12 +45,6 @@ const (
 	MetaLastMove PokemonMeta = iota
 	MetaSleepTime
 )
-
-// Keeps track of base stats and EV yield for a Pokemon
-type PokemonBaseStats struct {
-	Stats   [6]int // base stats of a Pokemon
-	EVYield [6]int // effort points gained when Pokemon is defeated
-}
 
 // Constants for growth rates of a Pokemon
 const (
@@ -151,11 +147,11 @@ func (p *Pokemon) GetGrowthRate() int {
 }
 
 func (p *Pokemon) GetBaseStats() [6]int {
-	return pokemonBaseStats[int(p.NatDex)].Stats
+	return pokemonData[p.NatDex].BaseStats
 }
 
 func (p *Pokemon) GetEVYield() [6]int {
-	return pokemonBaseStats[int(p.NatDex)].EVYield
+	return pokemonData[p.NatDex].EvYield
 }
 
 func (p *Pokemon) HasValidLevel() bool {

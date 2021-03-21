@@ -38,6 +38,8 @@ type data_pokemon struct {
 	NatDex  uint16
 	Type    int
 	Ability string
+	Stats   [6]int
+	Evs     [6]int
 }
 
 type data_move_flags uint32
@@ -72,23 +74,11 @@ type data_item struct {
 	Flags         []string
 }
 
-type baseStat struct {
-	stats []int
-	ev    []int
-}
-
 type data_nature struct {
 	id       int
 	name     string
 	statup   int
 	statdown int
-}
-
-func (b baseStat) String() string {
-	return fmt.Sprintf("{[6]int%s, [6]int%s}",
-		getIntArrayCodeOutput(b.stats),
-		getIntArrayCodeOutput(b.ev),
-	)
 }
 
 func parseInt(s string) (n int) {
@@ -431,6 +421,31 @@ func main() {
 			break
 		}
 	}
+
+	// pokemon base stat + EV yield
+	log.Println("Creating base stat table + EV yield table")
+	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
+	for {
+		record, err := pokemon_stats_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		dex_num := parseInt(record[0])
+
+		if dex_num > HighestDexNum {
+			break
+		}
+		dex_num-- // off by one
+
+		stat_id := parseInt(record[1]) - 1
+		stat_value := parseInt(record[2])
+		ev := parseInt(record[3])
+		pokemon[dex_num].Stats[stat_id] = stat_value
+		pokemon[dex_num].Evs[stat_id] = ev
+	}
+
 	output += "\n\n" +
 		"// A map of national pokedex numbers to pokemon data.\n" +
 		"var pokemonData = map[uint16]PokemonData{\n"
@@ -438,7 +453,7 @@ func main() {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("\t%d: {Name: \"%s\", Type: %v, Ability: %s},\n", p.NatDex, p.Name, p.Type, p.Ability)
+		output += fmt.Sprintf("%d: {Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs)
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"
@@ -714,43 +729,6 @@ func main() {
 		}
 
 		output += fmt.Sprintf("%d: %s,\n", dex_num, growth_rate_strings[growth_rate])
-	}
-	output += "}\n\n"
-
-	// pokemon base stat + EV yield
-	log.Println("Creating base stat table + EV yield table")
-	output += "// Table of Pokemon base stats and EV yield\n"
-	output += "var pokemonBaseStats = map[int]PokemonBaseStats{\n"
-	baseStats := make(map[int]baseStat)
-	for i := 0; i < HighestDexNum+1; i += 1 {
-		baseStats[i] = baseStat{
-			stats: make([]int, 6),
-			ev:    make([]int, 6),
-		}
-	}
-	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
-	for {
-		record, err := pokemon_stats_csv.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		dex_num := parseInt(record[0])
-
-		if dex_num > HighestDexNum {
-			break
-		}
-
-		stat_id := parseInt(record[1]) - 1
-		stat_value := parseInt(record[2])
-		ev := parseInt(record[3])
-		baseStats[dex_num].stats[stat_id] = stat_value
-		baseStats[dex_num].ev[stat_id] = ev
-	}
-
-	for n := 1; n < HighestDexNum+1; n += 1 {
-		output += fmt.Sprintf("%d: %s,\n", n, baseStats[n])
 	}
 	output += "}\n\n"
 
