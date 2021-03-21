@@ -34,12 +34,13 @@ type data_pokemon struct {
 	Weight         int
 	BaseExperience int
 
-	Name    string
-	NatDex  uint16
-	Type    int
-	Ability string
-	Stats   [6]int
-	Evs     [6]int
+	Name       string
+	NatDex     uint16
+	Type       int
+	Ability    string
+	Stats      [6]int
+	Evs        [6]int
+	GrowthRate int
 }
 
 type data_move_flags uint32
@@ -437,13 +438,36 @@ func main() {
 		if dex_num > HighestDexNum {
 			break
 		}
-		dex_num-- // off by one
 
 		stat_id := parseInt(record[1]) - 1
 		stat_value := parseInt(record[2])
 		ev := parseInt(record[3])
-		pokemon[dex_num].Stats[stat_id] = stat_value
-		pokemon[dex_num].Evs[stat_id] = ev
+		pokemon[dex_num-1].Stats[stat_id] = stat_value
+		pokemon[dex_num-1].Evs[stat_id] = ev
+	}
+
+	log.Println("Mapping growth rates to dex numbers")
+	// map growth rates to pokemon national dex numbers
+	pokemon_species_csv := getCsvReader("data/pokemon_species.csv")
+	for {
+		record, err := pokemon_species_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		growth_rate_id := parseInt(record[14])
+		dex_num := parseInt(record[0])
+
+		if dex_num == 0 {
+			continue
+		}
+
+		if dex_num > HighestDexNum {
+			break
+		}
+
+		pokemon[dex_num-1].GrowthRate = growth_rate_id
 	}
 
 	output += "\n\n" +
@@ -453,7 +477,7 @@ func main() {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("{Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v},\n", p.Name, p.Type, p.Ability, p.Stats, p.Evs)
+		output += fmt.Sprintf("{Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s},\n", p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate])
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"
@@ -691,45 +715,6 @@ func main() {
 	output += createLevelTableStringFromArray("GrowthMediumSlow", med_slow_leveling) + ","
 	output += createLevelTableStringFromArray("GrowthErratic", erratic_leveling) + ","
 	output += createLevelTableStringFromArray("GrowthFluctuating", fluctuating_leveling) + ","
-	output += "}\n\n"
-
-	log.Println("Mapping growth rates to dex numbers")
-	// map growth rates to pokemon national dex numbers
-	pokemon_species_csv := getCsvReader("data/pokemon_species.csv")
-	growth_rates := make([]int, HighestDexNum+1)
-
-	for {
-		record, err := pokemon_species_csv.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		growth_rate_id := parseInt(record[14])
-		dex_num := parseInt(record[0])
-
-		if dex_num == 0 {
-			continue
-		}
-
-		if dex_num > HighestDexNum {
-			break
-		}
-
-		growth_rates[dex_num] = growth_rate_id
-	}
-
-	output += "// A map of national pokedex numbers to Pokemon growth rates\n"
-	output += "var pokemonGrowthRates = map[int]int{\n"
-
-	for dex_num, growth_rate := range growth_rates {
-
-		if dex_num == 0 {
-			continue
-		}
-
-		output += fmt.Sprintf("%d: %s,\n", dex_num, growth_rate_strings[growth_rate])
-	}
 	output += "}\n\n"
 
 	// Natures

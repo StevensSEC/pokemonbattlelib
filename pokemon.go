@@ -31,11 +31,12 @@ type Pokemon struct {
 }
 
 type PokemonData struct {
-	Name      string
-	Type      Type
-	Ability   Ability
-	BaseStats [6]int // base stats of a Pokemon
-	EvYield   [6]int // effort points gained when Pokemon is defeated
+	Name       string
+	Type       Type
+	Ability    Ability
+	BaseStats  [6]int // base stats of a Pokemon
+	EvYield    [6]int // effort points gained when Pokemon is defeated
+	GrowthRate int
 }
 
 func (p *Pokemon) Data() PokemonData {
@@ -152,7 +153,7 @@ func (p *Pokemon) GetName() string {
 }
 
 func (p *Pokemon) GetGrowthRate() int {
-	return pokemonGrowthRates[int(p.NatDex)]
+	return p.Data().GrowthRate
 }
 
 func (p *Pokemon) GetBaseStats() [6]int {
