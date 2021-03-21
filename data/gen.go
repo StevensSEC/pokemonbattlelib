@@ -448,12 +448,12 @@ func main() {
 
 	output += "\n\n" +
 		"// A map of national pokedex numbers to pokemon data.\n" +
-		"var pokemonData = map[uint16]PokemonData{\n"
+		"var AllPokemonData = []PokemonData{\n"
 	for _, p := range pokemon {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("%d: {Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs)
+		output += fmt.Sprintf("{Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v},\n", p.Name, p.Type, p.Ability, p.Stats, p.Evs)
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"

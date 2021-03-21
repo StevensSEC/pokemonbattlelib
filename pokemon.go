@@ -38,6 +38,13 @@ type PokemonData struct {
 	EvYield   [6]int // effort points gained when Pokemon is defeated
 }
 
+func (p *Pokemon) Data() PokemonData {
+	if p.NatDex > uint16(len(AllPokemonData)) {
+		blog.Panicf("Pokemon (natdex: %d) is an invalid pokemon", p.NatDex)
+	}
+	return AllPokemonData[int(p.NatDex)-1]
+}
+
 // Metadata for a Pokemon to keep track of
 type PokemonMeta int
 
@@ -79,10 +86,12 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		StatModifiers:   [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0},
 		Stats:           [6]uint{1, 4, 4, 4, 4, 4},
 		Nature:          NatureHardy, // this nature is neutral and has no effect
-		Ability:         pokemonData[uint16(natdex)].Ability,
 		metadata:        make(map[PokemonMeta]interface{}),
 	}
-	p.Type = pokemonData[p.NatDex].Type
+	// apply data
+	p.Type = p.Data().Type
+	p.Ability = p.Data().Ability
+
 	for _, opt := range opts {
 		opt(p)
 	}
@@ -139,7 +148,7 @@ func WithMoves(moves ...*Move) GeneratePokemonOption {
 }
 
 func (p *Pokemon) GetName() string {
-	return pokemonData[p.NatDex].Name
+	return p.Data().Name
 }
 
 func (p *Pokemon) GetGrowthRate() int {
@@ -147,11 +156,11 @@ func (p *Pokemon) GetGrowthRate() int {
 }
 
 func (p *Pokemon) GetBaseStats() [6]int {
-	return pokemonData[p.NatDex].BaseStats
+	return p.Data().BaseStats
 }
 
 func (p *Pokemon) GetEVYield() [6]int {
-	return pokemonData[p.NatDex].EvYield
+	return p.Data().EvYield
 }
 
 func (p *Pokemon) HasValidLevel() bool {
