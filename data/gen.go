@@ -477,7 +477,7 @@ func main() {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("{Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s},\n", p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate])
+		output += fmt.Sprintf("{NatDex: %d, Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate])
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"

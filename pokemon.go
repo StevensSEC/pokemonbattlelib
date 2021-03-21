@@ -31,6 +31,7 @@ type Pokemon struct {
 }
 
 type PokemonData struct {
+	NatDex     uint16
 	Name       string
 	Type       Type
 	Ability    Ability
