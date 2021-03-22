@@ -236,7 +236,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 
 			// use the move
-			accuracy := float64(move.Accuracy())
+			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			evasion := float64(receiver.Evasion() / 100)
+			// Todo: account for user's accuracy stage
+			accuracy := float64(move.Accuracy()) * evasion
 			if b.Weather == WeatherFog {
 				accuracy *= 3. / 5.
 			}
@@ -244,8 +247,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			case ItemWideLens:
 				accuracy *= 1.10
 			}
-			// Todo: account for receiver's evasion
-			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			if move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
 				b.QueueTransaction(MoveFailTransaction{
 					User:   &user,
@@ -257,6 +258,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// Status Moves
 			if move.Category() == MoveCategoryStatus {
 				switch move.Id {
+				case MoveDoubleTeam:
+					b.QueueTransaction(ModifyStatTransaction{
+						Target: &user,
+						Stat:   StatEvasion,
+						Stages: +1,
+					})
 				case MoveStunSpore:
 					b.QueueTransaction(InflictStatusTransaction{
 						Target:       receiver,

@@ -321,6 +321,12 @@ func (p *Pokemon) CritChance() int {
 	return CritChances[stage]
 }
 
+// Returns multiplier for evasion
+func (p *Pokemon) Evasion() uint {
+	stage := p.StatModifiers[StatEvasion]
+	return EvasionFactor[stage]
+}
+
 // display a Pokemon close to how it would appear in a Pokemon battle
 func (p Pokemon) String() string {
 	return p.GetName()
