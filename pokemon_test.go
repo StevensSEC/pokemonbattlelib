@@ -103,7 +103,7 @@ var _ = Describe("Test leveling methods", func() {
 	})
 
 	It("prevents a Pokemon from gaining experience beyond the max", func() {
-		pkmn := GeneratePokemon(PkmnArceus, WithLevel(MaxLevel))
+		pkmn := GeneratePokemon(PkmnPiplup, WithLevel(MaxLevel))
 		pkmn.GainExperience(100000000000)
 		Expect(int(pkmn.Level)).To(Equal(MaxLevel))
 	})
@@ -119,5 +119,17 @@ var _ = Describe("Pokemon string representation", func() {
 		pkmn = GeneratePokemon(PkmnBulbasaur, WithLevel(5))
 		want = "Bulbasaur"
 		Expect(fmt.Sprintf("%s", pkmn)).To(Equal(want))
+	})
+})
+
+var _ = Describe("Pokemon Data", func() {
+	It("should work for Bulbasaur", func() {
+		pkmn := GeneratePokemon(PkmnBulbasaur)
+		Expect(pkmn.Data().Name).To(Equal("Bulbasaur"))
+	})
+
+	It("should work for Arceus", func() {
+		pkmn := GeneratePokemon(PkmnArceus)
+		Expect(pkmn.Data().Name).To(Equal("Arceus"))
 	})
 })
