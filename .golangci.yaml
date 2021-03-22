@@ -4,3 +4,7 @@ issues:
       linters:
       - gosimple
       text: "S1025"
+    - path: _test\.go
+      linters:
+      - errcheck
+      text: "Error return value"
