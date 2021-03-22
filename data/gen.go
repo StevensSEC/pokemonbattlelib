@@ -138,19 +138,6 @@ func createLevelTableStringFromArray(growth_rate_name string, level_array []int)
 	return output
 }
 
-func getIntArrayCodeOutput(arr []int) string {
-	output := "{"
-
-	// loop excluding last value
-	for _, value := range arr[0 : len(arr)-1] {
-		output += fmt.Sprintf("%d, ", value)
-	}
-
-	// add last value
-	output += fmt.Sprintf("%d}", arr[len(arr)-1])
-	return output
-}
-
 func createCodeOutput(s string) {
 	file, err := os.Create("pokedex_GEN.go")
 	if err != nil {
