@@ -598,6 +598,17 @@ func main() {
 		output += fmt.Sprintf("%s\n", varname)
 	}
 	output += ")\n"
+
+	// HACK: data is missing these flags on items in these categories for some reason
+	itemCategoryImplicitFlags := map[int][]string{
+		3:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		5:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		6:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		7:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		17: {"FlagHoldable", "FlagHoldablePassive"},
+		19: {"FlagHoldablePassive"},
+	}
+
 	items := make([]data_item, 0)
 	items_csv := getCsvReader("data/items.csv")
 	records, err = items_csv.ReadAll()
@@ -616,9 +627,8 @@ func main() {
 			FlingEffectID: parseInt(r[5]),
 			Flags:         item_flags[r[0]],
 		}
-		// HACK: data is missing these flags for some reason
-		if item.CategoryID == 5 {
-			item.Flags = append(item.Flags, "FlagConsumable", "FlagHoldable")
+		if impliedFlags, ok := itemCategoryImplicitFlags[item.CategoryID]; ok {
+			item.Flags = append(item.Flags, impliedFlags...)
 		}
 		items = append(items, item)
 	}
