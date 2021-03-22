@@ -513,8 +513,6 @@ var _ = Describe("Weather", func() {
 	})
 
 	Context("when weather is present, battles are affected", func() {
-		ember := GetMove(MoveEmber)
-		bubble := GetMove(MoveBubble)
 		solarBeam := GetMove(MoveSolarBeam)
 		weatherBall := GetMove(MoveWeatherBall)
 		moonlight := GetMove(MoveMoonlight)
@@ -534,42 +532,53 @@ var _ = Describe("Weather", func() {
 				Weather: WeatherClearSkies,
 			}))
 		})
-		It("should affect fire/water attacks during harsh sunlight", func() {
-			charmander := GeneratePokemon(PkmnCharmander, WithLevel(100), WithMoves(ember))
-			squirtle := GeneratePokemon(PkmnSquirtle, WithLevel(100), WithMoves(bubble))
-			p1.AddPokemon(charmander)
-			p2.AddPokemon(squirtle)
-			b.Weather = WeatherHarshSunlight
-			Expect(b.Start()).To(Succeed())
-			t, _ := b.SimulateRound()
-			// Fire boosted
-			Expect(t).To(HaveTransaction(
-				DamageTransaction{
-					User: charmander,
-					Target: target{
-						Pokemon:   *squirtle,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
+
+		When("harsh sunlight", func() {
+			It("should boost fire type moves", func() {
+				// intentional non water type pokemon, intentional no supereffective type matchup
+				machamp := GeneratePokemon(PkmnMachamp, WithLevel(100), WithMoves(GetMove(MoveFlamethrower)))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(GetMove(MoveTackle)))
+				p1.AddPokemon(machamp)
+				p2.AddPokemon(bidoof)
+				b.Weather = WeatherHarshSunlight
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(
+					DamageTransaction{
+						User: machamp,
+						Target: target{
+							Pokemon:   *bidoof,
+							party:     1,
+							partySlot: 0,
+							Team:      1,
+						},
+						Damage: 183,
 					},
-					Move:   ember,
-					Damage: 75,
-				},
-			))
-			// Water weakened
-			Expect(t).To(HaveTransaction(
-				DamageTransaction{
-					User: squirtle,
-					Target: target{
-						Pokemon:   *charmander,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
+				))
+			})
+
+			It("should weaken water type moves", func() {
+				// intentional non water type pokemon, intentional no supereffective type matchup
+				lileep := GeneratePokemon(PkmnLileep, WithLevel(100), WithMoves(GetMove(MoveBrine)))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(GetMove(MoveTackle)))
+				p1.AddPokemon(lileep)
+				p2.AddPokemon(bidoof)
+				b.Weather = WeatherHarshSunlight
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(
+					DamageTransaction{
+						User: lileep,
+						Target: target{
+							Pokemon:   *bidoof,
+							party:     1,
+							partySlot: 0,
+							Team:      1,
+						},
+						Damage: 41,
 					},
-					Move:   bubble,
-					Damage: 26,
-				},
-			))
+				))
+			})
 		})
 
 		When("raining", func() {
