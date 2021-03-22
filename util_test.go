@@ -57,6 +57,22 @@ func transactionDiff(expected, got Transaction) map[string]diff {
 		rfA := rA.Field(i)
 		rfB := rB.FieldByName(typeField.Name)
 
+		if !rfB.IsValid() {
+			result[typeField.Name] = diff{
+				expected: rfA.Interface(),
+				got:      "invalid reflection value",
+			}
+			continue
+		}
+
+		if rfA.Type() != rfB.Type() {
+			result[typeField.Name] = diff{
+				expected: rfA.Type(),
+				got:      rfB.Type(),
+			}
+			continue
+		}
+
 		if rfA.Type() == reflect.TypeOf(&Pokemon{}) {
 			a := rfA.Interface().(*Pokemon)
 			b := rfB.Interface().(*Pokemon)
