@@ -35,7 +35,8 @@ func (t DamageTransaction) Mutate(b *Battle) {
 		if receiver.HeldItem == ItemFocusSash {
 			receiver.CurrentHP = 1
 			b.QueueTransaction(ItemTransaction{
-				Target: receiver,
+				Target: t.Target,
+				IsHeld: true,
 				Item:   receiver.HeldItem,
 			})
 			return
@@ -161,50 +162,49 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		// TODO: boost random stat, requires battle RNG to be available.
 	// ItemCategoryHeldItems
 	case ItemBlackSludge:
-		if t.Target.Type&TypePoison != 0 {
+		if target.Type&TypePoison != 0 {
 			b.QueueTransaction(HealTransaction{
-				Target: t.Target,
-				Amount: t.Target.MaxHP() / 16,
+				Target: target,
+				Amount: target.MaxHP() / 16,
 			})
 		} else {
-			// Need target, change ItemTransaction.Target from *Pokemon to target?
-			// b.QueueTransaction(DamageTransaction{
-			// 	Target: t,
-			// 	Damage: t.Target.MaxHP() / 8,
-			// })
+			b.QueueTransaction(DamageTransaction{
+				Target: t.Target,
+				Damage: target.MaxHP() / 8,
+			})
 		}
 	case ItemLeftovers:
 		b.QueueTransaction(HealTransaction{
-			Target: t.Target,
-			Amount: t.Target.MaxHP() / 16,
+			Target: target,
+			Amount: target.MaxHP() / 16,
 		})
 	case ItemMentalHerb:
-		if t.Target.StatusEffects.check(StatusInfatuation) {
+		if target.StatusEffects.check(StatusInfatuation) {
 			b.QueueTransaction(ItemTransaction{
 				Target: t.Target,
-				Item:   t.Target.HeldItem,
+				Item:   target.HeldItem,
 			})
 			b.QueueTransaction(CureStatusTransaction{
-				Target:       t.Target,
+				Target:       target,
 				StatusEffect: StatusInfatuation,
 			})
 		}
 	case ItemWhiteHerb:
-		for stat, stages := range t.Target.StatModifiers {
+		for stat, stages := range target.StatModifiers {
 			if stages < 0 {
 				b.QueueTransaction(ModifyStatTransaction{
-					Target: t.Target,
+					Target: target,
 					Stat:   stat,
 					Stages: -stages,
 				})
 			}
 		}
 	}
-	if t.Target.HeldItem.Category() == ItemCategoryInAPinch && t.Target.CurrentHP <= t.Target.Stats[StatHP]/4 {
+	if target.HeldItem.Category() == ItemCategoryInAPinch && target.CurrentHP <= target.Stats[StatHP]/4 {
 		b.QueueTransaction(ItemTransaction{
 			Target: t.Target,
 			IsHeld: true,
-			Item:   t.Target.HeldItem,
+			Item:   target.HeldItem,
 		})
 	}
 }

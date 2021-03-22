@@ -1,6 +1,6 @@
 package pokemonbattlelib
 
-func calcMoveDamage(b *Battle, user, receiver *Pokemon, move *Move) (damage uint) {
+func calcMoveDamage(b *Battle, user, receiver *Pokemon, move *Move) (damage float64) {
 	weather := 1.0
 	if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Type() == TypeWater) || (sun && move.Type() == TypeFire) {
 		weather = 1.5
@@ -61,6 +61,6 @@ func calcMoveDamage(b *Battle, user, receiver *Pokemon, move *Move) (damage uint
 			modifier *= 1.10
 		}
 	}
-	damage = uint((((levelEffect * movePower * attack / defense) / 50) + 2) * modifier)
+	damage = (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
 	return damage
 }

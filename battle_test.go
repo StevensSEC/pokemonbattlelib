@@ -202,7 +202,7 @@ var _ = Describe("One round of battle", func() {
 			battle.rng = &AlwaysRNG
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(5))
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(4))
 		})
 
 		It("should miss moves randomly based on accuracy/evasion", func() {
@@ -911,18 +911,19 @@ var _ = Describe("Fainting", func() {
 		It("should consume the focus sash after damage is applied", func() {
 			b := setup()
 			t, _ := b.SimulateRound()
+			target := target{
+				Pokemon:   *b.getPokemon(0, 0),
+				party:     0,
+				partySlot: 0,
+				Team:      0,
+			}
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
-					User: b.getPokemon(1, 0),
-					Target: target{
-						Pokemon:   *b.getPokemon(0, 0),
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					User:   b.getPokemon(1, 0),
+					Target: target,
 				},
 				ItemTransaction{
-					Target: b.getPokemon(0, 0),
+					Target: target,
 					IsHeld: true,
 					Item:   ItemFocusSash,
 				},
@@ -1312,7 +1313,7 @@ var _ = Describe("Misc/held items", func() {
 		})
 
 		DescribeTable("Weather duration boosting rocks",
-			func(item Item, weather Weather, move int) {
+			func(item Item, weather Weather, move MoveId) {
 				b := setup(item, PkmnCastform)
 				b.parties[1].pokemon[0].Moves[0] = GetMove(move)
 				t, _ := b.SimulateRound()

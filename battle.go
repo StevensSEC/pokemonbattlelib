@@ -342,11 +342,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					User:   &user,
 					Target: t.Target,
 					Move:   user.Moves[t.Move],
-					Damage: damage,
+					Damage: uint(damage),
 				})
+				meta := move.Data().metadata
 				// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
-				if move.metadata.Drain != 0 {
-					drain := damage * float64(move.metadata.Drain) / 100
+				if meta.Drain != 0 {
+					drain := damage * float64(meta.Drain) / 100
 					if user.HeldItem == ItemBigRoot {
 						drain *= 1.30 // 30% more HP than normal
 					}
@@ -364,7 +365,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				case ItemKingsRock, ItemRazorFang:
 					// King's Rock makes non-flinching moves have a 10% to cause flinch
 					// TODO: ensure only certain moves are affected -> https://bulbapedia.bulbagarden.net/wiki/King%27s_Rock
-					if move.metadata.FlinchChance == 0 && b.rng.Roll(1, 10) {
+					if meta.FlinchChance == 0 && b.rng.Roll(1, 10) {
 						b.QueueTransaction(InflictStatusTransaction{
 							Target:       receiver,
 							StatusEffect: StatusFlinch,
@@ -436,44 +437,33 @@ func (b *Battle) postRound() {
 		// Weather effects
 		// TODO: check for weather resisting abilities
 		if b.Weather == WeatherSandstorm {
-			if pkmn.Type&(TypeRock|TypeGround|TypeSteel) == 0 {
+			if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
 				damage := pkmn.MaxHP() / 16
 				b.QueueTransaction(DamageTransaction{
 					Target: t,
 					Damage: damage,
 				})
 			}
-			// Weather effects
-			// TODO: check for weather resisting abilities
-			if b.Weather == WeatherSandstorm {
-				if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
-					damage := pkmn.MaxHP() / 16
-					b.QueueTransaction(DamageTransaction{
-						Target: t,
-						Damage: damage,
-					})
-				}
-			} else if b.Weather == WeatherHail {
-				if pkmn.EffectiveType()&TypeIce == 0 {
-					damage := pkmn.MaxHP() / 16
-					b.QueueTransaction(DamageTransaction{
-						Target: t,
-						Damage: damage,
-					})
-				}
-			}
-			if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
-				b.QueueTransaction(ItemTransaction{
+		} else if b.Weather == WeatherHail {
+			if pkmn.EffectiveType()&TypeIce == 0 {
+				damage := pkmn.MaxHP() / 16
+				b.QueueTransaction(DamageTransaction{
 					Target: t,
-					IsHeld: true,
-					Item:   pkmn.HeldItem,
+					Damage: damage,
 				})
 			}
+		}
+		if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
+			b.QueueTransaction(ItemTransaction{
+				Target: t,
+				IsHeld: true,
+				Item:   pkmn.HeldItem,
+			})
 		}
 		// Held item effects
 		if pkmn.HeldItem != ItemNone {
 			b.QueueTransaction(ItemTransaction{
-				Target: pkmn,
+				Target: t,
 				IsHeld: true,
 				Item:   pkmn.HeldItem,
 			})
