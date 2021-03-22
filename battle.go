@@ -123,7 +123,12 @@ func (b *Battle) preRound() {
 		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
 			pkmn := b.getPokemon(t.party, t.partySlot)
 			b.QueueTransaction(CureStatusTransaction{
-				Target:       pkmn,
+				Target: target{
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+					Pokemon:   *pkmn,
+				},
 				StatusEffect: StatusSleep,
 			})
 		}

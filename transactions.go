@@ -179,16 +179,10 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			Amount: target.MaxHP() / 16,
 		})
 	case ItemMentalHerb:
-		if target.StatusEffects.check(StatusInfatuation) {
-			b.QueueTransaction(ItemTransaction{
-				Target: t.Target,
-				Item:   target.HeldItem,
-			})
-			b.QueueTransaction(CureStatusTransaction{
-				Target:       target,
-				StatusEffect: StatusInfatuation,
-			})
-		}
+		b.QueueTransaction(CureStatusTransaction{
+			Target:       t.Target,
+			StatusEffect: StatusInfatuation,
+		})
 	case ItemWhiteHerb:
 		for stat, stages := range target.StatModifiers {
 			if stages < 0 {
@@ -246,14 +240,15 @@ func (t InflictStatusTransaction) Mutate(b *Battle) {
 }
 
 type CureStatusTransaction struct {
-	Target       *Pokemon
+	Target       target
 	StatusEffect StatusCondition
 }
 
 func (t CureStatusTransaction) Mutate(b *Battle) {
-	t.Target.StatusEffects.clear(t.StatusEffect)
+	target := b.getPokemon(t.Target.party, t.Target.partySlot)
+	target.StatusEffects.clear(t.StatusEffect)
 	if t.StatusEffect.check(StatusSleep) {
-		delete(t.Target.metadata, MetaSleepTime)
+		delete(target.metadata, MetaSleepTime)
 	}
 }
 
