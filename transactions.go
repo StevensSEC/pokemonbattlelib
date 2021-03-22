@@ -1,5 +1,7 @@
 package pokemonbattlelib
 
+import "fmt"
+
 // Transactions describes a change to battle state.
 // A sequence of transactions should be able to describe an entire battle.
 type Transaction interface {
@@ -108,6 +110,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 	if t.Item.Flags()&FlagConsumable > 0 {
 		if t.IsHeld {
 			t.Item = target.HeldItem // auto-correct if the value is not present or does not match
+			fmt.Println("ITEM:", t.Item)
 			target.HeldItem = ItemNone
 		}
 		// TODO: remove consumed item from party's inventory
