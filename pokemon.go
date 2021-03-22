@@ -31,6 +31,23 @@ type Pokemon struct {
 	metadata          map[PokemonMeta]interface{} // Data that is conditionally needed in a battle
 }
 
+type PokemonData struct {
+	NatDex     uint16
+	Name       string
+	Type       Type
+	Ability    Ability
+	BaseStats  [6]int // base stats of a Pokemon
+	EvYield    [6]int // effort points gained when Pokemon is defeated
+	GrowthRate int
+}
+
+func (p *Pokemon) Data() PokemonData {
+	if p.NatDex > uint16(len(AllPokemonData)) {
+		blog.Panicf("Pokemon (natdex: %d) is an invalid pokemon", p.NatDex)
+	}
+	return AllPokemonData[int(p.NatDex)-1]
+}
+
 // Metadata for a Pokemon to keep track of
 type PokemonMeta int
 
@@ -38,12 +55,6 @@ const (
 	MetaLastMove PokemonMeta = iota
 	MetaSleepTime
 )
-
-// Keeps track of base stats and EV yield for a Pokemon
-type PokemonBaseStats struct {
-	Stats   [6]int // base stats of a Pokemon
-	EVYield [6]int // effort points gained when Pokemon is defeated
-}
 
 // Constants for growth rates of a Pokemon
 const (
@@ -78,15 +89,12 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		StatModifiers:   [9]int{0, 0, 0, 0, 0, 0, 0, 0, 0},
 		Stats:           [6]uint{1, 4, 4, 4, 4, 4},
 		Nature:          NatureHardy, // this nature is neutral and has no effect
-		Ability:         pokemonData[uint16(natdex)].Ability,
 		metadata:        make(map[PokemonMeta]interface{}),
 	}
-	p.Type = pokemonData[p.NatDex].Type
-	// // TODO: find if opts contains a WithMoves already
-	// if len(opts) == 0 {
-	// 	// TODO: generate random moves from learnset
-	// 	opts = append(opts, WithMoves(GetMove(MovePound)))
-	// }
+	// apply data
+	p.Type = p.Data().Type
+	p.Ability = p.Data().Ability
+
 	for _, opt := range opts {
 		opt(p)
 	}
@@ -143,19 +151,19 @@ func WithMoves(moves ...*Move) GeneratePokemonOption {
 }
 
 func (p *Pokemon) GetName() string {
-	return pokemonData[p.NatDex].Name
+	return p.Data().Name
 }
 
 func (p *Pokemon) GetGrowthRate() int {
-	return pokemonGrowthRates[int(p.NatDex)]
+	return p.Data().GrowthRate
 }
 
 func (p *Pokemon) GetBaseStats() [6]int {
-	return pokemonBaseStats[int(p.NatDex)].Stats
+	return p.Data().BaseStats
 }
 
 func (p *Pokemon) GetEVYield() [6]int {
-	return pokemonBaseStats[int(p.NatDex)].EVYield
+	return p.Data().EvYield
 }
 
 func (p *Pokemon) HasValidLevel() bool {

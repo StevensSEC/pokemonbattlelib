@@ -237,8 +237,9 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// Todo: account for receiver's evasion
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			if move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
-				b.QueueTransaction(EvadeTransaction{
-					User: &user,
+				b.QueueTransaction(MoveFailTransaction{
+					User:   &user,
+					Reason: FailMiss,
 				})
 				continue
 			}

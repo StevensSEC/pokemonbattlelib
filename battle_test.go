@@ -209,13 +209,15 @@ var _ = Describe("One round of battle", func() {
 			battle.rng = &NeverRNG
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
-			Expect(t).To(HaveTransaction(EvadeTransaction{
-				User: charmander,
+			Expect(t).To(HaveTransaction(MoveFailTransaction{
+				User:   charmander,
+				Reason: FailMiss,
 			}))
 			battle.rng = &SimpleRNG
 			t, _ = battle.SimulateRound()
-			Expect(t).ToNot(HaveTransaction(EvadeTransaction{
-				User: charmander,
+			Expect(t).ToNot(HaveTransaction(MoveFailTransaction{
+				User:   charmander,
+				Reason: FailMiss,
 			}))
 		})
 	})

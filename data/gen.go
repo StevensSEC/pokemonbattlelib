@@ -34,10 +34,13 @@ type data_pokemon struct {
 	Weight         int
 	BaseExperience int
 
-	Name    string
-	NatDex  uint16
-	Type    int
-	Ability string
+	Name       string
+	NatDex     uint16
+	Type       int
+	Ability    string
+	Stats      [6]int
+	Evs        [6]int
+	GrowthRate int
 }
 
 type data_move_flags uint32
@@ -72,23 +75,11 @@ type data_item struct {
 	Flags         []string
 }
 
-type baseStat struct {
-	stats []int
-	ev    []int
-}
-
 type data_nature struct {
 	id       int
 	name     string
 	statup   int
 	statdown int
-}
-
-func (b baseStat) String() string {
-	return fmt.Sprintf("{[6]int%s, [6]int%s}",
-		getIntArrayCodeOutput(b.stats),
-		getIntArrayCodeOutput(b.ev),
-	)
 }
 
 func parseInt(s string) (n int) {
@@ -431,15 +422,62 @@ func main() {
 			break
 		}
 	}
+
+	// pokemon base stat + EV yield
+	log.Println("Creating base stat table + EV yield table")
+	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
+	for {
+		record, err := pokemon_stats_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		dex_num := parseInt(record[0])
+
+		if dex_num > HighestDexNum {
+			break
+		}
+
+		stat_id := parseInt(record[1]) - 1
+		stat_value := parseInt(record[2])
+		ev := parseInt(record[3])
+		pokemon[dex_num-1].Stats[stat_id] = stat_value
+		pokemon[dex_num-1].Evs[stat_id] = ev
+	}
+
+	log.Println("Mapping growth rates to dex numbers")
+	// map growth rates to pokemon national dex numbers
+	pokemon_species_csv := getCsvReader("data/pokemon_species.csv")
+	for {
+		record, err := pokemon_species_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		growth_rate_id := parseInt(record[14])
+		dex_num := parseInt(record[0])
+
+		if dex_num == 0 {
+			continue
+		}
+
+		if dex_num > HighestDexNum {
+			break
+		}
+
+		pokemon[dex_num-1].GrowthRate = growth_rate_id
+	}
+
 	output += "\n\n" +
-		"type pData struct {\nName string\nType Type\nAbility Ability}\n" +
 		"// A map of national pokedex numbers to pokemon data.\n" +
-		"var pokemonData = map[uint16]pData{\n"
+		"var AllPokemonData = []PokemonData{\n"
 	for _, p := range pokemon {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("\t%d: {Name: \"%s\", Type: %v, Ability: %s},\n", p.NatDex, p.Name, p.Type, p.Ability)
+		output += fmt.Sprintf("{NatDex: %d, Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate])
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"
@@ -598,6 +636,17 @@ func main() {
 		output += fmt.Sprintf("%s\n", varname)
 	}
 	output += ")\n"
+
+	// HACK: data is missing these flags on items in these categories for some reason
+	itemCategoryImplicitFlags := map[int][]string{
+		3:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		5:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		6:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		7:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		17: {"FlagHoldable", "FlagHoldablePassive"},
+		19: {"FlagHoldablePassive"},
+	}
+
 	items := make([]data_item, 0)
 	items_csv := getCsvReader("data/items.csv")
 	records, err = items_csv.ReadAll()
@@ -616,9 +665,8 @@ func main() {
 			FlingEffectID: parseInt(r[5]),
 			Flags:         item_flags[r[0]],
 		}
-		// HACK: data is missing these flags for some reason
-		if item.CategoryID == 5 {
-			item.Flags = append(item.Flags, "FlagConsumable", "FlagHoldable")
+		if impliedFlags, ok := itemCategoryImplicitFlags[item.CategoryID]; ok {
+			item.Flags = append(item.Flags, impliedFlags...)
 		}
 		items = append(items, item)
 	}
@@ -677,82 +725,6 @@ func main() {
 	output += createLevelTableStringFromArray("GrowthMediumSlow", med_slow_leveling) + ","
 	output += createLevelTableStringFromArray("GrowthErratic", erratic_leveling) + ","
 	output += createLevelTableStringFromArray("GrowthFluctuating", fluctuating_leveling) + ","
-	output += "}\n\n"
-
-	log.Println("Mapping growth rates to dex numbers")
-	// map growth rates to pokemon national dex numbers
-	pokemon_species_csv := getCsvReader("data/pokemon_species.csv")
-	growth_rates := make([]int, HighestDexNum+1)
-
-	for {
-		record, err := pokemon_species_csv.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		growth_rate_id := parseInt(record[14])
-		dex_num := parseInt(record[0])
-
-		if dex_num == 0 {
-			continue
-		}
-
-		if dex_num > HighestDexNum {
-			break
-		}
-
-		growth_rates[dex_num] = growth_rate_id
-	}
-
-	output += "// A map of national pokedex numbers to Pokemon growth rates\n"
-	output += "var pokemonGrowthRates = map[int]int{\n"
-
-	for dex_num, growth_rate := range growth_rates {
-
-		if dex_num == 0 {
-			continue
-		}
-
-		output += fmt.Sprintf("%d: %s,\n", dex_num, growth_rate_strings[growth_rate])
-	}
-	output += "}\n\n"
-
-	// pokemon base stat + EV yield
-	log.Println("Creating base stat table + EV yield table")
-	output += "// Table of Pokemon base stats and EV yield\n"
-	output += "var pokemonBaseStats = map[int]PokemonBaseStats{\n"
-	baseStats := make(map[int]baseStat)
-	for i := 0; i < HighestDexNum+1; i += 1 {
-		baseStats[i] = baseStat{
-			stats: make([]int, 6),
-			ev:    make([]int, 6),
-		}
-	}
-	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
-	for {
-		record, err := pokemon_stats_csv.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		dex_num := parseInt(record[0])
-
-		if dex_num > HighestDexNum {
-			break
-		}
-
-		stat_id := parseInt(record[1]) - 1
-		stat_value := parseInt(record[2])
-		ev := parseInt(record[3])
-		baseStats[dex_num].stats[stat_id] = stat_value
-		baseStats[dex_num].ev[stat_id] = ev
-	}
-
-	for n := 1; n < HighestDexNum+1; n += 1 {
-		output += fmt.Sprintf("%d: %s,\n", n, baseStats[n])
-	}
 	output += "}\n\n"
 
 	// Natures
