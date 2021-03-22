@@ -571,42 +571,55 @@ var _ = Describe("Weather", func() {
 				},
 			))
 		})
-		It("should affect fire/water attacks during rain", func() {
-			charmander := GeneratePokemon(PkmnCharmander, WithLevel(100), WithMoves(ember))
-			squirtle := GeneratePokemon(PkmnSquirtle, WithLevel(100), WithMoves(bubble))
-			p1.AddPokemon(charmander)
-			p2.AddPokemon(squirtle)
-			b.Weather = WeatherRain
-			Expect(b.Start()).To(Succeed())
-			t, _ := b.SimulateRound()
-			// Fire weakened
-			Expect(t).To(HaveTransaction(
-				DamageTransaction{
-					User: charmander,
-					Target: target{
-						Pokemon:   *squirtle,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
+
+		When("raining", func() {
+			It("should affect fire type moves", func() {
+				// intentional non water type pokemon, intentional no supereffective type matchup
+				machamp := GeneratePokemon(PkmnMachamp, WithLevel(100), WithMoves(GetMove(MoveFlamethrower)))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(GetMove(MoveTackle)))
+				p1.AddPokemon(machamp)
+				p2.AddPokemon(bidoof)
+				b.Weather = WeatherRain
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+				// Fire weakened
+				Expect(t).To(HaveTransaction(
+					DamageTransaction{
+						User: machamp,
+						Target: target{
+							Pokemon:   *bidoof,
+							party:     1,
+							partySlot: 0,
+							Team:      1,
+						},
+						Damage: 61,
 					},
-					Move:   ember,
-					Damage: 25,
-				},
-			))
-			// Water boosted
-			Expect(t).To(HaveTransaction(
-				DamageTransaction{
-					User: squirtle,
-					Target: target{
-						Pokemon:   *charmander,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
+				))
+			})
+
+			It("should affect water type moves", func() {
+				// intentional non water type pokemon, intentional no supereffective type matchup
+				lileep := GeneratePokemon(PkmnLileep, WithLevel(100), WithMoves(GetMove(MoveBrine)))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(GetMove(MoveTackle)))
+				p1.AddPokemon(lileep)
+				p2.AddPokemon(bidoof)
+				b.Weather = WeatherRain
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+				// Water boosted
+				Expect(t).To(HaveTransaction(
+					DamageTransaction{
+						User: lileep,
+						Target: target{
+							Pokemon:   *bidoof,
+							party:     1,
+							partySlot: 0,
+							Team:      1,
+						},
+						Damage: 125,
 					},
-					Move:   bubble,
-					Damage: 80,
-				},
-			))
+				))
+			})
 		})
 
 		// sandstorm tests and hailing tests could be tablized
