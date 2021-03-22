@@ -325,3 +325,11 @@ const (
 	WeatherHail
 	WeatherFog
 )
+
+type MoveFailReason uint8
+
+const (
+	FailOther MoveFailReason = iota
+	FailMiss
+	FailDodge
+)

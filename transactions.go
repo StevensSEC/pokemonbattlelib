@@ -287,11 +287,12 @@ func (t ImmobilizeTransaction) Mutate(b *Battle) {
 }
 
 // Handles evasion, misses, dodging, etc. when using moves
-type EvadeTransaction struct {
-	User *Pokemon
+type MoveFailTransaction struct {
+	User   *Pokemon
+	Reason MoveFailReason
 }
 
-func (t EvadeTransaction) Mutate(b *Battle) {
+func (t MoveFailTransaction) Mutate(b *Battle) {
 	// currently a no-op.
 }
 

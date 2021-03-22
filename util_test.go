@@ -40,8 +40,15 @@ type diff struct {
 
 // Creates a diff of expected fields vs received fields in same-type transactions
 // Also returns the number of fields that were compared
-
 func transactionDiff(expected, got Transaction) map[string]diff {
+	// types that must match exactly, including zeroed values
+	exactMatchTypes := []reflect.Type{
+		reflect.TypeOf(true),
+		reflect.TypeOf(FailMiss),
+		reflect.TypeOf(WeatherClearSkies),
+		reflect.TypeOf(StatusNone),
+	}
+
 	result := make(map[string]diff)
 	rA := reflect.ValueOf(expected)
 	rB := reflect.ValueOf(got)
@@ -83,6 +90,14 @@ func transactionDiff(expected, got Transaction) map[string]diff {
 			// For example, you should be able to omit Damage from the expected DamageTransaction if you don't want to check that.
 			// Example use case: Expect(transactions).ToNot(HaveTransaction(DamageTransaction{}))
 
+			mustExactMatch := false
+			for _, t := range exactMatchTypes {
+				if t == rfA.Type() {
+					mustExactMatch = true
+					break
+				}
+			}
+
 			if rfA.Kind() == reflect.Ptr {
 				if !rfA.IsNil() && !rfB.IsNil() {
 					if !reflect.DeepEqual(rfA.Interface(), rfB.Interface()) {
@@ -92,8 +107,7 @@ func transactionDiff(expected, got Transaction) map[string]diff {
 						}
 					}
 				}
-			} else if rfA.Kind() == reflect.Bool {
-				// booleans must always match
+			} else if mustExactMatch {
 				if !reflect.DeepEqual(rfA.Interface(), rfB.Interface()) {
 					result[typeField.Name] = diff{
 						expected: rfA.Interface(),
