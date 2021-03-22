@@ -1329,7 +1329,15 @@ var _ = Describe("Misc/held items", func() {
 				Target: holder,
 				Amount: holder.MaxHP() / 16,
 			}))
-			// TODO: DamageTransaction check
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   *holder,
+				},
+				Damage: holder.MaxHP() / 8,
+			}))
 		})
 
 		DescribeTable("Weather duration boosting rocks",
