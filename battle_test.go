@@ -515,7 +515,6 @@ var _ = Describe("Weather", func() {
 	Context("when weather is present, battles are affected", func() {
 		ember := GetMove(MoveEmber)
 		bubble := GetMove(MoveBubble)
-		tackle := GetMove(MoveTackle)
 		solarBeam := GetMove(MoveSolarBeam)
 		weatherBall := GetMove(MoveWeatherBall)
 		moonlight := GetMove(MoveMoonlight)
@@ -609,39 +608,94 @@ var _ = Describe("Weather", func() {
 				},
 			))
 		})
-		It("should damage/cause side effects during sandstorm", func() {
-			geodude := GeneratePokemon(PkmnGeodude, WithLevel(50), WithMoves(tackle))
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithLevel(50), WithMoves(solarBeam))
-			p1.AddPokemon(geodude)
-			p2.AddPokemon(bulbasaur)
-			b.Weather = WeatherSandstorm
-			b.metadata[MetaWeatherTurns] = 5
-			Expect(b.Start()).To(Succeed())
-			t, _ := b.SimulateRound()
-			// Weaken solar beam, SPDEF of rock type
-			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: bulbasaur,
-				Target: target{
-					Pokemon:   *geodude,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
-				Move:   solarBeam,
-				Damage: 55,
-			}))
-			// Damage from sandstorm
-			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: nil,
-				Target: target{
-					Pokemon:   *bulbasaur,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
-				Move:   nil,
-				Damage: 6,
-			}))
+
+		// sandstorm tests and hailing tests could be tablized
+		When("sandstorm", func() {
+			It("should weaken solar beam", func() {
+				bidoof := GeneratePokemon(PkmnBidoof,
+					WithLevel(5),
+					WithIVs([6]uint8{31, 0, 31, 0, 31, 0}),
+					WithEVs([6]uint8{200, 0, 31, 0, 31, 0}),
+					WithMoves(GetMove(MoveTackle)),
+				)
+				bulbasaur := GeneratePokemon(PkmnBulbasaur,
+					WithLevel(5),
+					WithIVs([6]uint8{31, 0, 31, 0, 31, 0}),
+					WithEVs([6]uint8{200, 0, 31, 0, 31, 0}),
+					WithMoves(GetMove(MoveSolarBeam)),
+				)
+				p1.AddPokemon(bidoof)
+				p2.AddPokemon(bulbasaur)
+				Expect(b.Start()).To(Succeed())
+
+				// TODO: compare doing solar beam WITH sandstorm deals less damage than WITHOUT sandstorm.
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: bulbasaur,
+					Target: target{
+						Pokemon:   *bidoof,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Move:   solarBeam,
+					Damage: 18,
+				}))
+
+				Expect(t).ToNot(HaveTransaction(FaintTransaction{}))
+
+				b.QueueTransaction(
+					WeatherTransaction{
+						Weather: WeatherSandstorm,
+						Turns:   5,
+					},
+					HealTransaction{
+						Target: b.getPokemon(0, 0),
+						Amount: 100,
+					},
+					HealTransaction{
+						Target: b.getPokemon(1, 0),
+						Amount: 100,
+					},
+				)
+				b.ProcessQueue()
+
+				t, _ = b.SimulateRound()
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: bulbasaur,
+					Target: target{
+						Pokemon:   *bidoof,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Move:   solarBeam,
+					Damage: 10,
+				}))
+			})
+
+			It("should cause sandstorm damage", func() {
+				bidoof := GeneratePokemon(PkmnBidoof, WithMoves(GetMove(MoveTackle)))
+				bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveSolarBeam)))
+				p1.AddPokemon(bidoof)
+				p2.AddPokemon(bulbasaur)
+				b.Weather = WeatherHail
+				b.metadata[MetaWeatherTurns] = 5
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: nil,
+					Target: target{
+						Pokemon:   *bulbasaur,
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+					},
+					Move:   nil,
+					Damage: 0,
+				}))
+			})
 		})
 
 		When("hailing", func() {
