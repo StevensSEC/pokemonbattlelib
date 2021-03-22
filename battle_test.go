@@ -186,14 +186,22 @@ var _ = Describe("One round of battle", func() {
 
 	Context("when dealing damage to a Pokemon", func() {
 		It("should account for same-type attack bonus", func() {
+			charmander = GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MovePound)))
+			party1 = NewOccupiedParty(&agent1, 0, charmander)
+			bidoof := GeneratePokemon(PkmnBidoof, WithMoves(GetMove(MoveTackle)))
+			party2 = NewOccupiedParty(&agent2, 1, bidoof)
+			battle = NewBattle()
+			battle.AddParty(party1, party2)
+			battle.rng = &SimpleRNG
+
 			charmander.Moves[0] = GetMove(MoveEmber)
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(6))
-			squirtle.CurrentHP = 100
+			Expect(bidoof.CurrentHP).To(BeEquivalentTo(7))
+			bidoof.CurrentHP = 100
 			charmander.Ability = AbilityAdaptability
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(93))
+			Expect(bidoof.CurrentHP).To(BeEquivalentTo(93))
 		})
 
 		It("should account for critical hits", func() {
