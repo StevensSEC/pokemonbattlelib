@@ -34,9 +34,13 @@ type data_pokemon struct {
 	Weight         int
 	BaseExperience int
 
-	Name   string
-	NatDex uint16
-	Type   int
+	Name       string
+	NatDex     uint16
+	Type       int
+	Ability    string
+	Stats      [6]int
+	Evs        [6]int
+	GrowthRate int
 }
 
 type data_move_flags uint32
@@ -89,23 +93,11 @@ type data_item struct {
 	Flags         []string
 }
 
-type baseStat struct {
-	stats []int
-	ev    []int
-}
-
 type data_nature struct {
 	id       int
 	name     string
 	statup   int
 	statdown int
-}
-
-func (b baseStat) String() string {
-	return fmt.Sprintf("{[6]int%s, [6]int%s}",
-		getIntArrayCodeOutput(b.stats),
-		getIntArrayCodeOutput(b.ev),
-	)
 }
 
 func parseInt(s string) (n int) {
@@ -161,19 +153,6 @@ func createLevelTableStringFromArray(growth_rate_name string, level_array []int)
 		output += fmt.Sprintf("%d: %d,\n", level, experience)
 	}
 	output += "}"
-	return output
-}
-
-func getIntArrayCodeOutput(arr []int) string {
-	output := "{"
-
-	// loop excluding last value
-	for _, value := range arr[0 : len(arr)-1] {
-		output += fmt.Sprintf("%d, ", value)
-	}
-
-	// add last value
-	output += fmt.Sprintf("%d}", arr[len(arr)-1])
 	return output
 }
 
@@ -237,6 +216,64 @@ func main() {
 		}
 	}
 
+	// Abilities
+	log.Println("Generating code for Abilities")
+	// read abilities data
+	abilities_csv := getCsvReader("data/abilities.csv")
+	abilities := []int{}
+	for {
+		record, err := abilities_csv.Read()
+		if err == io.EOF {
+			break
+		}
+
+		if parseInt(record[2]) > HighestGen {
+			continue
+		}
+
+		abilities = append(abilities, parseInt(record[0]))
+	}
+	ability_names_csv := getCsvReader("data/ability_names.csv")
+	ability_names := map[int]string{}
+	for {
+		record, err := ability_names_csv.Read()
+		if err == io.EOF {
+			break
+		}
+
+		if parseInt(record[1]) != EnglishLanguageID {
+			continue
+		}
+
+		ability_names[parseInt(record[0])] = record[2]
+	}
+	sort.Slice(abilities, func(i, j int) bool {
+		return ability_names[abilities[i]] < ability_names[abilities[j]]
+	})
+	// generate Ability Constants
+	log.Println("Generating Ability constants")
+	output += "const (\n"
+	for i, n := range abilities {
+		if i == 0 {
+			output += fmt.Sprintf("Ability%s Ability = iota + 1\n", cleanName(ability_names[n]))
+		} else {
+			output += fmt.Sprintf("Ability%s\n", cleanName(ability_names[n]))
+		}
+	}
+	output += ")\n\n"
+	// generate Ability String()
+	log.Println("Generating Ability String()")
+	output += "// Get the string name of this Ability.\n" +
+		"func (n Ability) String() string {\n" +
+		"switch n {\n"
+	for _, n := range abilities {
+		output += fmt.Sprintf("case Ability%s:\n", cleanName(ability_names[n]))
+		output += fmt.Sprintf("return \"%s\"\n", ability_names[n])
+	}
+	output += "}\n" +
+		"panic(\"Unknown ability\")" +
+		"}\n\n"
+
 	// get valid pokemon based on generation
 	valid_pkmn_ids := []int{}
 	pkmn_game_csv := getCsvReader("data/pokemon_game_indices.csv")
@@ -269,13 +306,18 @@ func main() {
 		height := parseInt(record[3])
 		weight := parseInt(record[4])
 		baseexp := parseInt(record[5])
-		pokemon = append(pokemon, data_pokemon{
+		dp := data_pokemon{
 			Identifier:     record[1],
 			SpeciesId:      species_id,
 			Height:         height,
 			Weight:         weight,
 			BaseExperience: baseexp,
-		})
+		}
+		if species_id == 94 { // gengar
+			// HACK: see #267
+			dp.Ability = "AbilityLevitate"
+		}
+		pokemon = append(pokemon, dp)
 	}
 
 	// find all the pokemon names
@@ -335,6 +377,34 @@ func main() {
 		}
 	}
 
+	// get all Pokemon abilities
+	log.Println("Getting Pokemon abilities")
+	pkmn_abilities_csv := getCsvReader("data/pokemon_abilities.csv")
+	for {
+		record, err := pkmn_abilities_csv.Read()
+		if err == io.EOF {
+			break
+		}
+		sid := parseInt(record[0])
+		aid := parseInt(record[1])
+		is_hidden := record[2] == "1"
+		if is_hidden {
+			// Hidden abilities were introduced in gen 5
+			continue
+		}
+		if !contains(abilities, aid) {
+			// skip abilities that aren't available in gen 4
+			continue
+		}
+		for i, p := range pokemon {
+			if p.SpeciesId != sid {
+				continue
+			}
+			(&pokemon[i]).Ability = fmt.Sprintf("Ability%s", cleanName(ability_names[aid]))
+			break
+		}
+	}
+
 	// find national dex numbers
 	log.Println("Getting Pokemon dex numbers")
 	pkmn_dex_nums_csv := getCsvReader("data/pokemon_dex_numbers.csv")
@@ -357,15 +427,62 @@ func main() {
 			break
 		}
 	}
+
+	// pokemon base stat + EV yield
+	log.Println("Creating base stat table + EV yield table")
+	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
+	for {
+		record, err := pokemon_stats_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		dex_num := parseInt(record[0])
+
+		if dex_num > HighestDexNum {
+			break
+		}
+
+		stat_id := parseInt(record[1]) - 1
+		stat_value := parseInt(record[2])
+		ev := parseInt(record[3])
+		pokemon[dex_num-1].Stats[stat_id] = stat_value
+		pokemon[dex_num-1].Evs[stat_id] = ev
+	}
+
+	log.Println("Mapping growth rates to dex numbers")
+	// map growth rates to pokemon national dex numbers
+	pokemon_species_csv := getCsvReader("data/pokemon_species.csv")
+	for {
+		record, err := pokemon_species_csv.Read()
+
+		if err == io.EOF {
+			break
+		}
+
+		growth_rate_id := parseInt(record[14])
+		dex_num := parseInt(record[0])
+
+		if dex_num == 0 {
+			continue
+		}
+
+		if dex_num > HighestDexNum {
+			break
+		}
+
+		pokemon[dex_num-1].GrowthRate = growth_rate_id
+	}
+
 	output += "\n\n" +
 		"// A map of national pokedex numbers to pokemon data.\n" +
-		"type pData struct {\nName string\nType Type}\n" +
-		"var pokemonData = map[uint16]pData{\n"
+		"var AllPokemonData = []PokemonData{\n"
 	for _, p := range pokemon {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("\t%d: {Name: \"%s\", Type: %v},\n", p.NatDex, p.Name, p.Type)
+		output += fmt.Sprintf("{NatDex: %d, Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate])
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"
@@ -482,17 +599,18 @@ func main() {
 			moves[i].Meta = data_move_meta{minHits, maxHits, minTurns, maxTurns, drain, healing, critRate, ailmentChance, flinchChance, statChance}
 		}
 	}
-	output += "var AllMoves = []Move{\n"
+	output += "var AllMoves = []MoveData{\n"
 	for _, p := range moves {
-		output += fmt.Sprintf("\t{ID: %d, Name: %q, Type: %d, Category: %s, CurrentPP: %d, MaxPP: %d,"+
-			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d, metadata: %s},\n", p.Id, p.Name, p.Type, p.DamageClass, p.PP, p.PP, p.Targets, p.Priority, p.Power, p.Accuracy, p.Meta)
+		output += fmt.Sprintf("\t{Name: %q, Type: %d, Category: %s, Targets: %d, Priority: %d, Power: %d, Accuracy: %d, metadata: %s},\n",
+			p.Name, p.Type, p.DamageClass, p.Targets, p.Priority, p.Power, p.Accuracy, p.Meta)
 	}
 	output += "}\n\n"
 	// Add move constants
-	output += "// Create move constant enum for quick reference\nconst (\n"
+	output += "// Create move constant enum for quick reference\nconst (\n" +
+		"MoveNone MoveId = iota\n"
 	for _, m := range moves {
 		name := cleanName(m.Name)
-		output += fmt.Sprintf("\tMove%s = %v\n", name, m.Id)
+		output += fmt.Sprintf("\tMove%s\n", name)
 	}
 	output += ")\n\n"
 	// Generate hold item data
@@ -549,6 +667,17 @@ func main() {
 		output += fmt.Sprintf("%s\n", varname)
 	}
 	output += ")\n"
+
+	// HACK: data is missing these flags on items in these categories for some reason
+	itemCategoryImplicitFlags := map[int][]string{
+		3:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		5:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		6:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		7:  {"FlagUsableInBattle", "FlagConsumable", "FlagHoldable"},
+		17: {"FlagHoldable", "FlagHoldablePassive"},
+		19: {"FlagHoldablePassive"},
+	}
+
 	items := make([]data_item, 0)
 	items_csv := getCsvReader("data/items.csv")
 	records, err = items_csv.ReadAll()
@@ -567,9 +696,8 @@ func main() {
 			FlingEffectID: parseInt(r[5]),
 			Flags:         item_flags[r[0]],
 		}
-		// HACK: data is missing these flags for some reason
-		if item.CategoryID == 5 {
-			item.Flags = append(item.Flags, "FlagConsumable", "FlagHoldable")
+		if impliedFlags, ok := itemCategoryImplicitFlags[item.CategoryID]; ok {
+			item.Flags = append(item.Flags, impliedFlags...)
 		}
 		items = append(items, item)
 	}
@@ -628,82 +756,6 @@ func main() {
 	output += createLevelTableStringFromArray("GrowthMediumSlow", med_slow_leveling) + ","
 	output += createLevelTableStringFromArray("GrowthErratic", erratic_leveling) + ","
 	output += createLevelTableStringFromArray("GrowthFluctuating", fluctuating_leveling) + ","
-	output += "}\n\n"
-
-	log.Println("Mapping growth rates to dex numbers")
-	// map growth rates to pokemon national dex numbers
-	pokemon_species_csv := getCsvReader("data/pokemon_species.csv")
-	growth_rates := make([]int, HighestDexNum+1)
-
-	for {
-		record, err := pokemon_species_csv.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		growth_rate_id := parseInt(record[14])
-		dex_num := parseInt(record[0])
-
-		if dex_num == 0 {
-			continue
-		}
-
-		if dex_num > HighestDexNum {
-			break
-		}
-
-		growth_rates[dex_num] = growth_rate_id
-	}
-
-	output += "// A map of national pokedex numbers to Pokemon growth rates\n"
-	output += "var pokemonGrowthRates = map[int]int{\n"
-
-	for dex_num, growth_rate := range growth_rates {
-
-		if dex_num == 0 {
-			continue
-		}
-
-		output += fmt.Sprintf("%d: %s,\n", dex_num, growth_rate_strings[growth_rate])
-	}
-	output += "}\n\n"
-
-	// pokemon base stat + EV yield
-	log.Println("Creating base stat table + EV yield table")
-	output += "// Table of Pokemon base stats and EV yield\n"
-	output += "var pokemonBaseStats = map[int]PokemonBaseStats{\n"
-	baseStats := make(map[int]baseStat)
-	for i := 0; i < HighestDexNum+1; i += 1 {
-		baseStats[i] = baseStat{
-			stats: make([]int, 6),
-			ev:    make([]int, 6),
-		}
-	}
-	pokemon_stats_csv := getCsvReader("data/pokemon_stats.csv")
-	for {
-		record, err := pokemon_stats_csv.Read()
-
-		if err == io.EOF {
-			break
-		}
-
-		dex_num := parseInt(record[0])
-
-		if dex_num > HighestDexNum {
-			break
-		}
-
-		stat_id := parseInt(record[1]) - 1
-		stat_value := parseInt(record[2])
-		ev := parseInt(record[3])
-		baseStats[dex_num].stats[stat_id] = stat_value
-		baseStats[dex_num].ev[stat_id] = ev
-	}
-
-	for n := 1; n < HighestDexNum+1; n += 1 {
-		output += fmt.Sprintf("%d: %s,\n", n, baseStats[n])
-	}
 	output += "}\n\n"
 
 	// Natures

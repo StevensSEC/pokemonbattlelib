@@ -62,11 +62,11 @@ func (b *Battle) AddParty(p ...*party) {
 // Gets a reference to a Pokemon using party ID and party slot
 func (b *Battle) getPokemon(party, slot int) *Pokemon {
 	if party >= len(b.parties) {
-		panic(PartyIndexError)
+		panic(ErrorPartyIndex)
 	}
 	p := b.parties[party].pokemon
 	if slot >= len(p) {
-		panic(PartyIndexError)
+		panic(ErrorPartyIndex)
 	}
 	return p[slot]
 }
@@ -97,7 +97,17 @@ func (b *Battle) GetOpponents(p *party) []target {
 
 // Start the battle.
 func (b *Battle) Start() error {
-	// TODO: validate the battle, return error if invalid
+	// validate
+	teams := map[int]int{}
+	for i, party := range b.parties {
+		if len(party.pokemon) == 0 {
+			return fmt.Errorf("Party (index: %d) has no pokemon.", i)
+		}
+		teams[party.team]++
+	}
+	if len(teams) != 2 {
+		return fmt.Errorf("Parties have invalid teams. There should be 2 teams with 1 party each, got %d teams", len(teams))
+	}
 
 	// Initiate the battle! Send out the first pokemon in the parties.
 	b.State = BattleInProgress
@@ -118,6 +128,34 @@ func (b *Battle) preRound() {
 			})
 		}
 	}
+}
+
+func (b *Battle) sortTurns(turns *[]TurnContext) {
+	sort.SliceStable(*turns, func(i, j int) bool {
+		turnA := (*turns)[i].Turn
+		turnB := (*turns)[j].Turn
+		ctxA := (*turns)[i].Context
+		ctxB := (*turns)[j].Context
+		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
+			switch turnA.(type) {
+			case FightTurn:
+				ftA := turnA.(FightTurn)
+				ftB := turnB.(FightTurn)
+				mvA := ctxA.Pokemon.Moves[ftA.Move]
+				mvB := ctxB.Pokemon.Moves[ftB.Move]
+				if mvA.Priority() != mvB.Priority() {
+					return mvA.Priority() > mvB.Priority()
+				}
+				// speedy pokemon should go first
+				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
+			}
+		} else {
+			// make higher priority turns go first
+			return turnA.Priority() > turnB.Priority()
+		}
+		// fallthrough
+		return false
+	})
 }
 
 // Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
@@ -149,31 +187,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 	blog.Println("Sorting turns")
 	// Sort turns using an in-place stable sort
-	sort.SliceStable(turns, func(i, j int) bool {
-		turnA := turns[i].Turn
-		turnB := turns[j].Turn
-		ctxA := turns[i].Context
-		ctxB := turns[j].Context
-		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
-			switch turnA.(type) {
-			case FightTurn:
-				ftA := turnA.(FightTurn)
-				ftB := turnB.(FightTurn)
-				mvA := ctxA.Pokemon.Moves[ftA.Move]
-				mvB := ctxB.Pokemon.Moves[ftB.Move]
-				if mvA.Priority != mvB.Priority {
-					return mvA.Priority > mvB.Priority
-				}
-				// speedy pokemon should go first
-				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
-			}
-		} else {
-			// make higher priority turns go first
-			return turnA.Priority() > turnB.Priority()
-		}
-		// fallthrough
-		return false
-	})
+	b.sortTurns(&turns)
+
 	// Run turns in sorted order and update battle state
 	for len(turns) > 0 {
 		turn := turns[0]
@@ -205,7 +220,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 					continue // forfeit turn
 				}
-			} else if user.StatusEffects.check(StatusSleep) && move.ID != MoveSnore && move.ID != MoveSleepTalk {
+			} else if user.StatusEffects.check(StatusSleep) && move.Id != MoveSnore && move.Id != MoveSleepTalk {
 				b.QueueTransaction(ImmobilizeTransaction{
 					Target: target{
 						Pokemon: user,
@@ -216,7 +231,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 
 			// use the move
-			accuracy := float64(move.Accuracy)
+			accuracy := float64(move.Accuracy())
 			if b.Weather == WeatherFog {
 				accuracy *= 3. / 5.
 			}
@@ -226,16 +241,17 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 			// Todo: account for receiver's evasion
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
-			if move.Accuracy != 0 && !b.rng.Roll(int(accuracy), 100) {
-				b.QueueTransaction(EvadeTransaction{
-					User: &user,
+			if move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
+				b.QueueTransaction(MoveFailTransaction{
+					User:   &user,
+					Reason: FailMiss,
 				})
 				continue
 			}
 			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
 			// Status Moves
-			if move.Category == MoveCategoryStatus {
-				switch move.ID {
+			if move.Category() == MoveCategoryStatus {
+				switch move.Id {
 				case MoveStunSpore:
 					b.QueueTransaction(InflictStatusTransaction{
 						Target:       receiver,
@@ -321,72 +337,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else {
 				// Physical/Special Moves
-				weather := 1.0
-				if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Type == TypeWater) || (sun && move.Type == TypeFire) {
-					weather = 1.5
-				} else if (rain && move.Type == TypeFire) || (sun && move.Type == TypeWater) {
-					weather = 0.5
-				}
-				crit := 1.0
-				if b.rng.Roll(1, user.CritChance()) {
-					crit = 2.0
-				}
-				stab := 1.0
-				if move != nil && user.Type&move.Type != 0 {
-					stab = 1.5
-					if user.Ability != nil && user.Ability.ID == 91 { // Adaptability
-						stab = 2.0
-					}
-				}
-				modifier := weather * crit * stab
-				levelEffect := float64((2 * user.Level / 5) + 2)
-				movePower := float64(move.Power)
-				attack := float64(user.Attack())
-				defense := float64(receiver.Defense())
-				// Move modifiers
-				if move.Category == MoveCategorySpecial {
-					attack = float64(user.SpecialAttack())
-					defense = float64(receiver.SpecialDefense())
-				}
-				// Weather modifiers
-				if b.Weather == WeatherSandstorm {
-					if receiver.Type&TypeRock != 0 {
-						defense *= 1.5
-					}
-					if move.ID == MoveSolarBeam {
-						movePower /= 2
-					}
-				}
-				if b.Weather == WeatherHail && move.ID == MoveSolarBeam {
-					movePower /= 2
-				}
-				if b.Weather == WeatherFog {
-					if move.ID == MoveWeatherBall {
-						movePower *= 2
-					}
-					if move.ID == MoveSolarBeam {
-						movePower /= 2
-					}
-				}
-				// Item modifiers
-				switch self.HeldItem {
-				case ItemLifeOrb:
-					modifier *= 1.30
-				case ItemMuscleBand:
-					if move.Category == MoveCategoryPhysical {
-						modifier *= 1.10
-					}
-				case ItemWiseGlasses:
-					if move.Category == MoveCategorySpecial {
-						modifier *= 1.10
-					}
-				}
-				damage := (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
+				damage := calcMoveDamage(b, &user, receiver, move)
 				b.QueueTransaction(DamageTransaction{
 					User:   &user,
 					Target: t.Target,
 					Move:   user.Moves[t.Move],
-					Damage: uint(damage),
+					Damage: damage,
 				})
 				// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
 				if move.metadata.Drain != 0 {
@@ -430,7 +386,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			move := receiver.Moves[t.Move]
 			b.QueueTransaction(ItemTransaction{
-				Target: receiver,
+				Target: t.Target,
 				Item:   t.Item,
 				Move:   move,
 			})
@@ -487,12 +443,30 @@ func (b *Battle) postRound() {
 					Damage: damage,
 				})
 			}
-		} else if b.Weather == WeatherHail {
-			if pkmn.Type&TypeIce == 0 {
-				damage := pkmn.MaxHP() / 16
-				b.QueueTransaction(DamageTransaction{
+			// Weather effects
+			// TODO: check for weather resisting abilities
+			if b.Weather == WeatherSandstorm {
+				if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
+					damage := pkmn.MaxHP() / 16
+					b.QueueTransaction(DamageTransaction{
+						Target: t,
+						Damage: damage,
+					})
+				}
+			} else if b.Weather == WeatherHail {
+				if pkmn.EffectiveType()&TypeIce == 0 {
+					damage := pkmn.MaxHP() / 16
+					b.QueueTransaction(DamageTransaction{
+						Target: t,
+						Damage: damage,
+					})
+				}
+			}
+			if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
+				b.QueueTransaction(ItemTransaction{
 					Target: t,
-					Damage: damage,
+					IsHeld: true,
+					Item:   pkmn.HeldItem,
 				})
 			}
 		}

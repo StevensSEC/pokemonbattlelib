@@ -96,29 +96,30 @@ func (t EVTransaction) Mutate(b *Battle) {
 
 // A transaction to use and possibly consume an item.
 type ItemTransaction struct {
-	Target *Pokemon
+	Target target
 	IsHeld bool
 	Item   Item
 	Move   *Move
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
+	target := b.getPokemon(t.Target.party, t.Target.partySlot)
 	if t.Item.Flags()&FlagConsumable > 0 {
 		if t.IsHeld {
-			t.Item = t.Target.HeldItem // auto-correct if the value is not present or does not match
-			t.Target.HeldItem = ItemNone
+			t.Item = target.HeldItem // auto-correct if the value is not present or does not match
+			target.HeldItem = ItemNone
 		}
 		// TODO: remove consumed item from party's inventory
 	}
 	switch t.Item {
 	// ItemCategoryMedicine
 	case ItemPotion:
-		b.QueueTransaction(t.Target.RestoreHP(20))
+		b.QueueTransaction(target.RestoreHP(20))
 
 	// ItemCategoryInAPinch
 	case ItemApicotBerry:
 		b.QueueTransaction(ModifyStatTransaction{
-			Target: t.Target,
+			Target: target,
 			Stat:   StatSpDef,
 			Stages: 1,
 		})
@@ -126,19 +127,19 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		// TODO: Force pokemon to go first
 	case ItemGanlonBerry:
 		b.QueueTransaction(ModifyStatTransaction{
-			Target: t.Target,
+			Target: target,
 			Stat:   StatDef,
 			Stages: 1,
 		})
 	case ItemLansatBerry:
 		b.QueueTransaction(ModifyStatTransaction{
-			Target: t.Target,
+			Target: target,
 			Stat:   StatCritChance,
 			Stages: 2,
 		})
 	case ItemLiechiBerry:
 		b.QueueTransaction(ModifyStatTransaction{
-			Target: t.Target,
+			Target: target,
 			Stat:   StatAtk,
 			Stages: 1,
 		})
@@ -146,13 +147,13 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		// TODO: Perfect accuracy for next move
 	case ItemPetayaBerry:
 		b.QueueTransaction(ModifyStatTransaction{
-			Target: t.Target,
+			Target: target,
 			Stat:   StatSpAtk,
 			Stages: 1,
 		})
 	case ItemSalacBerry:
 		b.QueueTransaction(ModifyStatTransaction{
-			Target: t.Target,
+			Target: target,
 			Stat:   StatSpeed,
 			Stages: 1,
 		})
@@ -211,14 +212,12 @@ func (t ItemTransaction) Mutate(b *Battle) {
 // A transaction to change the PP of a move.
 type PPTransaction struct {
 	Move   *Move
-	Amount int
+	Amount int8
 }
 
 func (t PPTransaction) Mutate(b *Battle) {
-	t.Move.CurrentPP += t.Amount
-	if t.Move.CurrentPP < 0 {
-		t.Move.CurrentPP = 0
-	} else if t.Move.CurrentPP > t.Move.MaxPP {
+	t.Move.CurrentPP += uint8(t.Amount)
+	if t.Move.CurrentPP > t.Move.MaxPP {
 		t.Move.CurrentPP = t.Move.MaxPP
 	}
 }
@@ -341,11 +340,12 @@ func (t ImmobilizeTransaction) Mutate(b *Battle) {
 }
 
 // Handles evasion, misses, dodging, etc. when using moves
-type EvadeTransaction struct {
-	User *Pokemon
+type MoveFailTransaction struct {
+	User   *Pokemon
+	Reason MoveFailReason
 }
 
-func (t EvadeTransaction) Mutate(b *Battle) {
+func (t MoveFailTransaction) Mutate(b *Battle) {
 	// currently a no-op.
 }
 

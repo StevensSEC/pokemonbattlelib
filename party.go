@@ -2,6 +2,7 @@ package pokemonbattlelib
 
 import (
 	"errors"
+	"fmt"
 	"log"
 )
 
@@ -11,12 +12,14 @@ type party struct {
 	pokemon       []*Pokemon       // The Pokemon in the party
 	activePokemon map[int]*Pokemon // Map containing slots and references to active Pokemon on the battlefield
 	team          int              // The team that this party belongs to
+	PokemonRules  PokemonValidationRules
 }
 
 // Maximum number of Pokemon in a party
 const MaxPartySize = 6
 
-var PartyIndexError = errors.New("invalid index for party")
+var ErrorPartyIndex = errors.New("invalid index for party")
+var ErrorPartyFull = fmt.Errorf("party size cannot exceed max of %d Pokemon\n", MaxPartySize)
 
 // Creates a new party to store Pokemon and assigns them to a team
 func NewParty(agent *Agent, team int) *party {
@@ -25,22 +28,32 @@ func NewParty(agent *Agent, team int) *party {
 		pokemon:       make([]*Pokemon, 0),
 		activePokemon: make(map[int]*Pokemon),
 		team:          team,
+		PokemonRules:  PkmnRuleSetDefault,
 	}
 }
 
 // Creates a new party and fills it out with the passed Pokemon
 func NewOccupiedParty(agent *Agent, team int, pkmn ...*Pokemon) *party {
 	party := NewParty(agent, team)
-	party.AddPokemon(pkmn...)
+	err := party.AddPokemon(pkmn...)
+	if err != nil {
+		panic(err)
+	}
 	return party
 }
 
 // Adds 1 or more Pokemon to a Party
-func (p *party) AddPokemon(pkmn ...*Pokemon) {
+func (p *party) AddPokemon(pkmn ...*Pokemon) error {
 	if len(p.pokemon)+len(pkmn) > MaxPartySize {
-		log.Panicf("party size cannot exceed max of %v Pokemon\n", MaxPartySize)
+		return ErrorPartyFull
+	}
+	for i := range pkmn {
+		if err := pkmn[i].Validate(p.PokemonRules); err != nil {
+			return err
+		}
 	}
 	p.pokemon = append(p.pokemon, pkmn...)
+	return nil
 }
 
 // Sets a Pokemon to be active by its index in a party (0-5)
@@ -62,7 +75,7 @@ func (p *party) SetInactive(i int) {
 // Checks if a Pokemon in a party is currently active
 func (p *party) IsActivePokemon(i int) bool {
 	if i >= len(p.pokemon) {
-		log.Panicln(PartyIndexError)
+		log.Panicln(ErrorPartyIndex)
 	}
 	if _, ok := p.activePokemon[i]; ok {
 		return true

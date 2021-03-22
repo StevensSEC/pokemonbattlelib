@@ -294,10 +294,7 @@ func (s StatusCondition) String() string {
 	return strings.Join(result, ", ")
 }
 
-type Ability struct {
-	//TODO
-	ID int // The ID of the ability
-}
+type Ability uint16
 
 // Natures can affect a Pokemon's stats, increasing one and decreasing another.
 // *Constants, GetStatModifiers(), and String() are auto-generated.*
@@ -327,4 +324,12 @@ const (
 	WeatherSandstorm
 	WeatherHail
 	WeatherFog
+)
+
+type MoveFailReason uint8
+
+const (
+	FailOther MoveFailReason = iota
+	FailMiss
+	FailDodge
 )

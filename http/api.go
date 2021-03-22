@@ -28,6 +28,7 @@ func HandleListMoves(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Failed to marshal moves into JSON: %s", err)
 	}
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write(bytes)
 }
@@ -67,15 +68,15 @@ func HandleGeneratePokemon(w http.ResponseWriter, r *http.Request) {
 		}
 		var moves []*Move
 		for _, id := range moveIds {
-			moves = append(moves, GetMove(id))
+			moves = append(moves, GetMove(MoveId(id)))
 		}
 		args.Opts = append(args.Opts, WithMoves(moves...))
 	} else {
 		args.Opts = append(args.Opts, WithMoves(
-			GetMove(1+rand.Intn(467)),
-			GetMove(1+rand.Intn(467)),
-			GetMove(1+rand.Intn(467)),
-			GetMove(1+rand.Intn(467)),
+			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
 		))
 	}
 
@@ -91,6 +92,7 @@ func HandleGeneratePokemon(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Failed to marshal generated pokemon into JSON: %s", err)
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write(bytes)
 }
@@ -175,6 +177,7 @@ func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write(bytes)
 }
@@ -192,6 +195,7 @@ func HandleBattleContext(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write(bytes)
 }
@@ -213,5 +217,6 @@ func HandleBattleAct(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleDumbAgent(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"type": 0, "args": {"target": {"party":0, "slot": 0}, "move": 0}}`))
 }

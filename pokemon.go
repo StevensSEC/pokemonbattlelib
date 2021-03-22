@@ -2,6 +2,7 @@ package pokemonbattlelib
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 )
@@ -12,7 +13,7 @@ const MaxMoves = 4
 type Pokemon struct {
 	NatDex            uint16                      // National Pokedex Number
 	Level             uint8                       // value from 1-100 influencing stats
-	Ability           *Ability                    // name of this Pokemon's ability
+	Ability           Ability                     // name of this Pokemon's ability
 	TotalExperience   uint                        // the total amount of exp this Pokemon has gained, influencing its level
 	Gender            Gender                      // this Pokemon's gender
 	IVs               [6]uint8                    // values from 0-31 that represents a Pokemon's 'genetic' potential
@@ -30,6 +31,23 @@ type Pokemon struct {
 	metadata          map[PokemonMeta]interface{} // Data that is conditionally needed in a battle
 }
 
+type PokemonData struct {
+	NatDex     uint16
+	Name       string
+	Type       Type
+	Ability    Ability
+	BaseStats  [6]int // base stats of a Pokemon
+	EvYield    [6]int // effort points gained when Pokemon is defeated
+	GrowthRate int
+}
+
+func (p *Pokemon) Data() PokemonData {
+	if p.NatDex > uint16(len(AllPokemonData)) {
+		blog.Panicf("Pokemon (natdex: %d) is an invalid pokemon", p.NatDex)
+	}
+	return AllPokemonData[int(p.NatDex)-1]
+}
+
 // Metadata for a Pokemon to keep track of
 type PokemonMeta int
 
@@ -37,12 +55,6 @@ const (
 	MetaLastMove PokemonMeta = iota
 	MetaSleepTime
 )
-
-// Keeps track of base stats and EV yield for a Pokemon
-type PokemonBaseStats struct {
-	Stats   [6]int // base stats of a Pokemon
-	EVYield [6]int // effort points gained when Pokemon is defeated
-}
 
 // Constants for growth rates of a Pokemon
 const (
@@ -79,7 +91,10 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 		Nature:          NatureHardy, // this nature is neutral and has no effect
 		metadata:        make(map[PokemonMeta]interface{}),
 	}
-	p.Type = pokemonData[p.NatDex].Type
+	// apply data
+	p.Type = p.Data().Type
+	p.Ability = p.Data().Ability
+
 	for _, opt := range opts {
 		opt(p)
 	}
@@ -117,6 +132,12 @@ func WithNature(nature Nature) GeneratePokemonOption {
 	}
 }
 
+func WithAbility(ability Ability) GeneratePokemonOption {
+	return func(p *Pokemon) {
+		p.Ability = ability
+	}
+}
+
 func WithMoves(moves ...*Move) GeneratePokemonOption {
 	return func(p *Pokemon) {
 		if len(moves) > MaxMoves {
@@ -130,19 +151,19 @@ func WithMoves(moves ...*Move) GeneratePokemonOption {
 }
 
 func (p *Pokemon) GetName() string {
-	return pokemonData[p.NatDex].Name
+	return p.Data().Name
 }
 
 func (p *Pokemon) GetGrowthRate() int {
-	return pokemonGrowthRates[int(p.NatDex)]
+	return p.Data().GrowthRate
 }
 
 func (p *Pokemon) GetBaseStats() [6]int {
-	return pokemonBaseStats[int(p.NatDex)].Stats
+	return p.Data().BaseStats
 }
 
 func (p *Pokemon) GetEVYield() [6]int {
-	return pokemonBaseStats[int(p.NatDex)].EVYield
+	return p.Data().EvYield
 }
 
 func (p *Pokemon) HasValidLevel() bool {
@@ -335,4 +356,61 @@ func (p *Pokemon) UnmarshalJSON(data []byte) error {
 		p.metadata = make(map[PokemonMeta]interface{})
 	}
 	return json.Unmarshal(data, &aux)
+}
+
+// Get the Pokemon's current elemental type, accounting for any abilities or conditions that would affect it.
+func (p *Pokemon) EffectiveType() Type {
+	return p.Type
+}
+
+var ErrorValidationMissingMoves = errors.New("Pokemon needs at least 1 move.")
+var ErrorValidationMissingAbility = errors.New("Pokemon needs to have an ability.")
+var ErrorValidationInvalidLevel = errors.New("Pokemon has invalid level.")
+var ErrorValidationInvalidIvs = errors.New("Pokemon has invalid IVs.")
+var ErrorValidationInvalidEvs = errors.New("Pokemon has invalid EVs.")
+
+// Used to pick and choose which validation rules to enforce
+type PokemonValidationRules uint8
+
+const (
+	PkmnRuleHasMoves PokemonValidationRules = 1 << iota
+	PkmnRuleHasAbility
+	PkmnRuleValidLevel
+	PkmnRuleValidIvs
+	PkmnRuleValidEvs
+)
+
+const PkmnRuleSetDefault = PkmnRuleHasMoves | PkmnRuleHasAbility | PkmnRuleValidLevel | PkmnRuleValidIvs | PkmnRuleValidEvs
+
+func (p *Pokemon) Validate(rules PokemonValidationRules) error {
+	if rules&PkmnRuleHasMoves > 0 {
+		hasMoves := false
+		for _, m := range p.Moves {
+			if m != nil {
+				hasMoves = true
+				break
+			}
+		}
+		if !hasMoves {
+			return ErrorValidationMissingMoves
+		}
+	}
+
+	if rules&PkmnRuleHasAbility > 0 && p.Ability == 0 {
+		return ErrorValidationMissingAbility
+	}
+
+	if rules&PkmnRuleValidLevel > 0 && !p.HasValidLevel() {
+		return ErrorValidationInvalidLevel
+	}
+
+	if rules&PkmnRuleValidIvs > 0 && !p.HasValidIVs() {
+		return ErrorValidationInvalidIvs
+	}
+
+	if rules&PkmnRuleValidEvs > 0 && !p.HasValidEVs() {
+		return ErrorValidationInvalidEvs
+	}
+
+	return nil
 }
