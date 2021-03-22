@@ -248,6 +248,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// Status Moves
 			if move.Category() == MoveCategoryStatus {
 				switch move.Id {
+				case MoveDoubleTeam:
+					b.QueueTransaction(ModifyStatTransaction{
+						Target: &user,
+						Stat:   StatEvasion,
+						Stages: +1,
+					})
 				case MoveStunSpore:
 					b.QueueTransaction(InflictStatusTransaction{
 						Target:       receiver,
