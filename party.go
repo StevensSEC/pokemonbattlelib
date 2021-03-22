@@ -18,7 +18,7 @@ type party struct {
 // Maximum number of Pokemon in a party
 const MaxPartySize = 6
 
-var PartyIndexError = errors.New("invalid index for party")
+var ErrorPartyIndex = errors.New("invalid index for party")
 var ErrorPartyFull = fmt.Errorf("party size cannot exceed max of %d Pokemon\n", MaxPartySize)
 
 // Creates a new party to store Pokemon and assigns them to a team
@@ -75,7 +75,7 @@ func (p *party) SetInactive(i int) {
 // Checks if a Pokemon in a party is currently active
 func (p *party) IsActivePokemon(i int) bool {
 	if i >= len(p.pokemon) {
-		log.Panicln(PartyIndexError)
+		log.Panicln(ErrorPartyIndex)
 	}
 	if _, ok := p.activePokemon[i]; ok {
 		return true
