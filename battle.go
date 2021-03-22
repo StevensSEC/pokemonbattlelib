@@ -301,7 +301,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
 			move := receiver.Moves[t.Move]
 			b.QueueTransaction(ItemTransaction{
-				Target: receiver,
+				Target: t.Target,
 				Item:   t.Item,
 				Move:   move,
 			})
@@ -375,7 +375,7 @@ func (b *Battle) postRound() {
 			}
 			if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
 				b.QueueTransaction(ItemTransaction{
-					Target: pkmn,
+					Target: t,
 					IsHeld: true,
 					Item:   pkmn.HeldItem,
 				})
