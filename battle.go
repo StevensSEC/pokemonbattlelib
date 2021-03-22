@@ -62,11 +62,11 @@ func (b *Battle) AddParty(p ...*party) {
 // Gets a reference to a Pokemon using party ID and party slot
 func (b *Battle) getPokemon(party, slot int) *Pokemon {
 	if party >= len(b.parties) {
-		panic(PartyIndexError)
+		panic(ErrorPartyIndex)
 	}
 	p := b.parties[party].pokemon
 	if slot >= len(p) {
-		panic(PartyIndexError)
+		panic(ErrorPartyIndex)
 	}
 	return p[slot]
 }

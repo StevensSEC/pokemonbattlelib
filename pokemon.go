@@ -2,6 +2,7 @@ package pokemonbattlelib
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 )
@@ -349,4 +350,56 @@ func (p *Pokemon) UnmarshalJSON(data []byte) error {
 // Get the Pokemon's current elemental type, accounting for any abilities or conditions that would affect it.
 func (p *Pokemon) EffectiveType() Type {
 	return p.Type
+}
+
+var ErrorValidationMissingMoves = errors.New("Pokemon needs at least 1 move.")
+var ErrorValidationMissingAbility = errors.New("Pokemon needs to have an ability.")
+var ErrorValidationInvalidLevel = errors.New("Pokemon has invalid level.")
+var ErrorValidationInvalidIvs = errors.New("Pokemon has invalid IVs.")
+var ErrorValidationInvalidEvs = errors.New("Pokemon has invalid EVs.")
+
+// Used to pick and choose which validation rules to enforce
+type PokemonValidationRules uint8
+
+const (
+	PkmnRuleHasMoves PokemonValidationRules = 1 << iota
+	PkmnRuleHasAbility
+	PkmnRuleValidLevel
+	PkmnRuleValidIvs
+	PkmnRuleValidEvs
+)
+
+const PkmnRuleSetDefault = PkmnRuleHasMoves | PkmnRuleHasAbility | PkmnRuleValidLevel | PkmnRuleValidIvs | PkmnRuleValidEvs
+
+func (p *Pokemon) Validate(rules PokemonValidationRules) error {
+	if rules&PkmnRuleHasMoves > 0 {
+		hasMoves := false
+		for _, m := range p.Moves {
+			if m != nil {
+				hasMoves = true
+				break
+			}
+		}
+		if !hasMoves {
+			return ErrorValidationMissingMoves
+		}
+	}
+
+	if rules&PkmnRuleHasAbility > 0 && p.Ability == 0 {
+		return ErrorValidationMissingAbility
+	}
+
+	if rules&PkmnRuleValidLevel > 0 && !p.HasValidLevel() {
+		return ErrorValidationInvalidLevel
+	}
+
+	if rules&PkmnRuleValidIvs > 0 && !p.HasValidIVs() {
+		return ErrorValidationInvalidIvs
+	}
+
+	if rules&PkmnRuleValidEvs > 0 && !p.HasValidEVs() {
+		return ErrorValidationInvalidEvs
+	}
+
+	return nil
 }
