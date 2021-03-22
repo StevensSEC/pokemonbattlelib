@@ -25,6 +25,23 @@ const (
 // Table of critical hit chances (denominator of 1/X)
 var CritChances = [5]int{16, 8, 4, 3, 2}
 
+// Table for evasion multiplier
+var EvasionFactor = map[int]uint{
+	-6: 300,
+	-5: 266,
+	-4: 250,
+	-3: 200,
+	-2: 166,
+	-1: 133,
+	0:  100,
+	1:  75,
+	2:  60,
+	3:  50,
+	4:  43,
+	5:  36,
+	6:  33,
+}
+
 // The min and max number of stages that a stat can be modified is [-6, 6]
 const (
 	MaxStatModifier = 6
