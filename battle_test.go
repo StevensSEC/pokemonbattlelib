@@ -1340,6 +1340,20 @@ var _ = Describe("Misc/held items", func() {
 			}))
 		})
 
+		It("handles Destiny Knot", func() {
+			b := setup(ItemDestinyKnot, PkmnMimeJr)
+			attacker := b.getPokemon(0, 0)
+			attacker.Moves[0] = GetMove(MoveAttract)
+			attacker.Gender = GenderMale
+			holder := b.getPokemon(1, 0)
+			holder.Gender = GenderFemale
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(InflictStatusTransaction{
+				Target:       attacker,
+				StatusEffect: StatusInfatuation,
+			}))
+		})
+
 		DescribeTable("Weather duration boosting rocks",
 			func(item Item, weather Weather, move MoveId) {
 				b := setup(item, PkmnCastform)
