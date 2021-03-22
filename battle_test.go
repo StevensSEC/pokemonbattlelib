@@ -285,9 +285,14 @@ var _ = Describe("Using items in battle", func() {
 			t, _ := battle.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				ItemTransaction{
-					Target: pkmn,
-					Item:   ItemPotion,
-					Move:   nil,
+					Target: target{
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+						Pokemon:   *pkmn,
+					},
+					Item: ItemPotion,
+					Move: nil,
 				},
 			))
 		})
@@ -1253,7 +1258,12 @@ var _ = Describe("In-a-pinch Berries", func() {
 			t, _ := b.SimulateRound()
 
 			Expect(t).To(HaveTransaction(ItemTransaction{
-				Target: holder,
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   *holder,
+				},
 				IsHeld: true,
 				Item:   holder.HeldItem,
 			}))
