@@ -1362,7 +1362,6 @@ var _ = Describe("Misc/held items", func() {
 
 		It("handles Life Orb", func() {
 			b, holder := setup(ItemLifeOrb, PkmnSnorlax)
-			b.rng = SimpleRNG()
 			holder.Moves[0] = GetMove(MoveTackle)
 			t, _ := b.SimulateRound()
 			// Boost damage by 30%
@@ -1388,6 +1387,23 @@ var _ = Describe("Misc/held items", func() {
 			}))
 		})
 
+		It("handles Muscle Band", func() {
+			b, holder := setup(ItemMuscleBand, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Boost damage by 10%
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: holder,
+				Target: target{
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+					Pokemon:   *b.getPokemon(0, 0),
+				},
+				Damage: 28,
+			}))
+		})
+
 		DescribeTable("Status curing held items",
 			func(item Item, status StatusCondition) {
 				b, holder := setup(item, PkmnSnorlax)
@@ -1405,6 +1421,7 @@ var _ = Describe("Misc/held items", func() {
 				// Item should be consumed after use
 				Expect(holder.HeldItem).To(Equal(ItemNone))
 			},
+			Entry("Mental Herb", ItemMentalHerb, StatusInfatuation),
 		)
 
 		DescribeTable("Flinch inducing items",
