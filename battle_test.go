@@ -1354,6 +1354,22 @@ var _ = Describe("Misc/held items", func() {
 			}))
 		})
 
+		DescribeTable("Flinch inducing items",
+			func(item Item) {
+				b := setup(ItemKingsRock, PkmnLucario)
+				holder := b.getPokemon(1, 0)
+				holder.Moves[0] = GetMove(MoveTackle)
+				b.rng = &AlwaysRNG
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(InflictStatusTransaction{
+					Target:       b.getPokemon(0, 0),
+					StatusEffect: StatusFlinch,
+				}))
+			},
+			Entry("King's Rock", ItemKingsRock),
+			Entry("Razor Fang", ItemRazorFang),
+		)
+
 		DescribeTable("Weather duration boosting rocks",
 			func(item Item, weather Weather, move MoveId) {
 				b := setup(item, PkmnCastform)
