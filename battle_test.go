@@ -1360,6 +1360,33 @@ var _ = Describe("Misc/held items", func() {
 			}))
 		})
 
+		It("handles Life Orb", func() {
+			b, holder := setup(ItemLifeOrb, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Boost damage by 30%
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: holder,
+				Target: target{
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+					Pokemon:   *b.getPokemon(0, 0),
+				},
+				Damage: 34,
+			}))
+			// Take 10% of max HP
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   *holder,
+				},
+				Damage: holder.MaxHP() / 10,
+			}))
+		})
+
 		DescribeTable("Flinch inducing items",
 			func(item Item) {
 				b, holder := setup(ItemKingsRock, PkmnLucario)

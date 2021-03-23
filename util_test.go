@@ -155,6 +155,9 @@ func getClosestTransaction(check []Transaction, want Transaction) map[string]dif
 	var best map[string]diff
 	bestDiff := 999
 	for _, t := range check {
+		if reflect.TypeOf(t) != reflect.TypeOf(want) {
+			continue
+		}
 		result := transactionDiff(want, t)
 		if len(result) < bestDiff {
 			bestDiff = len(result)
@@ -195,9 +198,13 @@ func (matcher *singleTransactionMatcher) FailureMessage(actual interface{}) (mes
 	case []Transaction:
 		first, count := findCountTransactionIdxWithMatchingType(transactions, matcher.expected)
 		if first == -1 {
-			return fmt.Sprintf("Expected the sequence of transactions to include: %T, but none of the same type were found in %d transactions.",
+			got := ""
+			for _, t := range transactions {
+				got += fmt.Sprintf("- %T\n", t)
+			}
+			return fmt.Sprintf("Expected the sequence of transactions to include: %T, but received the following transactions:\n%s",
 				matcher.expected,
-				len(transactions),
+				got,
 			)
 		} else if count == 1 {
 			return fmt.Sprintf("Expected:\n\t%T: %+v\n\nInstead, got:\n\t%T: %+v",
