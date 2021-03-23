@@ -1291,7 +1291,7 @@ var _ = Describe("Misc/held items", func() {
 	a2 := Agent(new(dumbAgent))
 	var holder *Pokemon
 
-	setup := func(item Item, pkmn int) *Battle {
+	setup := func(item Item, pkmn int) (*Battle, *Pokemon) {
 		p1 := NewOccupiedParty(&a1, 0, GeneratePokemon(
 			PkmnSnorlax,
 			WithLevel(25),
@@ -1308,22 +1308,20 @@ var _ = Describe("Misc/held items", func() {
 		b.rng = &SimpleRNG
 		b.AddParty(p1, p2)
 		Expect(b.Start()).To(Succeed())
-		return b
+		return b, holder
 	}
 
 	Context("when Pokemon hold certain misc. items in battle", func() {
 		It("handles Black Sludge", func() {
 			// Heal poison types for 1/16 HP
-			b := setup(ItemBlackSludge, PkmnGrimer)
-			holder := b.getPokemon(1, 0)
+			b, holder := setup(ItemBlackSludge, PkmnGrimer)
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(HealTransaction{
 				Target: holder,
 				Amount: holder.MaxHP() / 16,
 			}))
 			// Damage non-poison types for 1/8 HP
-			b = setup(ItemBlackSludge, PkmnAerodactyl)
-			holder = b.getPokemon(1, 0)
+			b, holder = setup(ItemBlackSludge, PkmnAerodactyl)
 			t, _ = b.SimulateRound()
 			Expect(t).ToNot(HaveTransaction(HealTransaction{
 				Target: holder,
@@ -1341,11 +1339,10 @@ var _ = Describe("Misc/held items", func() {
 		})
 
 		It("handles Destiny Knot", func() {
-			b := setup(ItemDestinyKnot, PkmnMimeJr)
+			b, holder := setup(ItemDestinyKnot, PkmnMimeJr)
 			attacker := b.getPokemon(0, 0)
 			attacker.Moves[0] = GetMove(MoveAttract)
 			attacker.Gender = GenderMale
-			holder := b.getPokemon(1, 0)
 			holder.Gender = GenderFemale
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(InflictStatusTransaction{
@@ -1354,10 +1351,18 @@ var _ = Describe("Misc/held items", func() {
 			}))
 		})
 
+		It("handles Leftovers", func() {
+			b, holder := setup(ItemLeftovers, PkmnSnorlax)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+		})
+
 		DescribeTable("Flinch inducing items",
 			func(item Item) {
-				b := setup(ItemKingsRock, PkmnLucario)
-				holder := b.getPokemon(1, 0)
+				b, holder := setup(ItemKingsRock, PkmnLucario)
 				holder.Moves[0] = GetMove(MoveTackle)
 				b.rng = &AlwaysRNG
 				t, _ := b.SimulateRound()
@@ -1372,8 +1377,8 @@ var _ = Describe("Misc/held items", func() {
 
 		DescribeTable("Weather duration boosting rocks",
 			func(item Item, weather Weather, move MoveId) {
-				b := setup(item, PkmnCastform)
-				b.parties[1].pokemon[0].Moves[0] = GetMove(move)
+				b, holder := setup(item, PkmnCastform)
+				holder.Moves[0] = GetMove(move)
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransaction(WeatherTransaction{
 					Weather: weather,
