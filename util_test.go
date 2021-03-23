@@ -301,6 +301,17 @@ func (g *TestRNG) Roll(x, y int) bool {
 	return v
 }
 
-var NeverRNG = TestRNG{rolls: []bool{false}}        // Never rolls random effects
-var AlwaysRNG = TestRNG{rolls: []bool{true}}        // Always rolls random effects
-var SimpleRNG = TestRNG{rolls: []bool{true, false}} // Always hit, never crit
+// Never rolls random effects
+func NeverRNG() *TestRNG {
+	return &TestRNG{rolls: []bool{false}}
+}
+
+// Always rolls random effects
+func AlwaysRNG() *TestRNG {
+	return &TestRNG{rolls: []bool{true}}
+}
+
+// Always hit, never crit
+func SimpleRNG() *TestRNG {
+	return &TestRNG{rolls: []bool{true, false}}
+}
