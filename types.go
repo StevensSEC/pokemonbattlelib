@@ -94,7 +94,7 @@ var typeStrings = map[Type]string{
 // Represents effectiveness of an elemental type matchup.
 type Effectiveness int8
 
-const NoEffect Effectiveness = math.MinInt8 // separate because it fucks up the iota
+const NoEffect Effectiveness = math.MinInt8 + 1 // separate because it fucks up the iota
 const (
 	VeryIneffective Effectiveness = iota - 2
 	Ineffective
