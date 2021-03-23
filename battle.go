@@ -502,8 +502,8 @@ func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 }
 
 // Get the battle context that will be shared with the client
-func (b *Battle) GetRoundContext(party int, pokemon int) *BattleContext {
-	return b.getContext(b.parties[party], b.parties[party].activePokemon[pokemon])
+func (b *Battle) GetRoundContext(t target) *BattleContext {
+	return b.getContext(b.parties[t.party], b.parties[t.party].activePokemon[t.partySlot])
 }
 
 // An abstraction over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.

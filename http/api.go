@@ -217,10 +217,14 @@ func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
 
 func HandleBattleContext(w http.ResponseWriter, r *http.Request) {
 	battleId := parseNumberArg(r, "id")
-	partyId := parseNumberArg(r, "party")
-	slot := parseNumberArg(r, "slot")
+	// partyId := parseNumberArg(r, "party")
+	// slot := parseNumberArg(r, "slot")
+	targetIdx := parseNumberArg(r, "target")
 
-	bytes, err := json.Marshal(battles[battleId].Battle.GetRoundContext(partyId, slot))
+	b := battles[battleId].Battle
+	target := b.GetTargets()[targetIdx]
+
+	bytes, err := json.Marshal(b.GetRoundContext(target))
 	if err != nil {
 		log.Printf("Failed to marshal into JSON: %s", err)
 		w.WriteHeader(500)
