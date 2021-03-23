@@ -1391,7 +1391,7 @@ var _ = Describe("Misc/held items", func() {
 			b, holder := setup(ItemMuscleBand, PkmnSnorlax)
 			holder.Moves[0] = GetMove(MoveTackle)
 			t, _ := b.SimulateRound()
-			// Boost damage by 10%
+			// Boost physical move damage by 10%
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: holder,
 				Target: target{
@@ -1432,6 +1432,23 @@ var _ = Describe("Misc/held items", func() {
 					Fail("Expected all lowered stats to be reset")
 				}
 			}
+		})
+
+		It("handles Wise Glasses", func() {
+			b, holder := setup(ItemWiseGlasses, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveSurf)
+			t, _ := b.SimulateRound()
+			// Boost special move damage by 10%
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: holder,
+				Target: target{
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+					Pokemon:   *b.getPokemon(0, 0),
+				},
+				Damage: 16,
+			}))
 		})
 
 		DescribeTable("Status curing held items",
