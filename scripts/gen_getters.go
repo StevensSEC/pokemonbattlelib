@@ -98,18 +98,33 @@ func main() {
 	output += "\n"
 
 	// generate MarshalJSON
-	output += fmt.Sprintf("func (%[2]s *%[1]s) MarshalJSON() ([]byte, error) {\ntype alias %[1]s\n", *forTypeName, minivar)
-	output += "return json.Marshal(&struct {\n"
-	for _, field := range dataType.Type.(*ast.StructType).Fields.List {
-		output += fmt.Sprintf("\t\t%[1]s %[2]s\n", field.Names[0], field.Type)
+	var star string
+	switch forType.Type.(type) {
+	case *ast.StructType:
+		star = "*"
 	}
-	output += "\t\t*alias\n" +
-		"}{\n"
+	output += fmt.Sprintf("func (%[2]s %[3]s%[1]s) MarshalJSON() ([]byte, error) {\ntype alias %[1]s\n", *forTypeName, minivar, star)
+	output += "return json.Marshal(&struct {\n"
+	switch forType.Type.(type) {
+	case *ast.StructType:
+		output += "*alias\n"
+	default:
+		output += "Id alias\n"
+	}
+	for _, field := range dataType.Type.(*ast.StructType).Fields.List {
+		output += fmt.Sprintf("%[1]s %[2]s\n", field.Names[0], field.Type)
+	}
+	output += "}{\n"
+	switch forType.Type.(type) {
+	case *ast.StructType:
+		output += fmt.Sprintf("alias: (*alias)(%[1]s),\n", minivar)
+	default:
+		output += fmt.Sprintf("Id: alias(%[2]s%[1]s),\n", minivar, star)
+	}
 	for _, field := range dataType.Type.(*ast.StructType).Fields.List {
 		output += fmt.Sprintf("%[1]s: %[2]s.%[1]s(),\n", field.Names[0], minivar)
 	}
-	output += fmt.Sprintf("alias: (*alias)(%[1]s),\n", minivar) +
-		"})\n}\n\n"
+	output += "})\n}\n\n"
 
 	// generate UnmarshalJSON
 	output += fmt.Sprintf("func (%[2]s *%[1]s) UnmarshalJSON(data []byte) error {\ntype alias %[1]s\n", *forTypeName, minivar)
@@ -122,10 +137,18 @@ func main() {
 			"}\n"
 		output += "return json.Unmarshal(data, &aux)\n"
 	default:
-		output += "var aux alias\n" +
+		output += fmt.Sprintf("type dataalias struct{ Id %s }\n", forType.Type) +
+			"if data[0] == '{' {\n" +
+			"var aux dataalias\n" +
+			"if err := json.Unmarshal(data, &aux); err != nil {return err}\n" +
+			fmt.Sprintf("*%[1]s = %[2]s(aux.Id)\n", minivar, *forTypeName) +
+			"return nil\n" +
+			"} else {\n" +
+			"var aux alias\n" +
 			"if err := json.Unmarshal(data, &aux); err != nil {return err}\n" +
 			fmt.Sprintf("*%[1]s = %[2]s(aux)\n", minivar, *forTypeName) +
-			"return nil\n"
+			"return nil\n" +
+			"}\n"
 	}
 	output += "}\n\n"
 
