@@ -101,8 +101,12 @@ var nextBattleId int
 var battles = map[int]*httpBattle{}
 
 type newBattleArgs struct {
-	Parties      [][]*Pokemon
-	CallbackUrls []string
+	Teams []struct {
+		Parties []struct {
+			Pokemon []*Pokemon `json:"pokemon"`
+		} `json:"parties"`
+	} `json:"teams"`
+	Parties [][]*Pokemon `json:"parties"` // deprecated
 }
 
 type httpBattle struct {
@@ -124,14 +128,31 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 		hb := httpBattle{
 			Battle: NewBattle(),
 		}
-		for i := range args.Parties {
-			// a := Agent(NewHttpCallbackAgent(args.CallbackUrls[i]))
-			wa := NewWaiterAgent()
-			a := Agent(wa)
-			hb.AgentInputs = append(hb.AgentInputs, wa.Input())
-			p := NewParty(&a, i)
-			p.AddPokemon(args.Parties[i]...)
-			hb.Battle.AddParty(p)
+		if len(args.Parties) > 0 {
+			// deprecated
+			for i := range args.Parties {
+				// a := Agent(NewHttpCallbackAgent(args.CallbackUrls[i]))
+				wa := NewWaiterAgent()
+				a := Agent(wa)
+				hb.AgentInputs = append(hb.AgentInputs, wa.Input())
+				p := NewParty(&a, i)
+				p.AddPokemon(args.Parties[i]...)
+				hb.Battle.AddParty(p)
+			}
+		} else if len(args.Teams) > 0 {
+			for t, team := range args.Teams {
+				for _, party := range team.Parties {
+					wa := NewWaiterAgent()
+					a := Agent(wa)
+					hb.AgentInputs = append(hb.AgentInputs, wa.Input())
+					p := NewParty(&a, t)
+					p.AddPokemon(party.Pokemon...)
+					hb.Battle.AddParty(p)
+				}
+			}
+		} else {
+			w.WriteHeader(400)
+			w.Write([]byte("Bad request: invalid body"))
 		}
 		battles[nextBattleId] = &hb
 
