@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"encoding/json"
 	"math"
 
 	. "github.com/onsi/ginkgo"
@@ -21,4 +22,21 @@ var _ = Describe("Using items", func() {
 	It("should panic if item is invalid", func() {
 		Expect(func() { Item(math.MaxUint16).Data() }).To(Panic())
 	})
+})
+
+var _ = Describe("Item Marshalling and Unmarshalling", func() {
+	DescribeTable("should marshall and unmarshall items",
+		func(i Item) {
+			b, err := json.Marshal(i)
+			Expect(err).To(Succeed())
+			var got Item
+			err = json.Unmarshal(b, &got)
+			Expect(err).To(Succeed())
+			Expect(got).To(BeEquivalentTo(i))
+		},
+		Entry("None", ItemNone),
+		Entry("Potion", ItemPotion),
+		Entry("Oran Berry", ItemOranBerry),
+		Entry("Ultra Ball", ItemUltraBall),
+	)
 })

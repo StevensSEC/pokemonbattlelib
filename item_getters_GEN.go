@@ -29,3 +29,13 @@ func (i *Item) MarshalJSON() ([]byte, error) {
 		alias:       (*alias)(i),
 	})
 }
+
+func (i *Item) UnmarshalJSON(data []byte) error {
+	type alias Item
+	var aux alias
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	*i = Item(aux)
+	return nil
+}

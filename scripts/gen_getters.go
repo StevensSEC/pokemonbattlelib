@@ -97,6 +97,7 @@ func main() {
 	}
 	output += "\n"
 
+	// generate MarshalJSON
 	output += fmt.Sprintf("func (%[2]s *%[1]s) MarshalJSON() ([]byte, error) {\ntype alias %[1]s\n", *forTypeName, minivar)
 	output += "return json.Marshal(&struct {\n"
 	for _, field := range dataType.Type.(*ast.StructType).Fields.List {
@@ -109,6 +110,24 @@ func main() {
 	}
 	output += fmt.Sprintf("alias: (*alias)(%[1]s),\n", minivar) +
 		"})\n}\n\n"
+
+	// generate UnmarshalJSON
+	output += fmt.Sprintf("func (%[2]s *%[1]s) UnmarshalJSON(data []byte) error {\ntype alias %[1]s\n", *forTypeName, minivar)
+	switch forType.Type.(type) {
+	case *ast.StructType:
+		output += "aux := &struct {\n" +
+			"*alias\n" +
+			"}{\n" +
+			fmt.Sprintf("alias: (*alias)(%[1]s),\n", minivar) +
+			"}\n"
+		output += "return json.Unmarshal(data, &aux)\n"
+	default:
+		output += "var aux alias\n" +
+			"if err := json.Unmarshal(data, &aux); err != nil {return err}\n" +
+			fmt.Sprintf("*%[1]s = %[2]s(aux)\n", minivar, *forTypeName) +
+			"return nil\n"
+	}
+	output += "}\n\n"
 
 	createCodeOutput(output)
 

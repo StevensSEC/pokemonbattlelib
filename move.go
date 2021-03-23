@@ -1,7 +1,5 @@
 package pokemonbattlelib
 
-import "encoding/json"
-
 type MoveCategory uint8
 
 const (
@@ -94,14 +92,4 @@ func (m *Move) Data() *MoveData {
 
 func (m Move) String() string {
 	return m.Name()
-}
-
-func (m *Move) UnmarshalJSON(data []byte) error {
-	type alias Move // required to not enter infinite recursive loop
-	aux := &struct {
-		*alias
-	}{
-		alias: (*alias)(m),
-	}
-	return json.Unmarshal(data, &aux)
 }

@@ -38,3 +38,13 @@ func (m *Move) MarshalJSON() ([]byte, error) {
 		alias:        (*alias)(m),
 	})
 }
+
+func (m *Move) UnmarshalJSON(data []byte) error {
+	type alias Move
+	aux := &struct {
+		*alias
+	}{
+		alias: (*alias)(m),
+	}
+	return json.Unmarshal(data, &aux)
+}
