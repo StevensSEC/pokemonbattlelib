@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -166,7 +165,20 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("Battle created: %v", hb.Battle)
 		w.WriteHeader(200)
-		w.Write([]byte(fmt.Sprintf("%d", nextBattleId)))
+		data, err := json.Marshal(struct {
+			BattleId      int
+			ActivePokemon int
+		}{
+			BattleId:      nextBattleId,
+			ActivePokemon: 2, // TODO: change for double battles
+		})
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Internal server error: Failed to marshal response"))
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(data)
 		nextBattleId++
 	} else {
 		w.WriteHeader(400)
