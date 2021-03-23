@@ -206,6 +206,70 @@ var _ = Describe("One round of battle", func() {
 			Expect(bidoof.CurrentHP).To(BeEquivalentTo(93))
 		})
 
+		It("should account for supereffective type matchups", func() {
+			a1 := newRcAgent()
+			a2 := newRcAgent()
+			_a1 := Agent(a1)
+			_a2 := Agent(a2)
+			pkmn1 := GeneratePokemon(
+				PkmnMightyena,
+				WithIVs([6]uint8{31, 0, 31, 0, 31, 31}),
+				WithMoves(
+					GetMove(MoveFireFang),
+					GetMove(MoveTackle),
+				),
+			)
+			party1 = NewOccupiedParty(&_a1, 0, pkmn1)
+			pkmn2 := GeneratePokemon(
+				PkmnTurtwig,
+				WithMoves(GetMove(MoveTackle)),
+				WithIVs([6]uint8{31, 31, 31, 31, 31, 0}),
+			)
+			party2 = NewOccupiedParty(&_a2, 1, pkmn2)
+			b := NewBattle()
+			b.AddParty(party1, party2)
+			b.rng = &SimpleRNG
+			Expect(b.Start()).To(Succeed())
+
+			// TODO: test the difference in damage between the transactions rather than the exact values of the transactions
+			// TODO: make it so that target doesn't need to include `Pokemon` or `Team`
+			a1 <- FightTurn{Move: 1, Target: target{Pokemon: *pkmn2, party: 1, partySlot: 0, Team: 1}}
+			a2 <- FightTurn{Move: 0, Target: target{Pokemon: *pkmn1, party: 0, partySlot: 0, Team: 0}}
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: pkmn1,
+				Target: target{
+					Pokemon:   *pkmn2,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Move:   GetMove(MoveTackle),
+				Damage: 3,
+			}))
+
+			b.QueueTransaction(HealTransaction{
+				Target: pkmn2,
+				Amount: 200,
+			})
+			b.ProcessQueue()
+
+			a1 <- FightTurn{Move: 0, Target: target{Pokemon: *pkmn2, party: 1, partySlot: 0, Team: 1}}
+			a2 <- FightTurn{Move: 0, Target: target{Pokemon: *pkmn1, party: 0, partySlot: 0, Team: 0}}
+			t, _ = b.SimulateRound()
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: pkmn1,
+				Target: target{
+					Pokemon:   *pkmn2,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Move:   GetMove(MoveFireFang),
+				Damage: 9,
+			}))
+		})
+
 		It("should account for critical hits", func() {
 			battle.rng = AlwaysRNG()
 			Expect(battle.Start()).To(Succeed())

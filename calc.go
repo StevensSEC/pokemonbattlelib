@@ -16,7 +16,9 @@ func calcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 		}
 	}
 
-	modifier := weatherMod * stab
+	elemental := GetElementalEffect(move.Type(), receiver.EffectiveType())
+
+	modifier := weatherMod * float64(elemental) * stab
 	levelEffect := float64((2 * user.Level / 5) + 2)
 	movePower := float64(move.Power())
 	attack := float64(user.Attack())
