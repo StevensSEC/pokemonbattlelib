@@ -93,10 +93,10 @@ var _ = Describe("Battle initialization", func() {
 			b := NewBattle()
 			b.AddParty(party)
 			Expect(func() {
-				b.getPokemon(1, 5)
+				b.getPokemonInBattle(1, 5)
 			}).To(Panic())
 			Expect(func() {
-				b.getPokemon(0, 5)
+				b.getPokemonInBattle(0, 5)
 			}).To(Panic())
 		})
 	})
@@ -340,7 +340,7 @@ var _ = Describe("Getting pokemon from parties", func() {
 
 	Context("when getting Pokemon by party/slot", func() {
 		It("should get the Pokemon the user expects", func() {
-			pkmn := battle.getPokemon(0, 1)
+			pkmn := battle.getPokemonInBattle(0, 1)
 			Expect(pkmn.NatDex).To(BeEquivalentTo(PkmnSquirtle))
 		})
 	})
@@ -692,11 +692,11 @@ var _ = Describe("Weather", func() {
 						Turns:   5,
 					},
 					HealTransaction{
-						Target: b.getPokemon(0, 0),
+						Target: b.getPokemonInBattle(0, 0),
 						Amount: 100,
 					},
 					HealTransaction{
-						Target: b.getPokemon(1, 0),
+						Target: b.getPokemonInBattle(1, 0),
 						Amount: 100,
 					},
 				)
@@ -780,11 +780,11 @@ var _ = Describe("Weather", func() {
 						Turns:   5,
 					},
 					HealTransaction{
-						Target: b.getPokemon(0, 0),
+						Target: b.getPokemonInBattle(0, 0),
 						Amount: 100,
 					},
 					HealTransaction{
-						Target: b.getPokemon(1, 0),
+						Target: b.getPokemonInBattle(1, 0),
 						Amount: 100,
 					},
 				)

@@ -20,7 +20,7 @@ func (t DamageTransaction) Mutate(b *Battle) {
 	if t.Damage == 0 {
 		t.Damage = 1
 	}
-	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+	receiver := b.getPokemon(t.Target)
 	if t.Move != nil {
 		t.User.metadata[MetaLastMove] = t.Move
 	}
@@ -94,7 +94,7 @@ type ItemTransaction struct {
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
-	target := b.getPokemon(t.Target.party, t.Target.partySlot)
+	target := b.getPokemon(t.Target)
 	if t.Item.Flags()&FlagConsumable > 0 {
 		if t.IsHeld {
 			t.Item = target.HeldItem // auto-correct if the value is not present or does not match
@@ -196,7 +196,7 @@ type CureStatusTransaction struct {
 }
 
 func (t CureStatusTransaction) Mutate(b *Battle) {
-	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+	receiver := b.getPokemon(t.Target)
 	receiver.StatusEffects.clear(t.StatusEffect)
 	if t.StatusEffect.check(StatusSleep) {
 		delete(receiver.metadata, MetaSleepTime)
@@ -219,7 +219,7 @@ func (t FaintTransaction) Mutate(b *Battle) {
 			// auto send out next pokemon
 			b.QueueTransaction(SendOutTransaction{
 				Target: target{
-					Pokemon:   *b.getPokemon(t.Target.party, i),
+					Pokemon:   *b.getPokemonInBattle(t.Target.party, i),
 					party:     t.Target.party,
 					partySlot: i,
 					Team:      t.Target.Team,
@@ -279,7 +279,7 @@ type ImmobilizeTransaction struct {
 }
 
 func (t ImmobilizeTransaction) Mutate(b *Battle) {
-	receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+	receiver := b.getPokemon(t.Target)
 	if t.StatusEffect.check(StatusSleep) {
 		receiver.metadata[MetaSleepTime] = receiver.metadata[MetaSleepTime].(int) - 1
 	}
