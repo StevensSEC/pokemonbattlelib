@@ -1404,6 +1404,36 @@ var _ = Describe("Misc/held items", func() {
 			}))
 		})
 
+		It("handles Shell Bell", func() {
+			b, holder := setup(ItemShellBell, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Self-inflict 1/8 of dealt damage
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   *holder,
+				},
+				Damage: 3,
+			}))
+		})
+
+		It("handles White Herb", func() {
+			b, holder := setup(ItemShellBell, PkmnSnorlax)
+			holder.StatModifiers = [9]int{-1, -1, -1, -1, -1, -1, 0, -1, -1}
+			b.SimulateRound()
+			// Consumed after use
+			Expect(holder.HeldItem).To(Equal(ItemNone))
+			// Reset all lowered stat modifiers
+			for _, stage := range holder.StatModifiers {
+				if stage < 0 {
+					Fail("Expected all lowered stats to be reset")
+				}
+			}
+		})
+
 		DescribeTable("Status curing held items",
 			func(item Item, status StatusCondition) {
 				b, holder := setup(item, PkmnSnorlax)
