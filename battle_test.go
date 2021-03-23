@@ -139,7 +139,7 @@ var _ = Describe("One round of battle", func() {
 		party2 = NewOccupiedParty(&agent2, 1, squirtle)
 		battle = NewBattle()
 		battle.AddParty(party1, party2)
-		battle.rng = &SimpleRNG
+		battle.rng = SimpleRNG()
 	})
 
 	Context("when simulating a round between two agents", func() {
@@ -194,7 +194,7 @@ var _ = Describe("One round of battle", func() {
 			party2 = NewOccupiedParty(&agent2, 1, bidoof)
 			battle = NewBattle()
 			battle.AddParty(party1, party2)
-			battle.rng = &SimpleRNG
+			battle.rng = SimpleRNG()
 
 			charmander.Moves[0] = GetMove(MoveEmber)
 			Expect(battle.Start()).To(Succeed())
@@ -207,21 +207,21 @@ var _ = Describe("One round of battle", func() {
 		})
 
 		It("should account for critical hits", func() {
-			battle.rng = &AlwaysRNG
+			battle.rng = AlwaysRNG()
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
 			Expect(squirtle.CurrentHP).To(BeEquivalentTo(5))
 		})
 
 		It("should miss moves randomly based on accuracy/evasion", func() {
-			battle.rng = &NeverRNG
+			battle.rng = NeverRNG()
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
 			Expect(t).To(HaveTransaction(MoveFailTransaction{
 				User:   charmander,
 				Reason: FailMiss,
 			}))
-			battle.rng = &SimpleRNG
+			battle.rng = SimpleRNG()
 			t, _ = battle.SimulateRound()
 			Expect(t).ToNot(HaveTransaction(MoveFailTransaction{
 				User:   charmander,
@@ -256,7 +256,7 @@ var _ = Describe("One round of battle", func() {
 		)
 
 		It("should change a move's PP", func() {
-			battle.rng = &AlwaysRNG
+			battle.rng = AlwaysRNG()
 			charmander.Moves[0] = GetMove(MoveSpite)
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound() // set Pokemon's last move
@@ -387,7 +387,7 @@ var _ = Describe("Turn priority", func() {
 			p2 := NewOccupiedParty(&a2, 1, charmander)
 			b := NewBattle()
 			b.AddParty(p1, p2)
-			b.rng = &SimpleRNG
+			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
@@ -420,7 +420,7 @@ var _ = Describe("Turn priority", func() {
 			party2 := NewOccupiedParty(&a2, 1, p2)
 			b := NewBattle()
 			b.AddParty(party1, party2)
-			b.rng = &SimpleRNG
+			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
@@ -457,7 +457,7 @@ var _ = Describe("Turn priority", func() {
 			p2 := NewOccupiedParty(&a2, 1, ninjask) // ninjask is faster than charmander
 			b := NewBattle()
 			b.AddParty(p1, p2)
-			b.rng = &SimpleRNG
+			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
@@ -502,7 +502,7 @@ var _ = Describe("Weather", func() {
 		p2 = NewParty(&a2, 1)
 		b = NewBattle()
 		b.AddParty(p1, p2)
-		b.rng = &SimpleRNG
+		b.rng = SimpleRNG()
 	})
 
 	Context("when using certain moves/certain abilities cause weather", func() {
@@ -892,7 +892,7 @@ var _ = Describe("Fainting", func() {
 		p2 = NewOccupiedParty(&a2, 1, scary_monster)
 		b = NewBattle()
 		b.AddParty(p1, p2)
-		b.rng = &SimpleRNG
+		b.rng = SimpleRNG()
 	})
 
 	Context("after a Pokemon faints in battle", func() {
@@ -1041,7 +1041,7 @@ var _ = Describe("Battle end", func() {
 		party2.AddPokemon(pkmn2)
 		b = NewBattle()
 		b.AddParty(party1, party2)
-		b.rng = &SimpleRNG
+		b.rng = SimpleRNG()
 	})
 
 	Context("when all Pokemon faint on one team", func() {
@@ -1091,7 +1091,7 @@ var _ = Describe("Battle metadata", func() {
 			)
 			b := NewBattle()
 			b.AddParty(p1, p2)
-			b.rng = &SimpleRNG
+			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
 			Expect(p1.pokemon[0].metadata).ToNot(HaveKeyWithValue(MetaLastMove, razorLeaf))
 			b.SimulateRound()
@@ -1112,7 +1112,7 @@ var _ = Describe("Status Conditions", func() {
 
 	BeforeEach(func() {
 		b = NewBattle()
-		b.rng = &AlwaysRNG
+		b.rng = AlwaysRNG()
 	})
 
 	Context("when using certain moves in battle causes status effects", func() {
@@ -1389,7 +1389,7 @@ var _ = Describe("In-a-pinch Berries", func() {
 		holder.CurrentHP = holder.MaxHP() / 4
 		p2 := NewOccupiedParty(&a2, 1, holder)
 		b := NewBattle()
-		b.rng = &SimpleRNG
+		b.rng = SimpleRNG()
 		b.AddParty(p1, p2)
 		Expect(b.Start()).To(Succeed())
 		return b
