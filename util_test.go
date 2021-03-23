@@ -207,12 +207,14 @@ func (matcher *singleTransactionMatcher) FailureMessage(actual interface{}) (mes
 				got,
 			)
 		} else if count == 1 {
-			return fmt.Sprintf("Expected:\n\t%T: %+v\n\nInstead, got:\n\t%T: %+v",
-				matcher.expected,
-				matcher.expected,
-				transactions[first],
-				transactions[first],
-			)
+			diffText := ""
+			result := transactionDiff(matcher.expected, transactions[first])
+			total := reflect.ValueOf(matcher.expected).NumField()
+			for name, val := range result {
+				diffText += fmt.Sprintf("- %s\nExpected: %v\nReceived: %v\n", name, val.expected, val.got)
+			}
+			return fmt.Sprintf("%d/%d fields of the %T do not match:\n%s",
+				len(result), total, matcher.expected, diffText)
 		} else {
 			diffText := ""
 			closest := getClosestTransaction(transactions, matcher.expected)

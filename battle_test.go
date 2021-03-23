@@ -1447,7 +1447,7 @@ var _ = Describe("Misc/held items", func() {
 					Team:      0,
 					Pokemon:   *b.getPokemon(0, 0),
 				},
-				Damage: 16,
+				Damage: 6,
 			}))
 		})
 
