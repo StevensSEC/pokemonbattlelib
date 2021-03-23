@@ -266,7 +266,7 @@ var _ = Describe("One round of battle", func() {
 					Team:      1,
 				},
 				Move:   GetMove(MoveFireFang),
-				Damage: 9,
+				Damage: 8,
 			}))
 		})
 
