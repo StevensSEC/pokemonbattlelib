@@ -59,8 +59,13 @@ func (b *Battle) AddParty(p ...*party) {
 	b.parties = append(b.parties, p...)
 }
 
+// Gets a reference to a Pokemon from a target
+func (b *Battle) getPokemon(t target) *Pokemon {
+	return b.getPokemonInBattle(t.party, t.partySlot)
+}
+
 // Gets a reference to a Pokemon using party ID and party slot
-func (b *Battle) getPokemon(party, slot int) *Pokemon {
+func (b *Battle) getPokemonInBattle(party, slot int) *Pokemon {
 	if party >= len(b.parties) {
 		panic(ErrorPartyIndex)
 	}
@@ -194,7 +199,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		turns = turns[1:]
 		blog.Printf("Processing Turn %T for %s", turn.Turn, turn.User.Pokemon)
 		// here, we can't use the turn context's reference to the pokemon, because it is a copy of the ground truth pokemon
-		self := b.getPokemon(turn.User.party, turn.User.partySlot)
+		self := b.getPokemon(turn.User)
 		if self.CurrentHP == 0 {
 			continue
 		}
@@ -230,7 +235,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 
 			// use the move
-			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			receiver := b.getPokemon(t.Target)
 			evasion := float64(receiver.Evasion() / 100)
 			// Todo: account for user's accuracy stage
 			accuracy := float64(move.Accuracy()) * evasion
@@ -305,7 +310,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				})
 			}
 		case ItemTurn:
-			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			receiver := b.getPokemon(t.Target)
 			move := receiver.Moves[t.Move]
 			b.QueueTransaction(ItemTransaction{
 				Target: t.Target,
