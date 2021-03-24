@@ -463,6 +463,10 @@ func (t *target) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (b *Battle) GetParty(t *target) *party {
+	return b.parties[t.party]
+}
+
 type BattleContext struct {
 	Battle    Battle   // A copy of the current Battle, including weather, state, etc.
 	Pokemon   Pokemon  // A copy of the Pokemon that is acting in this context

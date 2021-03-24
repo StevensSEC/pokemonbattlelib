@@ -111,6 +111,24 @@ type newBattleArgs struct {
 type httpBattle struct {
 	Battle      *Battle
 	AgentInputs []*chan Turn
+	queuedTurns map[int]Turn
+}
+
+func (hb *httpBattle) QueueNextTurn(targetId int, turn Turn) {
+	hb.queuedTurns[targetId] = turn
+}
+
+func (hb *httpBattle) FlushTurns() {
+	for i, t := range hb.Battle.GetTargets() {
+		p := hb.Battle.GetParty(&t)
+		switch a := (*p.Agent).(type) {
+		case WaiterAgent:
+			turn := hb.queuedTurns[i]
+			c := a.Input()
+			*c <- turn
+			delete(hb.queuedTurns, i)
+		}
+	}
 }
 
 func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
@@ -125,7 +143,8 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 		}
 
 		hb := httpBattle{
-			Battle: NewBattle(),
+			Battle:      NewBattle(),
+			queuedTurns: make(map[int]Turn),
 		}
 		if len(args.Parties) > 0 {
 			// deprecated
@@ -189,8 +208,9 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
 	battleId := parseNumberArg(r, "id")
 	log.Printf("Simulating round: id %d", battleId)
-	b := battles[battleId].Battle
-	transactions, ended := b.SimulateRound()
+	hb := battles[battleId]
+	hb.FlushTurns()
+	transactions, ended := hb.Battle.SimulateRound()
 
 	type roundResults struct {
 		Transactions []Transaction
@@ -239,21 +259,36 @@ func HandleBattleContext(w http.ResponseWriter, r *http.Request) {
 
 func HandleBattleAct(w http.ResponseWriter, r *http.Request) {
 	battleId := parseNumberArg(r, "id")
-	agentId := parseNumberArg(r, "agent")
+	targetIdx := parseNumberArg(r, "target")
 
 	var hT HttpTurn
 	err := json.NewDecoder(r.Body).Decode(&hT)
 	if err != nil {
-		log.Panicf("Failed to decode turn: %s", err)
+		respondSuccess(w, false)
+		log.Printf("Failed to decode turn: %s", err)
+		return
 	}
 
-	*battles[battleId].AgentInputs[agentId] <- hT.GetTurn()
+	battles[battleId].QueueNextTurn(targetIdx, hT.GetTurn())
 
 	w.WriteHeader(200)
-	w.Write([]byte("Turn has been queued."))
+	respondSuccess(w, true)
 }
 
 func HandleDumbAgent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"type": 0, "args": {"target": {"party":0, "slot": 0}, "move": 0}}`))
+}
+
+func respondSuccess(w http.ResponseWriter, success bool) {
+	data, err := json.Marshal(responseSuccess{true})
+	if err != nil {
+		log.Panicf("Failed to marshal response.")
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
+
+type responseSuccess struct {
+	Success bool `json:"success"`
 }
