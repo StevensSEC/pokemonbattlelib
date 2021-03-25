@@ -46,5 +46,11 @@ func calcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 		}
 	}
 	damage = uint((((levelEffect * movePower * attack / defense) / 50) + 2) * modifier)
+	elementalEffect := GetElementalEffect(move.Type(), receiver.EffectiveType())
+	if elementalEffect > NormalEffect {
+		damage <<= elementalEffect
+	} else if elementalEffect < NormalEffect {
+		damage >>= elementalEffect * -1 // bitshift operand must be positive
+	}
 	return damage
 }
