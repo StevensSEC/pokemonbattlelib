@@ -1559,7 +1559,7 @@ var _ = Describe("Misc/held items", func() {
 		})
 
 		It("handles White Herb", func() {
-			b, holder := setup(ItemShellBell, PkmnSnorlax)
+			b, holder := setup(ItemWhiteHerb, PkmnSnorlax)
 			holder.StatModifiers = [9]int{-1, -1, -1, -1, -1, -1, 0, -1, -1}
 			b.SimulateRound()
 			// Consumed after use
