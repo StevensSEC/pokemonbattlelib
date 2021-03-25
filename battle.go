@@ -468,6 +468,10 @@ func (t *target) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (b *Battle) GetParty(t *target) *party {
+	return b.parties[t.party]
+}
+
 type BattleContext struct {
 	Battle    Battle   // A copy of the current Battle, including weather, state, etc.
 	Pokemon   Pokemon  // A copy of the Pokemon that is acting in this context
@@ -507,8 +511,8 @@ func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 }
 
 // Get the battle context that will be shared with the client
-func (b *Battle) GetRoundContext(party int, pokemon int) *BattleContext {
-	return b.getContext(b.parties[party], b.parties[party].activePokemon[pokemon])
+func (b *Battle) GetRoundContext(t target) *BattleContext {
+	return b.getContext(b.parties[t.party], b.parties[t.party].activePokemon[t.partySlot])
 }
 
 // An abstraction over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.

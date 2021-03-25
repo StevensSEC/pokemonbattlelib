@@ -17,6 +17,7 @@ func (m Move) InitialMaxPP() uint8    { return m.Data().InitialMaxPP }
 func (m *Move) MarshalJSON() ([]byte, error) {
 	type alias Move
 	return json.Marshal(&struct {
+		*alias
 		Name         string
 		Type         Type
 		Category     MoveCategory
@@ -25,8 +26,8 @@ func (m *Move) MarshalJSON() ([]byte, error) {
 		Power        uint
 		Accuracy     uint
 		InitialMaxPP uint8
-		*alias
 	}{
+		alias:        (*alias)(m),
 		Name:         m.Name(),
 		Type:         m.Type(),
 		Category:     m.Category(),
@@ -35,6 +36,15 @@ func (m *Move) MarshalJSON() ([]byte, error) {
 		Power:        m.Power(),
 		Accuracy:     m.Accuracy(),
 		InitialMaxPP: m.InitialMaxPP(),
-		alias:        (*alias)(m),
 	})
+}
+
+func (m *Move) UnmarshalJSON(data []byte) error {
+	type alias Move
+	aux := &struct {
+		*alias
+	}{
+		alias: (*alias)(m),
+	}
+	return json.Unmarshal(data, &aux)
 }
