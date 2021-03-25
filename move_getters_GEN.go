@@ -27,6 +27,7 @@ func (m *Move) MarshalJSON() ([]byte, error) {
 		Power        uint
 		Accuracy     uint
 		InitialMaxPP uint8
+		metadata     MoveMeta
 	}{
 		alias:        (*alias)(m),
 		Name:         m.Name(),
@@ -37,6 +38,7 @@ func (m *Move) MarshalJSON() ([]byte, error) {
 		Power:        m.Power(),
 		Accuracy:     m.Accuracy(),
 		InitialMaxPP: m.InitialMaxPP(),
+		metadata:     m.metadata(),
 	})
 }
 

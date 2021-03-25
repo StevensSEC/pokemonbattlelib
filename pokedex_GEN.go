@@ -1377,491 +1377,5826 @@ const (
 )
 
 var AllMoves = []MoveData{
-	{Name: "Pound", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Karate Chop", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Double Slap", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 85, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Comet Punch", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 18, Accuracy: 85, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mega Punch", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Pay Day", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Fire Punch", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Ice Punch", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Thunder Punch", Type: 4096, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Scratch", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Vice Grip", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 55, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Guillotine", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 30, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Razor Wind", Type: 1, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Swords Dance", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Cut", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Gust", Type: 4, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Wing Attack", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Whirlwind", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: -6, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Fly", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bind", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Slam", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Vine Whip", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 45, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Stomp", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "Double Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 30, Accuracy: 100, metadata: MoveMeta{MinHits: 2, MaxHits: 2, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mega Kick", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Jump Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rolling Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "Sand Attack", Type: 16, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Headbutt", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "Horn Attack", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Fury Attack", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 85, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Horn Drill", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 30, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Tackle", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Body Slam", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 85, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Wrap", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Take Down", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -25, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Thrash", Type: 1, Category: MoveCategoryPhysical, Targets: 8, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Double-Edge", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -33, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Tail Whip", Type: 1, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Poison Sting", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Twineedle", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 100, metadata: MoveMeta{MinHits: 2, MaxHits: 2, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 20, FlinchChance: 0, StatChance: 0}},
-	{Name: "Pin Missile", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 95, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Leer", Type: 1, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Bite", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "Growl", Type: 1, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Roar", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: -6, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sing", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 55, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Supersonic", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 55, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sonic Boom", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Disable", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 4, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Acid", Type: 8, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Ember", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Flamethrower", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mist", Type: 16384, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Water Gun", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Hydro Pump", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 110, Accuracy: 80, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Surf", Type: 1024, Category: MoveCategorySpecial, Targets: 9, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Ice Beam", Type: 16384, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Blizzard", Type: 16384, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 110, Accuracy: 70, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Psybeam", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bubble Beam", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Aurora Beam", Type: 16384, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Hyper Beam", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Peck", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 35, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Drill Peck", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Submission", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 80, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -25, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Low Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Counter", Type: 2, Category: MoveCategoryPhysical, Targets: 1, Priority: -5, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Seismic Toss", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Strength", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Absorb", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 20, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mega Drain", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Leech Seed", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Growth", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Razor Leaf", Type: 2048, Category: MoveCategoryPhysical, Targets: 11, Priority: 0, Power: 55, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Solar Beam", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Poison Powder", Type: 8, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Stun Spore", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sleep Powder", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Petal Dance", Type: 2048, Category: MoveCategorySpecial, Targets: 8, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "String Shot", Type: 64, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dragon Rage", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Fire Spin", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 35, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Thunder Shock", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Thunderbolt", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Thunder Wave", Type: 4096, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Thunder", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 110, Accuracy: 70, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rock Throw", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Earthquake", Type: 16, Category: MoveCategoryPhysical, Targets: 9, Priority: 0, Power: 100, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Fissure", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 30, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dig", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Toxic", Type: 8, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 15, MaxTurns: 15, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Confusion", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Psychic", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Hypnosis", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 60, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Meditate", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Agility", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Quick Attack", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rage", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 20, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Teleport", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Night Shade", Type: 128, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mimic", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Screech", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Double Team", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Recover", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Harden", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Minimize", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Smokescreen", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Confuse Ray", Type: 128, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Withdraw", Type: 1024, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Defense Curl", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Barrier", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Light Screen", Type: 8192, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Haze", Type: 16384, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Reflect", Type: 8192, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Focus Energy", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bide", Type: 1, Category: MoveCategoryPhysical, Targets: 7, Priority: 1, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Metronome", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mirror Move", Type: 4, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Self-Destruct", Type: 1, Category: MoveCategoryPhysical, Targets: 9, Priority: 0, Power: 200, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Egg Bomb", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Lick", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 30, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Smog", Type: 8, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 30, Accuracy: 70, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 40, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sludge", Type: 8, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bone Club", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 10, StatChance: 0}},
-	{Name: "Fire Blast", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 110, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Waterfall", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 20, StatChance: 0}},
-	{Name: "Clamp", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 35, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Swift", Type: 1, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 60, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Skull Bash", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 130, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Spike Cannon", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 20, Accuracy: 100, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Constrict", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 10, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Amnesia", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Kinesis", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 80, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Soft-Boiled", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "High Jump Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 130, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Glare", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dream Eater", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 100, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Poison Gas", Type: 8, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Barrage", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 85, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Leech Life", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Lovely Kiss", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sky Attack", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 140, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "Transform", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bubble", Type: 1024, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Dizzy Punch", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 20, FlinchChance: 0, StatChance: 0}},
-	{Name: "Spore", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Flash", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Psywave", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Splash", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Acid Armor", Type: 8, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Crabhammer", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Explosion", Type: 1, Category: MoveCategoryPhysical, Targets: 9, Priority: 0, Power: 250, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Fury Swipes", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 18, Accuracy: 80, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bonemerang", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 90, metadata: MoveMeta{MinHits: 2, MaxHits: 2, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rest", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rock Slide", Type: 32, Category: MoveCategoryPhysical, Targets: 11, Priority: 0, Power: 75, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "Hyper Fang", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 10, StatChance: 0}},
-	{Name: "Sharpen", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Conversion", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Tri Attack", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 20, FlinchChance: 0, StatChance: 0}},
-	{Name: "Super Fang", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Slash", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Substitute", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Struggle", Type: 1, Category: MoveCategoryPhysical, Targets: 8, Priority: 0, Power: 50, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: -25, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sketch", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Triple Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 10, Accuracy: 90, metadata: MoveMeta{MinHits: 3, MaxHits: 3, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Thief", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Spider Web", Type: 64, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mind Reader", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Nightmare", Type: 128, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Flame Wheel", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Snore", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "Curse", Type: 128, Category: MoveCategoryStatus, Targets: 1, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Flail", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Conversion 2", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Aeroblast", Type: 4, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 100, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Cotton Spore", Type: 2048, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Reversal", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Spite", Type: 128, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Powder Snow", Type: 16384, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Protect", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 4, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mach Punch", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Scary Face", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Feint Attack", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sweet Kiss", Type: 131072, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Belly Drum", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sludge Bomb", Type: 8, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mud-Slap", Type: 16, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 20, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Octazooka", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 50}},
-	{Name: "Spikes", Type: 16, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Zap Cannon", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 120, Accuracy: 50, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Foresight", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Destiny Bond", Type: 128, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Perish Song", Type: 1, Category: MoveCategoryStatus, Targets: 14, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 4, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Icy Wind", Type: 16384, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 55, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Detect", Type: 2, Category: MoveCategoryStatus, Targets: 7, Priority: 4, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bone Rush", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 90, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Lock-On", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Outrage", Type: 32768, Category: MoveCategoryPhysical, Targets: 8, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sandstorm", Type: 32, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Giga Drain", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Endure", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 4, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Charm", Type: 131072, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rollout", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 30, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "False Swipe", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Swagger", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Milk Drink", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Spark", Type: 4096, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Fury Cutter", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Steel Wing", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Mean Look", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Attract", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sleep Talk", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Heal Bell", Type: 1, Category: MoveCategoryStatus, Targets: 13, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Return", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Present", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Frustration", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Safeguard", Type: 1, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Pain Split", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sacred Fire", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 50, FlinchChance: 0, StatChance: 0}},
-	{Name: "Magnitude", Type: 16, Category: MoveCategoryPhysical, Targets: 9, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dynamic Punch", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 50, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Megahorn", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dragon Breath", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Baton Pass", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Encore", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Pursuit", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rapid Spin", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 20, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sweet Scent", Type: 1, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Iron Tail", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 30}},
-	{Name: "Metal Claw", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Vital Throw", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: -1, Power: 70, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Morning Sun", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Synthesis", Type: 2048, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Moonlight", Type: 131072, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Hidden Power", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Cross Chop", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 80, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Twister", Type: 32768, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 20, StatChance: 0}},
-	{Name: "Rain Dance", Type: 1024, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sunny Day", Type: 512, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Crunch", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 20}},
-	{Name: "Mirror Coat", Type: 8192, Category: MoveCategorySpecial, Targets: 1, Priority: -5, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Psych Up", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Extreme Speed", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 2, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Ancient Power", Type: 32, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Shadow Ball", Type: 128, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 20}},
-	{Name: "Future Sight", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rock Smash", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 50}},
-	{Name: "Whirlpool", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 35, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Beat Up", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 6, MaxHits: 6, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Fake Out", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 3, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 100, StatChance: 0}},
-	{Name: "Uproar", Type: 1, Category: MoveCategorySpecial, Targets: 8, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Stockpile", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Spit Up", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Swallow", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 25, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Heat Wave", Type: 512, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 95, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Hail", Type: 16384, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Torment", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Flatter", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Will-O-Wisp", Type: 512, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Memento", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Facade", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Focus Punch", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: -3, Power: 150, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Smelling Salts", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Follow Me", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 2, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Nature Power", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Charge", Type: 4096, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Taunt", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Helping Hand", Type: 1, Category: MoveCategoryStatus, Targets: 3, Priority: 5, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Trick", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Role Play", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Wish", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Assist", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Ingrain", Type: 2048, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Superpower", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Magic Coat", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 4, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Recycle", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Revenge", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: -4, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Brick Break", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Yawn", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 2, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Knock Off", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Endeavor", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Eruption", Type: 512, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 150, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Skill Swap", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Imprison", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Refresh", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Grudge", Type: 128, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Snatch", Type: 65536, Category: MoveCategoryStatus, Targets: 7, Priority: 4, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Secret Power", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dive", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Arm Thrust", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 100, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Camouflage", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Tail Glow", Type: 64, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Luster Purge", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 50}},
-	{Name: "Mist Ball", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 50}},
-	{Name: "Feather Dance", Type: 4, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Teeter Dance", Type: 1, Category: MoveCategoryStatus, Targets: 9, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Blaze Kick", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 85, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mud Sport", Type: 16, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Ice Ball", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 30, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Needle Arm", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "Slack Off", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Hyper Voice", Type: 1, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Poison Fang", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 15, MaxTurns: 15, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 50, FlinchChance: 0, StatChance: 0}},
-	{Name: "Crush Claw", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 50}},
-	{Name: "Blast Burn", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Hydro Cannon", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Meteor Mash", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 20}},
-	{Name: "Astonish", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 30, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "Weather Ball", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Aromatherapy", Type: 2048, Category: MoveCategoryStatus, Targets: 13, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Fake Tears", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Air Cutter", Type: 4, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 60, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Overheat", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 130, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Odor Sleuth", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rock Tomb", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Silver Wind", Type: 64, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Metal Sound", Type: 256, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Grass Whistle", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 55, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Tickle", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Cosmic Power", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Water Spout", Type: 1024, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 150, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Signal Beam", Type: 64, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Punch", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Extrasensory", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 10, StatChance: 0}},
-	{Name: "Sky Uppercut", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 85, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sand Tomb", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 35, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sheer Cold", Type: 16384, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 30, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Muddy Water", Type: 1024, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 90, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 30}},
-	{Name: "Bullet Seed", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 100, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Aerial Ace", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Icicle Spear", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 100, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Iron Defense", Type: 256, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Block", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Howl", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dragon Claw", Type: 32768, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Frenzy Plant", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bulk Up", Type: 2, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bounce", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 85, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mud Shot", Type: 16, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 55, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Poison Tail", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Covet", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Volt Tackle", Type: 4096, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -33, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Magical Leaf", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Water Sport", Type: 1024, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Calm Mind", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Leaf Blade", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dragon Dance", Type: 32768, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rock Blast", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 90, metadata: MoveMeta{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shock Wave", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Water Pulse", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 20, FlinchChance: 0, StatChance: 0}},
-	{Name: "Doom Desire", Type: 256, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 140, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Psycho Boost", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 140, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Roost", Type: 4, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Gravity", Type: 8192, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Miracle Eye", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Wake-Up Slap", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Hammer Arm", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Gyro Ball", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Healing Wish", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Brine", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Natural Gift", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Feint", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 2, Power: 30, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Pluck", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Tailwind", Type: 4, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Acupressure", Type: 1, Category: MoveCategoryStatus, Targets: 5, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Metal Burst", Type: 256, Category: MoveCategoryPhysical, Targets: 1, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "U-turn", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Close Combat", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Payback", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Assurance", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Embargo", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Fling", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Psycho Shift", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Trump Card", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Heal Block", Type: 8192, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Wring Out", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Power Trick", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Gastro Acid", Type: 8, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Lucky Chant", Type: 1, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Me First", Type: 1, Category: MoveCategoryStatus, Targets: 2, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Copycat", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Power Swap", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Guard Swap", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Punishment", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Last Resort", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 140, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Worry Seed", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Sucker Punch", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Toxic Spikes", Type: 8, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Heart Swap", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Aqua Ring", Type: 1024, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Magnet Rise", Type: 4096, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Flare Blitz", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -33, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Force Palm", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Aura Sphere", Type: 2, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rock Polish", Type: 32, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Poison Jab", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dark Pulse", Type: 65536, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 20, StatChance: 0}},
-	{Name: "Night Slash", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Aqua Tail", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Seed Bomb", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Air Slash", Type: 4, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "X-Scissor", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bug Buzz", Type: 64, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Dragon Pulse", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 85, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dragon Rush", Type: 32768, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 20, StatChance: 0}},
-	{Name: "Power Gem", Type: 32, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Drain Punch", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Vacuum Wave", Type: 2, Category: MoveCategorySpecial, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Focus Blast", Type: 2, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 120, Accuracy: 70, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Energy Ball", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Brave Bird", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -33, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Earth Power", Type: 16, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Switcheroo", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Giga Impact", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Nasty Plot", Type: 65536, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bullet Punch", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Avalanche", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: -4, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Ice Shard", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Claw", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Thunder Fang", Type: 4096, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 10, StatChance: 0}},
-	{Name: "Ice Fang", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 10, StatChance: 0}},
-	{Name: "Fire Fang", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 10, StatChance: 0}},
-	{Name: "Shadow Sneak", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Mud Bomb", Type: 16, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 30}},
-	{Name: "Psycho Cut", Type: 8192, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Zen Headbutt", Type: 8192, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 20, StatChance: 0}},
-	{Name: "Mirror Shot", Type: 256, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 30}},
-	{Name: "Flash Cannon", Type: 256, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
-	{Name: "Rock Climb", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 20, FlinchChance: 0, StatChance: 0}},
-	{Name: "Defog", Type: 4, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Trick Room", Type: 8192, Category: MoveCategoryStatus, Targets: 12, Priority: -7, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Draco Meteor", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 130, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Discharge", Type: 4096, Category: MoveCategorySpecial, Targets: 9, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Lava Plume", Type: 512, Category: MoveCategorySpecial, Targets: 9, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Leaf Storm", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 130, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
-	{Name: "Power Whip", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Rock Wrecker", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Cross Poison", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
-	{Name: "Gunk Shot", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 80, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
-	{Name: "Iron Head", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
-	{Name: "Magnet Bomb", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Stone Edge", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 80, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Captivate", Type: 1, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Stealth Rock", Type: 32, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Grass Knot", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Chatter", Type: 4, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Judgment", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 100, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Bug Bite", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Charge Beam", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 50, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 70}},
-	{Name: "Wood Hammer", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -33, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Aqua Jet", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Attack Order", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Defend Order", Type: 64, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Heal Order", Type: 64, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Head Smash", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 150, Accuracy: 80, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Double Hit", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 35, Accuracy: 90, metadata: MoveMeta{MinHits: 2, MaxHits: 2, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Roar of Time", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Spacial Rend", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 100, Accuracy: 95, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Lunar Dance", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Crush Grip", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Magma Storm", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 100, Accuracy: 75, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
-	{Name: "Dark Void", Type: 65536, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 50, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Seed Flare", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 120, Accuracy: 85, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 40}},
-	{Name: "Ominous Wind", Type: 128, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 10}},
-	{Name: "Shadow Force", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Rush", Type: 0, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 55, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Blast", Type: 0, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Blitz", Type: 0, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Bolt", Type: 0, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Break", Type: 0, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Chill", Type: 0, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow End", Type: 0, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 60, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Fire", Type: 0, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Rave", Type: 0, Category: MoveCategorySpecial, Targets: 6, Priority: 0, Power: 70, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Storm", Type: 0, Category: MoveCategorySpecial, Targets: 6, Priority: 0, Power: 95, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Wave", Type: 0, Category: MoveCategorySpecial, Targets: 6, Priority: 0, Power: 50, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Down", Type: 0, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Half", Type: 0, Category: MoveCategorySpecial, Targets: 12, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Hold", Type: 0, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Mist", Type: 0, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 100, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Panic", Type: 0, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 90, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Shed", Type: 0, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
-	{Name: "Shadow Sky", Type: 0, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: MoveMeta{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Pound", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Karate Chop", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Double Slap", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Comet Punch", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 18, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mega Punch", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Pay Day", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Fire Punch", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Ice Punch", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Thunder Punch", Type: 4096, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Scratch", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Vice Grip", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 55, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Guillotine", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 30, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Razor Wind", Type: 1, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Swords Dance", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Cut", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Gust", Type: 4, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Wing Attack", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Whirlwind", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: -6, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Fly", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bind", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Slam", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Vine Whip", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 45, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Stomp", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "Double Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 30, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 2, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mega Kick", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Jump Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rolling Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "Sand Attack", Type: 16, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Headbutt", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "Horn Attack", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Fury Attack", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Horn Drill", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 30, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Tackle", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Body Slam", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 85, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Wrap", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Take Down", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -25, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Thrash", Type: 1, Category: MoveCategoryPhysical, Targets: 8, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Double-Edge", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -33, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Tail Whip", Type: 1, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Poison Sting", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Twineedle", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 2, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 20, FlinchChance: 0, StatChance: 0}},
+	{Name: "Pin Missile", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Leer", Type: 1, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Bite", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "Growl", Type: 1, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Roar", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: -6, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sing", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 55, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Supersonic", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 55, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sonic Boom", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Disable", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 4, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Acid", Type: 8, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Ember", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Flamethrower", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mist", Type: 16384, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Water Gun", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Hydro Pump", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 110, Accuracy: 80, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Surf", Type: 1024, Category: MoveCategorySpecial, Targets: 9, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Ice Beam", Type: 16384, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Blizzard", Type: 16384, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 110, Accuracy: 70, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Psybeam", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bubble Beam", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Aurora Beam", Type: 16384, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Hyper Beam", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Peck", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 35, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Drill Peck", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Submission", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 80, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -25, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Low Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Counter", Type: 2, Category: MoveCategoryPhysical, Targets: 1, Priority: -5, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Seismic Toss", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Strength", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Absorb", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 20, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mega Drain", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Leech Seed", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Growth", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Razor Leaf", Type: 2048, Category: MoveCategoryPhysical, Targets: 11, Priority: 0, Power: 55, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Solar Beam", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Poison Powder", Type: 8, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Stun Spore", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sleep Powder", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Petal Dance", Type: 2048, Category: MoveCategorySpecial, Targets: 8, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "String Shot", Type: 64, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dragon Rage", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Fire Spin", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 35, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Thunder Shock", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Thunderbolt", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Thunder Wave", Type: 4096, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Thunder", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 110, Accuracy: 70, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rock Throw", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Earthquake", Type: 16, Category: MoveCategoryPhysical, Targets: 9, Priority: 0, Power: 100, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Fissure", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 30, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dig", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Toxic", Type: 8, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 15, MaxTurns: 15, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Confusion", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Psychic", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Hypnosis", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 60, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Meditate", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Agility", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Quick Attack", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rage", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 20, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Teleport", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Night Shade", Type: 128, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mimic", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Screech", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Double Team", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Recover", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Harden", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Minimize", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Smokescreen", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Confuse Ray", Type: 128, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Withdraw", Type: 1024, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Defense Curl", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Barrier", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Light Screen", Type: 8192, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Haze", Type: 16384, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Reflect", Type: 8192, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Focus Energy", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bide", Type: 1, Category: MoveCategoryPhysical, Targets: 7, Priority: 1, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Metronome", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mirror Move", Type: 4, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Self-Destruct", Type: 1, Category: MoveCategoryPhysical, Targets: 9, Priority: 0, Power: 200, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Egg Bomb", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Lick", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 30, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Smog", Type: 8, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 30, Accuracy: 70, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 40, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sludge", Type: 8, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bone Club", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 10, StatChance: 0}},
+	{Name: "Fire Blast", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 110, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Waterfall", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 20, StatChance: 0}},
+	{Name: "Clamp", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 35, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Swift", Type: 1, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 60, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Skull Bash", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 130, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Spike Cannon", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 20, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Constrict", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 10, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Amnesia", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Kinesis", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 80, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Soft-Boiled", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "High Jump Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 130, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Glare", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dream Eater", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 100, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Poison Gas", Type: 8, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Barrage", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Leech Life", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Lovely Kiss", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sky Attack", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 140, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "Transform", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bubble", Type: 1024, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Dizzy Punch", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 20, FlinchChance: 0, StatChance: 0}},
+	{Name: "Spore", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Flash", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Psywave", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Splash", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Acid Armor", Type: 8, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Crabhammer", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Explosion", Type: 1, Category: MoveCategoryPhysical, Targets: 9, Priority: 0, Power: 250, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Fury Swipes", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 18, Accuracy: 80, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bonemerang", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 2, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rest", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rock Slide", Type: 32, Category: MoveCategoryPhysical, Targets: 11, Priority: 0, Power: 75, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "Hyper Fang", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 10, StatChance: 0}},
+	{Name: "Sharpen", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Conversion", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Tri Attack", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 20, FlinchChance: 0, StatChance: 0}},
+	{Name: "Super Fang", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Slash", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Substitute", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Struggle", Type: 1, Category: MoveCategoryPhysical, Targets: 8, Priority: 0, Power: 50, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: -25, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sketch", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Triple Kick", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 10, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 3, MaxHits: 3, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Thief", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Spider Web", Type: 64, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mind Reader", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Nightmare", Type: 128, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Flame Wheel", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Snore", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "Curse", Type: 128, Category: MoveCategoryStatus, Targets: 1, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Flail", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Conversion 2", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Aeroblast", Type: 4, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 100, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Cotton Spore", Type: 2048, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Reversal", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Spite", Type: 128, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Powder Snow", Type: 16384, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Protect", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 4, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mach Punch", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Scary Face", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Feint Attack", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sweet Kiss", Type: 131072, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Belly Drum", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sludge Bomb", Type: 8, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mud-Slap", Type: 16, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 20, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Octazooka", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 50}},
+	{Name: "Spikes", Type: 16, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Zap Cannon", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 120, Accuracy: 50, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Foresight", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Destiny Bond", Type: 128, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Perish Song", Type: 1, Category: MoveCategoryStatus, Targets: 14, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 4, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Icy Wind", Type: 16384, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 55, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Detect", Type: 2, Category: MoveCategoryStatus, Targets: 7, Priority: 4, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bone Rush", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Lock-On", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Outrage", Type: 32768, Category: MoveCategoryPhysical, Targets: 8, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sandstorm", Type: 32, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Giga Drain", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Endure", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 4, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Charm", Type: 131072, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rollout", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 30, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "False Swipe", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Swagger", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Milk Drink", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Spark", Type: 4096, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Fury Cutter", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Steel Wing", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Mean Look", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Attract", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sleep Talk", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Heal Bell", Type: 1, Category: MoveCategoryStatus, Targets: 13, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Return", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Present", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Frustration", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Safeguard", Type: 1, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Pain Split", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sacred Fire", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 50, FlinchChance: 0, StatChance: 0}},
+	{Name: "Magnitude", Type: 16, Category: MoveCategoryPhysical, Targets: 9, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dynamic Punch", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 50, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Megahorn", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dragon Breath", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Baton Pass", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Encore", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Pursuit", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rapid Spin", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 20, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sweet Scent", Type: 1, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Iron Tail", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 30}},
+	{Name: "Metal Claw", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Vital Throw", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: -1, Power: 70, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Morning Sun", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Synthesis", Type: 2048, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Moonlight", Type: 131072, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Hidden Power", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Cross Chop", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 80, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Twister", Type: 32768, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 20, StatChance: 0}},
+	{Name: "Rain Dance", Type: 1024, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sunny Day", Type: 512, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Crunch", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 20}},
+	{Name: "Mirror Coat", Type: 8192, Category: MoveCategorySpecial, Targets: 1, Priority: -5, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Psych Up", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Extreme Speed", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 2, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Ancient Power", Type: 32, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Shadow Ball", Type: 128, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 20}},
+	{Name: "Future Sight", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rock Smash", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 50}},
+	{Name: "Whirlpool", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 35, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Beat Up", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 6, MaxHits: 6, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Fake Out", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 3, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 100, StatChance: 0}},
+	{Name: "Uproar", Type: 1, Category: MoveCategorySpecial, Targets: 8, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Stockpile", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Spit Up", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Swallow", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 25, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Heat Wave", Type: 512, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 95, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Hail", Type: 16384, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Torment", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Flatter", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Will-O-Wisp", Type: 512, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Memento", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Facade", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Focus Punch", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: -3, Power: 150, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Smelling Salts", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Follow Me", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 2, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Nature Power", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Charge", Type: 4096, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Taunt", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Helping Hand", Type: 1, Category: MoveCategoryStatus, Targets: 3, Priority: 5, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Trick", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Role Play", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Wish", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Assist", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Ingrain", Type: 2048, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Superpower", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Magic Coat", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 4, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Recycle", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Revenge", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: -4, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Brick Break", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Yawn", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 2, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Knock Off", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Endeavor", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Eruption", Type: 512, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 150, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Skill Swap", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Imprison", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Refresh", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Grudge", Type: 128, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Snatch", Type: 65536, Category: MoveCategoryStatus, Targets: 7, Priority: 4, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Secret Power", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dive", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Arm Thrust", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 15, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Camouflage", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Tail Glow", Type: 64, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Luster Purge", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 50}},
+	{Name: "Mist Ball", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 50}},
+	{Name: "Feather Dance", Type: 4, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Teeter Dance", Type: 1, Category: MoveCategoryStatus, Targets: 9, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Blaze Kick", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 85, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mud Sport", Type: 16, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Ice Ball", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 30, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Needle Arm", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "Slack Off", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Hyper Voice", Type: 1, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Poison Fang", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 15, MaxTurns: 15, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 50, FlinchChance: 0, StatChance: 0}},
+	{Name: "Crush Claw", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 50}},
+	{Name: "Blast Burn", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Hydro Cannon", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Meteor Mash", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 20}},
+	{Name: "Astonish", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 30, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "Weather Ball", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Aromatherapy", Type: 2048, Category: MoveCategoryStatus, Targets: 13, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Fake Tears", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Air Cutter", Type: 4, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 60, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Overheat", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 130, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Odor Sleuth", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rock Tomb", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Silver Wind", Type: 64, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Metal Sound", Type: 256, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Grass Whistle", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 55, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Tickle", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Cosmic Power", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Water Spout", Type: 1024, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 150, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Signal Beam", Type: 64, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Punch", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Extrasensory", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 10, StatChance: 0}},
+	{Name: "Sky Uppercut", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 85, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sand Tomb", Type: 16, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 35, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sheer Cold", Type: 16384, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 30, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Muddy Water", Type: 1024, Category: MoveCategorySpecial, Targets: 11, Priority: 0, Power: 90, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 30}},
+	{Name: "Bullet Seed", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Aerial Ace", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Icicle Spear", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Iron Defense", Type: 256, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Block", Type: 1, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Howl", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dragon Claw", Type: 32768, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Frenzy Plant", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bulk Up", Type: 2, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bounce", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 85, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mud Shot", Type: 16, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 55, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Poison Tail", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Covet", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Volt Tackle", Type: 4096, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -33, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Magical Leaf", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Water Sport", Type: 1024, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Calm Mind", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Leaf Blade", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dragon Dance", Type: 32768, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rock Blast", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 25, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 5, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shock Wave", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Water Pulse", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 20, FlinchChance: 0, StatChance: 0}},
+	{Name: "Doom Desire", Type: 256, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 140, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Psycho Boost", Type: 8192, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 140, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Roost", Type: 4, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Gravity", Type: 8192, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Miracle Eye", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Wake-Up Slap", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Hammer Arm", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Gyro Ball", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Healing Wish", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Brine", Type: 1024, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Natural Gift", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Feint", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 2, Power: 30, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Pluck", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Tailwind", Type: 4, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Acupressure", Type: 1, Category: MoveCategoryStatus, Targets: 5, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Metal Burst", Type: 256, Category: MoveCategoryPhysical, Targets: 1, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "U-turn", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Close Combat", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Payback", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 50, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Assurance", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Embargo", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Fling", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Psycho Shift", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Trump Card", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Heal Block", Type: 8192, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Wring Out", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Power Trick", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Gastro Acid", Type: 8, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Lucky Chant", Type: 1, Category: MoveCategoryStatus, Targets: 4, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Me First", Type: 1, Category: MoveCategoryStatus, Targets: 2, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Copycat", Type: 1, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Power Swap", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Guard Swap", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Punishment", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Last Resort", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 140, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Worry Seed", Type: 2048, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Sucker Punch", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Toxic Spikes", Type: 8, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Heart Swap", Type: 8192, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Aqua Ring", Type: 1024, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Magnet Rise", Type: 4096, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Flare Blitz", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -33, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Force Palm", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Aura Sphere", Type: 2, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rock Polish", Type: 32, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Poison Jab", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dark Pulse", Type: 65536, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 20, StatChance: 0}},
+	{Name: "Night Slash", Type: 65536, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Aqua Tail", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Seed Bomb", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Air Slash", Type: 4, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "X-Scissor", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bug Buzz", Type: 64, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Dragon Pulse", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 85, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dragon Rush", Type: 32768, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 20, StatChance: 0}},
+	{Name: "Power Gem", Type: 32, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Drain Punch", Type: 2, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Vacuum Wave", Type: 2, Category: MoveCategorySpecial, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Focus Blast", Type: 2, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 120, Accuracy: 70, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Energy Ball", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Brave Bird", Type: 4, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -33, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Earth Power", Type: 16, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Switcheroo", Type: 65536, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Giga Impact", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Nasty Plot", Type: 65536, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bullet Punch", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Avalanche", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: -4, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Ice Shard", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Claw", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Thunder Fang", Type: 4096, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 10, StatChance: 0}},
+	{Name: "Ice Fang", Type: 16384, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 10, StatChance: 0}},
+	{Name: "Fire Fang", Type: 512, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 65, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 10, StatChance: 0}},
+	{Name: "Shadow Sneak", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Mud Bomb", Type: 16, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 30}},
+	{Name: "Psycho Cut", Type: 8192, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Zen Headbutt", Type: 8192, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 20, StatChance: 0}},
+	{Name: "Mirror Shot", Type: 256, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 30}},
+	{Name: "Flash Cannon", Type: 256, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 10}},
+	{Name: "Rock Climb", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 20, FlinchChance: 0, StatChance: 0}},
+	{Name: "Defog", Type: 4, Category: MoveCategoryStatus, Targets: 10, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Trick Room", Type: 8192, Category: MoveCategoryStatus, Targets: 12, Priority: -7, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Draco Meteor", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 130, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Discharge", Type: 4096, Category: MoveCategorySpecial, Targets: 9, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Lava Plume", Type: 512, Category: MoveCategorySpecial, Targets: 9, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Leaf Storm", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 130, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 100}},
+	{Name: "Power Whip", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Rock Wrecker", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Cross Poison", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 10, FlinchChance: 0, StatChance: 0}},
+	{Name: "Gunk Shot", Type: 8, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 80, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 30, FlinchChance: 0, StatChance: 0}},
+	{Name: "Iron Head", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 30, StatChance: 0}},
+	{Name: "Magnet Bomb", Type: 256, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Stone Edge", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 100, Accuracy: 80, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Captivate", Type: 1, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Stealth Rock", Type: 32, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Grass Knot", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Chatter", Type: 4, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 65, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 5, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Judgment", Type: 1, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 100, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Bug Bite", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Charge Beam", Type: 4096, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 50, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 70}},
+	{Name: "Wood Hammer", Type: 2048, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -33, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Aqua Jet", Type: 1024, Category: MoveCategoryPhysical, Targets: 10, Priority: 1, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Attack Order", Type: 64, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 90, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Defend Order", Type: 64, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Heal Order", Type: 64, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 50, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Head Smash", Type: 32, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 150, Accuracy: 80, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: -50, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Double Hit", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 35, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 2, MaxHits: 2, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Roar of Time", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 150, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Spacial Rend", Type: 32768, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 100, Accuracy: 95, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 1, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Lunar Dance", Type: 8192, Category: MoveCategoryStatus, Targets: 7, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Crush Grip", Type: 1, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Magma Storm", Type: 512, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 100, Accuracy: 75, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 5, MaxTurns: 6, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 100, FlinchChance: 0, StatChance: 0}},
+	{Name: "Dark Void", Type: 65536, Category: MoveCategoryStatus, Targets: 11, Priority: 0, Power: 0, Accuracy: 50, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 2, MaxTurns: 4, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Seed Flare", Type: 2048, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 120, Accuracy: 85, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 40}},
+	{Name: "Ominous Wind", Type: 128, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 60, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 10, FlinchChance: 0, StatChance: 10}},
+	{Name: "Shadow Force", Type: 128, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Rush", Type: 0, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 55, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Blast", Type: 0, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 80, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Blitz", Type: 0, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 40, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Bolt", Type: 0, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Break", Type: 0, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Chill", Type: 0, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow End", Type: 0, Category: MoveCategoryPhysical, Targets: 10, Priority: 0, Power: 120, Accuracy: 60, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Fire", Type: 0, Category: MoveCategorySpecial, Targets: 10, Priority: 0, Power: 75, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Rave", Type: 0, Category: MoveCategorySpecial, Targets: 6, Priority: 0, Power: 70, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Storm", Type: 0, Category: MoveCategorySpecial, Targets: 6, Priority: 0, Power: 95, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Wave", Type: 0, Category: MoveCategorySpecial, Targets: 6, Priority: 0, Power: 50, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Down", Type: 0, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Half", Type: 0, Category: MoveCategorySpecial, Targets: 12, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Hold", Type: 0, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Mist", Type: 0, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 100, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Panic", Type: 0, Category: MoveCategoryStatus, Targets: 6, Priority: 0, Power: 0, Accuracy: 90, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Shed", Type: 0, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
+	{Name: "Shadow Sky", Type: 0, Category: MoveCategoryStatus, Targets: 12, Priority: 0, Power: 0, Accuracy: 0, metadata: struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}{MinHits: 0, MaxHits: 0, MinTurns: 0, MaxTurns: 0, Drain: 0, Healing: 0, CritRate: 0, AilmentChance: 0, FlinchChance: 0, StatChance: 0}},
 }
 
 // Create move constant enum for quick reference

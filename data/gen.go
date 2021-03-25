@@ -44,24 +44,6 @@ type data_pokemon struct {
 }
 
 type data_move_flags uint32
-type data_move_meta struct {
-	minHits       int
-	maxHits       int
-	minTurns      int
-	maxTurns      int
-	drain         int
-	healing       int
-	critRate      int
-	ailmentChance int
-	flinchChance  int
-	statChance    int
-}
-
-func (d data_move_meta) String() string {
-	return fmt.Sprintf("MoveMeta{MinHits: %d, MaxHits: %d, MinTurns: %d, MaxTurns: %d, Drain: %d, Healing: %d, CritRate: %d, AilmentChance: %d, FlinchChance: %d, StatChance: %d}",
-		d.minHits, d.maxHits, d.minTurns, d.maxTurns, d.drain, d.healing, d.critRate, d.ailmentChance, d.flinchChance, d.statChance)
-}
-
 type data_move struct {
 	Id             int
 	Identifier     string
@@ -81,7 +63,19 @@ type data_move struct {
 	DamageClass string
 	Effect      int
 	Flags       data_move_flags
-	Meta        data_move_meta
+	// Metadata
+	metadata struct {
+		MinHits       int
+		MaxHits       int
+		MinTurns      int
+		MaxTurns      int
+		Drain         int
+		Healing       int
+		CritRate      int
+		AilmentChance int
+		FlinchChance  int
+		StatChance    int
+	}
 }
 
 type data_item struct {
@@ -582,27 +576,26 @@ func main() {
 	}
 	for _, v := range records {
 		mid := parseInt(v[0])
-		minHits := parseInt(v[3])
-		maxHits := parseInt(v[4])
-		minTurns := parseInt(v[5])
-		maxTurns := parseInt(v[6])
-		drain := parseInt(v[7])
-		healing := parseInt(v[8])
-		critRate := parseInt(v[9])
-		ailmentChance := parseInt(v[10])
-		flinchChance := parseInt(v[11])
-		statChance := parseInt(v[12])
 		for i, m := range moves {
 			if m.Id != mid {
 				continue
 			}
-			moves[i].Meta = data_move_meta{minHits, maxHits, minTurns, maxTurns, drain, healing, critRate, ailmentChance, flinchChance, statChance}
+			moves[i].metadata.MinHits = parseInt(v[3])
+			moves[i].metadata.MaxHits = parseInt(v[4])
+			moves[i].metadata.MinTurns = parseInt(v[5])
+			moves[i].metadata.MaxTurns = parseInt(v[6])
+			moves[i].metadata.Drain = parseInt(v[7])
+			moves[i].metadata.Healing = parseInt(v[8])
+			moves[i].metadata.CritRate = parseInt(v[9])
+			moves[i].metadata.AilmentChance = parseInt(v[10])
+			moves[i].metadata.FlinchChance = parseInt(v[11])
+			moves[i].metadata.StatChance = parseInt(v[12])
 		}
 	}
 	output += "var AllMoves = []MoveData{\n"
-	for _, p := range moves {
-		output += fmt.Sprintf("\t{Name: %q, Type: %d, Category: %s, Targets: %d, Priority: %d, Power: %d, Accuracy: %d, metadata: %s},\n",
-			p.Name, p.Type, p.DamageClass, p.Targets, p.Priority, p.Power, p.Accuracy, p.Meta)
+	for _, m := range moves {
+		output += fmt.Sprintf("\t{Name: %q, Type: %d, Category: %s, Targets: %d, Priority: %d, Power: %d, Accuracy: %d, metadata: %#v,},\n",
+			m.Name, m.Type, m.DamageClass, m.Targets, m.Priority, m.Power, m.Accuracy, m.metadata)
 	}
 	output += "}\n\n"
 	// Add move constants
