@@ -93,10 +93,10 @@ var _ = Describe("Battle initialization", func() {
 			b := NewBattle()
 			b.AddParty(party)
 			Expect(func() {
-				b.getPokemon(1, 5)
+				b.getPokemonInBattle(1, 5)
 			}).To(Panic())
 			Expect(func() {
-				b.getPokemon(0, 5)
+				b.getPokemonInBattle(0, 5)
 			}).To(Panic())
 		})
 	})
@@ -194,7 +194,7 @@ var _ = Describe("One round of battle", func() {
 			party2 = NewOccupiedParty(&agent2, 1, bidoof)
 			battle = NewBattle()
 			battle.AddParty(party1, party2)
-			battle.rng = &SimpleRNG
+			battle.rng = SimpleRNG()
 
 			charmander.Moves[0] = GetMove(MoveEmber)
 			Expect(battle.Start()).To(Succeed())
@@ -210,7 +210,7 @@ var _ = Describe("One round of battle", func() {
 			battle.rng = AlwaysRNG()
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(4))
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(5))
 		})
 
 		It("should miss moves randomly based on accuracy/evasion", func() {
@@ -340,7 +340,7 @@ var _ = Describe("Getting pokemon from parties", func() {
 
 	Context("when getting Pokemon by party/slot", func() {
 		It("should get the Pokemon the user expects", func() {
-			pkmn := battle.getPokemon(0, 1)
+			pkmn := battle.getPokemonInBattle(0, 1)
 			Expect(pkmn.NatDex).To(BeEquivalentTo(PkmnSquirtle))
 		})
 	})
@@ -692,11 +692,11 @@ var _ = Describe("Weather", func() {
 						Turns:   5,
 					},
 					HealTransaction{
-						Target: b.getPokemon(0, 0),
+						Target: b.getPokemonInBattle(0, 0),
 						Amount: 100,
 					},
 					HealTransaction{
-						Target: b.getPokemon(1, 0),
+						Target: b.getPokemonInBattle(1, 0),
 						Amount: 100,
 					},
 				)
@@ -780,11 +780,11 @@ var _ = Describe("Weather", func() {
 						Turns:   5,
 					},
 					HealTransaction{
-						Target: b.getPokemon(0, 0),
+						Target: b.getPokemonInBattle(0, 0),
 						Amount: 100,
 					},
 					HealTransaction{
-						Target: b.getPokemon(1, 0),
+						Target: b.getPokemonInBattle(1, 0),
 						Amount: 100,
 					},
 				)
@@ -1040,9 +1040,9 @@ var _ = Describe("Fainting", func() {
 			b := setup()
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: b.getPokemon(1, 0),
+				User: b.getPokemonInBattle(1, 0),
 				Target: target{
-					Pokemon:   *b.getPokemon(0, 0),
+					Pokemon:   *b.getPokemonInBattle(0, 0),
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -1055,14 +1055,14 @@ var _ = Describe("Fainting", func() {
 			b := setup()
 			t, _ := b.SimulateRound()
 			target := target{
-				Pokemon:   *b.getPokemon(0, 0),
+				Pokemon:   *b.getPokemonInBattle(0, 0),
 				party:     0,
 				partySlot: 0,
 				Team:      0,
 			}
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
-					User:   b.getPokemon(1, 0),
+					User:   b.getPokemonInBattle(1, 0),
 					Target: target,
 				},
 				ItemTransaction{
@@ -1071,8 +1071,8 @@ var _ = Describe("Fainting", func() {
 					Item:   ItemFocusSash,
 				},
 			))
-			Expect(b.getPokemon(0, 0).HeldItem).To(Equal(ItemNone))
-			Expect(b.getPokemon(1, 0).HeldItem).To(Equal(ItemNone))
+			Expect(b.getPokemonInBattle(0, 0).HeldItem).To(Equal(ItemNone))
+			Expect(b.getPokemonInBattle(1, 0).HeldItem).To(Equal(ItemNone))
 		})
 	})
 })
@@ -1478,7 +1478,7 @@ var _ = Describe("Misc/held items", func() {
 
 		It("handles Destiny Knot", func() {
 			b, holder := setup(ItemDestinyKnot, PkmnMimeJr)
-			attacker := b.getPokemon(0, 0)
+			attacker := b.getPokemonInBattle(0, 0)
 			attacker.Moves[0] = GetMove(MoveAttract)
 			attacker.Gender = GenderMale
 			holder.Gender = GenderFemale
@@ -1509,7 +1509,7 @@ var _ = Describe("Misc/held items", func() {
 					party:     0,
 					partySlot: 0,
 					Team:      0,
-					Pokemon:   *b.getPokemon(0, 0),
+					Pokemon:   *b.getPokemonInBattle(0, 0),
 				},
 				Damage: 34,
 			}))
@@ -1536,7 +1536,7 @@ var _ = Describe("Misc/held items", func() {
 					party:     0,
 					partySlot: 0,
 					Team:      0,
-					Pokemon:   *b.getPokemon(0, 0),
+					Pokemon:   *b.getPokemonInBattle(0, 0),
 				},
 				Damage: 28,
 			}))
@@ -1583,9 +1583,9 @@ var _ = Describe("Misc/held items", func() {
 					party:     0,
 					partySlot: 0,
 					Team:      0,
-					Pokemon:   *b.getPokemon(0, 0),
+					Pokemon:   *b.getPokemonInBattle(0, 0),
 				},
-				Damage: 6,
+				Damage: 16,
 			}))
 		})
 
@@ -1615,7 +1615,7 @@ var _ = Describe("Misc/held items", func() {
 				holder.Moves[0] = GetMove(MoveTackle)
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransaction(InflictStatusTransaction{
-					Target:       b.getPokemon(0, 0),
+					Target:       b.getPokemonInBattle(0, 0),
 					StatusEffect: StatusFlinch,
 				}))
 			},

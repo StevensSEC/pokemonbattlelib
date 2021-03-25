@@ -1,0 +1,5 @@
+name: "Pokemon Battle API"
+tasks:
+  start:
+    command: go run ./http
+    inboundUrl: http://localhost:4000

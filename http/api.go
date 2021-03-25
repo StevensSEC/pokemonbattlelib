@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -101,13 +100,35 @@ var nextBattleId int
 var battles = map[int]*httpBattle{}
 
 type newBattleArgs struct {
-	Parties      [][]*Pokemon
-	CallbackUrls []string
+	Teams []struct {
+		Parties []struct {
+			Pokemon []*Pokemon `json:"pokemon"`
+		} `json:"parties"`
+	} `json:"teams"`
+	Parties [][]*Pokemon `json:"parties"` // deprecated
 }
 
 type httpBattle struct {
 	Battle      *Battle
 	AgentInputs []*chan Turn
+	queuedTurns map[int]Turn
+}
+
+func (hb *httpBattle) QueueNextTurn(targetId int, turn Turn) {
+	hb.queuedTurns[targetId] = turn
+}
+
+func (hb *httpBattle) FlushTurns() {
+	for i, t := range hb.Battle.GetTargets() {
+		p := hb.Battle.GetParty(&t)
+		switch a := (*p.Agent).(type) {
+		case WaiterAgent:
+			turn := hb.queuedTurns[i]
+			c := a.Input()
+			*c <- turn
+			delete(hb.queuedTurns, i)
+		}
+	}
 }
 
 func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
@@ -122,16 +143,34 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 		}
 
 		hb := httpBattle{
-			Battle: NewBattle(),
+			Battle:      NewBattle(),
+			queuedTurns: make(map[int]Turn),
 		}
-		for i := range args.Parties {
-			// a := Agent(NewHttpCallbackAgent(args.CallbackUrls[i]))
-			wa := NewWaiterAgent()
-			a := Agent(wa)
-			hb.AgentInputs = append(hb.AgentInputs, wa.Input())
-			p := NewParty(&a, i)
-			p.AddPokemon(args.Parties[i]...)
-			hb.Battle.AddParty(p)
+		if len(args.Parties) > 0 {
+			// deprecated
+			for i := range args.Parties {
+				// a := Agent(NewHttpCallbackAgent(args.CallbackUrls[i]))
+				wa := NewWaiterAgent()
+				a := Agent(wa)
+				hb.AgentInputs = append(hb.AgentInputs, wa.Input())
+				p := NewParty(&a, i)
+				p.AddPokemon(args.Parties[i]...)
+				hb.Battle.AddParty(p)
+			}
+		} else if len(args.Teams) > 0 {
+			for t, team := range args.Teams {
+				for _, party := range team.Parties {
+					wa := NewWaiterAgent()
+					a := Agent(wa)
+					hb.AgentInputs = append(hb.AgentInputs, wa.Input())
+					p := NewParty(&a, t)
+					p.AddPokemon(party.Pokemon...)
+					hb.Battle.AddParty(p)
+				}
+			}
+		} else {
+			w.WriteHeader(400)
+			w.Write([]byte("Bad request: invalid body"))
 		}
 		battles[nextBattleId] = &hb
 
@@ -145,7 +184,20 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("Battle created: %v", hb.Battle)
 		w.WriteHeader(200)
-		w.Write([]byte(fmt.Sprintf("%d", nextBattleId)))
+		data, err := json.Marshal(struct {
+			BattleId      int
+			ActivePokemon int
+		}{
+			BattleId:      nextBattleId,
+			ActivePokemon: 2, // TODO: change for double battles
+		})
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Internal server error: Failed to marshal response"))
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(data)
 		nextBattleId++
 	} else {
 		w.WriteHeader(400)
@@ -156,8 +208,9 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
 	battleId := parseNumberArg(r, "id")
 	log.Printf("Simulating round: id %d", battleId)
-	b := battles[battleId].Battle
-	transactions, ended := b.SimulateRound()
+	hb := battles[battleId]
+	hb.FlushTurns()
+	transactions, ended := hb.Battle.SimulateRound()
 
 	type roundResults struct {
 		Transactions []Transaction
@@ -184,10 +237,14 @@ func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
 
 func HandleBattleContext(w http.ResponseWriter, r *http.Request) {
 	battleId := parseNumberArg(r, "id")
-	partyId := parseNumberArg(r, "party")
-	slot := parseNumberArg(r, "slot")
+	// partyId := parseNumberArg(r, "party")
+	// slot := parseNumberArg(r, "slot")
+	targetIdx := parseNumberArg(r, "target")
 
-	bytes, err := json.Marshal(battles[battleId].Battle.GetRoundContext(partyId, slot))
+	b := battles[battleId].Battle
+	target := b.GetTargets()[targetIdx]
+
+	bytes, err := json.Marshal(b.GetRoundContext(target))
 	if err != nil {
 		log.Printf("Failed to marshal into JSON: %s", err)
 		w.WriteHeader(500)
@@ -202,21 +259,36 @@ func HandleBattleContext(w http.ResponseWriter, r *http.Request) {
 
 func HandleBattleAct(w http.ResponseWriter, r *http.Request) {
 	battleId := parseNumberArg(r, "id")
-	agentId := parseNumberArg(r, "agent")
+	targetIdx := parseNumberArg(r, "target")
 
 	var hT HttpTurn
 	err := json.NewDecoder(r.Body).Decode(&hT)
 	if err != nil {
-		log.Panicf("Failed to decode turn: %s", err)
+		respondSuccess(w, false)
+		log.Printf("Failed to decode turn: %s", err)
+		return
 	}
 
-	*battles[battleId].AgentInputs[agentId] <- hT.GetTurn()
+	battles[battleId].QueueNextTurn(targetIdx, hT.GetTurn())
 
 	w.WriteHeader(200)
-	w.Write([]byte("Turn has been queued."))
+	respondSuccess(w, true)
 }
 
 func HandleDumbAgent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"type": 0, "args": {"target": {"party":0, "slot": 0}, "move": 0}}`))
+}
+
+func respondSuccess(w http.ResponseWriter, success bool) {
+	data, err := json.Marshal(responseSuccess{true})
+	if err != nil {
+		log.Panicf("Failed to marshal response.")
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
+
+type responseSuccess struct {
+	Success bool `json:"success"`
 }

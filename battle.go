@@ -59,8 +59,13 @@ func (b *Battle) AddParty(p ...*party) {
 	b.parties = append(b.parties, p...)
 }
 
+// Gets a reference to a Pokemon from a target
+func (b *Battle) getPokemon(t target) *Pokemon {
+	return b.getPokemonInBattle(t.party, t.partySlot)
+}
+
 // Gets a reference to a Pokemon using party ID and party slot
-func (b *Battle) getPokemon(party, slot int) *Pokemon {
+func (b *Battle) getPokemonInBattle(party, slot int) *Pokemon {
 	if party >= len(b.parties) {
 		panic(ErrorPartyIndex)
 	}
@@ -121,7 +126,7 @@ func (b *Battle) Start() error {
 func (b *Battle) preRound() {
 	for _, t := range b.GetTargets() {
 		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
-			pkmn := b.getPokemon(t.party, t.partySlot)
+			pkmn := b.getPokemon(t)
 			b.QueueTransaction(CureStatusTransaction{
 				Target: target{
 					party:     0,
@@ -200,7 +205,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		turns = turns[1:]
 		blog.Printf("Processing Turn %T for %s", turn.Turn, turn.User.Pokemon)
 		// here, we can't use the turn context's reference to the pokemon, because it is a copy of the ground truth pokemon
-		self := b.getPokemon(turn.User.party, turn.User.partySlot)
+		self := b.getPokemon(turn.User)
 		if self.CurrentHP == 0 {
 			continue
 		}
@@ -236,7 +241,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 
 			// use the move
-			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			receiver := b.getPokemon(t.Target)
 			evasion := float64(receiver.Evasion() / 100)
 			// Todo: account for user's accuracy stage
 			accuracy := float64(move.Accuracy()) * evasion
@@ -349,7 +354,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else {
 				// Physical/Special Moves
-				damage := calcMoveDamage(b, &user, receiver, move)
+				damage := calcMoveDamage(b.Weather, &user, receiver, move)
+				var crit uint = 1
+				if b.rng.Roll(1, user.CritChance()) {
+					crit = 2
+				}
+				damage *= crit
 				b.QueueTransaction(DamageTransaction{
 					User:   &user,
 					Target: t.Target,
@@ -359,9 +369,9 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				meta := move.Data().metadata
 				// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
 				if meta.Drain != 0 {
-					drain := damage * float64(meta.Drain) / 100
+					drain := damage * uint(meta.Drain/100)
 					if user.HeldItem == ItemBigRoot {
-						drain *= 1.30 // 30% more HP than normal
+						drain = (drain * 130) / 100 // 30% more HP than normal
 					}
 					if drain == 0 {
 						// Min 1 HP drain
@@ -396,7 +406,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			}
 		case ItemTurn:
-			receiver := b.getPokemon(t.Target.party, t.Target.partySlot)
+			receiver := b.getPokemon(t.Target)
 			move := receiver.Moves[t.Move]
 			b.QueueTransaction(ItemTransaction{
 				Target: t.Target,
@@ -428,7 +438,7 @@ func (b *Battle) postRound() {
 	blog.Println("Post-round")
 	// Effects on every Pokemon
 	for _, t := range b.GetTargets() {
-		pkmn := b.getPokemon(t.party, t.partySlot)
+		pkmn := b.getPokemon(t)
 		// Status effects
 		if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
 			cond := pkmn.StatusEffects & StatusNonvolatileMask
@@ -555,6 +565,10 @@ func (t *target) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (b *Battle) GetParty(t *target) *party {
+	return b.parties[t.party]
+}
+
 type BattleContext struct {
 	Battle    Battle   // A copy of the current Battle, including weather, state, etc.
 	Pokemon   Pokemon  // A copy of the Pokemon that is acting in this context
@@ -594,8 +608,8 @@ func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 }
 
 // Get the battle context that will be shared with the client
-func (b *Battle) GetRoundContext(party int, pokemon int) *BattleContext {
-	return b.getContext(b.parties[party], b.parties[party].activePokemon[pokemon])
+func (b *Battle) GetRoundContext(t target) *BattleContext {
+	return b.getContext(b.parties[t.party], b.parties[t.party].activePokemon[t.partySlot])
 }
 
 // An abstraction over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.

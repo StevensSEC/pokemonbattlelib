@@ -1,15 +1,11 @@
 package pokemonbattlelib
 
-func calcMoveDamage(b *Battle, user, receiver *Pokemon, move *Move) (damage float64) {
-	weather := 1.0
-	if rain, sun := b.Weather == WeatherRain, b.Weather == WeatherHarshSunlight; (rain && move.Type() == TypeWater) || (sun && move.Type() == TypeFire) {
-		weather = 1.5
+func calcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damage uint) {
+	weatherEffect := 1.0
+	if rain, sun := weather == WeatherRain, weather == WeatherHarshSunlight; (rain && move.Type() == TypeWater) || (sun && move.Type() == TypeFire) {
+		weatherEffect = 1.5
 	} else if (rain && move.Type() == TypeFire) || (sun && move.Type() == TypeWater) {
-		weather = 0.5
-	}
-	crit := 1.0
-	if b.rng.Roll(1, user.CritChance()) {
-		crit = 2.0
+		weatherEffect = 0.5
 	}
 	stab := 1.0
 	if move != nil && user.EffectiveType()&move.Type() != 0 {
@@ -19,7 +15,7 @@ func calcMoveDamage(b *Battle, user, receiver *Pokemon, move *Move) (damage floa
 		}
 	}
 	// Compute damage modifier
-	modifier := weather * crit * stab
+	modifier := weatherEffect * stab
 	levelEffect := float64((2 * user.Level / 5) + 2)
 	movePower := float64(move.Power())
 	attack := float64(user.Attack())
@@ -30,7 +26,7 @@ func calcMoveDamage(b *Battle, user, receiver *Pokemon, move *Move) (damage floa
 		defense = float64(receiver.SpecialDefense())
 	}
 	// Weather modifiers
-	if b.Weather == WeatherSandstorm {
+	if weather == WeatherSandstorm {
 		if receiver.EffectiveType()&TypeRock != 0 {
 			defense *= 1.5
 		}
@@ -38,10 +34,10 @@ func calcMoveDamage(b *Battle, user, receiver *Pokemon, move *Move) (damage floa
 			movePower /= 2
 		}
 	}
-	if b.Weather == WeatherHail && move.Id == MoveSolarBeam {
+	if weather == WeatherHail && move.Id == MoveSolarBeam {
 		movePower /= 2
 	}
-	if b.Weather == WeatherFog {
+	if weather == WeatherFog {
 		if move.Id == MoveWeatherBall {
 			movePower *= 2
 		} else if move.Id == MoveSolarBeam {
@@ -51,16 +47,16 @@ func calcMoveDamage(b *Battle, user, receiver *Pokemon, move *Move) (damage floa
 	// Item modifiers
 	switch user.HeldItem {
 	case ItemLifeOrb:
-		modifier *= 1.30
+		modifier = (modifier * 130) / 100
 	case ItemMuscleBand:
 		if move.Category() == MoveCategoryPhysical {
-			modifier *= 1.10
+			modifier = (modifier * 110) / 100
 		}
 	case ItemWiseGlasses:
 		if move.Category() == MoveCategorySpecial {
-			modifier *= 1.10
+			modifier = (modifier * 110) / 100
 		}
 	}
-	damage = (((levelEffect * movePower * attack / defense) / 50) + 2) * modifier
+	damage = uint((((levelEffect * movePower * attack / defense) / 50) + 2) * modifier)
 	return damage
 }
