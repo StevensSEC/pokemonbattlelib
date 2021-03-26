@@ -229,17 +229,16 @@ func (matcher *singleTransactionMatcher) FailureMessage(actual interface{}) (mes
 	case []Transaction:
 		first, count := findCountTransactionIdxWithMatchingType(transactions, matcher.expected)
 		if first == -1 {
-			return fmt.Sprintf("Expected the sequence of transactions to include: %T, but none of the same type were found in %d transactions.",
+			gotText := ""
+			for _, t := range transactions {
+				gotText += fmt.Sprintf("- %T\n", t)
+			}
+			return fmt.Sprintf("Expected the sequence of transactions to include %T, but received:\n%s",
 				matcher.expected,
-				len(transactions),
+				gotText,
 			)
 		} else if count == 1 {
-			return fmt.Sprintf("Expected:\n\t%T: %+v\n\nInstead, got:\n\t%T: %+v",
-				matcher.expected,
-				matcher.expected,
-				transactions[first],
-				transactions[first],
-			)
+			return getDiffText(transactions, matcher.expected)
 		} else {
 			diffText := getDiffText(transactions, matcher.expected)
 			return fmt.Sprintf("The closest of %d total %s", count, diffText)
@@ -275,7 +274,6 @@ func checkTransactionOrder(check, want []Transaction) (success bool, diffText st
 			break
 		}
 		if reflect.TypeOf(t) != reflect.TypeOf(want[i]) {
-			i += 1
 			continue
 		}
 		d := transactionDiff(want[i], t)

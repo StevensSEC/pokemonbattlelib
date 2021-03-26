@@ -982,9 +982,9 @@ var _ = Describe("Weather", func() {
 				Move:   weatherBall,
 				Damage: 22,
 			}))
-			Expect(t).To(HaveTransaction(HealTransaction{
-				Target: bulbasaur,
-				Amount: 7,
+			Expect(t).To(HaveTransaction(InflictStatusTransaction{
+				Target:       bulbasaur,
+				StatusEffect: StatusPoison,
 			}))
 		})
 	})
