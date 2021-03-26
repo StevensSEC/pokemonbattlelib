@@ -92,15 +92,15 @@ var typeStrings = map[Type]string{
 }
 
 // Represents effectiveness of an elemental type matchup.
-type Effectiveness float64
+type Effectiveness int8
 
+const NoEffect Effectiveness = math.MinInt8 + 1 // separate because it fucks up the iota
 const (
-	NoEffect           Effectiveness = 0
-	VeryIneffective    Effectiveness = 0.25
-	Ineffective        Effectiveness = 0.5
-	NormalEffect       Effectiveness = 1
-	SuperEffective     Effectiveness = 2
-	VerySuperEffective Effectiveness = 4
+	VeryIneffective Effectiveness = iota - 2
+	Ineffective
+	NormalEffect
+	SuperEffective
+	VerySuperEffective
 )
 
 var noEffect = map[Type]Type{
@@ -160,14 +160,8 @@ func GetElementalEffect(move, def Type) Effectiveness {
 
 	reduce := bits.OnesCount32(uint32(halfEffect[move] & def))
 	increase := bits.OnesCount32(uint32(doubleEffect[move] & def))
-	effect := (increase - reduce) * 2
-	if effect == 0 {
-		return NormalEffect
-	} else if effect > 0 {
-		return Effectiveness(effect)
-	} else {
-		return Effectiveness(1 / math.Abs(float64(effect)))
-	}
+	effect := increase - reduce
+	return Effectiveness(effect)
 }
 
 func (t Type) String() string {
