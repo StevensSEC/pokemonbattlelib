@@ -100,6 +100,13 @@ func transactionDiff(expected, got Transaction) map[string]diff {
 					got:      rfB.Interface(),
 				}
 			}
+		} else if rfA.Type() == reflect.TypeOf(&Move{}) {
+			if !rfB.IsNil() && !reflect.DeepEqual(rfA.Interface(), rfB.Interface()) {
+				result[typeField.Name] = diff{
+					expected: rfA.Interface(),
+					got:      rfB.Interface(),
+				}
+			}
 		} else {
 			// Special case to allow fields with primitive types or nil pointers to be ignored when comparing.
 			// If either A or B is a type's zero value, or nil, it won't bother comparing them.
