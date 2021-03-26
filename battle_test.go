@@ -500,8 +500,9 @@ var _ = Describe("Turn priority", func() {
 
 		It("should order turns properly based on priority", func() {
 			a2 := Agent(new(healAgent))
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, defaultMoveOpt)
-			charmander := GeneratePokemon(PkmnCharmander, defaultMoveOpt)
+			pound := GetMove(MovePound)
+			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(pound))
+			charmander := GeneratePokemon(PkmnCharmander, WithMoves(pound))
 			p1 := NewOccupiedParty(&a1, 0, bulbasaur)
 			p2 := NewOccupiedParty(&a2, 1, charmander)
 			b := NewBattle()
@@ -522,7 +523,7 @@ var _ = Describe("Turn priority", func() {
 						partySlot: 0,
 						Team:      1,
 					},
-					Move:   GetMove(MovePound),
+					Move:   pound,
 					Damage: 3,
 				},
 			))
@@ -531,7 +532,8 @@ var _ = Describe("Turn priority", func() {
 
 	Context("when determining priority for equal turn types", func() {
 		It("should handle moves with higher priority first", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(5), defaultMoveOpt)
+			pound := GetMove(MovePound)
+			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(5), WithMoves(pound))
 			p1.Stats[StatSpeed] = 100
 			party1 := NewOccupiedParty(&a1, 0, p1)
 			p2 := GeneratePokemon(PkmnCharmander, WithLevel(5), WithMoves(GetMove(MoveFakeOut)))
@@ -563,7 +565,7 @@ var _ = Describe("Turn priority", func() {
 						Team:      1,
 					},
 					Damage: 5,
-					Move:   GetMove(MovePound),
+					Move:   pound,
 				},
 			))
 		})
