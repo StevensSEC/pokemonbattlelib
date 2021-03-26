@@ -126,14 +126,8 @@ func (b *Battle) Start() error {
 func (b *Battle) preRound() {
 	for _, t := range b.GetTargets() {
 		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
-			pkmn := b.getPokemon(t)
 			b.QueueTransaction(CureStatusTransaction{
-				Target: target{
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-					Pokemon:   *pkmn,
-				},
+				Target:       t,
 				StatusEffect: StatusSleep,
 			})
 		}
@@ -366,10 +360,9 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					Move:   user.Moves[t.Move],
 					Damage: uint(damage),
 				})
-				meta := move.Data().metadata
 				// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
-				if meta.Drain != 0 {
-					drain := damage * uint(meta.Drain/100)
+				if move.Drain() != 0 {
+					drain := damage * uint(move.Drain()/100)
 					if user.HeldItem == ItemBigRoot {
 						drain = (drain * 130) / 100 // 30% more HP than normal
 					}
@@ -387,7 +380,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				case ItemKingsRock, ItemRazorFang:
 					// King's Rock makes non-flinching moves have a 10% to cause flinch
 					// TODO: ensure only certain moves are affected -> https://bulbapedia.bulbagarden.net/wiki/King%27s_Rock
-					if meta.FlinchChance == 0 && b.rng.Roll(1, 10) {
+					if move.FlinchChance() == 0 && b.rng.Roll(1, 10) {
 						b.QueueTransaction(InflictStatusTransaction{
 							Target:       receiver,
 							StatusEffect: StatusFlinch,

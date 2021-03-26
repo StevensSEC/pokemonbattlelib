@@ -64,18 +64,16 @@ type data_move struct {
 	Effect      int
 	Flags       data_move_flags
 	// Metadata
-	metadata struct {
-		MinHits       int
-		MaxHits       int
-		MinTurns      int
-		MaxTurns      int
-		Drain         int
-		Healing       int
-		CritRate      int
-		AilmentChance int
-		FlinchChance  int
-		StatChance    int
-	}
+	MinHits       int
+	MaxHits       int
+	MinTurns      int
+	MaxTurns      int
+	Drain         int
+	Healing       int
+	CritRate      int
+	AilmentChance int
+	FlinchChance  int
+	StatChance    int
 }
 
 type data_item struct {
@@ -580,22 +578,23 @@ func main() {
 			if m.Id != mid {
 				continue
 			}
-			moves[i].metadata.MinHits = parseInt(v[3])
-			moves[i].metadata.MaxHits = parseInt(v[4])
-			moves[i].metadata.MinTurns = parseInt(v[5])
-			moves[i].metadata.MaxTurns = parseInt(v[6])
-			moves[i].metadata.Drain = parseInt(v[7])
-			moves[i].metadata.Healing = parseInt(v[8])
-			moves[i].metadata.CritRate = parseInt(v[9])
-			moves[i].metadata.AilmentChance = parseInt(v[10])
-			moves[i].metadata.FlinchChance = parseInt(v[11])
-			moves[i].metadata.StatChance = parseInt(v[12])
+			moves[i].MinHits = parseInt(v[3])
+			moves[i].MaxHits = parseInt(v[4])
+			moves[i].MinTurns = parseInt(v[5])
+			moves[i].MaxTurns = parseInt(v[6])
+			moves[i].Drain = parseInt(v[7])
+			moves[i].Healing = parseInt(v[8])
+			moves[i].CritRate = parseInt(v[9])
+			moves[i].AilmentChance = parseInt(v[10])
+			moves[i].FlinchChance = parseInt(v[11])
+			moves[i].StatChance = parseInt(v[12])
 		}
 	}
 	output += "var AllMoves = []MoveData{\n"
 	for _, m := range moves {
-		output += fmt.Sprintf("\t{Name: %q, Type: %d, Category: %s, Targets: %d, Priority: %d, Power: %d, Accuracy: %d, metadata: %#v,},\n",
-			m.Name, m.Type, m.DamageClass, m.Targets, m.Priority, m.Power, m.Accuracy, m.metadata)
+		output += fmt.Sprintf("\t{%q, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d,},\n",
+			m.Name, m.Type, m.DamageClass, m.Targets, m.Priority, m.Power, m.Accuracy, m.PP,
+			m.MinHits, m.MaxHits, m.MinTurns, m.MaxTurns, m.Drain, m.Healing, m.CritRate, m.AilmentChance, m.FlinchChance, m.StatChance)
 	}
 	output += "}\n\n"
 	// Add move constants

@@ -210,9 +210,18 @@ type PPTransaction struct {
 }
 
 func (t PPTransaction) Mutate(b *Battle) {
-	t.Move.CurrentPP += uint8(t.Amount)
-	if t.Move.CurrentPP > t.Move.MaxPP {
-		t.Move.CurrentPP = t.Move.MaxPP
+	// This is why we should just use int
+	if t.Amount < 0 {
+		n := uint8(t.Amount * -1)
+		if t.Move.CurrentPP < n {
+			n = t.Move.CurrentPP
+		}
+		t.Move.CurrentPP -= n
+	} else {
+		t.Move.CurrentPP += uint8(t.Amount)
+		if t.Move.CurrentPP > t.Move.MaxPP {
+			t.Move.CurrentPP = t.Move.MaxPP
+		}
 	}
 }
 

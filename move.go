@@ -58,17 +58,7 @@ type MoveData struct {
 	Power        uint
 	Accuracy     uint
 	InitialMaxPP uint8
-	metadata     MoveMeta
-}
-
-// Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
-type Move struct {
-	Id        MoveId
-	CurrentPP uint8
-	MaxPP     uint8
-}
-
-type MoveMeta struct {
+	// Metadata
 	MinHits       int
 	MaxHits       int
 	MinTurns      int
@@ -79,6 +69,13 @@ type MoveMeta struct {
 	AilmentChance int
 	FlinchChance  int
 	StatChance    int
+}
+
+// Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
+type Move struct {
+	Id        MoveId
+	CurrentPP uint8
+	MaxPP     uint8
 }
 
 //go:generate go run ./scripts/gen_getters.go -for Move -data MoveData

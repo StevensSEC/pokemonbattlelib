@@ -1158,14 +1158,18 @@ var _ = Describe("Fainting", func() {
 		It("should not let the holder die", func() {
 			b := setup()
 			t, _ := b.SimulateRound()
+			holderTarget := target{
+				Pokemon:   *b.getPokemonInBattle(0, 0),
+				party:     0,
+				partySlot: 0,
+				Team:      0,
+			}
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: b.getPokemonInBattle(1, 0),
-				Target: target{
-					Pokemon:   *b.getPokemonInBattle(0, 0),
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
+				User:   b.getPokemonInBattle(1, 0),
+				Target: holderTarget,
+			}))
+			Expect(t).ToNot(HaveTransaction(FaintTransaction{
+				Target: holderTarget,
 			}))
 			Expect(b.parties[0].activePokemon[0].CurrentHP).To(BeEquivalentTo(1))
 		})
