@@ -180,6 +180,17 @@ func getClosestTransaction(check []Transaction, want Transaction) map[string]dif
 	return best
 }
 
+// Creates a text representation of the diff result of transactions
+func getDiffText(check []Transaction, want Transaction) string {
+	diffText := ""
+	closest := getClosestTransaction(check, want)
+	total := reflect.ValueOf(want).NumField()
+	for name, val := range closest {
+		diffText += fmt.Sprintf("- %s\nExpected: %v\nReceived: %v\n", name, val.expected, val.got)
+	}
+	return fmt.Sprintf("%T has %d/%d fields that do not match:\n%s", want, len(closest), total, diffText)
+}
+
 // Given a sequence of transactions, match if a given transaction is present in the sequence.
 type singleTransactionMatcher struct {
 	expected Transaction
@@ -223,14 +234,8 @@ func (matcher *singleTransactionMatcher) FailureMessage(actual interface{}) (mes
 				transactions[first],
 			)
 		} else {
-			diffText := ""
-			closest := getClosestTransaction(transactions, matcher.expected)
-			total := reflect.ValueOf(matcher.expected).NumField()
-			for name, val := range closest {
-				diffText += fmt.Sprintf("- %s\nExpected: %v\nReceived: %v\n", name, val.expected, val.got)
-			}
-			return fmt.Sprintf("Closest %T (%d total) has %d/%d fields that don't match:\n%s",
-				matcher.expected, count, len(closest), total, diffText)
+			diffText := getDiffText(transactions, matcher.expected)
+			return fmt.Sprintf("The closest of %d total %s", count, diffText)
 		}
 	default:
 		return fmt.Sprintf("Actual's type is %T, when it should be []Transaction", actual)
@@ -255,32 +260,65 @@ func HaveTransactionsInOrder(expected ...Transaction) types.GomegaMatcher {
 	}
 }
 
-func (matcher *orderedTransactionMatcher) Match(actual interface{}) (success bool, err error) {
-	switch transactions := actual.(type) {
-	case []Transaction:
-		expectedIdx := 0
-		for _, t := range transactions {
-			if compareTransaction(t, matcher.expected[expectedIdx]) {
-				expectedIdx++
-				if expectedIdx == len(matcher.expected) {
-					break
-				}
-			}
+func checkTransactionOrder(check, want []Transaction) (success bool, diffText string) {
+	i := 0
+	fails := make([]Transaction, 0)
+	for _, t := range check {
+		if i == len(want) {
+			break
 		}
-		return expectedIdx == len(matcher.expected), nil
+		if reflect.TypeOf(t) != reflect.TypeOf(want[i]) {
+			i += 1
+			continue
+		}
+		d := transactionDiff(want[i], t)
+		if len(d) == 0 {
+			i += 1
+			fails = make([]Transaction, 0)
+		} else {
+			fails = append(fails, t)
+		}
+	}
+	if i == len(want) {
+		return true, ""
+	}
+	diffText = getDiffText(fails, want[i])
+	return false, diffText
+}
+
+func (matcher *orderedTransactionMatcher) Match(actual interface{}) (success bool, err error) {
+	switch t := actual.(type) {
+	case []Transaction:
+		if len(t) < len(matcher.expected) {
+			return false, fmt.Errorf("Received %d, but expected at least %d transactions.", len(matcher.expected), len(t))
+		}
+		result, _ := checkTransactionOrder(t, matcher.expected)
+		return result, nil
 	default:
 		return false, errors.New("Was not given a []Transaction")
 	}
 }
 
 func (matcher *orderedTransactionMatcher) FailureMessage(actual interface{}) (message string) {
-	seq := []string{}
+	wantOrder := ""
 	for i, t := range matcher.expected {
-		seq = append(seq, fmt.Sprintf("%d: %T: %+v", i, t, t))
+		wantOrder += fmt.Sprintf("%d. %T\n", i+1, t)
 	}
-	return fmt.Sprintf("Expected the sequence of transactions to have these transactions in this order:\n%s",
-		strings.Join(seq, "\n"),
-	)
+	switch transactions := actual.(type) {
+	case []Transaction:
+		gotOrder := ""
+		for i, t := range transactions {
+			gotOrder += fmt.Sprintf("%d. %T\n", i+1, t)
+		}
+		msg := fmt.Sprintf("Expected the sequence of transactions to have these transactions in this order:\n%s"+
+			"\nReceived the following transactions:\n%s",
+			wantOrder, gotOrder,
+		)
+		_, result := checkTransactionOrder(transactions, matcher.expected)
+		return fmt.Sprintf("%s\nThe closest transaction that failed to match is shown below:\n%s", msg, result)
+	default:
+		return fmt.Sprintf("Actual's type is %T, when it should be []Transaction", actual)
+	}
 }
 
 func (matcher *orderedTransactionMatcher) NegatedFailureMessage(actual interface{}) (message string) {

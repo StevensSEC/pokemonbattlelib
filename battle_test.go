@@ -552,7 +552,7 @@ var _ = Describe("Turn priority", func() {
 						Team:      0,
 					},
 					Damage: 5,
-					Move:   GetMove(MoveFakeOut),
+					Move:   GetMove(MoveSolarBeam),
 				},
 				DamageTransaction{
 					User: p1,
