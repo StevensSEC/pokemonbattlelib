@@ -43,8 +43,6 @@ type data_pokemon struct {
 	GrowthRate int
 }
 
-type data_move_flags uint32
-
 type data_move struct {
 	Id             int
 	Identifier     string
@@ -63,7 +61,7 @@ type data_move struct {
 	Targets     int
 	DamageClass string
 	Effect      int
-	Flags       data_move_flags
+	Flags       []string
 }
 
 type data_item struct {
@@ -539,6 +537,29 @@ func main() {
 	}
 	// find all the move flags
 	log.Println("Getting move flags")
+	moveFlagMap := map[int]string{
+		1:  "FlagContact",
+		2:  "FlagCharge",
+		3:  "FlagRecharge",
+		4:  "FlagProtect",
+		5:  "FlagReflectable",
+		6:  "FlagSnatch",
+		7:  "FlagMirror",
+		8:  "FlagPunch",
+		9:  "FlagSound",
+		10: "FlagGravity",
+		11: "FlagDefrost",
+		12: "FlagDistance",
+		13: "FlagHeal",
+		14: "FlagAuthentic",
+		15: "FlagPowder",
+		16: "FlagBite",
+		17: "FlagPulse",
+		18: "FlagBallistics",
+		19: "FlagMental",
+		20: "FlagNonSkyBattle",
+		21: "FlagDance",
+	}
 	move_flag_map_csv := getCsvReader("data/move_flag_map.csv")
 	for {
 		record, err := move_flag_map_csv.Read()
@@ -551,14 +572,18 @@ func main() {
 			if m.Id != mid {
 				continue
 			}
-			(&moves[i]).Flags |= data_move_flags(1 << flag)
+			(&moves[i]).Flags = append((&moves[i]).Flags, moveFlagMap[flag])
 			break
 		}
 	}
 	output += "var AllMoves = []MoveData{\n"
-	for _, p := range moves {
-		output += fmt.Sprintf("\t{Name: %q, Type: %d, Category: %s,"+
-			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d},\n", p.Name, p.Type, p.DamageClass, p.Targets, p.Priority, p.Power, p.Accuracy)
+	for _, m := range moves {
+		flags := strings.Join(m.Flags, " | ")
+		if len(m.Flags) == 0 {
+			flags = "0"
+		}
+		output += fmt.Sprintf("{Name: %q, Type: %d, Category: %s,"+
+			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d, Flags: %s},\n", m.Name, m.Type, m.DamageClass, m.Targets, m.Priority, m.Power, m.Accuracy, flags)
 	}
 	output += "}\n\n"
 	// Add move constants
