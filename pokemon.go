@@ -45,6 +45,9 @@ func (p *Pokemon) Data() PokemonData {
 	if p.NatDex > uint16(len(AllPokemonData)) {
 		blog.Panicf("Pokemon (natdex: %d) is an invalid pokemon", p.NatDex)
 	}
+	if p.NatDex == 0 {
+		return PokemonData{}
+	}
 	return AllPokemonData[int(p.NatDex)-1]
 }
 
