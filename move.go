@@ -108,7 +108,7 @@ func GetMove(id MoveId) *Move {
 
 // Grabs move's constant data
 func (m *Move) Data() *MoveData {
-	if m.Id >= MoveId(len(AllMoves)-1) {
+	if m.Id > MoveId(len(AllMoves)) {
 		blog.Panicf("Move (id: %d) is an invalid move", m.Id)
 	}
 	if m.Id == MoveNone {

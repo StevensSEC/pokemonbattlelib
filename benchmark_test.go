@@ -1,7 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 )
@@ -37,13 +36,13 @@ func randParty() *party {
 	party := NewParty(&a1, 0)
 	count := rand.Intn(5) + 1
 	for j := 0; j < count; j++ {
-		p := GeneratePokemon(rand.Intn(493),
+		p := GeneratePokemon(rand.Intn(493)+1,
 			WithLevel(uint8(47+rand.Intn(6))),
 			WithMoves(
-				GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
-				GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
-				GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
-				GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
+				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
+				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
+				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
+				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
 			),
 		)
 		party.AddPokemon(p)
@@ -54,7 +53,6 @@ func randParty() *party {
 func BenchmarkBattle(b *testing.B) {
 	rand.Seed(8778723)
 	for i := 0; i < b.N; i++ {
-		// fmt.Printf("%d/%d", i, b.N)
 		p1 := randParty()
 		p2 := randParty()
 		p2.team = 1
@@ -66,7 +64,10 @@ func BenchmarkBattle(b *testing.B) {
 		}
 		for {
 			transactions, ended := battle.SimulateRound()
-			fmt.Println(len(transactions))
+			// HACK: sometimes we generate battles with unimplemented status moves. this avoids getting stuck
+			if len(transactions) == 0 {
+				ended = true
+			}
 			if ended {
 				break
 			}
