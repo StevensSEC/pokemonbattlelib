@@ -1,5 +1,5 @@
 // Auto generate getters on one type to grab data from another type.
-// example usage: go run ./scripts/gen_getters.go -for Move -data AllMoves -output move_getters_GEN.go
+// example usage: go run ./scripts/getters/gen_getters.go -for Move -data AllMoves -output move_getters_GEN.go
 package main
 
 import (

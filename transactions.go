@@ -1,5 +1,7 @@
 package pokemonbattlelib
 
+//go:generate go run ./scripts/transaction_marshall/gen_transaction_marshall.go
+
 // Transactions describes a change to battle state.
 // A sequence of transactions should be able to describe an entire battle.
 type Transaction interface {

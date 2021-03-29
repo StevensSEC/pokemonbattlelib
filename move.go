@@ -94,7 +94,7 @@ type Move struct {
 	MaxPP     uint8
 }
 
-//go:generate go run ./scripts/gen_getters.go -for Move -data MoveData
+//go:generate go run ./scripts/getters/gen_getters.go -for Move -data MoveData
 
 // Retrieves a Pokemon move given its move ID
 func GetMove(id MoveId) *Move {
@@ -108,7 +108,7 @@ func GetMove(id MoveId) *Move {
 
 // Grabs move's constant data
 func (m *Move) Data() *MoveData {
-	if m.Id >= MoveId(len(AllMoves)-1) {
+	if m.Id > MoveId(len(AllMoves)) {
 		blog.Panicf("Move (id: %d) is an invalid move", m.Id)
 	}
 	if m.Id == MoveNone {
