@@ -23,6 +23,7 @@ func (m Move) CritRate() int          { return m.Data().CritRate }
 func (m Move) AilmentChance() int     { return m.Data().AilmentChance }
 func (m Move) FlinchChance() int      { return m.Data().FlinchChance }
 func (m Move) StatChance() int        { return m.Data().StatChance }
+func (m Move) Flags() MoveFlags       { return m.Data().Flags }
 
 func (m *Move) MarshalJSON() ([]byte, error) {
 	type alias Move
@@ -46,6 +47,7 @@ func (m *Move) MarshalJSON() ([]byte, error) {
 		AilmentChance int
 		FlinchChance  int
 		StatChance    int
+		Flags         MoveFlags
 	}{
 		alias:         (*alias)(m),
 		Name:          m.Name(),
@@ -66,6 +68,7 @@ func (m *Move) MarshalJSON() ([]byte, error) {
 		AilmentChance: m.AilmentChance(),
 		FlinchChance:  m.FlinchChance(),
 		StatChance:    m.StatChance(),
+		Flags:         m.Flags(),
 	})
 }
 

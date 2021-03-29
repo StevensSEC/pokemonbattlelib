@@ -47,6 +47,32 @@ const (
 	MoveTargetAll
 )
 
+type MoveFlags uint32
+
+const (
+	FlagAuthentic MoveFlags = 1 << iota
+	FlagBallistics
+	FlagBite
+	FlagCharge
+	FlagContact
+	FlagDance
+	FlagDefrost
+	FlagDistance
+	FlagGravity
+	FlagHeal
+	FlagMental
+	FlagMirror
+	FlagNonSkyBattle
+	FlagPowder
+	FlagProtect
+	FlagPulse
+	FlagPunch
+	FlagRecharge
+	FlagReflectable
+	FlagSnatch
+	FlagSound
+)
+
 type MoveId uint16
 
 type MoveData struct {
@@ -69,6 +95,7 @@ type MoveData struct {
 	AilmentChance int
 	FlinchChance  int
 	StatChance    int
+	Flags         MoveFlags
 }
 
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.

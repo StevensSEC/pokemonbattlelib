@@ -183,7 +183,6 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 		}
 
 		log.Printf("Battle created: %v", hb.Battle)
-		w.WriteHeader(200)
 		data, err := json.Marshal(struct {
 			BattleId      int
 			ActivePokemon int
