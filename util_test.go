@@ -26,7 +26,7 @@ func comparePokemon(a, b *Pokemon) bool {
 
 // Used for custom gomega matchers. For simplicity, the fields of the struct are hardcoded. If we need to add more fields to `target` something is probably wrong.
 func compareTargets(a, b target) bool {
-	return comparePokemon(&a.Pokemon, &b.Pokemon) &&
+	return comparePokemon(a.Pokemon, b.Pokemon) &&
 		a.party == b.party &&
 		a.partySlot == b.partySlot &&
 		a.Team == b.Team

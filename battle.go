@@ -124,10 +124,10 @@ func (b *Battle) Start() error {
 
 // Handles all pre-turn logic
 func (b *Battle) preRound() {
-	for _, t := range b.GetTargets() {
+	for _, t := range b.GetTargetsRef() {
 		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
 			b.QueueTransaction(CureStatusTransaction{
-				Target:       t,
+				Target:       *t,
 				StatusEffect: StatusSleep,
 			})
 		}
@@ -138,20 +138,20 @@ func (b *Battle) sortTurns(turns *[]TurnContext) {
 	sort.SliceStable(*turns, func(i, j int) bool {
 		turnA := (*turns)[i].Turn
 		turnB := (*turns)[j].Turn
-		ctxA := (*turns)[i].Context
-		ctxB := (*turns)[j].Context
+		pkmnA := (*turns)[i].User.Pokemon
+		pkmnB := (*turns)[j].User.Pokemon
 		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
 			switch turnA.(type) {
 			case FightTurn:
 				ftA := turnA.(FightTurn)
 				ftB := turnB.(FightTurn)
-				mvA := ctxA.Pokemon.Moves[ftA.Move]
-				mvB := ctxB.Pokemon.Moves[ftB.Move]
+				mvA := pkmnA.Moves[ftA.Move]
+				mvB := pkmnB.Moves[ftB.Move]
 				if mvA.Priority() != mvB.Priority() {
 					return mvA.Priority() > mvB.Priority()
 				}
 				// speedy pokemon should go first
-				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
+				return pkmnA.Speed() > pkmnB.Speed()
 			}
 		} else {
 			// make higher priority turns go first
@@ -176,15 +176,23 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			ctx := b.getContext(party, pokemon)
 			blog.Printf("Requesting turn from agent %d for pokemon %d (%s)", i, j, pokemon)
 			turn := (*party.Agent).Act(ctx)
+			// use the ground truth instead of a copy to let the garbage collector clean up the copied memory when it can
+			switch t := turn.(type) {
+			case FightTurn:
+				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
+				turn = t // because the type check creates a copy (again...), we need to make sure that this version of the turn gets placed into the turn list
+			case ItemTurn:
+				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
+				turn = t
+			}
 			turns = append(turns, TurnContext{
 				User: target{
-					Pokemon:   *pokemon,
+					Pokemon:   b.getPokemonInBattle(i, j), // use the ground truth instead of a copy
 					party:     i,
 					partySlot: j,
 					Team:      party.team,
 				},
-				Turn:    turn,
-				Context: ctx,
+				Turn: turn,
 			})
 		}
 	}
@@ -198,14 +206,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		turn := turns[0]
 		turns = turns[1:]
 		blog.Printf("Processing Turn %T for %s", turn.Turn, turn.User.Pokemon)
-		// here, we can't use the turn context's reference to the pokemon, because it is a copy of the ground truth pokemon
-		self := b.getPokemon(turn.User)
-		if self.CurrentHP == 0 {
+		user := turn.User.Pokemon
+		if user.CurrentHP == 0 {
 			continue
 		}
 		switch t := turn.Turn.(type) {
 		case FightTurn:
-			user := turn.Context.Pokemon
 			move := user.Moves[t.Move]
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
@@ -235,20 +241,20 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 
 			// use the move
-			receiver := b.getPokemon(t.Target)
+			receiver := t.Target.Pokemon
 			evasion := receiver.Evasion()
 			// Todo: account for user's accuracy stage
 			accuracy := move.Accuracy() * evasion / 100
 			if b.Weather == WeatherFog {
 				accuracy = (accuracy * 3) / 5
 			}
-			switch self.HeldItem {
+			switch user.HeldItem {
 			case ItemWideLens:
 				accuracy = (accuracy * 110) / 100
 			}
 			if move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
 				b.QueueTransaction(MoveFailTransaction{
-					User:   &user,
+					User:   user,
 					Reason: FailMiss,
 				})
 				continue
@@ -259,17 +265,17 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				switch move.Id {
 				case MoveDoubleTeam:
 					b.QueueTransaction(ModifyStatTransaction{
-						Target: &user,
+						Target: user,
 						Stat:   StatEvasion,
 						Stages: +1,
 					})
 				case MoveStunSpore:
 					b.QueueTransaction(InflictStatusTransaction{
-						Target:       receiver,
+						Target:       t.Target.Pokemon,
 						StatusEffect: StatusParalyze,
 					})
 				case MoveSpite:
-					if m := receiver.metadata[MetaLastMove]; m != nil {
+					if m := t.Target.Pokemon.metadata[MetaLastMove]; m != nil {
 						b.QueueTransaction(PPTransaction{
 							Move:   m.(*Move),
 							Amount: -4,
@@ -285,14 +291,14 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						})
 						if receiver.HeldItem == ItemDestinyKnot {
 							b.QueueTransaction(InflictStatusTransaction{
-								Target:       self,
+								Target:       user,
 								StatusEffect: StatusInfatuation,
 							})
 						}
 					}
 				case MoveRainDance:
 					turns := 5
-					if self.HeldItem == ItemDampRock {
+					if user.HeldItem == ItemDampRock {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
@@ -301,7 +307,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				case MoveSunnyDay:
 					turns := 5
-					if self.HeldItem == ItemHeatRock {
+					if user.HeldItem == ItemHeatRock {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
@@ -310,7 +316,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				case MoveHail:
 					turns := 5
-					if self.HeldItem == ItemIcyRock {
+					if user.HeldItem == ItemIcyRock {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
@@ -319,7 +325,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				case MoveSandstorm:
 					turns := 5
-					if self.HeldItem == ItemSmoothRock {
+					if user.HeldItem == ItemSmoothRock {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
@@ -328,7 +334,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				case MoveHowl:
 					b.QueueTransaction(ModifyStatTransaction{
-						Target: self,
+						Target: user,
 						Stat:   StatAtk,
 						Stages: +1,
 					})
@@ -341,8 +347,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				case MoveMoonlight, MoveSynthesis, MoveMorningSun:
 					if b.Weather == WeatherFog {
 						b.QueueTransaction(HealTransaction{
-							Target: self,
-							Amount: self.MaxHP() / 4,
+							Target: user,
+							Amount: user.MaxHP() / 4,
 						})
 					}
 				default:
@@ -350,14 +356,14 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else {
 				// Physical/Special Moves
-				damage := calcMoveDamage(b.Weather, &user, receiver, move)
+				damage := calcMoveDamage(b.Weather, user, receiver, move)
 				var crit uint = 1
 				if b.rng.Roll(1, user.CritChance()) {
 					crit = 2
 				}
 				damage *= crit
 				b.QueueTransaction(DamageTransaction{
-					User:   &user,
+					User:   user,
 					Target: t.Target,
 					Move:   user.Moves[t.Move],
 					Damage: uint(damage),
@@ -373,7 +379,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						drain = 1
 					}
 					b.QueueTransaction(HealTransaction{
-						Target: &user,
+						Target: user,
 						Amount: uint(drain),
 					})
 				}
@@ -391,7 +397,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				case ItemLifeOrb:
 					b.QueueTransaction(DamageTransaction{
 						Target: turn.User,
-						Damage: self.MaxHP() / 10,
+						Damage: user.MaxHP() / 10,
 					})
 				case ItemShellBell:
 					b.QueueTransaction(DamageTransaction{
@@ -401,12 +407,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			}
 		case ItemTurn:
-			receiver := b.getPokemon(t.Target)
-			move := receiver.Moves[t.Move]
 			b.QueueTransaction(ItemTransaction{
 				Target: t.Target,
 				Item:   t.Item,
-				Move:   move,
+				Move:   t.Target.Pokemon.Moves[t.Move],
 			})
 		default:
 			blog.Panicf("Unknown turn of type %v", t)
@@ -432,8 +436,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 func (b *Battle) postRound() {
 	blog.Println("Post-round")
 	// Effects on every Pokemon
-	for _, t := range b.GetTargets() {
-		pkmn := b.getPokemon(t)
+	for _, t := range b.GetTargetsRef() {
+		pkmn := t.Pokemon
 		// Status effects
 		if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
 			cond := pkmn.StatusEffects & StatusNonvolatileMask
@@ -446,7 +450,7 @@ func (b *Battle) postRound() {
 				damage = pkmn.MaxHP() / 16
 			}
 			b.QueueTransaction(DamageTransaction{
-				Target:       t,
+				Target:       *t,
 				Damage:       damage,
 				StatusEffect: cond,
 			})
@@ -457,7 +461,7 @@ func (b *Battle) postRound() {
 			if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
 				damage := pkmn.MaxHP() / 16
 				b.QueueTransaction(DamageTransaction{
-					Target: t,
+					Target: *t,
 					Damage: damage,
 				})
 			}
@@ -465,14 +469,14 @@ func (b *Battle) postRound() {
 			if pkmn.EffectiveType()&TypeIce == 0 {
 				damage := pkmn.MaxHP() / 16
 				b.QueueTransaction(DamageTransaction{
-					Target: t,
+					Target: *t,
 					Damage: damage,
 				})
 			}
 		}
 		if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
 			b.QueueTransaction(ItemTransaction{
-				Target: t,
+				Target: *t,
 				IsHeld: true,
 				Item:   pkmn.HeldItem,
 			})
@@ -480,7 +484,7 @@ func (b *Battle) postRound() {
 		// Held item effects
 		if pkmn.HeldItem != ItemNone {
 			b.QueueTransaction(ItemTransaction{
-				Target: t,
+				Target: *t,
 				IsHeld: true,
 				Item:   pkmn.HeldItem,
 			})
@@ -520,10 +524,10 @@ func (b *Battle) ProcessQueue() {
 }
 
 type target struct {
-	party     int     // Identifier for a party (index in battle parties, or "party ID")
-	partySlot int     // The slot of the active Pokemon
-	Team      int     // The team that the Pokemon belongs to
-	Pokemon   Pokemon // Pokemon that is a candidate target
+	party     int      // Identifier for a party (index in battle parties, or "party ID")
+	partySlot int      // The slot of the active Pokemon
+	Team      int      // The team that the Pokemon belongs to
+	Pokemon   *Pokemon // Pokemon that is a candidate target
 }
 
 func (t target) String() string {
@@ -573,16 +577,19 @@ type BattleContext struct {
 	Targets   []target // An array of all possible targets that the Pokemon can act on
 }
 
-// Gets all the active Pokemon (targets) in the battle
+// Gets a deep copy of all the active Pokemon (targets) in the battle
 func (b *Battle) GetTargets() []target {
 	targets := make([]target, 0)
 	for partyID, party := range b.parties {
 		for slot, active := range party.activePokemon {
+			var pkmn Pokemon
+			bytes, _ := json.Marshal(active)
+			json.Unmarshal(bytes, &pkmn)
 			target := target{
 				party:     partyID,
 				partySlot: slot,
 				Team:      party.team,
-				Pokemon:   *active,
+				Pokemon:   &pkmn,
 			}
 			targets = append(targets, target)
 		}
@@ -590,11 +597,33 @@ func (b *Battle) GetTargets() []target {
 	return targets
 }
 
+// Gets all the active Pokemon (targets) in the battle with ground truth pointers.
+func (b *Battle) GetTargetsRef() []*target {
+	targets := make([]*target, 0)
+	for partyID, party := range b.parties {
+		for slot := range party.activePokemon {
+			target := target{
+				party:     partyID,
+				partySlot: slot,
+				Team:      party.team,
+			}
+			target.Pokemon = b.getPokemon(target)
+			targets = append(targets, &target)
+		}
+	}
+	return targets
+}
+
 // Gets the current context for a pokemon to act (perform a turn)
 func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
+	// not joking, this is *actually* the fastest way to deep copy in Go.
+	// although I didn't benchmark it myself, so I don't know that for a fact.
+	var pkmn Pokemon
+	bytes, _ := json.Marshal(pokemon)
+	json.Unmarshal(bytes, &pkmn)
 	return &BattleContext{
 		Battle:    *b,
-		Pokemon:   *pokemon,
+		Pokemon:   pkmn,
 		Team:      party.team,
 		Allies:    b.GetAllies(party),
 		Opponents: b.GetOpponents(party),
@@ -614,9 +643,8 @@ type Turn interface {
 
 // Wrapper used to determine turn order in a battle
 type TurnContext struct {
-	User    target         // The pokemon that made this turn.
-	Turn    Turn           // A copy of the turn that a Pokemon made using an Agent
-	Context *BattleContext // The context in which the Pokemon took its turn
+	User target // The pokemon that made this turn.
+	Turn Turn   // A copy of the turn that a Pokemon made using an Agent
 }
 
 // A turn to represent a Pokemon using a Move.

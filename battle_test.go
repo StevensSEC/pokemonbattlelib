@@ -120,6 +120,28 @@ var _ = Describe("Battle initialization", func() {
 	})
 })
 
+var _ = Describe("Battle memory management", func() {
+	agent1 := Agent(new(dumbAgent))
+	agent2 := Agent(new(dumbAgent))
+
+	It("should produce transactions that reference the ground truth pointers", func() {
+		party1 := NewOccupiedParty(&agent1, 0, GeneratePokemon(PkmnCharmander, defaultMoveOpt))
+		party2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(PkmnSquirtle, defaultMoveOpt))
+		b := NewBattle()
+		b.AddParty(party1, party2)
+		Expect(b.Start()).To(Succeed())
+
+		t, _ := b.SimulateRound()
+		for i := range t {
+			switch tt := t[i].(type) {
+			case DamageTransaction:
+				real := b.getPokemon(tt.Target)
+				Expect(tt.Target.Pokemon).To(BeIdenticalTo(real))
+			}
+		}
+	})
+})
+
 var _ = Describe("One round of battle", func() {
 	agent1 := Agent(new(dumbAgent))
 	agent2 := Agent(new(dumbAgent))
@@ -156,7 +178,7 @@ var _ = Describe("One round of battle", func() {
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: charmander,
 				Target: target{
-					Pokemon:   *squirtle,
+					Pokemon:   squirtle,
 					party:     1,
 					partySlot: 0,
 					Team:      1,
@@ -167,7 +189,7 @@ var _ = Describe("One round of battle", func() {
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: squirtle,
 				Target: target{
-					Pokemon:   *charmander,
+					Pokemon:   charmander,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -244,13 +266,13 @@ var _ = Describe("One round of battle", func() {
 
 				// TODO: test the difference in damage between the transactions rather than the exact values of the transactions
 				// TODO: make it so that target doesn't need to include `Pokemon` or `Team`
-				a1 <- FightTurn{Move: 1, Target: target{Pokemon: *pkmn2, party: 1, partySlot: 0, Team: 1}}
-				a2 <- FightTurn{Move: 0, Target: target{Pokemon: *pkmn1, party: 0, partySlot: 0, Team: 0}}
+				a1 <- FightTurn{Move: 1, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
+				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransaction(DamageTransaction{
 					User: pkmn1,
 					Target: target{
-						Pokemon:   *pkmn2,
+						Pokemon:   pkmn2,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -265,13 +287,13 @@ var _ = Describe("One round of battle", func() {
 				})
 				b.ProcessQueue()
 
-				a1 <- FightTurn{Move: 0, Target: target{Pokemon: *pkmn2, party: 1, partySlot: 0, Team: 1}}
-				a2 <- FightTurn{Move: 0, Target: target{Pokemon: *pkmn1, party: 0, partySlot: 0, Team: 0}}
+				a1 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
+				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
 				t, _ = b.SimulateRound()
 				Expect(t).To(HaveTransaction(DamageTransaction{
 					User: pkmn1,
 					Target: target{
-						Pokemon:   *pkmn2,
+						Pokemon:   pkmn2,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -296,13 +318,13 @@ var _ = Describe("One round of battle", func() {
 				Expect(b.Start()).To(Succeed())
 
 				// TODO: make it so that target doesn't need to include `Pokemon` or `Team`
-				a1 <- FightTurn{Move: 0, Target: target{Pokemon: *pkmn2, party: 1, partySlot: 0, Team: 1}}
-				a2 <- FightTurn{Move: 0, Target: target{Pokemon: *pkmn1, party: 0, partySlot: 0, Team: 0}}
+				a1 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
+				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransaction(DamageTransaction{
 					User: pkmn1,
 					Target: target{
-						Pokemon:   *pkmn2,
+						Pokemon:   pkmn2,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -313,7 +335,7 @@ var _ = Describe("One round of battle", func() {
 				Expect(t).To(HaveTransaction(DamageTransaction{
 					User: pkmn2,
 					Target: target{
-						Pokemon:   *pkmn1,
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -378,6 +400,8 @@ var _ = Describe("One round of battle", func() {
 			charmander.Moves[0] = GetMove(MoveSpite)
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound() // set Pokemon's last move
+			charmander.CurrentHP = charmander.MaxHP()
+			squirtle.CurrentHP = squirtle.MaxHP()
 			squirtle.Moves[0].CurrentPP = 1
 			t, _ := battle.SimulateRound()
 			Expect(t).To(HaveTransaction(PPTransaction{
@@ -420,7 +444,7 @@ var _ = Describe("Using items in battle", func() {
 						party:     0,
 						partySlot: 0,
 						Team:      0,
-						Pokemon:   *pkmn,
+						Pokemon:   pkmn,
 					},
 					Item: ItemPotion,
 					Move: nil,
@@ -499,9 +523,8 @@ var _ = Describe("Turn priority", func() {
 
 		It("should order turns properly based on priority", func() {
 			a2 := Agent(new(healAgent))
-			pound := GetMove(MovePound)
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(pound))
-			charmander := GeneratePokemon(PkmnCharmander, WithMoves(pound))
+			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MovePound)))
+			charmander := GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MovePound)))
 			p1 := NewOccupiedParty(&a1, 0, bulbasaur)
 			p2 := NewOccupiedParty(&a2, 1, charmander)
 			b := NewBattle()
@@ -517,12 +540,12 @@ var _ = Describe("Turn priority", func() {
 				DamageTransaction{
 					User: bulbasaur,
 					Target: target{
-						Pokemon:   *charmander,
+						Pokemon:   charmander,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
 					},
-					Move:   pound,
+					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
 			))
@@ -547,7 +570,7 @@ var _ = Describe("Turn priority", func() {
 				DamageTransaction{
 					User: p2,
 					Target: target{
-						Pokemon:   *p1,
+						Pokemon:   p1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -558,7 +581,7 @@ var _ = Describe("Turn priority", func() {
 				DamageTransaction{
 					User: p1,
 					Target: target{
-						Pokemon:   *p2,
+						Pokemon:   p2,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -583,7 +606,7 @@ var _ = Describe("Turn priority", func() {
 				DamageTransaction{
 					User: ninjask,
 					Target: target{
-						Pokemon:   *charmander,
+						Pokemon:   charmander,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -594,7 +617,7 @@ var _ = Describe("Turn priority", func() {
 				DamageTransaction{
 					User: charmander,
 					Target: target{
-						Pokemon:   *ninjask,
+						Pokemon:   ninjask,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -686,7 +709,7 @@ var _ = Describe("Weather", func() {
 					DamageTransaction{
 						User: machamp,
 						Target: target{
-							Pokemon:   *bidoof,
+							Pokemon:   bidoof,
 							party:     1,
 							partySlot: 0,
 							Team:      1,
@@ -709,7 +732,7 @@ var _ = Describe("Weather", func() {
 					DamageTransaction{
 						User: lileep,
 						Target: target{
-							Pokemon:   *bidoof,
+							Pokemon:   bidoof,
 							party:     1,
 							partySlot: 0,
 							Team:      1,
@@ -735,7 +758,7 @@ var _ = Describe("Weather", func() {
 					DamageTransaction{
 						User: machamp,
 						Target: target{
-							Pokemon:   *bidoof,
+							Pokemon:   bidoof,
 							party:     1,
 							partySlot: 0,
 							Team:      1,
@@ -759,7 +782,7 @@ var _ = Describe("Weather", func() {
 					DamageTransaction{
 						User: lileep,
 						Target: target{
-							Pokemon:   *bidoof,
+							Pokemon:   bidoof,
 							party:     1,
 							partySlot: 0,
 							Team:      1,
@@ -794,7 +817,7 @@ var _ = Describe("Weather", func() {
 				Expect(t).To(HaveTransaction(DamageTransaction{
 					User: bulbasaur,
 					Target: target{
-						Pokemon:   *bidoof,
+						Pokemon:   bidoof,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -825,7 +848,7 @@ var _ = Describe("Weather", func() {
 				Expect(t).To(HaveTransaction(DamageTransaction{
 					User: bulbasaur,
 					Target: target{
-						Pokemon:   *bidoof,
+						Pokemon:   bidoof,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -848,7 +871,7 @@ var _ = Describe("Weather", func() {
 				Expect(t).To(HaveTransaction(DamageTransaction{
 					User: nil,
 					Target: target{
-						Pokemon:   *bulbasaur,
+						Pokemon:   bulbasaur,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -882,7 +905,7 @@ var _ = Describe("Weather", func() {
 				Expect(t).To(HaveTransaction(DamageTransaction{
 					User: bulbasaur,
 					Target: target{
-						Pokemon:   *bidoof,
+						Pokemon:   bidoof,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -913,7 +936,7 @@ var _ = Describe("Weather", func() {
 				Expect(t).To(HaveTransaction(DamageTransaction{
 					User: bulbasaur,
 					Target: target{
-						Pokemon:   *bidoof,
+						Pokemon:   bidoof,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -936,7 +959,7 @@ var _ = Describe("Weather", func() {
 				Expect(t).To(HaveTransaction(DamageTransaction{
 					User: nil,
 					Target: target{
-						Pokemon:   *bulbasaur,
+						Pokemon:   bulbasaur,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -961,7 +984,7 @@ var _ = Describe("Weather", func() {
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: bulbasaur,
 				Target: target{
-					Pokemon:   *castform,
+					Pokemon:   castform,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -976,7 +999,7 @@ var _ = Describe("Weather", func() {
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: castform,
 				Target: target{
-					Pokemon:   *bulbasaur,
+					Pokemon:   bulbasaur,
 					party:     1,
 					partySlot: 0,
 					Team:      1,
@@ -1031,14 +1054,14 @@ var _ = Describe("Fainting", func() {
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
-						Pokemon:   *b.parties[0].pokemon[0],
+						Pokemon:   b.parties[0].pokemon[0],
 						party:     0,
 						partySlot: 0,
 						Team:      0,
 					},
 				}, SendOutTransaction{
 					Target: target{
-						Pokemon:   *b.parties[0].pokemon[1],
+						Pokemon:   b.parties[0].pokemon[1],
 						party:     0,
 						partySlot: 1,
 						Team:      0,
@@ -1064,7 +1087,7 @@ var _ = Describe("Fainting", func() {
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
-						Pokemon:   *pkmn1,
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -1072,7 +1095,7 @@ var _ = Describe("Fainting", func() {
 				},
 				SendOutTransaction{
 					Target: target{
-						Pokemon:   *pkmn3,
+						Pokemon:   pkmn3,
 						party:     0,
 						partySlot: 1,
 						Team:      0,
@@ -1083,7 +1106,7 @@ var _ = Describe("Fainting", func() {
 				DamageTransaction{
 					User: pkmn1,
 					Target: target{
-						Pokemon:   *pkmn2,
+						Pokemon:   pkmn2,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -1159,7 +1182,7 @@ var _ = Describe("Fainting", func() {
 			b := setup()
 			t, _ := b.SimulateRound()
 			holderTarget := target{
-				Pokemon:   *b.getPokemonInBattle(0, 0),
+				Pokemon:   b.getPokemonInBattle(0, 0),
 				party:     0,
 				partySlot: 0,
 				Team:      0,
@@ -1178,7 +1201,7 @@ var _ = Describe("Fainting", func() {
 			b := setup()
 			t, _ := b.SimulateRound()
 			target := target{
-				Pokemon:   *b.getPokemonInBattle(0, 0),
+				Pokemon:   b.getPokemonInBattle(0, 0),
 				party:     0,
 				partySlot: 0,
 				Team:      0,
@@ -1231,7 +1254,7 @@ var _ = Describe("Battle end", func() {
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
-						Pokemon:   *pkmn1,
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -1245,7 +1268,7 @@ var _ = Describe("Battle end", func() {
 				DamageTransaction{
 					User: pkmn1,
 					Target: target{
-						Pokemon:   *pkmn2,
+						Pokemon:   pkmn2,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -1325,7 +1348,7 @@ var _ = Describe("Status Conditions", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
-					Pokemon:   *pkmn1,
+					Pokemon:   pkmn1,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -1335,7 +1358,7 @@ var _ = Describe("Status Conditions", func() {
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
-					Pokemon:   *pkmn2,
+					Pokemon:   pkmn2,
 					party:     1,
 					partySlot: 0,
 					Team:      1,
@@ -1356,7 +1379,7 @@ var _ = Describe("Status Conditions", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
-					Pokemon:   *pkmn1,
+					Pokemon:   pkmn1,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -1378,7 +1401,7 @@ var _ = Describe("Status Conditions", func() {
 			Expect(t).To(HaveTransaction(
 				ImmobilizeTransaction{
 					Target: target{
-						Pokemon:   *pkmn1,
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -1400,7 +1423,7 @@ var _ = Describe("Status Conditions", func() {
 			Expect(t).To(HaveTransaction(
 				ImmobilizeTransaction{
 					Target: target{
-						Pokemon:   *pkmn1,
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -1427,7 +1450,7 @@ var _ = Describe("Status Conditions", func() {
 				Expect(t).To(HaveTransaction(
 					ImmobilizeTransaction{
 						Target: target{
-							Pokemon:   *pkmn1,
+							Pokemon:   pkmn1,
 							party:     0,
 							partySlot: 0,
 							Team:      0,
@@ -1454,10 +1477,10 @@ var _ = Describe("Status Conditions", func() {
 				Expect(t).To(HaveTransaction(
 					CureStatusTransaction{
 						Target: target{
+							Pokemon:   pkmn1,
 							party:     0,
 							partySlot: 0,
 							Team:      0,
-							Pokemon:   *pkmn1,
 						},
 						StatusEffect: StatusSleep,
 					},
@@ -1499,7 +1522,7 @@ var _ = Describe("Status Conditions", func() {
 					Expect(t).ToNot(HaveTransaction(
 						ImmobilizeTransaction{
 							Target: target{
-								Pokemon:   *pkmn1,
+								Pokemon:   pkmn1,
 								party:     0,
 								partySlot: 0,
 								Team:      0,
@@ -1523,10 +1546,10 @@ var _ = Describe("Status Conditions", func() {
 			Expect(b.Start()).To(Succeed())
 			b.QueueTransaction(CureStatusTransaction{
 				Target: target{
+					Pokemon:   pkmn1,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
-					Pokemon:   *pkmn1,
 				},
 				StatusEffect: StatusParalyze,
 			})
@@ -1535,10 +1558,10 @@ var _ = Describe("Status Conditions", func() {
 			Expect(t).To(HaveTransaction(
 				CureStatusTransaction{
 					Target: target{
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
-						Pokemon:   *pkmn1,
 					},
 					StatusEffect: StatusParalyze,
 				},
@@ -1593,7 +1616,7 @@ var _ = Describe("Misc/held items", func() {
 					party:     1,
 					partySlot: 0,
 					Team:      1,
-					Pokemon:   *holder,
+					Pokemon:   holder,
 				},
 				Damage: holder.MaxHP() / 8,
 			}))
@@ -1632,7 +1655,7 @@ var _ = Describe("Misc/held items", func() {
 					party:     0,
 					partySlot: 0,
 					Team:      0,
-					Pokemon:   *b.getPokemonInBattle(0, 0),
+					Pokemon:   b.getPokemonInBattle(0, 0),
 				},
 				Damage: 34,
 			}))
@@ -1642,7 +1665,7 @@ var _ = Describe("Misc/held items", func() {
 					party:     1,
 					partySlot: 0,
 					Team:      1,
-					Pokemon:   *holder,
+					Pokemon:   holder,
 				},
 				Damage: holder.MaxHP() / 10,
 			}))
@@ -1659,7 +1682,7 @@ var _ = Describe("Misc/held items", func() {
 					party:     0,
 					partySlot: 0,
 					Team:      0,
-					Pokemon:   *b.getPokemonInBattle(0, 0),
+					Pokemon:   b.getPokemonInBattle(0, 0),
 				},
 				Damage: 28,
 			}))
@@ -1675,7 +1698,7 @@ var _ = Describe("Misc/held items", func() {
 					party:     1,
 					partySlot: 0,
 					Team:      1,
-					Pokemon:   *holder,
+					Pokemon:   holder,
 				},
 				Damage: 3,
 			}))
@@ -1706,7 +1729,7 @@ var _ = Describe("Misc/held items", func() {
 					party:     0,
 					partySlot: 0,
 					Team:      0,
-					Pokemon:   *b.getPokemonInBattle(0, 0),
+					Pokemon:   b.getPokemonInBattle(0, 0),
 				},
 				Damage: 16,
 			}))
@@ -1722,7 +1745,7 @@ var _ = Describe("Misc/held items", func() {
 						party:     1,
 						partySlot: 0,
 						Team:      1,
-						Pokemon:   *holder,
+						Pokemon:   holder,
 					},
 					StatusEffect: status,
 				}))
@@ -1801,7 +1824,7 @@ var _ = Describe("In-a-pinch Berries", func() {
 					party:     1,
 					partySlot: 0,
 					Team:      1,
-					Pokemon:   *holder,
+					Pokemon:   holder,
 				},
 				IsHeld: true,
 				Item:   holder.HeldItem,
