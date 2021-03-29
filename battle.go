@@ -206,14 +206,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		turn := turns[0]
 		turns = turns[1:]
 		blog.Printf("Processing Turn %T for %s", turn.Turn, turn.User.Pokemon)
-		// here, we can't use the turn context's reference to the pokemon, because it is a copy of the ground truth pokemon
-		self := b.getPokemon(turn.User)
-		if self.CurrentHP == 0 {
+		user := turn.User.Pokemon
+		if user.CurrentHP == 0 {
 			continue
 		}
 		switch t := turn.Turn.(type) {
 		case FightTurn:
-			user := turn.User.Pokemon
 			move := user.Moves[t.Move]
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
@@ -243,14 +241,14 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 
 			// use the move
-			receiver := b.getPokemon(t.Target)
+			receiver := t.Target.Pokemon
 			evasion := receiver.Evasion()
 			// Todo: account for user's accuracy stage
 			accuracy := move.Accuracy() * evasion / 100
 			if b.Weather == WeatherFog {
 				accuracy = (accuracy * 3) / 5
 			}
-			switch self.HeldItem {
+			switch user.HeldItem {
 			case ItemWideLens:
 				accuracy = (accuracy * 110) / 100
 			}
@@ -273,11 +271,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				case MoveStunSpore:
 					b.QueueTransaction(InflictStatusTransaction{
-						Target:       receiver,
+						Target:       t.Target.Pokemon,
 						StatusEffect: StatusParalyze,
 					})
 				case MoveSpite:
-					if m := receiver.metadata[MetaLastMove]; m != nil {
+					if m := t.Target.Pokemon.metadata[MetaLastMove]; m != nil {
 						b.QueueTransaction(PPTransaction{
 							Move:   m.(*Move),
 							Amount: -4,
@@ -293,14 +291,14 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						})
 						if receiver.HeldItem == ItemDestinyKnot {
 							b.QueueTransaction(InflictStatusTransaction{
-								Target:       self,
+								Target:       user,
 								StatusEffect: StatusInfatuation,
 							})
 						}
 					}
 				case MoveRainDance:
 					turns := 5
-					if self.HeldItem == ItemDampRock {
+					if user.HeldItem == ItemDampRock {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
@@ -309,7 +307,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				case MoveSunnyDay:
 					turns := 5
-					if self.HeldItem == ItemHeatRock {
+					if user.HeldItem == ItemHeatRock {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
@@ -318,7 +316,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				case MoveHail:
 					turns := 5
-					if self.HeldItem == ItemIcyRock {
+					if user.HeldItem == ItemIcyRock {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
@@ -327,7 +325,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				case MoveSandstorm:
 					turns := 5
-					if self.HeldItem == ItemSmoothRock {
+					if user.HeldItem == ItemSmoothRock {
 						turns = 8
 					}
 					b.QueueTransaction(WeatherTransaction{
@@ -349,8 +347,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				case MoveMoonlight, MoveSynthesis, MoveMorningSun:
 					if b.Weather == WeatherFog {
 						b.QueueTransaction(HealTransaction{
-							Target: self,
-							Amount: self.MaxHP() / 4,
+							Target: user,
+							Amount: user.MaxHP() / 4,
 						})
 					}
 				default:
@@ -399,7 +397,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				case ItemLifeOrb:
 					b.QueueTransaction(DamageTransaction{
 						Target: turn.User,
-						Damage: self.MaxHP() / 10,
+						Damage: user.MaxHP() / 10,
 					})
 				case ItemShellBell:
 					b.QueueTransaction(DamageTransaction{
@@ -409,12 +407,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			}
 		case ItemTurn:
-			receiver := b.getPokemon(t.Target)
-			move := receiver.Moves[t.Move]
 			b.QueueTransaction(ItemTransaction{
 				Target: t.Target,
 				Item:   t.Item,
-				Move:   move,
+				Move:   t.Target.Pokemon.Moves[t.Move],
 			})
 		default:
 			blog.Panicf("Unknown turn of type %v", t)
