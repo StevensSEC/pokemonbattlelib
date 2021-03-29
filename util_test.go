@@ -101,7 +101,7 @@ func transactionDiff(expected, got Transaction) map[string]diff {
 				}
 			}
 		} else if rfA.Type() == reflect.TypeOf(&Move{}) {
-			if !rfB.IsNil() {
+			if !rfA.IsNil() && !rfB.IsNil() {
 				mvA := rfA.Interface().(*Move)
 				mvB := rfB.Interface().(*Move)
 				if mvA.Id != mvB.Id {
@@ -182,6 +182,9 @@ func getClosestTransaction(check []Transaction, want Transaction) map[string]dif
 	var best map[string]diff
 	bestDiff := 999
 	for _, t := range check {
+		if reflect.TypeOf(t) != reflect.TypeOf(want) {
+			continue
+		}
 		result := transactionDiff(want, t)
 		if len(result) < bestDiff {
 			bestDiff = len(result)
