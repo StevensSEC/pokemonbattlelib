@@ -138,20 +138,20 @@ func (b *Battle) sortTurns(turns *[]TurnContext) {
 	sort.SliceStable(*turns, func(i, j int) bool {
 		turnA := (*turns)[i].Turn
 		turnB := (*turns)[j].Turn
-		ctxA := (*turns)[i].Context
-		ctxB := (*turns)[j].Context
+		pkmnA := (*turns)[i].User.Pokemon
+		pkmnB := (*turns)[j].User.Pokemon
 		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
 			switch turnA.(type) {
 			case FightTurn:
 				ftA := turnA.(FightTurn)
 				ftB := turnB.(FightTurn)
-				mvA := ctxA.Pokemon.Moves[ftA.Move]
-				mvB := ctxB.Pokemon.Moves[ftB.Move]
+				mvA := pkmnA.Moves[ftA.Move]
+				mvB := pkmnB.Moves[ftB.Move]
 				if mvA.Priority() != mvB.Priority() {
 					return mvA.Priority() > mvB.Priority()
 				}
 				// speedy pokemon should go first
-				return ctxA.Pokemon.Speed() > ctxB.Pokemon.Speed()
+				return pkmnA.Speed() > pkmnB.Speed()
 			}
 		} else {
 			// make higher priority turns go first
@@ -192,8 +192,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					partySlot: j,
 					Team:      party.team,
 				},
-				Turn:    turn,
-				Context: ctx,
+				Turn: turn,
 			})
 		}
 	}
@@ -648,9 +647,8 @@ type Turn interface {
 
 // Wrapper used to determine turn order in a battle
 type TurnContext struct {
-	User    target         // The pokemon that made this turn.
-	Turn    Turn           // A copy of the turn that a Pokemon made using an Agent
-	Context *BattleContext // The context in which the Pokemon took its turn
+	User target // The pokemon that made this turn.
+	Turn Turn   // A copy of the turn that a Pokemon made using an Agent
 }
 
 // A turn to represent a Pokemon using a Move.
