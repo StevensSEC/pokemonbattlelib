@@ -105,4 +105,4 @@ func (i Item) Data() *ItemData {
 	return &AllItems[i-1]
 }
 
-//go:generate go run ./scripts/gen_getters.go -for Item -data ItemData
+//go:generate go run ./scripts/getters/gen_getters.go -for Item -data ItemData
