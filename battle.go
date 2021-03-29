@@ -295,6 +295,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 							Amount: self.MaxHP() / 4,
 						})
 					}
+				default:
+					blog.Printf("Unimplemented status move: %s", move.Name())
 				}
 			} else {
 				// Physical/Special Moves
