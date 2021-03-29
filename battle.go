@@ -436,8 +436,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 func (b *Battle) postRound() {
 	blog.Println("Post-round")
 	// Effects on every Pokemon
-	for _, t := range b.GetTargets() {
-		pkmn := b.getPokemon(t)
+	for _, t := range b.GetTargetsRef() {
+		pkmn := t.Pokemon
 		// Status effects
 		if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
 			cond := pkmn.StatusEffects & StatusNonvolatileMask
@@ -450,7 +450,7 @@ func (b *Battle) postRound() {
 				damage = pkmn.MaxHP() / 16
 			}
 			b.QueueTransaction(DamageTransaction{
-				Target:       t,
+				Target:       *t,
 				Damage:       damage,
 				StatusEffect: cond,
 			})
@@ -461,7 +461,7 @@ func (b *Battle) postRound() {
 			if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
 				damage := pkmn.MaxHP() / 16
 				b.QueueTransaction(DamageTransaction{
-					Target: t,
+					Target: *t,
 					Damage: damage,
 				})
 			}
@@ -469,14 +469,14 @@ func (b *Battle) postRound() {
 			if pkmn.EffectiveType()&TypeIce == 0 {
 				damage := pkmn.MaxHP() / 16
 				b.QueueTransaction(DamageTransaction{
-					Target: t,
+					Target: *t,
 					Damage: damage,
 				})
 			}
 		}
 		if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
 			b.QueueTransaction(ItemTransaction{
-				Target: t,
+				Target: *t,
 				IsHeld: true,
 				Item:   pkmn.HeldItem,
 			})
@@ -484,7 +484,7 @@ func (b *Battle) postRound() {
 		// Held item effects
 		if pkmn.HeldItem != ItemNone {
 			b.QueueTransaction(ItemTransaction{
-				Target: t,
+				Target: *t,
 				IsHeld: true,
 				Item:   pkmn.HeldItem,
 			})
