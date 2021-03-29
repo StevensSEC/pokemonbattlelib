@@ -26,7 +26,7 @@ var _ = Describe("Agents", func() {
 		a2 := Agent(funkyAgent(func(ctx *BattleContext) Turn {
 			real := b.getPokemon(ctx.Opponents[0])
 			Expect(ctx.Opponents[0].Pokemon).ToNot(BeIdenticalTo(real))
-			// Expect(ctx.Opponents[0].Pokemon.Moves[0]).ToNot(BeIdenticalTo(real.Moves[0])) // See #294
+			Expect(ctx.Opponents[0].Pokemon.Moves[0]).ToNot(BeIdenticalTo(real.Moves[0])) // See #294
 			for t := range ctx.Targets {
 				real := b.getPokemon(ctx.Targets[t]) // because range makes a copy of the array
 				Expect(ctx.Targets[t].Pokemon).ToNot(BeIdenticalTo(real))
