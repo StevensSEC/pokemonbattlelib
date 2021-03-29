@@ -153,7 +153,6 @@ var _ = Describe("One round of battle", func() {
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
 			Expect(t).To(HaveLen(2))
-			pound := GetMove(MovePound)
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: charmander,
 				Target: target{
@@ -162,7 +161,7 @@ var _ = Describe("One round of battle", func() {
 					partySlot: 0,
 					Team:      1,
 				},
-				Move:   pound,
+				Move:   GetMove(MovePound),
 				Damage: 3,
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
@@ -173,7 +172,7 @@ var _ = Describe("One round of battle", func() {
 					partySlot: 0,
 					Team:      0,
 				},
-				Move:   pound,
+				Move:   GetMove(MovePound),
 				Damage: 3,
 			}))
 		})
@@ -569,9 +568,8 @@ var _ = Describe("Turn priority", func() {
 		})
 
 		It("should handle faster Pokemon first", func() {
-			pound := GetMove(MovePound)
-			charmander := GeneratePokemon(PkmnCharmander, WithMoves(pound))
-			ninjask := GeneratePokemon(PkmnNinjask, WithMoves(pound))
+			charmander := GeneratePokemon(PkmnCharmander, defaultMoveOpt)
+			ninjask := GeneratePokemon(PkmnNinjask, defaultMoveOpt)
 			p1 := NewOccupiedParty(&a1, 0, charmander)
 			p2 := NewOccupiedParty(&a2, 1, ninjask) // ninjask is faster than charmander
 			b := NewBattle()
@@ -588,7 +586,7 @@ var _ = Describe("Turn priority", func() {
 						partySlot: 0,
 						Team:      0,
 					},
-					Move:   pound,
+					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
 				DamageTransaction{
@@ -599,7 +597,7 @@ var _ = Describe("Turn priority", func() {
 						partySlot: 0,
 						Team:      1,
 					},
-					Move:   pound,
+					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
 			))
