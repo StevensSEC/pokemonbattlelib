@@ -279,7 +279,7 @@ func (t FaintTransaction) Mutate(b *Battle) {
 			// auto send out next pokemon
 			b.QueueTransaction(SendOutTransaction{
 				Target: target{
-					Pokemon:   *b.getPokemonInBattle(t.Target.party, i),
+					Pokemon:   b.getPokemonInBattle(t.Target.party, i),
 					party:     t.Target.party,
 					partySlot: i,
 					Team:      t.Target.Team,

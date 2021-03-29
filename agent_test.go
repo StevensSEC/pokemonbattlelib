@@ -27,6 +27,10 @@ var _ = Describe("Agents", func() {
 			real := b.getPokemon(ctx.Opponents[0])
 			Expect(ctx.Opponents[0].Pokemon).ToNot(BeIdenticalTo(real))
 			// Expect(ctx.Opponents[0].Pokemon.Moves[0]).ToNot(BeIdenticalTo(real.Moves[0])) // See #294
+			for t := range ctx.Targets {
+				real := b.getPokemon(ctx.Targets[t]) // because range makes a copy of the array
+				Expect(ctx.Targets[t].Pokemon).ToNot(BeIdenticalTo(real))
+			}
 			return FightTurn{Move: 0, Target: ctx.Opponents[0]}
 		}))
 		party1 := NewOccupiedParty(&_a1, 0, GeneratePokemon(PkmnCharmander, defaultMoveOpt))

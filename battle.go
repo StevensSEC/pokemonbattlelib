@@ -124,10 +124,10 @@ func (b *Battle) Start() error {
 
 // Handles all pre-turn logic
 func (b *Battle) preRound() {
-	for _, t := range b.GetTargets() {
+	for _, t := range b.GetTargetsRef() {
 		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
 			b.QueueTransaction(CureStatusTransaction{
-				Target:       t,
+				Target:       *t,
 				StatusEffect: StatusSleep,
 			})
 		}
@@ -176,9 +176,18 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			ctx := b.getContext(party, pokemon)
 			blog.Printf("Requesting turn from agent %d for pokemon %d (%s)", i, j, pokemon)
 			turn := (*party.Agent).Act(ctx)
+			// use the ground truth instead of a copy to let the garbage collector clean up the copied memory when it can
+			switch t := turn.(type) {
+			case FightTurn:
+				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
+				turn = t // because the type check creates a copy (again...), we need to make sure that this version of the turn gets placed into the turn list
+			case ItemTurn:
+				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
+				turn = t
+			}
 			turns = append(turns, TurnContext{
 				User: target{
-					Pokemon:   *pokemon,
+					Pokemon:   b.getPokemonInBattle(i, j), // use the ground truth instead of a copy
 					party:     i,
 					partySlot: j,
 					Team:      party.team,
@@ -205,7 +214,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		}
 		switch t := turn.Turn.(type) {
 		case FightTurn:
-			user := turn.Context.Pokemon
+			user := turn.User.Pokemon
 			move := user.Moves[t.Move]
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
@@ -248,7 +257,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 			if move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
 				b.QueueTransaction(MoveFailTransaction{
-					User:   &user,
+					User:   user,
 					Reason: FailMiss,
 				})
 				continue
@@ -259,7 +268,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				switch move.Id {
 				case MoveDoubleTeam:
 					b.QueueTransaction(ModifyStatTransaction{
-						Target: &user,
+						Target: user,
 						Stat:   StatEvasion,
 						Stages: +1,
 					})
@@ -328,7 +337,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				case MoveHowl:
 					b.QueueTransaction(ModifyStatTransaction{
-						Target: self,
+						Target: user,
 						Stat:   StatAtk,
 						Stages: +1,
 					})
@@ -350,14 +359,14 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else {
 				// Physical/Special Moves
-				damage := calcMoveDamage(b.Weather, &user, receiver, move)
+				damage := calcMoveDamage(b.Weather, user, receiver, move)
 				var crit uint = 1
 				if b.rng.Roll(1, user.CritChance()) {
 					crit = 2
 				}
 				damage *= crit
 				b.QueueTransaction(DamageTransaction{
-					User:   &user,
+					User:   user,
 					Target: t.Target,
 					Move:   user.Moves[t.Move],
 					Damage: uint(damage),
@@ -373,7 +382,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						drain = 1
 					}
 					b.QueueTransaction(HealTransaction{
-						Target: &user,
+						Target: user,
 						Amount: uint(drain),
 					})
 				}
@@ -520,10 +529,10 @@ func (b *Battle) ProcessQueue() {
 }
 
 type target struct {
-	party     int     // Identifier for a party (index in battle parties, or "party ID")
-	partySlot int     // The slot of the active Pokemon
-	Team      int     // The team that the Pokemon belongs to
-	Pokemon   Pokemon // Pokemon that is a candidate target
+	party     int      // Identifier for a party (index in battle parties, or "party ID")
+	partySlot int      // The slot of the active Pokemon
+	Team      int      // The team that the Pokemon belongs to
+	Pokemon   *Pokemon // Pokemon that is a candidate target
 }
 
 func (t target) String() string {
@@ -573,16 +582,19 @@ type BattleContext struct {
 	Targets   []target // An array of all possible targets that the Pokemon can act on
 }
 
-// Gets all the active Pokemon (targets) in the battle
+// Gets a deep copy of all the active Pokemon (targets) in the battle
 func (b *Battle) GetTargets() []target {
 	targets := make([]target, 0)
 	for partyID, party := range b.parties {
 		for slot, active := range party.activePokemon {
+			var pkmn Pokemon
+			bytes, _ := json.Marshal(active)
+			json.Unmarshal(bytes, &pkmn)
 			target := target{
 				party:     partyID,
 				partySlot: slot,
 				Team:      party.team,
-				Pokemon:   *active,
+				Pokemon:   &pkmn,
 			}
 			targets = append(targets, target)
 		}
@@ -590,11 +602,33 @@ func (b *Battle) GetTargets() []target {
 	return targets
 }
 
+// Gets all the active Pokemon (targets) in the battle with ground truth pointers.
+func (b *Battle) GetTargetsRef() []*target {
+	targets := make([]*target, 0)
+	for partyID, party := range b.parties {
+		for slot := range party.activePokemon {
+			target := target{
+				party:     partyID,
+				partySlot: slot,
+				Team:      party.team,
+			}
+			target.Pokemon = b.getPokemon(target)
+			targets = append(targets, &target)
+		}
+	}
+	return targets
+}
+
 // Gets the current context for a pokemon to act (perform a turn)
 func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
+	// not joking, this is *actually* the fastest way to deep copy in Go.
+	// although I didn't benchmark it myself, so I don't know that for a fact.
+	var pkmn Pokemon
+	bytes, _ := json.Marshal(pokemon)
+	json.Unmarshal(bytes, &pkmn)
 	return &BattleContext{
 		Battle:    *b,
-		Pokemon:   *pokemon,
+		Pokemon:   pkmn,
 		Team:      party.team,
 		Allies:    b.GetAllies(party),
 		Opponents: b.GetOpponents(party),
