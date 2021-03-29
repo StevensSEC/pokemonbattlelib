@@ -499,8 +499,9 @@ var _ = Describe("Turn priority", func() {
 
 		It("should order turns properly based on priority", func() {
 			a2 := Agent(new(healAgent))
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, defaultMoveOpt)
-			charmander := GeneratePokemon(PkmnCharmander, defaultMoveOpt)
+			pound := GetMove(MovePound)
+			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(pound))
+			charmander := GeneratePokemon(PkmnCharmander, WithMoves(pound))
 			p1 := NewOccupiedParty(&a1, 0, bulbasaur)
 			p2 := NewOccupiedParty(&a2, 1, charmander)
 			b := NewBattle()
@@ -521,7 +522,7 @@ var _ = Describe("Turn priority", func() {
 						partySlot: 0,
 						Team:      1,
 					},
-					Move:   GetMove(MovePound),
+					Move:   pound,
 					Damage: 3,
 				},
 			))
@@ -530,7 +531,8 @@ var _ = Describe("Turn priority", func() {
 
 	Context("when determining priority for equal turn types", func() {
 		It("should handle moves with higher priority first", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(5), defaultMoveOpt)
+			pound := GetMove(MovePound)
+			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(5), WithMoves(pound))
 			p1.Stats[StatSpeed] = 100
 			party1 := NewOccupiedParty(&a1, 0, p1)
 			p2 := GeneratePokemon(PkmnCharmander, WithLevel(5), WithMoves(GetMove(MoveFakeOut)))
@@ -562,7 +564,7 @@ var _ = Describe("Turn priority", func() {
 						Team:      1,
 					},
 					Damage: 5,
-					Move:   GetMove(MovePound),
+					Move:   pound,
 				},
 			))
 		})
@@ -1136,6 +1138,66 @@ var _ = Describe("Fainting", func() {
 			))
 		})
 	})
+
+	When("holding Focus Sash", func() {
+		setup := func() *Battle {
+			holder := GeneratePokemon(PkmnMachoke, WithLevel(26), WithMoves(GetMove(MoveSplash)))
+			holder.CurrentHP = 4
+			holder.HeldItem = ItemFocusSash
+			party1 := NewOccupiedParty(&a1, 0, holder)
+			party2 := NewOccupiedParty(&a2, 1,
+				GeneratePokemon(PkmnGrotle, WithLevel(30), WithMoves(GetMove(MoveRazorLeaf))),
+			)
+			b = NewBattle()
+			b.AddParty(party1, party2)
+			b.rng = SimpleRNG()
+			Expect(b.Start()).To(Succeed())
+			return b
+		}
+
+		It("should not let the holder die", func() {
+			b := setup()
+			t, _ := b.SimulateRound()
+			holderTarget := target{
+				Pokemon:   *b.getPokemonInBattle(0, 0),
+				party:     0,
+				partySlot: 0,
+				Team:      0,
+			}
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User:   b.getPokemonInBattle(1, 0),
+				Target: holderTarget,
+			}))
+			Expect(t).ToNot(HaveTransaction(FaintTransaction{
+				Target: holderTarget,
+			}))
+			Expect(b.parties[0].activePokemon[0].CurrentHP).To(BeEquivalentTo(1))
+		})
+
+		It("should consume the focus sash after damage is applied", func() {
+			b := setup()
+			t, _ := b.SimulateRound()
+			target := target{
+				Pokemon:   *b.getPokemonInBattle(0, 0),
+				party:     0,
+				partySlot: 0,
+				Team:      0,
+			}
+			Expect(t).To(HaveTransactionsInOrder(
+				DamageTransaction{
+					User:   b.getPokemonInBattle(1, 0),
+					Target: target,
+				},
+				ItemTransaction{
+					Target: target,
+					IsHeld: true,
+					Item:   ItemFocusSash,
+				},
+			))
+			Expect(b.getPokemonInBattle(0, 0).HeldItem).To(Equal(ItemNone))
+			Expect(b.getPokemonInBattle(1, 0).HeldItem).To(Equal(ItemNone))
+		})
+	})
 })
 
 var _ = Describe("Battle end", func() {
@@ -1392,10 +1454,10 @@ var _ = Describe("Status Conditions", func() {
 				Expect(t).To(HaveTransaction(
 					CureStatusTransaction{
 						Target: target{
-							Pokemon:   *pkmn1,
 							party:     0,
 							partySlot: 0,
 							Team:      0,
+							Pokemon:   *pkmn1,
 						},
 						StatusEffect: StatusSleep,
 					},
@@ -1461,10 +1523,10 @@ var _ = Describe("Status Conditions", func() {
 			Expect(b.Start()).To(Succeed())
 			b.QueueTransaction(CureStatusTransaction{
 				Target: target{
-					Pokemon:   *pkmn1,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
+					Pokemon:   *pkmn1,
 				},
 				StatusEffect: StatusParalyze,
 			})
@@ -1473,15 +1535,232 @@ var _ = Describe("Status Conditions", func() {
 			Expect(t).To(HaveTransaction(
 				CureStatusTransaction{
 					Target: target{
-						Pokemon:   *pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
+						Pokemon:   *pkmn1,
 					},
 					StatusEffect: StatusParalyze,
 				},
 			))
 		})
+	})
+})
+
+var _ = Describe("Misc/held items", func() {
+	a1 := Agent(new(dumbAgent))
+	a2 := Agent(new(dumbAgent))
+	var holder *Pokemon
+
+	setup := func(item Item, pkmn int) (*Battle, *Pokemon) {
+		p1 := NewOccupiedParty(&a1, 0, GeneratePokemon(
+			PkmnSnorlax,
+			WithLevel(25),
+			WithMoves(GetMove(MoveSplash)),
+		))
+		holder = GeneratePokemon(
+			pkmn,
+			WithLevel(25),
+			WithMoves(GetMove(MoveSplash)),
+		)
+		holder.HeldItem = item
+		p2 := NewOccupiedParty(&a2, 1, holder)
+		b := NewBattle()
+		b.rng = SimpleRNG()
+		b.AddParty(p1, p2)
+		Expect(b.Start()).To(Succeed())
+		return b, holder
+	}
+
+	Context("when Pokemon hold certain misc. items in battle", func() {
+		It("handles Black Sludge", func() {
+			// Heal poison types for 1/16 HP
+			b, holder := setup(ItemBlackSludge, PkmnGrimer)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+			// Damage non-poison types for 1/8 HP
+			b, holder = setup(ItemBlackSludge, PkmnAerodactyl)
+			t, _ = b.SimulateRound()
+			Expect(t).ToNot(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   *holder,
+				},
+				Damage: holder.MaxHP() / 8,
+			}))
+		})
+
+		It("handles Destiny Knot", func() {
+			b, holder := setup(ItemDestinyKnot, PkmnMimeJr)
+			attacker := b.getPokemonInBattle(0, 0)
+			attacker.Moves[0] = GetMove(MoveAttract)
+			attacker.Gender = GenderMale
+			holder.Gender = GenderFemale
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(InflictStatusTransaction{
+				Target:       attacker,
+				StatusEffect: StatusInfatuation,
+			}))
+		})
+
+		It("handles Leftovers", func() {
+			b, holder := setup(ItemLeftovers, PkmnSnorlax)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+		})
+
+		It("handles Life Orb", func() {
+			b, holder := setup(ItemLifeOrb, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Boost damage by 30%
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: holder,
+				Target: target{
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+					Pokemon:   *b.getPokemonInBattle(0, 0),
+				},
+				Damage: 34,
+			}))
+			// Take 10% of max HP
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   *holder,
+				},
+				Damage: holder.MaxHP() / 10,
+			}))
+		})
+
+		It("handles Muscle Band", func() {
+			b, holder := setup(ItemMuscleBand, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Boost physical move damage by 10%
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: holder,
+				Target: target{
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+					Pokemon:   *b.getPokemonInBattle(0, 0),
+				},
+				Damage: 28,
+			}))
+		})
+
+		It("handles Shell Bell", func() {
+			b, holder := setup(ItemShellBell, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Self-inflict 1/8 of dealt damage
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   *holder,
+				},
+				Damage: 3,
+			}))
+		})
+
+		It("handles White Herb", func() {
+			b, holder := setup(ItemWhiteHerb, PkmnSnorlax)
+			holder.StatModifiers = [9]int{-1, -1, -1, -1, -1, -1, 0, -1, -1}
+			b.SimulateRound()
+			// Consumed after use
+			Expect(holder.HeldItem).To(Equal(ItemNone))
+			// Reset all lowered stat modifiers
+			for _, stage := range holder.StatModifiers {
+				if stage < 0 {
+					Fail("Expected all lowered stats to be reset")
+				}
+			}
+		})
+
+		It("handles Wise Glasses", func() {
+			b, holder := setup(ItemWiseGlasses, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveSurf)
+			t, _ := b.SimulateRound()
+			// Boost special move damage by 10%
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: holder,
+				Target: target{
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+					Pokemon:   *b.getPokemonInBattle(0, 0),
+				},
+				Damage: 16,
+			}))
+		})
+
+		DescribeTable("Status curing held items",
+			func(item Item, status StatusCondition) {
+				b, holder := setup(item, PkmnSnorlax)
+				holder.StatusEffects.apply(status)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(CureStatusTransaction{
+					Target: target{
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+						Pokemon:   *holder,
+					},
+					StatusEffect: status,
+				}))
+				// Item should be consumed after use
+				Expect(holder.HeldItem).To(Equal(ItemNone))
+			},
+			Entry("Mental Herb", ItemMentalHerb, StatusInfatuation),
+		)
+
+		DescribeTable("Flinch inducing items",
+			func(item Item) {
+				b, holder := setup(ItemKingsRock, PkmnLucario)
+				holder.Moves[0] = GetMove(MoveTackle)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(InflictStatusTransaction{
+					Target:       b.getPokemonInBattle(0, 0),
+					StatusEffect: StatusFlinch,
+				}))
+			},
+			Entry("King's Rock", ItemKingsRock),
+			Entry("Razor Fang", ItemRazorFang),
+		)
+
+		DescribeTable("Weather duration boosting rocks",
+			func(item Item, weather Weather, move MoveId) {
+				b, holder := setup(item, PkmnCastform)
+				holder.Moves[0] = GetMove(move)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(WeatherTransaction{
+					Weather: weather,
+					Turns:   8,
+				}))
+			},
+			Entry("Damp Rock", ItemDampRock, WeatherRain, MoveRainDance),
+			Entry("Heat Rock", ItemHeatRock, WeatherHarshSunlight, MoveSunnyDay),
+			Entry("Icy Rock", ItemIcyRock, WeatherHail, MoveHail),
+			Entry("Smooth Rock", ItemSmoothRock, WeatherSandstorm, MoveSandstorm),
+		)
 	})
 })
 

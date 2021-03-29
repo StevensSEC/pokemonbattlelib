@@ -33,6 +33,16 @@ func (t DamageTransaction) Mutate(b *Battle) {
 		receiver.CurrentHP = 0
 	}
 	if receiver.CurrentHP == 0 {
+		// Prevent OHKO with Focus Sash
+		if receiver.HeldItem == ItemFocusSash {
+			receiver.CurrentHP = 1
+			b.QueueTransaction(ItemTransaction{
+				Target: t.Target,
+				IsHeld: true,
+				Item:   receiver.HeldItem,
+			})
+			return
+		}
 		// pokemon has fainted
 		b.QueueTransaction(FaintTransaction{
 			Target: t.Target,
@@ -104,7 +114,6 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		}
 		// TODO: remove consumed item from party's inventory
 	}
-
 	switch t.Item {
 	// ItemCategoryMedicine
 	case ItemPotion:
@@ -153,6 +162,46 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		})
 	case ItemStarfBerry:
 		// TODO: boost random stat, requires battle RNG to be available.
+	// ItemCategoryHeldItems
+	case ItemBlackSludge:
+		if target.Type&TypePoison != 0 {
+			b.QueueTransaction(HealTransaction{
+				Target: target,
+				Amount: target.MaxHP() / 16,
+			})
+		} else {
+			b.QueueTransaction(DamageTransaction{
+				Target: t.Target,
+				Damage: target.MaxHP() / 8,
+			})
+		}
+	case ItemLeftovers:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: target.MaxHP() / 16,
+		})
+	case ItemMentalHerb:
+		b.QueueTransaction(CureStatusTransaction{
+			Target:       t.Target,
+			StatusEffect: StatusInfatuation,
+		})
+	case ItemWhiteHerb:
+		for stat, stages := range target.StatModifiers {
+			if stages < 0 {
+				b.QueueTransaction(ModifyStatTransaction{
+					Target: target,
+					Stat:   stat,
+					Stages: -stages,
+				})
+			}
+		}
+	}
+	if target.HeldItem.Category() == ItemCategoryInAPinch && target.CurrentHP <= target.Stats[StatHP]/4 {
+		b.QueueTransaction(ItemTransaction{
+			Target: t.Target,
+			IsHeld: true,
+			Item:   target.HeldItem,
+		})
 	}
 }
 
@@ -163,9 +212,18 @@ type PPTransaction struct {
 }
 
 func (t PPTransaction) Mutate(b *Battle) {
-	t.Move.CurrentPP += uint8(t.Amount)
-	if t.Move.CurrentPP > t.Move.MaxPP {
-		t.Move.CurrentPP = t.Move.MaxPP
+	// This is why we should just use int
+	if t.Amount < 0 {
+		n := uint8(t.Amount * -1)
+		if t.Move.CurrentPP < n {
+			n = t.Move.CurrentPP
+		}
+		t.Move.CurrentPP -= n
+	} else {
+		t.Move.CurrentPP += uint8(t.Amount)
+		if t.Move.CurrentPP > t.Move.MaxPP {
+			t.Move.CurrentPP = t.Move.MaxPP
+		}
 	}
 }
 

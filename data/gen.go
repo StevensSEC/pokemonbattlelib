@@ -61,7 +61,18 @@ type data_move struct {
 	Targets     int
 	DamageClass string
 	Effect      int
-	Flags       []string
+	// Metadata
+	MinHits       int
+	MaxHits       int
+	MinTurns      int
+	MaxTurns      int
+	Drain         int
+	Healing       int
+	CritRate      int
+	AilmentChance int
+	FlinchChance  int
+	StatChance    int
+	Flags         []string
 }
 
 type data_item struct {
@@ -576,14 +587,40 @@ func main() {
 			break
 		}
 	}
+	// Getting move metadata
+	log.Println("Getting move metadata")
+	move_meta_csv := getCsvReader("data/move_meta.csv")
+	records, err = move_meta_csv.ReadAll()
+	if err != nil {
+		panic(err)
+	}
+	for _, v := range records {
+		mid := parseInt(v[0])
+		for i, m := range moves {
+			if m.Id != mid {
+				continue
+			}
+			moves[i].MinHits = parseInt(v[3])
+			moves[i].MaxHits = parseInt(v[4])
+			moves[i].MinTurns = parseInt(v[5])
+			moves[i].MaxTurns = parseInt(v[6])
+			moves[i].Drain = parseInt(v[7])
+			moves[i].Healing = parseInt(v[8])
+			moves[i].CritRate = parseInt(v[9])
+			moves[i].AilmentChance = parseInt(v[10])
+			moves[i].FlinchChance = parseInt(v[11])
+			moves[i].StatChance = parseInt(v[12])
+		}
+	}
 	output += "var AllMoves = []MoveData{\n"
 	for _, m := range moves {
 		flags := strings.Join(m.Flags, " | ")
 		if len(m.Flags) == 0 {
 			flags = "0"
 		}
-		output += fmt.Sprintf("{Name: %q, Type: %d, Category: %s,"+
-			" Targets: %d, Priority: %d, Power: %d, Accuracy: %d, Flags: %s},\n", m.Name, m.Type, m.DamageClass, m.Targets, m.Priority, m.Power, m.Accuracy, flags)
+		output += fmt.Sprintf("\t{%q, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s,},\n",
+			m.Name, m.Type, m.DamageClass, m.Targets, m.Priority, m.Power, m.Accuracy, m.PP,
+			m.MinHits, m.MaxHits, m.MinTurns, m.MaxTurns, m.Drain, m.Healing, m.CritRate, m.AilmentChance, m.FlinchChance, m.StatChance, flags)
 	}
 	output += "}\n\n"
 	// Add move constants

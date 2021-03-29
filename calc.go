@@ -1,13 +1,12 @@
 package pokemonbattlelib
 
 func calcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damage uint) {
-	weatherMod := 1.0
+	weatherEffect := 1.0
 	if rain, sun := weather == WeatherRain, weather == WeatherHarshSunlight; (rain && move.Type() == TypeWater) || (sun && move.Type() == TypeFire) {
-		weatherMod = 1.5
+		weatherEffect = 1.5
 	} else if (rain && move.Type() == TypeFire) || (sun && move.Type() == TypeWater) {
-		weatherMod = 0.5
+		weatherEffect = 0.5
 	}
-
 	stab := 1.0
 	if move != nil && user.EffectiveType()&move.Type() != 0 {
 		stab = 1.5
@@ -15,8 +14,8 @@ func calcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 			stab = 2.0
 		}
 	}
-
-	modifier := weatherMod * stab
+	// Compute damage modifier
+	modifier := weatherEffect * stab
 	levelEffect := float64((2 * user.Level / 5) + 2)
 	movePower := float64(move.Power())
 	attack := float64(user.Attack())
@@ -43,6 +42,19 @@ func calcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 			movePower *= 2
 		} else if move.Id == MoveSolarBeam {
 			movePower /= 2
+		}
+	}
+	// Item modifiers
+	switch user.HeldItem {
+	case ItemLifeOrb:
+		modifier = (modifier * 130) / 100
+	case ItemMuscleBand:
+		if move.Category() == MoveCategoryPhysical {
+			modifier = (modifier * 110) / 100
+		}
+	case ItemWiseGlasses:
+		if move.Category() == MoveCategorySpecial {
+			modifier = (modifier * 110) / 100
 		}
 	}
 	damage = uint((((levelEffect * movePower * attack / defense) / 50) + 2) * modifier)

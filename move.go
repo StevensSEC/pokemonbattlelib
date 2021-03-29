@@ -84,7 +84,18 @@ type MoveData struct {
 	Power        uint
 	Accuracy     uint
 	InitialMaxPP uint8
-	Flags        MoveFlags
+	// Metadata
+	MinHits       int
+	MaxHits       int
+	MinTurns      int
+	MaxTurns      int
+	Drain         int
+	Healing       int
+	CritRate      int
+	AilmentChance int
+	FlinchChance  int
+	StatChance    int
+	Flags         MoveFlags
 }
 
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.

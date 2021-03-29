@@ -236,11 +236,15 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 			// use the move
 			receiver := b.getPokemon(t.Target)
-			evasion := float64(receiver.Evasion() / 100)
+			evasion := receiver.Evasion()
 			// Todo: account for user's accuracy stage
-			accuracy := float64(move.Accuracy()) * evasion
+			accuracy := move.Accuracy() * evasion / 100
 			if b.Weather == WeatherFog {
-				accuracy *= 3. / 5.
+				accuracy = (accuracy * 3) / 5
+			}
+			switch self.HeldItem {
+			case ItemWideLens:
+				accuracy = (accuracy * 110) / 100
 			}
 			if move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
 				b.QueueTransaction(MoveFailTransaction{
@@ -271,14 +275,60 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 							Amount: -4,
 						})
 					}
+				case MoveAttract:
+					g1, g2 := user.Gender, receiver.Gender
+					// Only applies when Pokemon are opposite gender
+					if g1 != GenderGenderless && g2 != GenderGenderless && g1 != g2 {
+						b.QueueTransaction(InflictStatusTransaction{
+							Target:       receiver,
+							StatusEffect: StatusInfatuation,
+						})
+						if receiver.HeldItem == ItemDestinyKnot {
+							b.QueueTransaction(InflictStatusTransaction{
+								Target:       self,
+								StatusEffect: StatusInfatuation,
+							})
+						}
+					}
+				case MoveRainDance:
+					turns := 5
+					if self.HeldItem == ItemDampRock {
+						turns = 8
+					}
+					b.QueueTransaction(WeatherTransaction{
+						Weather: WeatherRain,
+						Turns:   turns,
+					})
 				case MoveSunnyDay:
+					turns := 5
+					if self.HeldItem == ItemHeatRock {
+						turns = 8
+					}
 					b.QueueTransaction(WeatherTransaction{
 						Weather: WeatherHarshSunlight,
-						Turns:   5,
+						Turns:   turns,
+					})
+				case MoveHail:
+					turns := 5
+					if self.HeldItem == ItemIcyRock {
+						turns = 8
+					}
+					b.QueueTransaction(WeatherTransaction{
+						Weather: WeatherHail,
+						Turns:   turns,
+					})
+				case MoveSandstorm:
+					turns := 5
+					if self.HeldItem == ItemSmoothRock {
+						turns = 8
+					}
+					b.QueueTransaction(WeatherTransaction{
+						Weather: WeatherSandstorm,
+						Turns:   turns,
 					})
 				case MoveHowl:
 					b.QueueTransaction(ModifyStatTransaction{
-						Target: &user,
+						Target: self,
 						Stat:   StatAtk,
 						Stages: +1,
 					})
@@ -301,15 +351,54 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			} else {
 				// Physical/Special Moves
 				damage := calcMoveDamage(b.Weather, &user, receiver, move)
-				if b.rng.Roll(1, CritChances[user.StatModifiers[StatCritChance]]) {
-					damage *= 2
+				var crit uint = 1
+				if b.rng.Roll(1, user.CritChance()) {
+					crit = 2
 				}
+				damage *= crit
 				b.QueueTransaction(DamageTransaction{
 					User:   &user,
 					Target: t.Target,
 					Move:   user.Moves[t.Move],
-					Damage: damage,
+					Damage: uint(damage),
 				})
+				// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
+				if move.Drain() != 0 {
+					drain := damage * uint(move.Drain()/100)
+					if user.HeldItem == ItemBigRoot {
+						drain = (drain * 130) / 100 // 30% more HP than normal
+					}
+					if drain == 0 {
+						// Min 1 HP drain
+						drain = 1
+					}
+					b.QueueTransaction(HealTransaction{
+						Target: &user,
+						Amount: uint(drain),
+					})
+				}
+				// Other item effects in battle
+				switch user.HeldItem {
+				case ItemKingsRock, ItemRazorFang:
+					// King's Rock makes non-flinching moves have a 10% to cause flinch
+					// TODO: ensure only certain moves are affected -> https://bulbapedia.bulbagarden.net/wiki/King%27s_Rock
+					if move.FlinchChance() == 0 && b.rng.Roll(1, 10) {
+						b.QueueTransaction(InflictStatusTransaction{
+							Target:       receiver,
+							StatusEffect: StatusFlinch,
+						})
+					}
+				case ItemLifeOrb:
+					b.QueueTransaction(DamageTransaction{
+						Target: turn.User,
+						Damage: self.MaxHP() / 10,
+					})
+				case ItemShellBell:
+					b.QueueTransaction(DamageTransaction{
+						Target: turn.User,
+						Damage: uint(damage / 8),
+					})
+				}
 			}
 		case ItemTurn:
 			receiver := b.getPokemon(t.Target)
@@ -343,57 +432,58 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 func (b *Battle) postRound() {
 	blog.Println("Post-round")
 	// Effects on every Pokemon
-	for a, party := range b.parties {
-		for ap, pkmn := range party.activePokemon {
-			t := target{
-				party:     a,
-				partySlot: ap,
-				Pokemon:   *pkmn,
-				Team:      party.team,
+	for _, t := range b.GetTargets() {
+		pkmn := b.getPokemon(t)
+		// Status effects
+		if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
+			cond := pkmn.StatusEffects & StatusNonvolatileMask
+			var damage uint
+			switch cond {
+			case StatusBurn, StatusPoison:
+				damage = pkmn.MaxHP() / 8
+			case StatusBadlyPoison:
+				// TODO: implement counter for increasing bad poison damage
+				damage = pkmn.MaxHP() / 16
 			}
-			// Status effects
-			if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
-				cond := pkmn.StatusEffects & StatusNonvolatileMask
-				var damage uint
-				switch cond {
-				case StatusBurn, StatusPoison:
-					damage = pkmn.MaxHP() / 8
-				case StatusBadlyPoison:
-					// TODO: implement counter for increasing bad poison damage
-					damage = pkmn.MaxHP() / 16
-				}
+			b.QueueTransaction(DamageTransaction{
+				Target:       t,
+				Damage:       damage,
+				StatusEffect: cond,
+			})
+		}
+		// Weather effects
+		// TODO: check for weather resisting abilities
+		if b.Weather == WeatherSandstorm {
+			if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
+				damage := pkmn.MaxHP() / 16
 				b.QueueTransaction(DamageTransaction{
-					Target:       t,
-					Damage:       damage,
-					StatusEffect: cond,
-				})
-			}
-			// Weather effects
-			// TODO: check for weather resisting abilities
-			if b.Weather == WeatherSandstorm {
-				if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
-					damage := pkmn.MaxHP() / 16
-					b.QueueTransaction(DamageTransaction{
-						Target: t,
-						Damage: damage,
-					})
-				}
-			} else if b.Weather == WeatherHail {
-				if pkmn.EffectiveType()&TypeIce == 0 {
-					damage := pkmn.MaxHP() / 16
-					b.QueueTransaction(DamageTransaction{
-						Target: t,
-						Damage: damage,
-					})
-				}
-			}
-			if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
-				b.QueueTransaction(ItemTransaction{
 					Target: t,
-					IsHeld: true,
-					Item:   pkmn.HeldItem,
+					Damage: damage,
 				})
 			}
+		} else if b.Weather == WeatherHail {
+			if pkmn.EffectiveType()&TypeIce == 0 {
+				damage := pkmn.MaxHP() / 16
+				b.QueueTransaction(DamageTransaction{
+					Target: t,
+					Damage: damage,
+				})
+			}
+		}
+		if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
+			b.QueueTransaction(ItemTransaction{
+				Target: t,
+				IsHeld: true,
+				Item:   pkmn.HeldItem,
+			})
+		}
+		// Held item effects
+		if pkmn.HeldItem != ItemNone {
+			b.QueueTransaction(ItemTransaction{
+				Target: t,
+				IsHeld: true,
+				Item:   pkmn.HeldItem,
+			})
 		}
 	}
 	// Effects on the battle

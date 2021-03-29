@@ -313,6 +313,17 @@ func (p *Pokemon) Speed() uint {
 	return uint(effective)
 }
 
+// Returns denominator for critical hit chance
+func (p *Pokemon) CritChance() int {
+	stage := p.StatModifiers[StatCritChance]
+	if p.HeldItem == ItemRazorClaw || p.HeldItem == ItemScopeLens {
+		if stage < len(CritChances)-1 {
+			stage += 1
+		}
+	}
+	return CritChances[stage]
+}
+
 // Returns multiplier for evasion
 func (p *Pokemon) Evasion() uint {
 	stage := p.StatModifiers[StatEvasion]
