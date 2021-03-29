@@ -13,6 +13,7 @@ func (m Move) Priority() int8         { return m.Data().Priority }
 func (m Move) Power() uint            { return m.Data().Power }
 func (m Move) Accuracy() uint         { return m.Data().Accuracy }
 func (m Move) InitialMaxPP() uint8    { return m.Data().InitialMaxPP }
+func (m Move) Flags() MoveFlags       { return m.Data().Flags }
 
 func (m *Move) MarshalJSON() ([]byte, error) {
 	type alias Move
@@ -26,6 +27,7 @@ func (m *Move) MarshalJSON() ([]byte, error) {
 		Power        uint
 		Accuracy     uint
 		InitialMaxPP uint8
+		Flags        MoveFlags
 	}{
 		alias:        (*alias)(m),
 		Name:         m.Name(),
@@ -36,6 +38,7 @@ func (m *Move) MarshalJSON() ([]byte, error) {
 		Power:        m.Power(),
 		Accuracy:     m.Accuracy(),
 		InitialMaxPP: m.InitialMaxPP(),
+		Flags:        m.Flags(),
 	})
 }
 
