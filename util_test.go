@@ -101,10 +101,14 @@ func transactionDiff(expected, got Transaction) map[string]diff {
 				}
 			}
 		} else if rfA.Type() == reflect.TypeOf(&Move{}) {
-			if !rfB.IsNil() && !reflect.DeepEqual(rfA.Interface(), rfB.Interface()) {
-				result[typeField.Name] = diff{
-					expected: rfA.Interface(),
-					got:      rfB.Interface(),
+			if !rfB.IsNil() {
+				mvA := rfA.Interface().(*Move)
+				mvB := rfB.Interface().(*Move)
+				if mvA.Id != mvB.Id {
+					result[typeField.Name] = diff{
+						expected: mvA.String(),
+						got:      mvB.String(),
+					}
 				}
 			}
 		} else {
