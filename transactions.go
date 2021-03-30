@@ -289,7 +289,10 @@ func (t FaintTransaction) Mutate(b *Battle) {
 	}
 	if !anyAlive {
 		// cause the battle to end by knockout
-		b.QueueTransaction(EndBattleTransaction{Reason: EndKnockout})
+		b.QueueTransaction(EndBattleTransaction{
+			Reason: EndKnockout,
+			Winner: (p.team + 1) % 2, // HACK: because there is always 2 teams in a battle
+		})
 	}
 }
 
@@ -325,10 +328,12 @@ const (
 
 type EndBattleTransaction struct {
 	Reason EndReason
+	Winner int
 }
 
 func (t EndBattleTransaction) Mutate(b *Battle) {
 	b.State = BattleEnd
+	b.results.Winner = t.Winner
 }
 
 // Handles pre-turn status checks. (Paralysis, Sleeping, etc.)
