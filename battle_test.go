@@ -1262,6 +1262,7 @@ var _ = Describe("Battle end", func() {
 				},
 				EndBattleTransaction{
 					Reason: EndKnockout,
+					Winner: 1,
 				},
 			))
 			Expect(t).ToNot(HaveTransaction(
@@ -1275,6 +1276,7 @@ var _ = Describe("Battle end", func() {
 					},
 				},
 			))
+			Expect(b.GetResults().Winner).To(Equal(1))
 		})
 	})
 })

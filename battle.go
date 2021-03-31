@@ -20,6 +20,7 @@ type Battle struct {
 
 	tQueue     []Transaction
 	tProcessed []Transaction
+	results    BattleResults
 }
 
 type BattleMeta int
@@ -634,6 +635,19 @@ func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
 // Get the battle context that will be shared with the client
 func (b *Battle) GetRoundContext(t target) *BattleContext {
 	return b.getContext(b.parties[t.party], b.parties[t.party].activePokemon[t.partySlot])
+}
+
+// Get the results of the battle. The battle must be in the `BattleEnd` state.
+func (b *Battle) GetResults() BattleResults {
+	if b.State != BattleEnd {
+		blog.Panic("Unable to get results of a battle that has not ended.")
+	}
+	return b.results
+}
+
+// Results for a Battle.
+type BattleResults struct {
+	Winner int // The team that won the battle.
 }
 
 // An abstraction over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.
