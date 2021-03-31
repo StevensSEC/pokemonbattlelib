@@ -51,10 +51,8 @@ var _ = Describe("Pokemon generation", func() {
 	})
 
 	It("generates a Pokemon with a given moveset", func() {
-		pound := GetMove(MovePound)
-		pursuit := GetMove(MovePursuit)
-		pkmn := GeneratePokemon(PkmnPiplup, WithMoves(pound, pursuit))
-		Expect(pkmn.Moves).To(BeEquivalentTo([MaxMoves]*Move{pound, pursuit, nil, nil}))
+		pkmn := GeneratePokemon(PkmnPiplup, WithMoves(MovePound, MovePursuit))
+		Expect(pkmn.Moves).To(BeEquivalentTo([MaxMoves]*Move{GetMove(MovePound), GetMove(MovePursuit), nil, nil}))
 	})
 
 	It("creates Pokemon with accurate stats reflecting its given values", func() {
@@ -82,12 +80,12 @@ var _ = Describe("Pokemon generation", func() {
 		Entry("level too low", WithLevel(MinLevel-1)),
 		Entry("IVs too high", WithIVs([6]uint8{32, 32, 32, 32, 32, 32})),
 		Entry("EVs too high", WithEVs([6]uint8{255, 255, 255, 255, 255, 255})),
-		Entry("too many moves", WithMoves(GetMove(MoveFly), GetMove(MoveAerialAce), GetMove(MoveRoost), GetMove(MovePeck), GetMove(MovePound))),
+		Entry("too many moves", WithMoves(MoveFly, MoveAerialAce, MoveRoost, MovePeck, MovePound)),
 	)
 
 	Describe("Validation", func() {
 		It("succeeds when the pokemon has moves", func() {
-			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveThunder))
 			Expect(p.Validate(PkmnRuleSetDefault)).To(Succeed())
 		})
 
@@ -97,25 +95,25 @@ var _ = Describe("Pokemon generation", func() {
 		})
 
 		It("fails when the pokemon has invalid level", func() {
-			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveThunder))
 			p.Ability = 0
 			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationMissingAbility))
 		})
 
 		It("fails when the pokemon has invalid level", func() {
-			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveThunder))
 			p.Level = 0
 			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidLevel))
 		})
 
 		It("fails when the pokemon has invalid IVs", func() {
-			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveThunder))
 			p.IVs[StatHP] = 255
 			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidIvs))
 		})
 
 		It("fails when the pokemon has invalid EVs", func() {
-			p := GeneratePokemon(PkmnPikachu, WithMoves(GetMove(MoveThunder)))
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveThunder))
 			p.EVs[StatHP] = 255
 			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidEvs))
 		})
@@ -161,7 +159,7 @@ var _ = Describe("Pokemon string representation", func() {
 var _ = Describe("Pokemon stat boosts", func() {
 	DescribeTable("crit chance boosting items",
 		func(i Item) {
-			p := GeneratePokemon(PkmnPiplup, WithLevel(5), WithMoves(GetMove(MoveSplash)))
+			p := GeneratePokemon(PkmnPiplup, WithLevel(5), WithMoves(MoveSplash))
 			p.HeldItem = ItemRazorClaw
 			Expect(p.CritChance()).To(Equal(CritChances[p.StatModifiers[StatCritChance]+1]))
 		},

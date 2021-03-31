@@ -141,15 +141,15 @@ func WithAbility(ability Ability) GeneratePokemonOption {
 	}
 }
 
-func WithMoves(moves ...*Move) GeneratePokemonOption {
+func WithMoves(moves ...MoveId) GeneratePokemonOption {
 	return func(p *Pokemon) {
 		if len(moves) > MaxMoves {
 			panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MaxMoves))
 		}
 
-		var limited_moves [4]*Move
-		copy(limited_moves[:], moves)
-		p.Moves = limited_moves
+		for i, id := range moves {
+			p.Moves[i] = GetMove(id)
+		}
 	}
 }
 

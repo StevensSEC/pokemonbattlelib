@@ -12,9 +12,9 @@ var _ = Describe("Party creation", func() {
 		It("fails when adding too many Pokemon to a party", func() {
 			party := NewParty(&agent, 0)
 			for i := 0; i < MaxPartySize; i += 1 {
-				party.AddPokemon(GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveTackle))))
+				party.AddPokemon(GeneratePokemon(PkmnBulbasaur, WithMoves(MoveTackle)))
 			}
-			Expect(party.AddPokemon(GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveTackle))))).To(MatchError(ErrorPartyFull))
+			Expect(party.AddPokemon(GeneratePokemon(PkmnBulbasaur, WithMoves(MoveTackle)))).To(MatchError(ErrorPartyFull))
 		})
 
 		It("fails when adding invalid pokemon to a party", func() {

@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var defaultMoveOpt = WithMoves(GetMove(MovePound))
+var defaultMoveOpt = WithMoves(MovePound)
 
 type dumbAgent struct{}
 
@@ -209,9 +209,9 @@ var _ = Describe("One round of battle", func() {
 
 	Context("when dealing damage to a Pokemon", func() {
 		It("should account for same-type attack bonus", func() {
-			charmander = GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MovePound)))
+			charmander = GeneratePokemon(PkmnCharmander, WithMoves(MovePound))
 			party1 = NewOccupiedParty(&agent1, 0, charmander)
-			bidoof := GeneratePokemon(PkmnBidoof, WithMoves(GetMove(MoveTackle)))
+			bidoof := GeneratePokemon(PkmnBidoof, WithMoves(MoveTackle))
 			party2 = NewOccupiedParty(&agent2, 1, bidoof)
 			battle = NewBattle()
 			battle.AddParty(party1, party2)
@@ -250,14 +250,14 @@ var _ = Describe("One round of battle", func() {
 					PkmnMightyena,
 					WithIVs([6]uint8{31, 0, 31, 0, 31, 31}),
 					WithMoves(
-						GetMove(MoveFireFang),
-						GetMove(MoveTackle),
+						MoveFireFang,
+						MoveTackle,
 					),
 				)
 				party1 = NewOccupiedParty(&_a1, 0, pkmn1)
 				pkmn2 := GeneratePokemon(
 					PkmnTurtwig,
-					WithMoves(GetMove(MoveTackle)),
+					WithMoves(MoveTackle),
 					WithIVs([6]uint8{31, 31, 31, 31, 31, 0}),
 				)
 				party2 = NewOccupiedParty(&_a2, 1, pkmn2)
@@ -306,12 +306,12 @@ var _ = Describe("One round of battle", func() {
 			It("should have no effect", func() {
 				pkmn1 := GeneratePokemon(
 					PkmnGastly,
-					WithMoves(GetMove(MoveShadowBall)),
+					WithMoves(MoveShadowBall),
 				)
 				party1 = NewOccupiedParty(&_a1, 0, pkmn1)
 				pkmn2 := GeneratePokemon(
 					PkmnBidoof,
-					WithMoves(GetMove(MoveTackle)),
+					WithMoves(MoveTackle),
 				)
 				party2 = NewOccupiedParty(&_a2, 1, pkmn2)
 				b.AddParty(party1, party2)
@@ -523,8 +523,8 @@ var _ = Describe("Turn priority", func() {
 
 		It("should order turns properly based on priority", func() {
 			a2 := Agent(new(healAgent))
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MovePound)))
-			charmander := GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MovePound)))
+			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(MovePound))
+			charmander := GeneratePokemon(PkmnCharmander, WithMoves(MovePound))
 			p1 := NewOccupiedParty(&a1, 0, bulbasaur)
 			p2 := NewOccupiedParty(&a2, 1, charmander)
 			b := NewBattle()
@@ -554,11 +554,10 @@ var _ = Describe("Turn priority", func() {
 
 	Context("when determining priority for equal turn types", func() {
 		It("should handle moves with higher priority first", func() {
-			pound := GetMove(MovePound)
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(5), WithMoves(pound))
+			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(5), WithMoves(MovePound))
 			p1.Stats[StatSpeed] = 100
 			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(5), WithMoves(GetMove(MoveFakeOut)))
+			p2 := GeneratePokemon(PkmnCharmander, WithLevel(5), WithMoves(MoveFakeOut))
 			p2.Stats[StatSpeed] = 10
 			party2 := NewOccupiedParty(&a2, 1, p2)
 			b := NewBattle()
@@ -587,7 +586,7 @@ var _ = Describe("Turn priority", func() {
 						Team:      1,
 					},
 					Damage: 5,
-					Move:   pound,
+					Move:   GetMove(MovePound),
 				},
 			))
 		})
@@ -650,8 +649,8 @@ var _ = Describe("Weather", func() {
 	Context("when using certain moves/certain abilities cause weather", func() {
 		// TODO: https://bulbapedia.bulbagarden.net/wiki/Weather#Causing_weather
 		It("should clear fog when using MoveDefog", func() {
-			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveDefog)))
-			pkmn2 := GeneratePokemon(PkmnMagikarp, WithMoves(GetMove(MoveSplash)))
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveDefog))
+			pkmn2 := GeneratePokemon(PkmnMagikarp, WithMoves(MoveSplash))
 			p1.AddPokemon(pkmn1)
 			p2.AddPokemon(pkmn2)
 			b.Weather = WeatherFog
@@ -662,8 +661,8 @@ var _ = Describe("Weather", func() {
 			}))
 		})
 		It("should cause harsh sunlight", func() {
-			p1.AddPokemon(GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MoveSunnyDay))))
-			p2.AddPokemon(GeneratePokemon(PkmnMagikarp, WithMoves(GetMove(MoveSplash))))
+			p1.AddPokemon(GeneratePokemon(PkmnCharmander, WithMoves(MoveSunnyDay)))
+			p2.AddPokemon(GeneratePokemon(PkmnMagikarp, WithMoves(MoveSplash)))
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(WeatherTransaction{
@@ -679,8 +678,8 @@ var _ = Describe("Weather", func() {
 		weatherBall := GetMove(MoveWeatherBall)
 		moonlight := GetMove(MoveMoonlight)
 		It("should use metadata to track weather and clear weather over time", func() {
-			p1.AddPokemon(GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MoveSunnyDay))))
-			p2.AddPokemon(GeneratePokemon(PkmnMagikarp, WithMoves(GetMove(MoveSplash))))
+			p1.AddPokemon(GeneratePokemon(PkmnCharmander, WithMoves(MoveSunnyDay)))
+			p2.AddPokemon(GeneratePokemon(PkmnMagikarp, WithMoves(MoveSplash)))
 			Expect(b.Start()).To(Succeed())
 			b.SimulateRound()
 			Expect(b.metadata[MetaWeatherTurns]).To(Equal(4))
@@ -698,8 +697,8 @@ var _ = Describe("Weather", func() {
 		When("harsh sunlight", func() {
 			It("should boost fire type moves", func() {
 				// intentional non water type pokemon, intentional no supereffective type matchup
-				machamp := GeneratePokemon(PkmnMachamp, WithLevel(100), WithMoves(GetMove(MoveFlamethrower)))
-				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(GetMove(MoveTackle)))
+				machamp := GeneratePokemon(PkmnMachamp, WithLevel(100), WithMoves(MoveFlamethrower))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(MoveTackle))
 				p1.AddPokemon(machamp)
 				p2.AddPokemon(bidoof)
 				b.Weather = WeatherHarshSunlight
@@ -721,8 +720,8 @@ var _ = Describe("Weather", func() {
 
 			It("should weaken water type moves", func() {
 				// intentional non water type pokemon, intentional no supereffective type matchup
-				lileep := GeneratePokemon(PkmnLileep, WithLevel(100), WithMoves(GetMove(MoveBrine)))
-				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(GetMove(MoveTackle)))
+				lileep := GeneratePokemon(PkmnLileep, WithLevel(100), WithMoves(MoveBrine))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(MoveTackle))
 				p1.AddPokemon(lileep)
 				p2.AddPokemon(bidoof)
 				b.Weather = WeatherHarshSunlight
@@ -746,8 +745,8 @@ var _ = Describe("Weather", func() {
 		When("raining", func() {
 			It("should affect fire type moves", func() {
 				// intentional non water type pokemon, intentional no supereffective type matchup
-				machamp := GeneratePokemon(PkmnMachamp, WithLevel(100), WithMoves(GetMove(MoveFlamethrower)))
-				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(GetMove(MoveTackle)))
+				machamp := GeneratePokemon(PkmnMachamp, WithLevel(100), WithMoves(MoveFlamethrower))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(MoveTackle))
 				p1.AddPokemon(machamp)
 				p2.AddPokemon(bidoof)
 				b.Weather = WeatherRain
@@ -770,8 +769,8 @@ var _ = Describe("Weather", func() {
 
 			It("should affect water type moves", func() {
 				// intentional non water type pokemon, intentional no supereffective type matchup
-				lileep := GeneratePokemon(PkmnLileep, WithLevel(100), WithMoves(GetMove(MoveBrine)))
-				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(GetMove(MoveTackle)))
+				lileep := GeneratePokemon(PkmnLileep, WithLevel(100), WithMoves(MoveBrine))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(MoveTackle))
 				p1.AddPokemon(lileep)
 				p2.AddPokemon(bidoof)
 				b.Weather = WeatherRain
@@ -800,13 +799,13 @@ var _ = Describe("Weather", func() {
 					WithLevel(5),
 					WithIVs([6]uint8{31, 0, 31, 0, 31, 0}),
 					WithEVs([6]uint8{200, 0, 31, 0, 31, 0}),
-					WithMoves(GetMove(MoveTackle)),
+					WithMoves(MoveTackle),
 				)
 				bulbasaur := GeneratePokemon(PkmnBulbasaur,
 					WithLevel(5),
 					WithIVs([6]uint8{31, 0, 31, 0, 31, 0}),
 					WithEVs([6]uint8{200, 0, 31, 0, 31, 0}),
-					WithMoves(GetMove(MoveSolarBeam)),
+					WithMoves(MoveSolarBeam),
 				)
 				p1.AddPokemon(bidoof)
 				p2.AddPokemon(bulbasaur)
@@ -859,8 +858,8 @@ var _ = Describe("Weather", func() {
 			})
 
 			It("should cause sandstorm damage", func() {
-				bidoof := GeneratePokemon(PkmnBidoof, WithMoves(GetMove(MoveTackle)))
-				bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveSolarBeam)))
+				bidoof := GeneratePokemon(PkmnBidoof, WithMoves(MoveTackle))
+				bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSolarBeam))
 				p1.AddPokemon(bidoof)
 				p2.AddPokemon(bulbasaur)
 				b.Weather = WeatherHail
@@ -888,13 +887,13 @@ var _ = Describe("Weather", func() {
 					WithLevel(5),
 					WithIVs([6]uint8{31, 0, 31, 0, 31, 0}),
 					WithEVs([6]uint8{200, 0, 31, 0, 31, 0}),
-					WithMoves(GetMove(MoveTackle)),
+					WithMoves(MoveTackle),
 				)
 				bulbasaur := GeneratePokemon(PkmnBulbasaur,
 					WithLevel(5),
 					WithIVs([6]uint8{31, 0, 31, 0, 31, 0}),
 					WithEVs([6]uint8{200, 0, 31, 0, 31, 0}),
-					WithMoves(GetMove(MoveSolarBeam)),
+					WithMoves(MoveSolarBeam),
 				)
 				p1.AddPokemon(bidoof)
 				p2.AddPokemon(bulbasaur)
@@ -947,8 +946,8 @@ var _ = Describe("Weather", func() {
 			})
 
 			It("should cause hail damage", func() {
-				bidoof := GeneratePokemon(PkmnBidoof, WithMoves(GetMove(MoveTackle)))
-				bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveSolarBeam)))
+				bidoof := GeneratePokemon(PkmnBidoof, WithMoves(MoveTackle))
+				bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSolarBeam))
 				p1.AddPokemon(bidoof)
 				p2.AddPokemon(bulbasaur)
 				b.Weather = WeatherHail
@@ -971,8 +970,8 @@ var _ = Describe("Weather", func() {
 		})
 
 		It("should cause side effects during fog", func() {
-			castform := GeneratePokemon(PkmnCastform, WithLevel(10), WithMoves(weatherBall))
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithLevel(10), WithMoves(solarBeam))
+			castform := GeneratePokemon(PkmnCastform, WithLevel(10), WithMoves(MoveWeatherBall))
+			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithLevel(10), WithMoves(MoveSolarBeam))
 			p1.AddPokemon(castform)
 			p2.AddPokemon(bulbasaur)
 			b.Weather = WeatherFog
@@ -1164,12 +1163,12 @@ var _ = Describe("Fainting", func() {
 
 	When("holding Focus Sash", func() {
 		setup := func() *Battle {
-			holder := GeneratePokemon(PkmnMachoke, WithLevel(26), WithMoves(GetMove(MoveSplash)))
+			holder := GeneratePokemon(PkmnMachoke, WithLevel(26), WithMoves(MoveSplash))
 			holder.CurrentHP = 4
 			holder.HeldItem = ItemFocusSash
 			party1 := NewOccupiedParty(&a1, 0, holder)
 			party2 := NewOccupiedParty(&a2, 1,
-				GeneratePokemon(PkmnGrotle, WithLevel(30), WithMoves(GetMove(MoveRazorLeaf))),
+				GeneratePokemon(PkmnGrotle, WithLevel(30), WithMoves(MoveRazorLeaf)),
 			)
 			b = NewBattle()
 			b.AddParty(party1, party2)
@@ -1285,11 +1284,11 @@ var _ = Describe("Battle metadata", func() {
 			a1 := Agent(new(dumbAgent))
 			razorLeaf := GetMove(MoveRazorLeaf)
 			p1 := NewOccupiedParty(&a1, 0,
-				GeneratePokemon(PkmnBulbasaur, WithMoves(razorLeaf)),
+				GeneratePokemon(PkmnBulbasaur, WithMoves(MoveRazorLeaf)),
 			)
 			ember := GetMove(MoveEmber)
 			p2 := NewOccupiedParty(&a1, 1, GeneratePokemon(
-				PkmnCharmander, WithMoves(ember)),
+				PkmnCharmander, WithMoves(MoveEmber)),
 			)
 			b := NewBattle()
 			b.AddParty(p1, p2)
@@ -1319,8 +1318,8 @@ var _ = Describe("Status Conditions", func() {
 
 	Context("when using certain moves in battle causes status effects", func() {
 		It("should inflict paralysis from MoveStunSpore", func() {
-			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveSplash)))
-			pkmn2 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveStunSpore)))
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSplash))
+			pkmn2 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveStunSpore))
 			p1 = NewOccupiedParty(&a1, 0, pkmn1)
 			p2 = NewOccupiedParty(&a2, 1, pkmn2)
 			b.AddParty(p1, p2)
@@ -1507,7 +1506,7 @@ var _ = Describe("Status Conditions", func() {
 
 			DescribeTable("Sleep walking",
 				func(moveid MoveId) {
-					pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(moveid), GetMove(MoveRazorLeaf)))
+					pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(moveid, MoveRazorLeaf))
 					p1 = NewOccupiedParty(&a1, 0, pkmn1)
 					pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), defaultMoveOpt)
 					p2 = NewOccupiedParty(&a2, 1, pkmn2)
@@ -1579,12 +1578,12 @@ var _ = Describe("Misc/held items", func() {
 		p1 := NewOccupiedParty(&a1, 0, GeneratePokemon(
 			PkmnSnorlax,
 			WithLevel(25),
-			WithMoves(GetMove(MoveSplash)),
+			WithMoves(MoveSplash),
 		))
 		holder = GeneratePokemon(
 			pkmn,
 			WithLevel(25),
-			WithMoves(GetMove(MoveSplash)),
+			WithMoves(MoveSplash),
 		)
 		holder.HeldItem = item
 		p2 := NewOccupiedParty(&a2, 1, holder)
@@ -1796,12 +1795,12 @@ var _ = Describe("In-a-pinch Berries", func() {
 		p1 := NewOccupiedParty(&a1, 0, GeneratePokemon(
 			PkmnCombusken,
 			WithLevel(25),
-			WithMoves(GetMove(MoveSplash)),
+			WithMoves(MoveSplash),
 		))
 		holder = GeneratePokemon(
 			PkmnGrotle,
 			WithLevel(25),
-			WithMoves(GetMove(MoveSplash)),
+			WithMoves(MoveSplash),
 			WithIVs([6]uint8{1, 1, 1, 20, 1, 1}),
 		)
 		holder.HeldItem = item
