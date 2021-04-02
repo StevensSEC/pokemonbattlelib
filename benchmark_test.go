@@ -39,10 +39,10 @@ func randParty() *party {
 		p := GeneratePokemon(rand.Intn(493)+1,
 			WithLevel(uint8(47+rand.Intn(6))),
 			WithMoves(
-				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
-				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
-				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
-				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
+				MoveId(rand.Intn(len(AllMoves))+1),
+				MoveId(rand.Intn(len(AllMoves))+1),
+				MoveId(rand.Intn(len(AllMoves))+1),
+				MoveId(rand.Intn(len(AllMoves))+1),
 			),
 		)
 		party.AddPokemon(p)
