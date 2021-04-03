@@ -271,7 +271,7 @@ func (t FaintTransaction) Mutate(b *Battle) {
 	p := b.parties[t.Target.party]
 	p.SetInactive(t.Target.partySlot)
 	anyAlive := false
-	for i, pkmn := range p.pokemon {
+	for i, pkmn := range p.pokemon() {
 		if pkmn.CurrentHP > 0 {
 			anyAlive = true
 			// TODO: prompt Agent for which pokemon to send out next
