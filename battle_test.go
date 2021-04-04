@@ -206,11 +206,11 @@ var _ = Describe("One round of battle", func() {
 			charmander.Moves[0] = GetMove(MoveEmber)
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(bidoof.CurrentHP).To(BeEquivalentTo(7))
+			Expect(bidoof.CurrentHP).To(BeEquivalentTo(8))
 			bidoof.CurrentHP = 100
 			charmander.Ability = AbilityAdaptability
 			battle.SimulateRound()
-			Expect(bidoof.CurrentHP).To(BeEquivalentTo(93))
+			Expect(bidoof.CurrentHP).To(BeEquivalentTo(94))
 		})
 
 		Context("Type Matchups", func() {
@@ -742,7 +742,7 @@ var _ = Describe("Weather", func() {
 							partySlot: 0,
 							Team:      1,
 						},
-						Damage: 125,
+						Damage: 124,
 					},
 				))
 			})
@@ -945,7 +945,7 @@ var _ = Describe("Weather", func() {
 					Team:      0,
 				},
 				Move:   solarBeam,
-				Damage: 13,
+				Damage: 12,
 			}))
 			bulbasaur.Moves[0] = moonlight
 			bulbasaur.CurrentHP = bulbasaur.MaxHP()
@@ -960,7 +960,7 @@ var _ = Describe("Weather", func() {
 					Team:      1,
 				},
 				Move:   weatherBall,
-				Damage: 22,
+				Damage: 21,
 			}))
 			Expect(t).To(HaveTransaction(HealTransaction{
 				Target: bulbasaur,
@@ -1568,7 +1568,7 @@ var _ = Describe("Misc/held items", func() {
 					Team:      0,
 					Pokemon:   b.getPokemonInBattle(0, 0),
 				},
-				Damage: 34,
+				Damage: 32,
 			}))
 			// Take 10% of max HP
 			Expect(t).To(HaveTransaction(DamageTransaction{
@@ -1595,7 +1595,7 @@ var _ = Describe("Misc/held items", func() {
 					Team:      0,
 					Pokemon:   b.getPokemonInBattle(0, 0),
 				},
-				Damage: 28,
+				Damage: 27,
 			}))
 		})
 
