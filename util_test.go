@@ -390,7 +390,7 @@ func New1v1Battle(p1 *Pokemon, a1 *Agent, p2 *Pokemon, a2 *Agent) *Battle {
 	return NewSingleBattle(NewOccupiedParty(p1), a1, NewOccupiedParty(p2), a2)
 }
 
-// Creates a new party to store Pokemon and assigns them to a team
+// Deprecated: Creates a new party to store Pokemon and assigns them to a team
 // This function should only be used in tests.
 func newBattlePartyOld(agent *Agent, team int) *battleParty {
 	return &battleParty{
