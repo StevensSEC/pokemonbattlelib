@@ -15,7 +15,7 @@ type Battle struct {
 	State    BattleState
 	rng      RNG
 
-	parties  []*party                   // All parties participating in the battle
+	parties  []*battleParty             // All parties participating in the battle
 	metadata map[BattleMeta]interface{} // Metadata to be tracked during a battle
 
 	tQueue     []Transaction
@@ -55,8 +55,17 @@ func (b *Battle) SetSeed(seed uint) {
 	b.rng.SetSeed(seed)
 }
 
+func (b *Battle) AddParty(p *Party, a *Agent, team int) {
+	b.AddBattleParty(&battleParty{
+		Party:         p,
+		Agent:         a,
+		activePokemon: make(map[int]*Pokemon),
+		team:          team,
+	})
+}
+
 // Adds one or more parties to a team in the battle
-func (b *Battle) AddParty(p ...*party) {
+func (b *Battle) AddBattleParty(p ...*battleParty) {
 	b.parties = append(b.parties, p...)
 }
 
@@ -70,7 +79,7 @@ func (b *Battle) getPokemonInBattle(party, slot int) *Pokemon {
 	if party >= len(b.parties) {
 		panic(ErrorPartyIndex)
 	}
-	p := b.parties[party].pokemon
+	p := b.parties[party].pokemon()
 	if slot >= len(p) {
 		panic(ErrorPartyIndex)
 	}
@@ -78,7 +87,7 @@ func (b *Battle) getPokemonInBattle(party, slot int) *Pokemon {
 }
 
 // Gets all active ally Pokemon for a party
-func (b *Battle) GetAllies(p *party) []target {
+func (b *Battle) GetAllies(p *battleParty) []target {
 	allies := make([]target, 0)
 	targets := b.GetTargets()
 	for _, target := range targets {
@@ -90,7 +99,7 @@ func (b *Battle) GetAllies(p *party) []target {
 }
 
 // Gets all active opponent Pokemon for a party
-func (b *Battle) GetOpponents(p *party) []target {
+func (b *Battle) GetOpponents(p *battleParty) []target {
 	opponents := make([]target, 0)
 	targets := b.GetTargets()
 	for _, target := range targets {
@@ -106,7 +115,7 @@ func (b *Battle) Start() error {
 	// validate
 	teams := map[int]int{}
 	for i, party := range b.parties {
-		if len(party.pokemon) == 0 {
+		if len(party.pokemon()) == 0 {
 			return fmt.Errorf("Party (index: %d) has no pokemon.", i)
 		}
 		teams[party.team]++
@@ -565,7 +574,7 @@ func (t *target) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (b *Battle) GetParty(t *target) *party {
+func (b *Battle) GetParty(t *target) *battleParty {
 	return b.parties[t.party]
 }
 
@@ -616,7 +625,7 @@ func (b *Battle) GetTargetsRef() []*target {
 }
 
 // Gets the current context for a pokemon to act (perform a turn)
-func (b *Battle) getContext(party *party, pokemon *Pokemon) *BattleContext {
+func (b *Battle) getContext(party *battleParty, pokemon *Pokemon) *BattleContext {
 	// not joking, this is *actually* the fastest way to deep copy in Go.
 	// although I didn't benchmark it myself, so I don't know that for a fact.
 	var pkmn Pokemon

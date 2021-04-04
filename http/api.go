@@ -152,9 +152,7 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 				wa := NewWaiterAgent()
 				a := Agent(wa)
 				hb.AgentInputs = append(hb.AgentInputs, wa.Input())
-				p := NewParty(&a, i)
-				p.AddPokemon(args.Parties[i]...)
-				hb.Battle.AddParty(p)
+				hb.Battle.AddParty(NewOccupiedParty(args.Parties[i]...), &a, i)
 			}
 		} else if len(args.Teams) > 0 {
 			for t, team := range args.Teams {
@@ -162,9 +160,7 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 					wa := NewWaiterAgent()
 					a := Agent(wa)
 					hb.AgentInputs = append(hb.AgentInputs, wa.Input())
-					p := NewParty(&a, t)
-					p.AddPokemon(party.Pokemon...)
-					hb.Battle.AddParty(p)
+					hb.Battle.AddParty(NewOccupiedParty(party.Pokemon...), &a, t)
 				}
 			}
 		} else {
