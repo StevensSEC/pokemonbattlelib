@@ -380,9 +380,9 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				})
 				// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
 				if move.Drain() != 0 {
-					drain := damage * uint(move.Drain()/100)
+					drain := damage * uint(move.Drain()) / 100
 					if user.HeldItem == ItemBigRoot {
-						drain = (drain * 130) / 100 // 30% more HP than normal
+						drain = drain * 130 / 100 // 30% more HP than normal
 					}
 					if drain == 0 {
 						// Min 1 HP drain
@@ -390,7 +390,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					}
 					b.QueueTransaction(HealTransaction{
 						Target: user,
-						Amount: uint(drain),
+						Amount: drain,
 					})
 				}
 				// Other item effects in battle
