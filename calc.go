@@ -1,6 +1,6 @@
 package pokemonbattlelib
 
-func calcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damage uint) {
+func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damage uint) {
 	// Compute base damage
 	levelEffect := uint((2 * user.Level / 5) + 2)
 	movePower := move.Power()
