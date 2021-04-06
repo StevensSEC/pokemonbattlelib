@@ -1556,9 +1556,9 @@ var _ = Describe("Misc/held items", func() {
 					User: holder,
 					Target: target{
 						Pokemon:   b.getPokemonInBattle(0, 0),
-						party:     1,
+						party:     0,
 						partySlot: 0,
-						Team:      1,
+						Team:      0,
 					},
 					Damage: 201,
 				},
