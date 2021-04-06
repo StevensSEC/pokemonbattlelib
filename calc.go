@@ -33,7 +33,7 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	damage = uint((((levelEffect * movePower * attack / defense) / 50) + 2))
 
 	// Other modifiers
-	elementalEffect := GetElementalEffect(move.Type(), receiver.EffectiveType())
+	elementalEffect := GetElementalEffect(move.Type(), receiver.EffectiveType(), receiver.HeldItem)
 	if elementalEffect > NormalEffect {
 		damage <<= elementalEffect
 	} else if elementalEffect < NormalEffect {
@@ -61,7 +61,7 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 		// TODO: boost attack by 50% (in p.GetAttack)
 		// TODO: boost special attak by 50% (in p.GetSpAtk)
 		if lastMove := user.metadata[MetaLastMove]; lastMove != nil && lastMove != move {
-			blog.Panicf("cannot use move blocked by %s", user.HeldItem.Name)
+			blog.Panicf("cannot use move blocked by %s", user.HeldItem.Name())
 		}
 	case ItemLifeOrb:
 		damage = (damage * 130) / 100

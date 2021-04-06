@@ -1506,7 +1506,59 @@ var _ = Describe("Misc/held items", func() {
 		return b, holder
 	}
 
-	Context("when Pokemon hold certain misc. items in battle", func() {
+	When("Pokemon hold bad held items in battle", func() {
+		It("inflicts burn from Flame Orb", func() {
+			b, holder := setup(ItemFlameOrb, PkmnBulbasaur)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(InflictStatusTransaction{
+				Target:       holder,
+				StatusEffect: StatusBurn,
+			}))
+		})
+
+		DescribeTable("Move last in priority bracket items",
+			func(item Item) {
+				b, _ := setup(item, PkmnMagikarp)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransactionsInOrder(
+					MoveFailTransaction{
+						User:   b.getPokemonInBattle(0, 0),
+						Reason: FailOther,
+					},
+					MoveFailTransaction{
+						User:   b.getPokemonInBattle(1, 0),
+						Reason: FailOther,
+					},
+				))
+			},
+			Entry("Full Incense", ItemFullIncense),
+			Entry("Lagging Tail", ItemLaggingTail),
+		)
+
+		It("handles Iron Ball", func() {
+			b, holder := setup(ItemIronBall, PkmnPidgeot)
+			attacker := b.getPokemonInBattle(0, 0)
+			attacker.Moves[0] = GetMove(MoveEarthquake)
+			// Flying immunity negated
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: attacker,
+				Target: target{
+					Pokemon:   holder,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Move:   GetMove(MoveEarthquake),
+				Damage: 36,
+			}))
+			speed := holder.Speed()
+			holder.HeldItem = ItemNone
+			Expect(holder.Speed()).To(BeNumerically(">", speed))
+		})
+	})
+
+	When("Pokemon hold certain misc. items in battle", func() {
 		It("handles Black Sludge", func() {
 			// Heal poison types for 1/16 HP
 			b, holder := setup(ItemBlackSludge, PkmnGrimer)

@@ -153,14 +153,17 @@ var doubleEffect = map[Type]Type{
 }
 
 // Get effectiveness of a given elemental type matchup.
-func GetElementalEffect(move, def Type) Effectiveness {
-	if noEffect[move]&def > 0 {
-		return NoEffect
-	}
-
+func GetElementalEffect(move, def Type, item Item) Effectiveness {
 	reduce := bits.OnesCount32(uint32(halfEffect[move] & def))
 	increase := bits.OnesCount32(uint32(doubleEffect[move] & def))
 	effect := increase - reduce
+	if noEffect[move]&def > 0 {
+		if move&TypeGround > 0 && def&TypeFlying > 0 && item == ItemIronBall {
+			// Flying immunity negated
+		} else {
+			return NoEffect
+		}
+	}
 	return Effectiveness(effect)
 }
 

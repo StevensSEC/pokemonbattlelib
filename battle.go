@@ -135,6 +135,10 @@ func (b *Battle) Start() error {
 // Handles all pre-turn logic
 func (b *Battle) preRound() {
 	for _, t := range b.GetTargetsRef() {
+		switch t.Pokemon.HeldItem {
+		case ItemFullIncense, ItemLaggingTail:
+			t.Pokemon.metadata[MetaPriorityLast] = true
+		}
 		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
 			b.QueueTransaction(CureStatusTransaction{
 				Target:       *t,
@@ -159,6 +163,10 @@ func (b *Battle) sortTurns(turns *[]TurnContext) {
 				mvB := pkmnB.Moves[ftB.Move]
 				if mvA.Priority() != mvB.Priority() {
 					return mvA.Priority() > mvB.Priority()
+				}
+				// Held item priority
+				if v, ok := pkmnA.metadata[MetaPriorityLast].(bool); ok && v {
+					return false
 				}
 				// speedy pokemon should go first
 				return pkmnA.Speed() > pkmnB.Speed()
@@ -348,6 +356,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Stat:   StatAtk,
 						Stages: +1,
 					})
+				case MoveSplash:
+					b.QueueTransaction(MoveFailTransaction{
+						User:   user,
+						Reason: FailOther,
+					})
 				case MoveDefog:
 					if b.Weather == WeatherFog {
 						b.QueueTransaction(WeatherTransaction{
@@ -505,9 +518,9 @@ func (b *Battle) postRound() {
 				})
 			}
 			// Held item effects
-			if pkmn.HeldItem != nil {
+			if pkmn.HeldItem != ItemNone {
 				b.QueueTransaction(ItemTransaction{
-					Target: pkmn,
+					Target: *t,
 					Item:   pkmn.HeldItem,
 				})
 			}
@@ -622,7 +635,10 @@ func (b *Battle) GetTargets() []target {
 		for slot, active := range party.activePokemon {
 			var pkmn Pokemon
 			bytes, _ := json.Marshal(active)
-			json.Unmarshal(bytes, &pkmn)
+			err := json.Unmarshal(bytes, &pkmn)
+			if err != nil {
+				panic(err)
+			}
 			target := target{
 				party:     partyID,
 				partySlot: slot,
@@ -658,7 +674,10 @@ func (b *Battle) getContext(party *battleParty, pokemon *Pokemon) *BattleContext
 	// although I didn't benchmark it myself, so I don't know that for a fact.
 	var pkmn Pokemon
 	bytes, _ := json.Marshal(pokemon)
-	json.Unmarshal(bytes, &pkmn)
+	err := json.Unmarshal(bytes, &pkmn)
+	if err != nil {
+		panic(err)
+	}
 	return &BattleContext{
 		Battle:    *b,
 		Pokemon:   pkmn,
