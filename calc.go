@@ -56,6 +56,10 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 
 	// Item modifiers
 	switch user.HeldItem {
+	case ItemExpertBelt:
+		if elementalEffect >= SuperEffective {
+			damage = (damage * 120) / 100
+		}
 	case ItemLifeOrb:
 		damage = (damage * 130) / 100
 	case ItemMuscleBand:
