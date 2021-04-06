@@ -110,7 +110,7 @@ type MoveData struct {
 	MaxHits       int
 	MinTurns      int
 	MaxTurns      int
-	Drain         int
+	Drain         int // Percentage (out of 100) of the damage dealt by this move is given back to the user as HP. If the value is negative, it's recoil damage.
 	Healing       int
 	CritRate      int
 	AilmentChance int

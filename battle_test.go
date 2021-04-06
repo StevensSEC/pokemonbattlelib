@@ -1863,3 +1863,72 @@ var _ = Describe("In-a-pinch Berries", func() {
 		Entry("Salac Berry", ItemSalacBerry, StatSpeed, 1),
 	)
 })
+
+var _ = Describe("Draining moves", func() {
+	a1 := Agent(new(dumbAgent))
+	var b *Battle
+
+	BeforeEach(func() {
+		b = NewSingleBattle(
+			NewOccupiedParty(
+				GeneratePokemon(PkmnRoselia,
+					WithLevel(25),
+					WithMoves(MoveGigaDrain),
+				),
+			),
+			&a1,
+			NewOccupiedParty(
+				GeneratePokemon(PkmnBidoof,
+					WithLevel(25),
+					WithMoves(MoveSplash),
+				),
+			),
+			&a1,
+		)
+		b.rng = SimpleRNG()
+		Expect(b.Start()).To(Succeed())
+	})
+
+	It("should damage the target and heal the user", func() {
+		t, _ := b.SimulateRound()
+
+		Expect(t).To(HaveTransactionsInOrder(
+			DamageTransaction{
+				User: b.getPokemonInBattle(0, 0),
+				Target: target{
+					Pokemon:   b.getPokemonInBattle(1, 0),
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Damage: 62,
+			},
+			HealTransaction{
+				Target: b.getPokemonInBattle(0, 0),
+				Amount: 31,
+			},
+		))
+	})
+
+	It("should heal more when the user is holding a big root", func() {
+		b.getPokemonInBattle(0, 0).HeldItem = ItemBigRoot
+		t, _ := b.SimulateRound()
+
+		Expect(t).To(HaveTransactionsInOrder(
+			DamageTransaction{
+				User: b.getPokemonInBattle(0, 0),
+				Target: target{
+					Pokemon:   b.getPokemonInBattle(1, 0),
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Damage: 62,
+			},
+			HealTransaction{
+				Target: b.getPokemonInBattle(0, 0),
+				Amount: 40,
+			},
+		))
+	})
+})
