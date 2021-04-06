@@ -70,6 +70,19 @@ func (t PPTransaction) MarshalJSON() ([]byte, error) {
 	})
 }
 
+func (t SwapItemTransaction) MarshalJSON() ([]byte, error) {
+	type alias SwapItemTransaction
+	return json.Marshal(&struct {
+		Type int    `json:"type"`
+		Name string `json:"name"`
+		Args *alias `json:"args"`
+	}{
+		Type: 5,
+		Name: "SwapItemTransaction",
+		Args: (*alias)(&t),
+	})
+}
+
 func (t HealTransaction) MarshalJSON() ([]byte, error) {
 	type alias HealTransaction
 	return json.Marshal(&struct {
@@ -77,7 +90,7 @@ func (t HealTransaction) MarshalJSON() ([]byte, error) {
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
-		Type: 5,
+		Type: 6,
 		Name: "HealTransaction",
 		Args: (*alias)(&t),
 	})
@@ -90,7 +103,7 @@ func (t InflictStatusTransaction) MarshalJSON() ([]byte, error) {
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
-		Type: 6,
+		Type: 7,
 		Name: "InflictStatusTransaction",
 		Args: (*alias)(&t),
 	})
@@ -103,7 +116,7 @@ func (t CureStatusTransaction) MarshalJSON() ([]byte, error) {
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
-		Type: 7,
+		Type: 8,
 		Name: "CureStatusTransaction",
 		Args: (*alias)(&t),
 	})
@@ -116,7 +129,7 @@ func (t FaintTransaction) MarshalJSON() ([]byte, error) {
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
-		Type: 8,
+		Type: 9,
 		Name: "FaintTransaction",
 		Args: (*alias)(&t),
 	})
@@ -129,7 +142,7 @@ func (t SendOutTransaction) MarshalJSON() ([]byte, error) {
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
-		Type: 9,
+		Type: 10,
 		Name: "SendOutTransaction",
 		Args: (*alias)(&t),
 	})
@@ -142,7 +155,7 @@ func (t WeatherTransaction) MarshalJSON() ([]byte, error) {
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
-		Type: 10,
+		Type: 11,
 		Name: "WeatherTransaction",
 		Args: (*alias)(&t),
 	})
@@ -155,7 +168,7 @@ func (t EndBattleTransaction) MarshalJSON() ([]byte, error) {
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
-		Type: 11,
+		Type: 12,
 		Name: "EndBattleTransaction",
 		Args: (*alias)(&t),
 	})
@@ -168,7 +181,7 @@ func (t ImmobilizeTransaction) MarshalJSON() ([]byte, error) {
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
-		Type: 12,
+		Type: 13,
 		Name: "ImmobilizeTransaction",
 		Args: (*alias)(&t),
 	})
@@ -181,7 +194,7 @@ func (t MoveFailTransaction) MarshalJSON() ([]byte, error) {
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
-		Type: 13,
+		Type: 14,
 		Name: "MoveFailTransaction",
 		Args: (*alias)(&t),
 	})
@@ -194,7 +207,7 @@ func (t ModifyStatTransaction) MarshalJSON() ([]byte, error) {
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
-		Type: 14,
+		Type: 15,
 		Name: "ModifyStatTransaction",
 		Args: (*alias)(&t),
 	})
