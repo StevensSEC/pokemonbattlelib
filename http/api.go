@@ -65,18 +65,17 @@ func HandleGeneratePokemon(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatalf("Invalid move ids %s: %s", r.FormValue("moves"), err)
 		}
-		var moves []*Move
+		var moves []MoveId
 		for _, id := range moveIds {
-			moves = append(moves, GetMove(MoveId(id)))
+			moves = append(moves, MoveId(id))
 		}
 		args.Opts = append(args.Opts, WithMoves(moves...))
 	} else {
 		args.Opts = append(args.Opts, WithMoves(
-			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
-			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
-			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
-			GetMove(MoveId(rand.Intn(len(AllMoves)))+1),
-		))
+			MoveId(rand.Intn(len(AllMoves)))+1,
+			MoveId(rand.Intn(len(AllMoves)))+1,
+			MoveId(rand.Intn(len(AllMoves)))+1,
+			MoveId(rand.Intn(len(AllMoves)))+1))
 	}
 
 	args.Opts = append(args.Opts,
@@ -153,9 +152,7 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 				wa := NewWaiterAgent()
 				a := Agent(wa)
 				hb.AgentInputs = append(hb.AgentInputs, wa.Input())
-				p := NewParty(&a, i)
-				p.AddPokemon(args.Parties[i]...)
-				hb.Battle.AddParty(p)
+				hb.Battle.AddParty(NewOccupiedParty(args.Parties[i]...), &a, i)
 			}
 		} else if len(args.Teams) > 0 {
 			for t, team := range args.Teams {
@@ -163,9 +160,7 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 					wa := NewWaiterAgent()
 					a := Agent(wa)
 					hb.AgentInputs = append(hb.AgentInputs, wa.Input())
-					p := NewParty(&a, t)
-					p.AddPokemon(party.Pokemon...)
-					hb.Battle.AddParty(p)
+					hb.Battle.AddParty(NewOccupiedParty(party.Pokemon...), &a, t)
 				}
 			}
 		} else {

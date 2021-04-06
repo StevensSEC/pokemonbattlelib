@@ -141,15 +141,15 @@ func WithAbility(ability Ability) GeneratePokemonOption {
 	}
 }
 
-func WithMoves(moves ...*Move) GeneratePokemonOption {
+func WithMoves(moves ...MoveId) GeneratePokemonOption {
 	return func(p *Pokemon) {
 		if len(moves) > MaxMoves {
 			panic(fmt.Sprintf("A Pokemon cannot have more than %d moves", MaxMoves))
 		}
 
-		var limited_moves [4]*Move
-		copy(limited_moves[:], moves)
-		p.Moves = limited_moves
+		for i, id := range moves {
+			p.Moves[i] = GetMove(id)
+		}
 	}
 }
 
@@ -311,6 +311,17 @@ func (p *Pokemon) Speed() uint {
 	effective := float64(p.Stats[StatSpeed])
 	// TODO: speed modifiers
 	return uint(effective)
+}
+
+// Returns denominator for critical hit chance
+func (p *Pokemon) CritChance() int {
+	stage := p.StatModifiers[StatCritChance]
+	if p.HeldItem == ItemRazorClaw || p.HeldItem == ItemScopeLens {
+		if stage < len(CritChances)-1 {
+			stage += 1
+		}
+	}
+	return CritChances[stage]
 }
 
 // Returns multiplier for evasion

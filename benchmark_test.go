@@ -31,18 +31,18 @@ func (smartAgent) Act(ctx *BattleContext) Turn {
 	}
 }
 
-func randParty() *party {
+func randParty() *battleParty {
 	a1 := Agent(smartAgent{})
-	party := NewParty(&a1, 0)
+	party := newBattlePartyOld(&a1, 0)
 	count := rand.Intn(5) + 1
 	for j := 0; j < count; j++ {
 		p := GeneratePokemon(rand.Intn(493)+1,
 			WithLevel(uint8(47+rand.Intn(6))),
 			WithMoves(
-				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
-				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
-				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
-				GetMove(MoveId(rand.Intn(len(AllMoves))+1)),
+				MoveId(rand.Intn(len(AllMoves))+1),
+				MoveId(rand.Intn(len(AllMoves))+1),
+				MoveId(rand.Intn(len(AllMoves))+1),
+				MoveId(rand.Intn(len(AllMoves))+1),
 			),
 		)
 		party.AddPokemon(p)
@@ -57,7 +57,7 @@ func BenchmarkBattle(b *testing.B) {
 		p2 := randParty()
 		p2.team = 1
 		battle := NewBattle()
-		battle.AddParty(p1, p2)
+		battle.AddBattleParty(p1, p2)
 		err := battle.Start()
 		if err != nil {
 			panic(err)

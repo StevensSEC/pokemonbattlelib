@@ -26,7 +26,7 @@ func comparePokemon(a, b *Pokemon) bool {
 
 // Used for custom gomega matchers. For simplicity, the fields of the struct are hardcoded. If we need to add more fields to `target` something is probably wrong.
 func compareTargets(a, b target) bool {
-	return comparePokemon(&a.Pokemon, &b.Pokemon) &&
+	return comparePokemon(a.Pokemon, b.Pokemon) &&
 		a.party == b.party &&
 		a.partySlot == b.partySlot &&
 		a.Team == b.Team
@@ -373,4 +373,41 @@ func AlwaysRNG() *TestRNG {
 // Always hit, never crit
 func SimpleRNG() *TestRNG {
 	return &TestRNG{rolls: []bool{true, false}}
+}
+
+// Create a single Battle. A single battle is a battle where only 1 pokemon is sent out at a time, and there can only be 2 parties.
+// This function should only be used in tests.
+func NewSingleBattle(p1 *Party, a1 *Agent, p2 *Party, a2 *Agent) *Battle {
+	b := NewBattle()
+	b.AddParty(p1, a1, 0)
+	b.AddParty(p2, a2, 1)
+	return b
+}
+
+// Create a single Battle with only 1 pokemon in each party.
+// This function should only be used in tests.
+func New1v1Battle(p1 *Pokemon, a1 *Agent, p2 *Pokemon, a2 *Agent) *Battle {
+	return NewSingleBattle(NewOccupiedParty(p1), a1, NewOccupiedParty(p2), a2)
+}
+
+// Deprecated: Creates a new party to store Pokemon and assigns them to a team
+// This function should only be used in tests.
+func newBattlePartyOld(agent *Agent, team int) *battleParty {
+	return &battleParty{
+		Party:         NewParty(),
+		Agent:         agent,
+		activePokemon: make(map[int]*Pokemon),
+		team:          team,
+	}
+}
+
+// Creates a new party and fills it out with the passed Pokemon
+// This function should only be used in tests.
+func newOccupiedBattleParty(agent *Agent, team int, pkmn ...*Pokemon) *battleParty {
+	party := newBattlePartyOld(agent, team)
+	err := party.AddPokemon(pkmn...)
+	if err != nil {
+		panic(err)
+	}
+	return party
 }

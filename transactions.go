@@ -22,7 +22,7 @@ func (t DamageTransaction) Mutate(b *Battle) {
 	if t.Damage == 0 {
 		t.Damage = 1
 	}
-	receiver := b.getPokemon(t.Target)
+	receiver := t.Target.Pokemon
 	if t.Move != nil {
 		t.User.metadata[MetaLastMove] = t.Move
 	}
@@ -33,6 +33,16 @@ func (t DamageTransaction) Mutate(b *Battle) {
 		receiver.CurrentHP = 0
 	}
 	if receiver.CurrentHP == 0 {
+		// Prevent OHKO with Focus Sash
+		if receiver.HeldItem == ItemFocusSash {
+			receiver.CurrentHP = 1
+			b.QueueTransaction(ItemTransaction{
+				Target: t.Target,
+				IsHeld: true,
+				Item:   receiver.HeldItem,
+			})
+			return
+		}
 		// pokemon has fainted
 		b.QueueTransaction(FaintTransaction{
 			Target: t.Target,
@@ -96,7 +106,7 @@ type ItemTransaction struct {
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
-	target := b.getPokemon(t.Target)
+	target := t.Target.Pokemon
 	if t.Item.Flags()&FlagConsumable > 0 {
 		if t.IsHeld {
 			t.Item = target.HeldItem // auto-correct if the value is not present or does not match
@@ -104,7 +114,6 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		}
 		// TODO: remove consumed item from party's inventory
 	}
-
 	switch t.Item {
 	// ItemCategoryMedicine
 	case ItemPotion:
@@ -153,6 +162,46 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		})
 	case ItemStarfBerry:
 		// TODO: boost random stat, requires battle RNG to be available.
+	// ItemCategoryHeldItems
+	case ItemBlackSludge:
+		if target.Type&TypePoison != 0 {
+			b.QueueTransaction(HealTransaction{
+				Target: target,
+				Amount: target.MaxHP() / 16,
+			})
+		} else {
+			b.QueueTransaction(DamageTransaction{
+				Target: t.Target,
+				Damage: target.MaxHP() / 8,
+			})
+		}
+	case ItemLeftovers:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: target.MaxHP() / 16,
+		})
+	case ItemMentalHerb:
+		b.QueueTransaction(CureStatusTransaction{
+			Target:       t.Target,
+			StatusEffect: StatusInfatuation,
+		})
+	case ItemWhiteHerb:
+		for stat, stages := range target.StatModifiers {
+			if stages < 0 {
+				b.QueueTransaction(ModifyStatTransaction{
+					Target: target,
+					Stat:   stat,
+					Stages: -stages,
+				})
+			}
+		}
+	}
+	if target.HeldItem.Category() == ItemCategoryInAPinch && target.CurrentHP <= target.Stats[StatHP]/4 {
+		b.QueueTransaction(ItemTransaction{
+			Target: t.Target,
+			IsHeld: true,
+			Item:   target.HeldItem,
+		})
 	}
 }
 
@@ -163,9 +212,18 @@ type PPTransaction struct {
 }
 
 func (t PPTransaction) Mutate(b *Battle) {
-	t.Move.CurrentPP += uint8(t.Amount)
-	if t.Move.CurrentPP > t.Move.MaxPP {
-		t.Move.CurrentPP = t.Move.MaxPP
+	// This is why we should just use int
+	if t.Amount < 0 {
+		n := uint8(t.Amount * -1)
+		if t.Move.CurrentPP < n {
+			n = t.Move.CurrentPP
+		}
+		t.Move.CurrentPP -= n
+	} else {
+		t.Move.CurrentPP += uint8(t.Amount)
+		if t.Move.CurrentPP > t.Move.MaxPP {
+			t.Move.CurrentPP = t.Move.MaxPP
+		}
 	}
 }
 
@@ -198,10 +256,9 @@ type CureStatusTransaction struct {
 }
 
 func (t CureStatusTransaction) Mutate(b *Battle) {
-	receiver := b.getPokemon(t.Target)
-	receiver.StatusEffects.clear(t.StatusEffect)
+	t.Target.Pokemon.StatusEffects.clear(t.StatusEffect)
 	if t.StatusEffect.check(StatusSleep) {
-		delete(receiver.metadata, MetaSleepTime)
+		delete(t.Target.Pokemon.metadata, MetaSleepTime)
 	}
 }
 
@@ -214,14 +271,14 @@ func (t FaintTransaction) Mutate(b *Battle) {
 	p := b.parties[t.Target.party]
 	p.SetInactive(t.Target.partySlot)
 	anyAlive := false
-	for i, pkmn := range p.pokemon {
+	for i, pkmn := range p.pokemon() {
 		if pkmn.CurrentHP > 0 {
 			anyAlive = true
 			// TODO: prompt Agent for which pokemon to send out next
 			// auto send out next pokemon
 			b.QueueTransaction(SendOutTransaction{
 				Target: target{
-					Pokemon:   *b.getPokemonInBattle(t.Target.party, i),
+					Pokemon:   b.getPokemonInBattle(t.Target.party, i),
 					party:     t.Target.party,
 					partySlot: i,
 					Team:      t.Target.Team,
@@ -232,7 +289,10 @@ func (t FaintTransaction) Mutate(b *Battle) {
 	}
 	if !anyAlive {
 		// cause the battle to end by knockout
-		b.QueueTransaction(EndBattleTransaction{Reason: EndKnockout})
+		b.QueueTransaction(EndBattleTransaction{
+			Reason: EndKnockout,
+			Winner: (p.team + 1) % 2, // HACK: because there is always 2 teams in a battle
+		})
 	}
 }
 
@@ -268,10 +328,12 @@ const (
 
 type EndBattleTransaction struct {
 	Reason EndReason
+	Winner int
 }
 
 func (t EndBattleTransaction) Mutate(b *Battle) {
 	b.State = BattleEnd
+	b.results.Winner = t.Winner
 }
 
 // Handles pre-turn status checks. (Paralysis, Sleeping, etc.)
@@ -281,7 +343,7 @@ type ImmobilizeTransaction struct {
 }
 
 func (t ImmobilizeTransaction) Mutate(b *Battle) {
-	receiver := b.getPokemon(t.Target)
+	receiver := t.Target.Pokemon
 	if t.StatusEffect.check(StatusSleep) {
 		receiver.metadata[MetaSleepTime] = receiver.metadata[MetaSleepTime].(int) - 1
 	}
