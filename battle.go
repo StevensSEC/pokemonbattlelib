@@ -252,21 +252,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 
 			// use the move
 			receiver := t.Target.Pokemon
-			evasion := receiver.Evasion()
-			// TODO: account for user's accuracy stage
-			// TODO: calculate accuracy separately for tests
-			accuracy := move.Accuracy() * evasion / 100
-			if b.Weather == WeatherFog {
-				accuracy = (accuracy * 3) / 5
-			}
-			switch user.HeldItem {
-			case ItemWideLens:
-				accuracy = (accuracy * 110) / 100
-			}
-			switch receiver.HeldItem {
-			case ItemBrightPowder, ItemLaxIncense:
-				accuracy -= accuracy / 10
-			}
+			accuracy := CalcAccuracy(b.Weather, user, receiver, move)
 			if move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
 				b.QueueTransaction(MoveFailTransaction{
 					User:   user,
