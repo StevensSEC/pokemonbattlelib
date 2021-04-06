@@ -930,11 +930,13 @@ var _ = Describe("Weather", func() {
 			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithLevel(10), WithMoves(MoveSolarBeam))
 			b := New1v1Battle(castform, &a1, bulbasaur, &a2)
 			b.rng = SimpleRNG()
+			baseAccuracy := CalcAccuracy(WeatherClearSkies, castform, bulbasaur, GetMove(MovePound))
+			fogAccuracy := CalcAccuracy(WeatherFog, castform, bulbasaur, GetMove(MovePound))
+			Expect(fogAccuracy).To(BeNumerically("<", baseAccuracy))
 			b.Weather = WeatherFog
 			b.metadata[MetaWeatherTurns] = 5
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			// TODO: Accuracy decreases from fog
 			// Solar beam weakened
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: bulbasaur,
@@ -1645,6 +1647,21 @@ var _ = Describe("Misc/held items", func() {
 				Damage: 16,
 			}))
 		})
+
+		DescribeTable("Accuracy/evasion items",
+			func(attacking Item, defending Item, op string) {
+				b, holder := setup(ItemNone, PkmnSnorlax)
+				opponent := b.getPokemonInBattle(0, 0)
+				base := CalcAccuracy(b.Weather, holder, opponent, GetMove(MovePound))
+				holder.HeldItem = attacking
+				opponent.HeldItem = defending
+				new := CalcAccuracy(b.Weather, holder, opponent, GetMove(MovePound))
+				Expect(new).To(BeNumerically(op, base))
+			},
+			Entry("Wide Lens", ItemWideLens, ItemNone, ">"),
+			Entry("Bright Powder", ItemNone, ItemBrightPowder, "<"),
+			Entry("Lax Incense", ItemNone, ItemLaxIncense, "<"),
+		)
 
 		DescribeTable("Status curing held items",
 			func(item Item, status StatusCondition) {
