@@ -1809,11 +1809,11 @@ var _ = Describe("Draining moves", func() {
 					partySlot: 0,
 					Team:      1,
 				},
-				Damage: 62,
+				Damage: 61,
 			},
 			HealTransaction{
 				Target: b.getPokemonInBattle(0, 0),
-				Amount: 31,
+				Amount: 30,
 			},
 		))
 	})
@@ -1831,11 +1831,11 @@ var _ = Describe("Draining moves", func() {
 					partySlot: 0,
 					Team:      1,
 				},
-				Damage: 62,
+				Damage: 61,
 			},
 			HealTransaction{
 				Target: b.getPokemonInBattle(0, 0),
-				Amount: 40,
+				Amount: 39,
 			},
 		))
 	})
