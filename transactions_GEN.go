@@ -70,15 +70,15 @@ func (t PPTransaction) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func (t SwapItemTransaction) MarshalJSON() ([]byte, error) {
-	type alias SwapItemTransaction
+func (t GiveItemTransaction) MarshalJSON() ([]byte, error) {
+	type alias GiveItemTransaction
 	return json.Marshal(&struct {
 		Type int    `json:"type"`
 		Name string `json:"name"`
 		Args *alias `json:"args"`
 	}{
 		Type: 5,
-		Name: "SwapItemTransaction",
+		Name: "GiveItemTransaction",
 		Args: (*alias)(&t),
 	})
 }

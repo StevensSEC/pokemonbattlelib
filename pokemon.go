@@ -314,13 +314,11 @@ func (p *Pokemon) SpecialDefense() uint {
 
 func (p *Pokemon) Speed() uint {
 	effective := p.Stats[StatSpeed]
-	if p.HeldItem != ItemNone {
-		switch p.HeldItem {
-		case ItemIronBall:
-			effective /= 2
-		case ItemChoiceScarf:
-			effective = (effective * 150) / 100
-		}
+	switch p.HeldItem {
+	case ItemIronBall:
+		effective /= 2
+	case ItemChoiceScarf:
+		effective = (effective * 150) / 100
 	}
 	return effective
 }

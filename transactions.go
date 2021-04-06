@@ -241,12 +241,12 @@ func (t PPTransaction) Mutate(b *Battle) {
 }
 
 // A transaction to change the held item of a Pokemon
-type SwapItemTransaction struct {
+type GiveItemTransaction struct {
 	Target *Pokemon
 	Item   Item
 }
 
-func (t SwapItemTransaction) Mutate(b *Battle) {
+func (t GiveItemTransaction) Mutate(b *Battle) {
 	t.Target.HeldItem = t.Item
 }
 

@@ -1604,11 +1604,11 @@ var _ = Describe("Misc/held items", func() {
 					},
 					Damage: attacker.MaxHP() / 8,
 				},
-				SwapItemTransaction{
+				GiveItemTransaction{
 					Target: attacker,
 					Item:   ItemStickyBarb,
 				},
-				SwapItemTransaction{
+				GiveItemTransaction{
 					Target: holder,
 					Item:   ItemNone,
 				},

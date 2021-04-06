@@ -394,11 +394,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						})
 						if move.Flags()&FlagContact != 0 && user.HeldItem == ItemNone {
 							b.QueueTransaction(
-								SwapItemTransaction{
+								GiveItemTransaction{
 									Target: user,
 									Item:   receiver.HeldItem,
 								},
-								SwapItemTransaction{
+								GiveItemTransaction{
 									Target: receiver,
 									Item:   ItemNone,
 								},
