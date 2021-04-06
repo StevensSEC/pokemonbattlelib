@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -40,15 +41,18 @@ var _ = Describe("Pokemon generation", func() {
 	})
 
 	It("generates a Pokemon with a given Nature", func() {
-		p := GeneratePokemon(PkmnPiplup, WithNature(GetNature(NatureAdamant)))
-		Expect(p.Nature).To(Equal(GetNature(NatureAdamant)))
+		p := GeneratePokemon(PkmnPiplup, WithNature(NatureAdamant))
+		Expect(p.Nature).To(Equal(NatureAdamant))
+	})
+
+	It("generates a Pokemon with a given Ability", func() {
+		p := GeneratePokemon(PkmnPiplup, WithAbility(AbilityBadDreams))
+		Expect(p.Ability).To(Equal(AbilityBadDreams))
 	})
 
 	It("generates a Pokemon with a given moveset", func() {
-		pound := GetMove(MovePound)
-		pursuit := GetMove(MovePursuit)
-		pkmn := GeneratePokemon(PkmnPiplup, WithMoves(pound, pursuit))
-		Expect(pkmn.Moves).To(BeEquivalentTo([MaxMoves]*Move{pound, pursuit, nil, nil}))
+		pkmn := GeneratePokemon(PkmnPiplup, WithMoves(MovePound, MovePursuit))
+		Expect(pkmn.Moves).To(BeEquivalentTo([MaxMoves]*Move{GetMove(MovePound), GetMove(MovePursuit), nil, nil}))
 	})
 
 	It("creates Pokemon with accurate stats reflecting its given values", func() {
@@ -68,22 +72,51 @@ var _ = Describe("Pokemon generation", func() {
 		Expect(func() { p.computeStats() }).To(Panic())
 	})
 
-	It("panics when trying to create a Pokemon out of level bounds", func() {
-		Expect(func() { GeneratePokemon(PkmnStarly, WithLevel(MaxLevel+1)) }).To(Panic())
-		Expect(func() { GeneratePokemon(PkmnStarly, WithLevel(MinLevel-1)) }).To(Panic())
-	})
+	DescribeTable("Panic when given invalid options",
+		func(opts ...GeneratePokemonOption) {
+			Expect(func() { GeneratePokemon(PkmnStarly, opts...) }).To(Panic())
+		},
+		Entry("level too high", WithLevel(MaxLevel+1)),
+		Entry("level too low", WithLevel(MinLevel-1)),
+		Entry("IVs too high", WithIVs([6]uint8{32, 32, 32, 32, 32, 32})),
+		Entry("EVs too high", WithEVs([6]uint8{255, 255, 255, 255, 255, 255})),
+		Entry("too many moves", WithMoves(MoveFly, MoveAerialAce, MoveRoost, MovePeck, MovePound)),
+	)
 
-	It("panics when creating a Pokemon with higher than max IVs", func() {
-		Expect(func() { GeneratePokemon(PkmnStarly, WithIVs([6]uint8{32, 32, 32, 32, 32, 32})) }).To(Panic())
-	})
+	Describe("Validation", func() {
+		It("succeeds when the pokemon has moves", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveThunder))
+			Expect(p.Validate(PkmnRuleSetDefault)).To(Succeed())
+		})
 
-	It("panics when creating a Pokemon with higher than max EVs", func() {
-		Expect(func() { GeneratePokemon(PkmnStarly, WithEVs([6]uint8{255, 255, 255, 255, 255, 255})) }).To(Panic())
-	})
+		It("fails when the pokemon has no moves", func() {
+			p := GeneratePokemon(PkmnPikachu)
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationMissingMoves))
+		})
 
-	It("panics when creating a Pokemon with more than the maximum allowed moves", func() {
-		pound := GetMove(MovePound)
-		Expect(func() { GeneratePokemon(PkmnStarly, WithMoves(pound, pound, pound, pound, pound)) }).To(Panic())
+		It("fails when the pokemon has invalid level", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveThunder))
+			p.Ability = 0
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationMissingAbility))
+		})
+
+		It("fails when the pokemon has invalid level", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveThunder))
+			p.Level = 0
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidLevel))
+		})
+
+		It("fails when the pokemon has invalid IVs", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveThunder))
+			p.IVs[StatHP] = 255
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidIvs))
+		})
+
+		It("fails when the pokemon has invalid EVs", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveThunder))
+			p.EVs[StatHP] = 255
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidEvs))
+		})
 	})
 })
 
@@ -104,22 +137,45 @@ var _ = Describe("Test leveling methods", func() {
 	})
 
 	It("prevents a Pokemon from gaining experience beyond the max", func() {
-		pkmn := GeneratePokemon(PkmnArceus, WithLevel(MaxLevel))
+		pkmn := GeneratePokemon(PkmnPiplup, WithLevel(MaxLevel))
 		pkmn.GainExperience(100000000000)
 		Expect(int(pkmn.Level)).To(Equal(MaxLevel))
 	})
 })
 
-var _ = Describe("Stringer interface", func() {
+var _ = Describe("Pokemon string representation", func() {
 	var (
 		pkmn *Pokemon
 		want string
 	)
 
-	It("prints as expected", func() {
+	It("should show the correct string for Pokemon", func() {
 		pkmn = GeneratePokemon(PkmnBulbasaur, WithLevel(5))
-		pkmn.Gender = GenderFemale
-		want = "Bulbasaur♀\tLv5\nHP: 19/19\n"
+		want = "Bulbasaur"
 		Expect(fmt.Sprintf("%s", pkmn)).To(Equal(want))
+	})
+})
+
+var _ = Describe("Pokemon stat boosts", func() {
+	DescribeTable("crit chance boosting items",
+		func(i Item) {
+			p := GeneratePokemon(PkmnPiplup, WithLevel(5), WithMoves(MoveSplash))
+			p.HeldItem = ItemRazorClaw
+			Expect(p.CritChance()).To(Equal(CritChances[p.StatModifiers[StatCritChance]+1]))
+		},
+		Entry("Razor Claw", ItemRazorClaw),
+		Entry("Scope Lens", ItemScopeLens),
+	)
+})
+
+var _ = Describe("Pokemon Data", func() {
+	It("should work for Bulbasaur", func() {
+		pkmn := GeneratePokemon(PkmnBulbasaur)
+		Expect(pkmn.Data().Name).To(Equal("Bulbasaur"))
+	})
+
+	It("should work for Arceus", func() {
+		pkmn := GeneratePokemon(PkmnArceus)
+		Expect(pkmn.Data().Name).To(Equal("Arceus"))
 	})
 })

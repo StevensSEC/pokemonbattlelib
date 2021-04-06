@@ -9,14 +9,17 @@ var _ = Describe("Party creation", func() {
 	agent := Agent(new(dumbAgent))
 
 	Context("when adding Pokemon to a party", func() {
-		It("panics when adding too many Pokemon to a party", func() {
-			party := NewParty(&agent, 0)
+		It("fails when adding too many Pokemon to a party", func() {
+			party := newBattlePartyOld(&agent, 0)
 			for i := 0; i < MaxPartySize; i += 1 {
-				party.AddPokemon(GeneratePokemon(PkmnBulbasaur))
+				party.AddPokemon(GeneratePokemon(PkmnBulbasaur, WithMoves(MoveTackle)))
 			}
-			Expect(func() {
-				party.AddPokemon(GeneratePokemon(PkmnBulbasaur))
-			}).To(Panic())
+			Expect(party.AddPokemon(GeneratePokemon(PkmnBulbasaur, WithMoves(MoveTackle)))).To(MatchError(ErrorPartyFull))
+		})
+
+		It("fails when adding invalid pokemon to a party", func() {
+			party := newBattlePartyOld(&agent, 0)
+			Expect(party.AddPokemon(GeneratePokemon(PkmnBulbasaur))).To(MatchError(ErrorValidationMissingMoves))
 		})
 	})
 })
@@ -24,11 +27,14 @@ var _ = Describe("Party creation", func() {
 var _ = Describe("Active pokemon", func() {
 	agent := Agent(new(dumbAgent))
 	var (
-		party *party
+		party *battleParty
 	)
 
 	BeforeEach(func() {
-		party = NewOccupiedParty(&agent, 0, GeneratePokemon(PkmnSquirtle), GeneratePokemon(PkmnBlastoise))
+		party = newOccupiedBattleParty(&agent, 0,
+			GeneratePokemon(PkmnSquirtle, defaultMoveOpt),
+			GeneratePokemon(PkmnBlastoise, defaultMoveOpt),
+		)
 	})
 
 	Context("when managing active Pokemon in a party", func() {

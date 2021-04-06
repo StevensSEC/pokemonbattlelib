@@ -25,6 +25,23 @@ const (
 // Table of critical hit chances (denominator of 1/X)
 var CritChances = [5]int{16, 8, 4, 3, 2}
 
+// Table for evasion multiplier
+var EvasionFactor = map[int]uint{
+	-6: 300,
+	-5: 266,
+	-4: 250,
+	-3: 200,
+	-2: 166,
+	-1: 133,
+	0:  100,
+	1:  75,
+	2:  60,
+	3:  50,
+	4:  43,
+	5:  36,
+	6:  33,
+}
+
 // The min and max number of stages that a stat can be modified is [-6, 6]
 const (
 	MaxStatModifier = 6
@@ -75,15 +92,15 @@ var typeStrings = map[Type]string{
 }
 
 // Represents effectiveness of an elemental type matchup.
-type Effectiveness float64
+type Effectiveness int8
 
+const NoEffect Effectiveness = math.MinInt8 + 1 // separate because it fucks up the iota
 const (
-	NoEffect           Effectiveness = 0
-	VeryIneffective    Effectiveness = 0.25
-	Ineffective        Effectiveness = 0.5
-	NormalEffect       Effectiveness = 1
-	SuperEffective     Effectiveness = 2
-	VerySuperEffective Effectiveness = 4
+	VeryIneffective Effectiveness = iota - 2
+	Ineffective
+	NormalEffect
+	SuperEffective
+	VerySuperEffective
 )
 
 var noEffect = map[Type]Type{
@@ -143,14 +160,8 @@ func GetElementalEffect(move, def Type) Effectiveness {
 
 	reduce := bits.OnesCount32(uint32(halfEffect[move] & def))
 	increase := bits.OnesCount32(uint32(doubleEffect[move] & def))
-	effect := (increase - reduce) * 2
-	if effect == 0 {
-		return NormalEffect
-	} else if effect > 0 {
-		return Effectiveness(effect)
-	} else {
-		return Effectiveness(1 / math.Abs(float64(effect)))
-	}
+	effect := increase - reduce
+	return Effectiveness(effect)
 }
 
 func (t Type) String() string {
@@ -294,71 +305,21 @@ func (s StatusCondition) String() string {
 	return strings.Join(result, ", ")
 }
 
-type Ability struct {
-	//TODO
-	ID int // The ID of the ability
-}
+type Ability uint16
 
-type Nature struct {
-	StatUp   int
-	StatDown int
-	name     string
-}
+// Natures can affect a Pokemon's stats, increasing one and decreasing another.
+// *Constants, GetStatModifiers(), and String() are auto-generated.*
+type Nature uint8
 
-// Constants for looking up natures
-const (
-	NatureHardy = iota + 1
-	NatureLonely
-	NatureAdamant
-	NatureNaughty
-	NatureBrave
-	NatureBold
-	NatureDocile
-	NatureImpish
-	NatureLax
-	NatureRelaxed
-	NatureModest
-	NatureMild
-	NatureBashful
-	NatureRash
-	NatureQuiet
-	NatureCalm
-	NatureGentle
-	NatureCareful
-	NatureQuirky
-	NatureSassy
-	NatureTimid
-	NatureHasty
-	NatureJolly
-	NatureNaive
-	NatureSerious
-)
-
-func GetNature(nature int) *Nature {
-	natures := map[int]*Nature{
-		//TODO: add all natures
-		NatureHardy: {
-			StatUp:   StatAtk,
-			StatDown: StatAtk,
-			name:     "Hardy",
-		},
-		NatureAdamant: {
-			StatUp:   StatAtk,
-			StatDown: StatSpAtk,
-			name:     "Adamant",
-		},
-	}
-	return natures[nature]
-}
-
+// Deprecated: getNatureModifers is deprecated. Use Nature.GetStatModifiers() instead.
 func (n Nature) getNatureModifers() [6]float64 {
+	up, down := n.GetStatModifiers()
 	natureModifiers := [6]float64{-1, 1, 1, 1, 1, 1} // hp is not affected by nature
-	natureModifiers[n.StatUp] = 1.1
-	natureModifiers[n.StatDown] = 0.9
 
 	// tried to multiply natureModifiers by both 1.1 and 0.9, caused rounding errors
-	if n.StatUp == n.StatDown {
-		natureModifiers[n.StatUp] = 1
+	if up != down {
+		natureModifiers[up] = 1.1
+		natureModifiers[down] = 0.9
 	}
 
 	return natureModifiers
@@ -374,4 +335,12 @@ const (
 	WeatherSandstorm
 	WeatherHail
 	WeatherFog
+)
+
+type MoveFailReason uint8
+
+const (
+	FailOther MoveFailReason = iota
+	FailMiss
+	FailDodge
 )

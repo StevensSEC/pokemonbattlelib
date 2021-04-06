@@ -1,17 +1,18 @@
 package pokemonbattlelib
 
-import "fmt"
-
 // A Party can use Items in a battle for different effects. A Pokemon can hold one Item.
-type Item struct {
-	ID          int
+type Item uint16
+
+// Represents data associated with an `Item`.
+type ItemData struct {
 	Name        string
 	Category    ItemCategory
 	FlingPower  int
 	FlingEffect FlingEffect
 	Flags       ItemFlags
 }
-type ItemCategory int
+
+type ItemCategory uint8
 
 // Fix: remove unnecessary items
 const (
@@ -64,7 +65,7 @@ const (
 	ItemCategoryZCrystals
 )
 
-type FlingEffect int
+type FlingEffect uint8
 
 const (
 	FlingBadlyPoison FlingEffect = iota + 1
@@ -92,63 +93,16 @@ const (
 	FlagUsableInBattle
 )
 
-// Retrieves an item using its ID
-// Can also use constants like ItemPotion or ItemRevive
+// Retrieves an Item's data.
 // For item effects, see https://github.com/veekun/pokedex/blob/master/pokedex/data/csv/item_prose.csv
-func GetItem(itemID int) Item {
-	for _, item := range AllItems {
-		if item.ID == itemID {
-			return item
-		}
+func (i Item) Data() *ItemData {
+	if int(i) >= len(AllItems)-1 {
+		blog.Panicf("%d is an invalid item", i)
 	}
-	panic(fmt.Sprintf("unknown item with ID %v\n", itemID))
+	if i == ItemNone {
+		return &ItemData{}
+	}
+	return &AllItems[i-1]
 }
 
-// Dispatches the correct item handler based on its category
-func (p *Pokemon) UseItem(i *Item, b *Battle) []Transaction {
-	switch i.Category {
-	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
-		return p.UseMedicine(i)
-	case ItemCategoryBadHeldItems:
-		return p.UseMiscItem(i, b)
-	}
-	return make([]Transaction, 0)
-}
-
-// Uses a medicine item which affects HP and status effects
-func (p *Pokemon) UseMedicine(i *Item) (t []Transaction) {
-	switch i.ID {
-	case ItemPotion:
-		t = append(t, p.RestoreHP(20))
-	}
-	return t
-}
-
-// Uses a miscellaneous item
-// Includes bad held items, choice items, EV training, and more
-func (p *Pokemon) UseMiscItem(i *Item, b *Battle) (t []Transaction) {
-	switch i.ID {
-	case ItemFlameOrb:
-		t = append(t, InflictStatusTransaction{
-			Target:       p,
-			StatusEffect: StatusBurn,
-		})
-	case ItemIronBall:
-		// TODO: set PokemonMeta[MetaIronBall]
-	case ItemStickyBarb:
-		for _, target := range b.GetTargets() {
-			if b.getPokemon(target.party, target.partySlot) == p {
-				t = append(t, DamageTransaction{
-					Target: target,
-					Damage: p.Stats[StatHP] / 8,
-				})
-			}
-		}
-	case ItemToxicOrb:
-		t = append(t, InflictStatusTransaction{
-			Target:       p,
-			StatusEffect: StatusPoison,
-		})
-	}
-	return t
-}
+//go:generate go run ./scripts/getters/gen_getters.go -for Item -data ItemData

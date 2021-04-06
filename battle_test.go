@@ -2,8 +2,11 @@ package pokemonbattlelib
 
 import (
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
+
+var defaultMoveOpt = WithMoves(MovePound)
 
 type dumbAgent struct{}
 
@@ -23,10 +26,9 @@ type healAgent struct{}
 
 // Always uses a potion on first Pokemon
 func (a healAgent) Act(ctx *BattleContext) Turn {
-	item := GetItem(ItemPotion)
 	for _, target := range ctx.Allies {
 		return ItemTurn{
-			Item:   &item,
+			Item:   ItemPotion,
 			Target: target,
 		}
 	}
@@ -50,12 +52,9 @@ var _ = Describe("RC Agent", func() {
 	a2 := newRcAgent()
 	_a1 := Agent(a1)
 	_a2 := Agent(a2)
-	pkmn1 := GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MovePound)))
-	pkmn2 := GeneratePokemon(PkmnSquirtle, WithMoves(GetMove(MovePound)))
-	party1 := NewOccupiedParty(&_a1, 0, pkmn1)
-	party2 := NewOccupiedParty(&_a2, 1, pkmn2)
-	b := NewBattle()
-	b.AddParty(party1, party2)
+	party1 := NewOccupiedParty(GeneratePokemon(PkmnCharmander, WithMoves(MoveSplash)))
+	party2 := NewOccupiedParty(GeneratePokemon(PkmnSquirtle, WithMoves(MoveSplash)))
+	b := NewSingleBattle(party1, &_a1, party2, &_a2)
 	Expect(b.Start()).To(Succeed())
 	a1 <- FightTurn{
 		Move: 0,
@@ -79,47 +78,79 @@ var _ = Describe("Battle initialization", func() {
 
 	Context("when creating a new battle", func() {
 		It("runs without panicking", func() {
-			party1 := NewOccupiedParty(&agent1, 0, GeneratePokemon(PkmnCharmander))
-			party2 := NewOccupiedParty(&agent2, 1, GeneratePokemon(PkmnSquirtle))
-			b := NewBattle()
-			b.AddParty(party1, party2)
+			party1 := NewOccupiedParty(GeneratePokemon(PkmnCharmander, defaultMoveOpt))
+			party2 := NewOccupiedParty(GeneratePokemon(PkmnSquirtle, defaultMoveOpt))
+			b := NewSingleBattle(party1, &agent1, party2, &agent2)
 			b.SetSeed(849823)
 		})
 
 		It("panics when getting an invalid Pokemon", func() {
-			party := NewOccupiedParty(&agent1, 0, GeneratePokemon(PkmnBulbasaur))
+			party := NewOccupiedParty(GeneratePokemon(PkmnBulbasaur, defaultMoveOpt))
 			b := NewBattle()
-			b.AddParty(party)
+			b.AddParty(party, &agent1, 0)
 			Expect(func() {
-				b.getPokemon(1, 5)
+				b.getPokemonInBattle(1, 5)
 			}).To(Panic())
 			Expect(func() {
-				b.getPokemon(0, 5)
+				b.getPokemonInBattle(0, 5)
 			}).To(Panic())
+		})
+	})
+
+	Context("team validation", func() {
+		It("should fail when party has no pokemon", func() {
+			b := NewSingleBattle(
+				NewParty(), &agent1,
+				NewOccupiedParty(GeneratePokemon(PkmnBulbasaur, defaultMoveOpt)), &agent2,
+			)
+			Expect(b.Start()).NotTo(Succeed())
+		})
+
+		It("should fail when both parties are on the same team", func() {
+			b := NewBattle()
+			b.AddParty(NewOccupiedParty(GeneratePokemon(PkmnBulbasaur, defaultMoveOpt)), &agent1, 0)
+			b.AddParty(NewOccupiedParty(GeneratePokemon(PkmnBulbasaur, defaultMoveOpt)), &agent2, 0)
+			Expect(b.Start()).NotTo(Succeed())
 		})
 	})
 })
 
+var _ = Describe("Battle memory management", func() {
+	agent1 := Agent(new(dumbAgent))
+
+	It("should produce transactions that reference the ground truth pointers", func() {
+		party1 := NewOccupiedParty(GeneratePokemon(PkmnCharmander, defaultMoveOpt))
+		party2 := NewOccupiedParty(GeneratePokemon(PkmnSquirtle, defaultMoveOpt))
+		b := NewSingleBattle(party1, &agent1, party2, &agent1)
+		Expect(b.Start()).To(Succeed())
+
+		t, _ := b.SimulateRound()
+		for i := range t {
+			switch tt := t[i].(type) {
+			case DamageTransaction:
+				real := b.getPokemon(tt.Target)
+				Expect(tt.Target.Pokemon).To(BeIdenticalTo(real))
+			}
+		}
+	})
+})
+
 var _ = Describe("One round of battle", func() {
+	//FIXME: this test suite needs to be separated into multiple suites
 	agent1 := Agent(new(dumbAgent))
 	agent2 := Agent(new(dumbAgent))
 
 	var (
-		party1     *party
-		party2     *party
 		battle     *Battle
 		charmander *Pokemon
 		squirtle   *Pokemon
 	)
 
 	BeforeEach(func() {
-		charmander = GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MovePound)))
-		party1 = NewOccupiedParty(&agent1, 0, charmander)
-		squirtle = GeneratePokemon(PkmnSquirtle, WithMoves(GetMove(MovePound)))
-		party2 = NewOccupiedParty(&agent2, 1, squirtle)
-		battle = NewBattle()
-		battle.AddParty(party1, party2)
-		battle.rng = &SimpleRNG
+		charmander = GeneratePokemon(PkmnCharmander, defaultMoveOpt)
+		squirtle = GeneratePokemon(PkmnSquirtle, defaultMoveOpt)
+		battle = New1v1Battle(charmander, &agent1, squirtle, &agent2)
+		battle.rng = SimpleRNG()
 	})
 
 	Context("when simulating a round between two agents", func() {
@@ -133,27 +164,26 @@ var _ = Describe("One round of battle", func() {
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
 			Expect(t).To(HaveLen(2))
-			pound := GetMove(MovePound)
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: charmander,
 				Target: target{
-					Pokemon:   *squirtle,
+					Pokemon:   squirtle,
 					party:     1,
 					partySlot: 0,
 					Team:      1,
 				},
-				Move:   pound,
+				Move:   GetMove(MovePound),
 				Damage: 3,
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: squirtle,
 				Target: target{
-					Pokemon:   *charmander,
+					Pokemon:   charmander,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
 				},
-				Move:   pound,
+				Move:   GetMove(MovePound),
 				Damage: 3,
 			}))
 		})
@@ -161,67 +191,203 @@ var _ = Describe("One round of battle", func() {
 		It("should cause Pokemon to have reduced HP", func() {
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(charmander.CurrentHP < charmander.Stats[StatHP]).To(BeTrue())
-			Expect(squirtle.CurrentHP < squirtle.Stats[StatHP]).To(BeTrue())
+			Expect(charmander.CurrentHP < charmander.MaxHP()).To(BeTrue())
+			Expect(squirtle.CurrentHP < squirtle.MaxHP()).To(BeTrue())
 		})
 	})
 
 	Context("when dealing damage to a Pokemon", func() {
 		It("should account for same-type attack bonus", func() {
-			// TODO: remove when elemental type added
-			charmander.Type = TypeFire
+			charmander = GeneratePokemon(PkmnCharmander, WithMoves(MovePound))
+			bidoof := GeneratePokemon(PkmnBidoof, WithMoves(MoveTackle))
+			battle = New1v1Battle(charmander, &agent1, bidoof, &agent2)
+			battle.rng = SimpleRNG()
+
 			charmander.Moves[0] = GetMove(MoveEmber)
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(6))
-			squirtle.CurrentHP = 100
-			adaptability := Ability{ID: 91}
-			charmander.Ability = &adaptability
+			Expect(bidoof.CurrentHP).To(BeEquivalentTo(8))
+			bidoof.CurrentHP = 100
+			charmander.Ability = AbilityAdaptability
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(93))
+			Expect(bidoof.CurrentHP).To(BeEquivalentTo(94))
+		})
+
+		Context("Type Matchups", func() {
+			var (
+				a1  rcAgent
+				a2  rcAgent
+				_a1 Agent
+				_a2 Agent
+				b   *Battle
+			)
+
+			BeforeEach(func() {
+				a1 = newRcAgent()
+				a2 = newRcAgent()
+				_a1 = Agent(a1)
+				_a2 = Agent(a2)
+				b = NewBattle()
+				b.rng = SimpleRNG()
+			})
+
+			It("should account for supereffective type matchups", func() {
+				pkmn1 := GeneratePokemon(
+					PkmnMightyena,
+					WithIVs([6]uint8{31, 0, 31, 0, 31, 31}),
+					WithMoves(
+						MoveFireFang,
+						MoveTackle,
+					),
+				)
+				pkmn2 := GeneratePokemon(
+					PkmnTurtwig,
+					WithMoves(MoveTackle),
+					WithIVs([6]uint8{31, 31, 31, 31, 31, 0}),
+				)
+				b := New1v1Battle(pkmn1, &_a1, pkmn2, &_a2)
+				b.rng = SimpleRNG()
+				Expect(b.Start()).To(Succeed())
+
+				// TODO: test the difference in damage between the transactions rather than the exact values of the transactions
+				// TODO: make it so that target doesn't need to include `Pokemon` or `Team`
+				a1 <- FightTurn{Move: 1, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
+				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: pkmn1,
+					Target: target{
+						Pokemon:   pkmn2,
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+					},
+					Move:   GetMove(MoveTackle),
+					Damage: 3,
+				}))
+
+				b.QueueTransaction(HealTransaction{
+					Target: pkmn2,
+					Amount: 200,
+				})
+				b.ProcessQueue()
+
+				a1 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
+				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
+				t, _ = b.SimulateRound()
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: pkmn1,
+					Target: target{
+						Pokemon:   pkmn2,
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+					},
+					Move:   GetMove(MoveFireFang),
+					Damage: 8,
+				}))
+			})
+
+			It("should have no effect", func() {
+				pkmn1 := GeneratePokemon(PkmnGastly, WithMoves(MoveShadowBall))
+				pkmn2 := GeneratePokemon(PkmnBidoof, WithMoves(MoveTackle))
+				b := New1v1Battle(pkmn1, &_a1, pkmn2, &_a2)
+				b.rng = SimpleRNG()
+				Expect(b.Start()).To(Succeed())
+
+				// TODO: make it so that target doesn't need to include `Pokemon` or `Team`
+				a1 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
+				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: pkmn1,
+					Target: target{
+						Pokemon:   pkmn2,
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+					},
+					Move:   GetMove(MoveShadowBall),
+					Damage: 0,
+				}))
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: pkmn2,
+					Target: target{
+						Pokemon:   pkmn1,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Move:   GetMove(MoveTackle),
+					Damage: 0,
+				}))
+			})
 		})
 
 		It("should account for critical hits", func() {
-			battle.rng = &AlwaysRNG
+			battle.rng = AlwaysRNG()
 			Expect(battle.Start()).To(Succeed())
 			battle.SimulateRound()
-			Expect(squirtle.CurrentHP).To(BeEquivalentTo(4))
+			Expect(squirtle.CurrentHP).To(BeEquivalentTo(5))
 		})
 
 		It("should miss moves randomly based on accuracy/evasion", func() {
-			battle.rng = &NeverRNG
+			battle.rng = NeverRNG()
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
-			Expect(t).To(HaveTransaction(EvadeTransaction{
-				User: charmander,
+			Expect(t).To(HaveTransaction(MoveFailTransaction{
+				User:   charmander,
+				Reason: FailMiss,
 			}))
-			battle.rng = &SimpleRNG
+			battle.rng = SimpleRNG()
 			t, _ = battle.SimulateRound()
-			Expect(t).ToNot(HaveTransaction(EvadeTransaction{
-				User: charmander,
+			Expect(t).ToNot(HaveTransaction(MoveFailTransaction{
+				User:   charmander,
+				Reason: FailMiss,
 			}))
 		})
 	})
 
 	Context("when certain moves are used in battle", func() {
-		It("should change a Pokemon's stat modifiers", func() {
-			charmander.Moves[0] = GetMove(MoveHowl)
+		DescribeTable("Changing Pokemon stat modifiers",
+			func(id MoveId, stat, stages int) {
+				charmander.Moves[0] = GetMove(id)
+				Expect(battle.Start()).To(Succeed())
+				t, _ := battle.SimulateRound()
+				Expect(t).To(HaveTransaction(ModifyStatTransaction{
+					Target: charmander,
+					Stat:   stat,
+					Stages: stages,
+				}))
+				// Bound by min/max stat modifier
+				charmander.StatModifiers[stat] = MaxStatModifier
+				t, _ = battle.SimulateRound()
+				Expect(t).To(HaveTransaction(ModifyStatTransaction{
+					Target: charmander,
+					Stat:   stat,
+					Stages: stages,
+				}))
+				Expect(charmander.StatModifiers[stat]).To(BeEquivalentTo(MaxStatModifier))
+			},
+			Entry("Howl", MoveHowl, StatAtk, +1),
+			Entry("Double Team", MoveDoubleTeam, StatEvasion, +1),
+		)
+
+		It("should change a move's PP", func() {
+			battle.rng = AlwaysRNG()
+			charmander.Moves[0] = GetMove(MoveSpite)
 			Expect(battle.Start()).To(Succeed())
+			battle.SimulateRound() // set Pokemon's last move
+			charmander.CurrentHP = charmander.MaxHP()
+			squirtle.CurrentHP = squirtle.MaxHP()
+			squirtle.Moves[0].CurrentPP = 1
 			t, _ := battle.SimulateRound()
-			Expect(t).To(HaveTransaction(ModifyStatTransaction{
-				Target: charmander,
-				Stat:   StatAtk,
-				Stages: +1,
+			Expect(t).To(HaveTransaction(PPTransaction{
+				Move:   squirtle.Moves[0],
+				Amount: -4,
 			}))
-			// Bound by min/max stat modifier
-			charmander.StatModifiers[StatAtk] = MaxStatModifier
-			t, _ = battle.SimulateRound()
-			Expect(t).To(HaveTransaction(ModifyStatTransaction{
-				Target: charmander,
-				Stat:   StatAtk,
-				Stages: +1,
-			}))
-			Expect(charmander.StatModifiers[StatAtk]).To(BeEquivalentTo(MaxStatModifier))
+			// Ensure that PP stays in bounds
+			Expect(squirtle.Moves[0].CurrentPP).To(BeEquivalentTo(0))
 		})
 	})
 })
@@ -230,28 +396,31 @@ var _ = Describe("Using items in battle", func() {
 	agent := Agent(new(healAgent))
 	var (
 		pkmn   *Pokemon
-		party  *party
+		pkmn2  *Pokemon
 		battle *Battle
 	)
 
 	BeforeEach(func() {
-		pkmn = GeneratePokemon(PkmnVenusaur, WithLevel(50))
+		pkmn = GeneratePokemon(PkmnVenusaur, WithLevel(50), defaultMoveOpt)
 		pkmn.CurrentHP = 10
-		party = NewOccupiedParty(&agent, 0, pkmn)
-		battle = NewBattle()
-		battle.AddParty(party)
+		pkmn2 = GeneratePokemon(PkmnWartortle, WithLevel(50), defaultMoveOpt)
+		battle = New1v1Battle(pkmn, &agent, pkmn2, &agent)
 	})
 
 	Context("when the battle processes item turns", func() {
 		It("should create ItemTransaction(s) properly", func() {
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
-			potion := GetItem(ItemPotion)
 			Expect(t).To(HaveTransaction(
 				ItemTransaction{
-					Target: pkmn,
-					Item:   &potion,
-					Move:   nil,
+					Target: target{
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+						Pokemon:   pkmn,
+					},
+					Item: ItemPotion,
+					Move: nil,
 				},
 			))
 		})
@@ -268,25 +437,22 @@ var _ = Describe("Getting pokemon from parties", func() {
 	agent1 := Agent(new(dumbAgent))
 	agent2 := Agent(new(dumbAgent))
 	var (
-		party1 *party
-		party2 *party
 		battle *Battle
 	)
 
 	BeforeEach(func() {
-		party1 = NewOccupiedParty(&agent1, 0,
-			GeneratePokemon(PkmnCharmander),
-			GeneratePokemon(PkmnSquirtle),
-			GeneratePokemon(PkmnMetapod),
+		party1 := NewOccupiedParty(
+			GeneratePokemon(PkmnCharmander, defaultMoveOpt),
+			GeneratePokemon(PkmnSquirtle, defaultMoveOpt),
+			GeneratePokemon(PkmnMetapod, defaultMoveOpt),
 		)
-		party2 = NewOccupiedParty(&agent2, 1, GeneratePokemon(PkmnBeedrill))
-		battle = NewBattle()
-		battle.AddParty(party1, party2)
+		party2 := NewOccupiedParty(GeneratePokemon(PkmnBeedrill, defaultMoveOpt))
+		battle = NewSingleBattle(party1, &agent1, party2, &agent2)
 	})
 
 	Context("when getting Pokemon by party/slot", func() {
 		It("should get the Pokemon the user expects", func() {
-			pkmn := battle.getPokemon(0, 1)
+			pkmn := battle.getPokemonInBattle(0, 1)
 			Expect(pkmn.NatDex).To(BeEquivalentTo(PkmnSquirtle))
 		})
 	})
@@ -294,7 +460,7 @@ var _ = Describe("Getting pokemon from parties", func() {
 	Context("when getting ally Pokemon", func() {
 		It("should return targets whose team matches the passed party", func() {
 			Expect(battle.Start()).To(Succeed())
-			for _, party := range []*party{party1, party2} {
+			for _, party := range battle.parties {
 				allies := battle.GetAllies(party)
 				Expect(allies).To(HaveLen(1))
 			}
@@ -304,7 +470,7 @@ var _ = Describe("Getting pokemon from parties", func() {
 	Context("when getting opponent Pokemon", func() {
 		It("should return targets whose team does not match the passed party ", func() {
 			Expect(battle.Start()).To(Succeed())
-			for _, party := range []*party{party1, party2} {
+			for _, party := range battle.parties {
 				opponents := battle.GetOpponents(party)
 				Expect(opponents).To(HaveLen(1))
 			}
@@ -317,24 +483,20 @@ var _ = Describe("Turn priority", func() {
 	a2 := Agent(new(dumbAgent))
 
 	Context("each turn type should have a priority level", func() {
-		It("should have a priority of 0 for FightTurn", func() {
-			turn := FightTurn{}
-			Expect(turn.Priority()).To(Equal(0))
-		})
-
-		It("should have a priority of 1 for ItemTurn", func() {
-			turn := ItemTurn{}
-			Expect(turn.Priority()).To(Equal(1))
-		})
+		DescribeTable("Turn priority",
+			func(turn Turn, want int) {
+				Expect(turn.Priority()).To(Equal(want))
+			},
+			Entry("FightTurn", FightTurn{}, 0),
+			Entry("ItemTurn", ItemTurn{}, 1),
+		)
 
 		It("should order turns properly based on priority", func() {
 			a2 := Agent(new(healAgent))
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MovePound)))
-			charmander := GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MovePound)))
-			p1 := NewOccupiedParty(&a1, 0, bulbasaur)
-			p2 := NewOccupiedParty(&a2, 1, charmander)
-			b := NewBattle()
-			b.AddParty(p1, p2)
+			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(MovePound))
+			charmander := GeneratePokemon(PkmnCharmander, WithMoves(MovePound))
+			b := New1v1Battle(bulbasaur, &a1, charmander, &a2)
+			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
@@ -345,7 +507,7 @@ var _ = Describe("Turn priority", func() {
 				DamageTransaction{
 					User: bulbasaur,
 					Target: target{
-						Pokemon:   *charmander,
+						Pokemon:   charmander,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -359,23 +521,19 @@ var _ = Describe("Turn priority", func() {
 
 	Context("when determining priority for equal turn types", func() {
 		It("should handle moves with higher priority first", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(5), WithMoves(GetMove(MovePound)))
+			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(5), WithMoves(MovePound))
 			p1.Stats[StatSpeed] = 100
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(5), WithMoves(GetMove(MoveFakeOut)))
+			p2 := GeneratePokemon(PkmnCharmander, WithLevel(5), WithMoves(MoveFakeOut))
 			p2.Stats[StatSpeed] = 10
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.rng = &SimpleRNG
+			b := New1v1Battle(p1, &a1, p2, &a2)
+			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(2))
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
 					User: p2,
 					Target: target{
-						Pokemon:   *p1,
+						Pokemon:   p1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -386,7 +544,7 @@ var _ = Describe("Turn priority", func() {
 				DamageTransaction{
 					User: p1,
 					Target: target{
-						Pokemon:   *p2,
+						Pokemon:   p2,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -398,37 +556,33 @@ var _ = Describe("Turn priority", func() {
 		})
 
 		It("should handle faster Pokemon first", func() {
-			pound := GetMove(MovePound)
-			charmander := GeneratePokemon(PkmnCharmander, WithMoves(pound))
-			ninjask := GeneratePokemon(PkmnNinjask, WithMoves(pound))
-			p1 := NewOccupiedParty(&a1, 0, charmander)
-			p2 := NewOccupiedParty(&a2, 1, ninjask) // ninjask is faster than charmander
-			b := NewBattle()
-			b.AddParty(p1, p2)
-			b.rng = &SimpleRNG
+			charmander := GeneratePokemon(PkmnCharmander, defaultMoveOpt)
+			ninjask := GeneratePokemon(PkmnNinjask, defaultMoveOpt) // ninjask is faster than charmander
+			b := New1v1Battle(charmander, &a1, ninjask, &a2)
+			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
 					User: ninjask,
 					Target: target{
-						Pokemon:   *charmander,
+						Pokemon:   charmander,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
 					},
-					Move:   pound,
+					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
 				DamageTransaction{
 					User: charmander,
 					Target: target{
-						Pokemon:   *ninjask,
+						Pokemon:   ninjask,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
 					},
-					Move:   pound,
+					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
 			))
@@ -439,27 +593,15 @@ var _ = Describe("Turn priority", func() {
 var _ = Describe("Weather", func() {
 	a1 := Agent(new(dumbAgent))
 	a2 := Agent(new(dumbAgent))
-	var (
-		p1 *party
-		p2 *party
-		b  *Battle
-	)
-
-	BeforeEach(func() {
-		p1 = NewParty(&a1, 0)
-		p2 = NewParty(&a2, 1)
-		b = NewBattle()
-		b.AddParty(p1, p2)
-		b.rng = &SimpleRNG
-	})
 
 	Context("when using certain moves/certain abilities cause weather", func() {
 		// TODO: https://bulbapedia.bulbagarden.net/wiki/Weather#Causing_weather
 		It("should clear fog when using MoveDefog", func() {
-			poke1 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveDefog)))
-			poke2 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MovePound)))
-			p1.AddPokemon(poke1)
-			p2.AddPokemon(poke2)
+			b := New1v1Battle(
+				GeneratePokemon(PkmnBulbasaur, WithMoves(MoveDefog)), &a1,
+				GeneratePokemon(PkmnMagikarp, WithMoves(MoveSplash)), &a2,
+			)
+			b.rng = SimpleRNG()
 			b.Weather = WeatherFog
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
@@ -467,165 +609,329 @@ var _ = Describe("Weather", func() {
 				Weather: WeatherClearSkies,
 			}))
 		})
+
+		It("should cause harsh sunlight", func() {
+			b := New1v1Battle(
+				GeneratePokemon(PkmnCharmander, WithMoves(MoveSunnyDay)), &a1,
+				GeneratePokemon(PkmnMagikarp, WithMoves(MoveSplash)), &a2,
+			)
+			b.rng = SimpleRNG()
+			Expect(b.Start()).To(Succeed())
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(WeatherTransaction{
+				Weather: WeatherHarshSunlight,
+				Turns:   5,
+			}))
+			Expect(b.metadata[MetaWeatherTurns]).To(Equal(4))
+		})
 	})
 
 	Context("when weather is present, battles are affected", func() {
-		ember := GetMove(MoveEmber)
-		bubble := GetMove(MoveBubble)
-		tackle := GetMove(MoveTackle)
 		solarBeam := GetMove(MoveSolarBeam)
 		weatherBall := GetMove(MoveWeatherBall)
 		moonlight := GetMove(MoveMoonlight)
-		It("should affect fire/water attacks during harsh sunlight", func() {
-			charmander := GeneratePokemon(PkmnCharmander, WithLevel(100), WithMoves(ember))
-			squirtle := GeneratePokemon(PkmnSquirtle, WithLevel(100), WithMoves(bubble))
-			p1.AddPokemon(charmander)
-			p2.AddPokemon(squirtle)
-			b.Weather = WeatherHarshSunlight
+		It("should use metadata to track weather and clear weather over time", func() {
+			b := New1v1Battle(
+				GeneratePokemon(PkmnCharmander, WithMoves(MoveSunnyDay)), &a1,
+				GeneratePokemon(PkmnMagikarp, WithMoves(MoveSplash)), &a2,
+			)
+			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
-			transactions, _ := b.SimulateRound()
-			// Fire boosted
-			Expect(transactions).To(HaveTransaction(
-				DamageTransaction{
-					User: charmander,
-					Target: target{
-						Pokemon:   *squirtle,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
+			b.SimulateRound()
+			Expect(b.metadata[MetaWeatherTurns]).To(Equal(4))
+			Expect(b.Weather).ToNot(Equal(WeatherFog))
+			b.getPokemonInBattle(0, 0).Moves[0] = GetMove(MoveSplash)
+			b.SimulateRound()
+			Expect(b.metadata[MetaWeatherTurns]).To(Equal(3))
+			b.metadata[MetaWeatherTurns] = 0
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(WeatherTransaction{
+				Weather: WeatherClearSkies,
+			}))
+		})
+
+		When("harsh sunlight", func() {
+			It("should boost fire type moves", func() {
+				// intentional non water type pokemon, intentional no supereffective type matchup
+				machamp := GeneratePokemon(PkmnMachamp, WithLevel(100), WithMoves(MoveFlamethrower))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(MoveTackle))
+				b := New1v1Battle(machamp, &a1, bidoof, &a2)
+				b.rng = SimpleRNG()
+				b.Weather = WeatherHarshSunlight
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(
+					DamageTransaction{
+						User: machamp,
+						Target: target{
+							Pokemon:   bidoof,
+							party:     1,
+							partySlot: 0,
+							Team:      1,
+						},
+						Damage: 183,
 					},
-					Move:   ember,
-					Damage: 50,
-				},
-			))
-			// Water weakened
-			Expect(transactions).To(HaveTransaction(
-				DamageTransaction{
-					User: squirtle,
+				))
+			})
+
+			It("should weaken water type moves", func() {
+				// intentional non water type pokemon, intentional no supereffective type matchup
+				lileep := GeneratePokemon(PkmnLileep, WithLevel(100), WithMoves(MoveBrine))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(MoveTackle))
+				b := New1v1Battle(lileep, &a1, bidoof, &a2)
+				b.rng = SimpleRNG()
+				b.Weather = WeatherHarshSunlight
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(
+					DamageTransaction{
+						User: lileep,
+						Target: target{
+							Pokemon:   bidoof,
+							party:     1,
+							partySlot: 0,
+							Team:      1,
+						},
+						Damage: 41,
+					},
+				))
+			})
+		})
+
+		When("raining", func() {
+			It("should affect fire type moves", func() {
+				// intentional non water type pokemon, intentional no supereffective type matchup
+				machamp := GeneratePokemon(PkmnMachamp, WithLevel(100), WithMoves(MoveFlamethrower))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(MoveTackle))
+				b := New1v1Battle(machamp, &a1, bidoof, &a2)
+				b.rng = SimpleRNG()
+				b.Weather = WeatherRain
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+				// Fire weakened
+				Expect(t).To(HaveTransaction(
+					DamageTransaction{
+						User: machamp,
+						Target: target{
+							Pokemon:   bidoof,
+							party:     1,
+							partySlot: 0,
+							Team:      1,
+						},
+						Damage: 61,
+					},
+				))
+			})
+
+			It("should affect water type moves", func() {
+				// intentional non water type pokemon, intentional no supereffective type matchup
+				lileep := GeneratePokemon(PkmnLileep, WithLevel(100), WithMoves(MoveBrine))
+				bidoof := GeneratePokemon(PkmnBidoof, WithLevel(100), WithMoves(MoveTackle))
+				b := New1v1Battle(lileep, &a1, bidoof, &a2)
+				b.rng = SimpleRNG()
+				b.Weather = WeatherRain
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+				// Water boosted
+				Expect(t).To(HaveTransaction(
+					DamageTransaction{
+						User: lileep,
+						Target: target{
+							Pokemon:   bidoof,
+							party:     1,
+							partySlot: 0,
+							Team:      1,
+						},
+						Damage: 124,
+					},
+				))
+			})
+		})
+
+		// sandstorm tests and hailing tests could be tablized
+		When("sandstorm", func() {
+			It("should weaken solar beam", func() {
+				bidoof := GeneratePokemon(PkmnBidoof,
+					WithLevel(5),
+					WithIVs([6]uint8{31, 0, 31, 0, 31, 0}),
+					WithEVs([6]uint8{200, 0, 31, 0, 31, 0}),
+					WithMoves(MoveTackle),
+				)
+				bulbasaur := GeneratePokemon(PkmnBulbasaur,
+					WithLevel(5),
+					WithIVs([6]uint8{31, 0, 31, 0, 31, 0}),
+					WithEVs([6]uint8{200, 0, 31, 0, 31, 0}),
+					WithMoves(MoveSolarBeam),
+				)
+				b := New1v1Battle(bidoof, &a1, bulbasaur, &a2)
+				b.rng = SimpleRNG()
+				Expect(b.Start()).To(Succeed())
+
+				// TODO: compare doing solar beam WITH sandstorm deals less damage than WITHOUT sandstorm.
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: bulbasaur,
 					Target: target{
-						Pokemon:   *charmander,
+						Pokemon:   bidoof,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
 					},
-					Move:   bubble,
-					Damage: 17,
-				},
-			))
-		})
-		It("should affect fire/water attacks during rain", func() {
-			charmander := GeneratePokemon(PkmnCharmander, WithLevel(100), WithMoves(ember))
-			squirtle := GeneratePokemon(PkmnSquirtle, WithLevel(100), WithMoves(bubble))
-			p1.AddPokemon(charmander)
-			p2.AddPokemon(squirtle)
-			b.Weather = WeatherRain
-			Expect(b.Start()).To(Succeed())
-			transactions, _ := b.SimulateRound()
-			// Fire weakened
-			Expect(transactions).To(HaveTransaction(
-				DamageTransaction{
-					User: charmander,
-					Target: target{
-						Pokemon:   *squirtle,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
+					Move:   solarBeam,
+					Damage: 18,
+				}))
+
+				Expect(t).ToNot(HaveTransaction(FaintTransaction{}))
+
+				b.QueueTransaction(
+					WeatherTransaction{
+						Weather: WeatherSandstorm,
+						Turns:   5,
 					},
-					Move:   ember,
-					Damage: 16,
-				},
-			))
-			// Water boosted
-			Expect(transactions).To(HaveTransaction(
-				DamageTransaction{
-					User: squirtle,
+					HealTransaction{
+						Target: b.getPokemonInBattle(0, 0),
+						Amount: 100,
+					},
+					HealTransaction{
+						Target: b.getPokemonInBattle(1, 0),
+						Amount: 100,
+					},
+				)
+				b.ProcessQueue()
+
+				t, _ = b.SimulateRound()
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: bulbasaur,
 					Target: target{
-						Pokemon:   *charmander,
+						Pokemon:   bidoof,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
 					},
-					Move:   bubble,
-					Damage: 53,
-				},
-			))
+					Move:   solarBeam,
+					Damage: 10,
+				}))
+			})
+
+			It("should cause sandstorm damage", func() {
+				bidoof := GeneratePokemon(PkmnBidoof, WithMoves(MoveTackle))
+				bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSolarBeam))
+				b := New1v1Battle(bidoof, &a1, bulbasaur, &a2)
+				b.rng = SimpleRNG()
+				b.Weather = WeatherHail
+				b.metadata[MetaWeatherTurns] = 5
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: nil,
+					Target: target{
+						Pokemon:   bulbasaur,
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+					},
+					Move:   nil,
+					Damage: 0,
+				}))
+			})
 		})
-		It("should damage/cause side effects during sandstorm", func() {
-			geodude := GeneratePokemon(PkmnGeodude, WithLevel(50), WithMoves(tackle))
-			geodude.Type = TypeRock | TypeGround
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithLevel(50), WithMoves(solarBeam))
-			p1.AddPokemon(geodude)
-			p2.AddPokemon(bulbasaur)
-			b.Weather = WeatherSandstorm
-			Expect(b.Start()).To(Succeed())
-			transactions, _ := b.SimulateRound()
-			Expect(transactions).To(HaveLen(3))
-			// Weaken solar beam, SPDEF of rock type
-			Expect(transactions).To(HaveTransaction(DamageTransaction{
-				User: bulbasaur,
-				Target: target{
-					Pokemon:   *geodude,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
-				Move:   solarBeam,
-				Damage: 37,
-			}))
-			// Damage from sandstorm
-			Expect(transactions).To(HaveTransaction(DamageTransaction{
-				User: nil,
-				Target: target{
-					Pokemon:   *bulbasaur,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
-				Move:   nil,
-				Damage: 6,
-			}))
+
+		When("hailing", func() {
+			It("should weaken solar beam", func() {
+				bidoof := GeneratePokemon(PkmnBidoof,
+					WithLevel(5),
+					WithIVs([6]uint8{31, 0, 31, 0, 31, 0}),
+					WithEVs([6]uint8{200, 0, 31, 0, 31, 0}),
+					WithMoves(MoveTackle),
+				)
+				bulbasaur := GeneratePokemon(PkmnBulbasaur,
+					WithLevel(5),
+					WithIVs([6]uint8{31, 0, 31, 0, 31, 0}),
+					WithEVs([6]uint8{200, 0, 31, 0, 31, 0}),
+					WithMoves(MoveSolarBeam),
+				)
+				b := New1v1Battle(bidoof, &a1, bulbasaur, &a2)
+				b.rng = SimpleRNG()
+				Expect(b.Start()).To(Succeed())
+
+				// TODO: compare doing solar beam WITH hail deals less damage than WITHOUT hail.
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: bulbasaur,
+					Target: target{
+						Pokemon:   bidoof,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Move:   solarBeam,
+					Damage: 18,
+				}))
+
+				Expect(t).ToNot(HaveTransaction(FaintTransaction{}))
+
+				b.QueueTransaction(
+					WeatherTransaction{
+						Weather: WeatherHail,
+						Turns:   5,
+					},
+					HealTransaction{
+						Target: b.getPokemonInBattle(0, 0),
+						Amount: 100,
+					},
+					HealTransaction{
+						Target: b.getPokemonInBattle(1, 0),
+						Amount: 100,
+					},
+				)
+				b.ProcessQueue()
+
+				t, _ = b.SimulateRound()
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: bulbasaur,
+					Target: target{
+						Pokemon:   bidoof,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Move:   solarBeam,
+					Damage: 10,
+				}))
+			})
+
+			It("should cause hail damage", func() {
+				bidoof := GeneratePokemon(PkmnBidoof, WithMoves(MoveTackle))
+				bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSolarBeam))
+				b := New1v1Battle(bidoof, &a1, bulbasaur, &a2)
+				b.rng = SimpleRNG()
+				b.Weather = WeatherHail
+				b.metadata[MetaWeatherTurns] = 5
+				Expect(b.Start()).To(Succeed())
+				t, _ := b.SimulateRound()
+
+				Expect(t).To(HaveTransaction(DamageTransaction{
+					User: nil,
+					Target: target{
+						Pokemon:   bulbasaur,
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+					},
+					Move:   nil,
+					Damage: 0,
+				}))
+			})
 		})
-		It("should damage/cause side effects during hail", func() {
-			articuno := GeneratePokemon(PkmnArticuno, WithMoves(tackle))
-			articuno.Type = TypeIce
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(solarBeam))
-			p1.AddPokemon(articuno)
-			p2.AddPokemon(bulbasaur)
-			b.Weather = WeatherHail
-			Expect(b.Start()).To(Succeed())
-			transactions, _ := b.SimulateRound()
-			Expect(transactions).To(HaveLen(3))
-			// Weaken solar beam
-			Expect(transactions).To(HaveTransaction(DamageTransaction{
-				User: bulbasaur,
-				Target: target{
-					Pokemon:   *articuno,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
-				Move:   solarBeam,
-				Damage: 4,
-			}))
-			// Damage from hail
-			Expect(transactions).To(HaveTransaction(DamageTransaction{
-				User: nil,
-				Target: target{
-					Pokemon:   *bulbasaur,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
-				Move:   nil,
-				Damage: 0,
-			}))
-		})
+
 		It("should cause side effects during fog", func() {
-			castform := GeneratePokemon(PkmnCastform, WithLevel(50), WithMoves(weatherBall))
-			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithLevel(50), WithMoves(solarBeam))
-			p1.AddPokemon(castform)
-			p2.AddPokemon(bulbasaur)
+			castform := GeneratePokemon(PkmnCastform, WithLevel(10), WithMoves(MoveWeatherBall))
+			bulbasaur := GeneratePokemon(PkmnBulbasaur, WithLevel(10), WithMoves(MoveSolarBeam))
+			b := New1v1Battle(castform, &a1, bulbasaur, &a2)
+			b.rng = SimpleRNG()
 			b.Weather = WeatherFog
+			b.metadata[MetaWeatherTurns] = 5
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			// TODO: Accuracy decreases from fog
@@ -633,31 +939,32 @@ var _ = Describe("Weather", func() {
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: bulbasaur,
 				Target: target{
-					Pokemon:   *castform,
+					Pokemon:   castform,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
 				},
 				Move:   solarBeam,
-				Damage: 26,
+				Damage: 12,
 			}))
 			bulbasaur.Moves[0] = moonlight
+			bulbasaur.CurrentHP = bulbasaur.MaxHP()
 			t, _ = b.SimulateRound()
-			// Moonlight heals 1/4 max HP
+			// Moonlight heals 1/4 max HP, weather ball boosted
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: castform,
 				Target: target{
-					Pokemon:   *bulbasaur,
+					Pokemon:   bulbasaur,
 					party:     1,
 					partySlot: 0,
 					Team:      1,
 				},
 				Move:   weatherBall,
-				Damage: 49,
+				Damage: 21,
 			}))
 			Expect(t).To(HaveTransaction(HealTransaction{
 				Target: bulbasaur,
-				Amount: 26,
+				Amount: 7,
 			}))
 		})
 	})
@@ -667,29 +974,27 @@ var _ = Describe("Fainting", func() {
 	a1 := Agent(new(dumbAgent))
 	a2 := Agent(new(dumbAgent))
 	var (
-		p1 *party
-		p2 *party
+		p1 *Party
+		p2 *Party
 		b  *Battle
 	)
 
 	BeforeEach(func() {
-		scary_monster := GeneratePokemon(PkmnSquirtle, WithLevel(100), WithMoves(GetMove(MovePound)))
+		scary_monster := GeneratePokemon(PkmnSquirtle, WithLevel(100), WithMoves(MovePound))
 		scary_monster.Stats[StatSpeed] = 1
-		p1 = NewOccupiedParty(&a1, 0,
-			GeneratePokemon(PkmnCharmander, WithMoves(GetMove(MovePound))),
-			GeneratePokemon(PkmnTurtwig, WithMoves(GetMove(MovePound))),
+		p1 = NewOccupiedParty(
+			GeneratePokemon(PkmnCharmander, WithMoves(MovePound)),
+			GeneratePokemon(PkmnTurtwig, WithMoves(MovePound)),
 		)
-		p2 = NewOccupiedParty(&a2, 1, scary_monster)
-		b = NewBattle()
-		b.AddParty(p1, p2)
-		b.rng = &SimpleRNG
+		p2 = NewOccupiedParty(scary_monster) // and nice sprites
+		b = NewSingleBattle(p1, &a1, p2, &a2)
+		b.rng = SimpleRNG()
 	})
 
 	Context("after a Pokemon faints in battle", func() {
 		It("should switch to the next available Pokemon", func() {
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(5))
 			// Charmander smashed his nubby little fist into Squirtle as
 			// hard as he could. Spectators gasped and winced when the
 			// impact created a very audible crack. But it was not
@@ -703,14 +1008,14 @@ var _ = Describe("Fainting", func() {
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
-						Pokemon:   *b.parties[0].pokemon[0],
+						Pokemon:   b.parties[0].pokemon()[0],
 						party:     0,
 						partySlot: 0,
 						Team:      0,
 					},
 				}, SendOutTransaction{
 					Target: target{
-						Pokemon:   *b.parties[0].pokemon[1],
+						Pokemon:   b.parties[0].pokemon()[1],
 						party:     0,
 						partySlot: 1,
 						Team:      0,
@@ -719,25 +1024,23 @@ var _ = Describe("Fainting", func() {
 		})
 
 		It("should not allow fainted Pokemon to take turns", func() {
-			party1 := NewParty(&a1, 0)
-			pkmn1 := GeneratePokemon(PkmnCharmander, WithLevel(3), WithMoves(GetMove(MovePound)))
-			pkmn2 := GeneratePokemon(PkmnSquirtle, WithLevel(10), WithMoves(GetMove(MovePound)))
-			pkmn3 := GeneratePokemon(PkmnTurtwig, WithLevel(3), WithMoves(GetMove(MovePound)))
+			pkmn1 := GeneratePokemon(PkmnCharmander, WithLevel(3), defaultMoveOpt)
+			pkmn2 := GeneratePokemon(PkmnSquirtle, WithLevel(10), defaultMoveOpt)
+			pkmn3 := GeneratePokemon(PkmnTurtwig, WithLevel(3), defaultMoveOpt)
+			party1 := NewOccupiedParty(pkmn1, pkmn3)
 			pkmn1.CurrentHP = 1
 			party1.AddPokemon(pkmn1, pkmn3)
-			party2 := NewParty(&a2, 1)
+			party2 := NewOccupiedParty(pkmn2)
 			pkmn2.Stats[StatSpeed] = 255
 			party2.AddPokemon(pkmn2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
+			b := NewSingleBattle(party1, &a1, party2, &a2)
 			Expect(b.Start()).To(Succeed())
 			t, ended := b.SimulateRound()
 			Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
-			Expect(t).To(HaveLen(4), "Expected 4 transactions to occur")
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
-						Pokemon:   *pkmn1,
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -745,7 +1048,7 @@ var _ = Describe("Fainting", func() {
 				},
 				SendOutTransaction{
 					Target: target{
-						Pokemon:   *pkmn3,
+						Pokemon:   pkmn3,
 						party:     0,
 						partySlot: 1,
 						Team:      0,
@@ -756,7 +1059,7 @@ var _ = Describe("Fainting", func() {
 				DamageTransaction{
 					User: pkmn1,
 					Target: target{
-						Pokemon:   *pkmn2,
+						Pokemon:   pkmn2,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
@@ -766,31 +1069,103 @@ var _ = Describe("Fainting", func() {
 		})
 
 		It("should lose 1 friendship when fainting", func() {
-			dies := GeneratePokemon(PkmnBulbasaur, WithLevel(1), WithMoves(GetMove(MovePound)))
+			dies := GeneratePokemon(PkmnBulbasaur, WithLevel(1), defaultMoveOpt)
 			dies.Friendship = 100
-			p1 := NewOccupiedParty(&a1, 0, dies)
-			p2 := NewOccupiedParty(&a2, 1, GeneratePokemon(PkmnCharmander, WithLevel(25), WithMoves(GetMove(MovePound))))
+			p1 := NewOccupiedParty(dies)
+			p2 := NewOccupiedParty(GeneratePokemon(PkmnCharmander, WithLevel(25), defaultMoveOpt))
 			b = NewBattle()
-			b.AddParty(p1, p2)
+			b.AddParty(p1, &a1, 0)
+			b.AddParty(p2, &a2, 1)
 			Expect(b.Start()).To(Succeed())
 			b.SimulateRound()
 			Expect(dies.Friendship).To(Equal(99))
 		})
 
 		It("should lose 5 or 10 friendship when fainting", func() {
-			dies := GeneratePokemon(PkmnBulbasaur, WithLevel(1), WithMoves(GetMove(MovePound)))
+			dies := GeneratePokemon(PkmnBulbasaur, WithLevel(1), defaultMoveOpt)
 			dies.Friendship = 100
-			dies2 := GeneratePokemon(PkmnBulbasaur, WithLevel(1), WithMoves(GetMove(MovePound)))
+			dies2 := GeneratePokemon(PkmnBulbasaur, WithLevel(1), defaultMoveOpt)
 			dies2.Friendship = 200
-			p1 := NewOccupiedParty(&a1, 0, dies, dies2)
-			p2 := NewOccupiedParty(&a2, 1, GeneratePokemon(PkmnCharmander, WithLevel(100), WithMoves(GetMove(MovePound))))
-			b = NewBattle()
-			b.AddParty(p1, p2)
+			p1 := NewOccupiedParty(dies, dies2)
+			p2 := NewOccupiedParty(GeneratePokemon(PkmnCharmander, WithLevel(100), defaultMoveOpt))
+			b = NewSingleBattle(p1, &a1, p2, &a2)
 			Expect(b.Start()).To(Succeed())
 			b.SimulateRound()
 			Expect(dies.Friendship).To(Equal(95))
 			b.SimulateRound()
 			Expect(dies2.Friendship).To(Equal(190))
+		})
+
+		It("should gain EVs when defeating Pokemon", func() {
+			winner := GeneratePokemon(PkmnBulbasaur, WithLevel(100), defaultMoveOpt)
+			loser := GeneratePokemon(PkmnBulbasaur, defaultMoveOpt)
+			p1 = NewOccupiedParty(winner)
+			p2 = NewOccupiedParty(loser)
+			b = NewSingleBattle(p1, &a1, p2, &a2)
+			Expect(b.Start()).To(Succeed())
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(
+				EVTransaction{
+					Target: winner,
+					Stat:   StatSpAtk,
+					Amount: 1,
+				},
+			))
+		})
+	})
+
+	When("holding Focus Sash", func() {
+		setup := func() *Battle {
+			holder := GeneratePokemon(PkmnMachoke, WithLevel(26), WithMoves(MoveSplash))
+			holder.CurrentHP = 4
+			holder.HeldItem = ItemFocusSash
+			b = New1v1Battle(holder, &a1, GeneratePokemon(PkmnGrotle, WithLevel(30), WithMoves(MoveRazorLeaf)), &a2)
+			b.rng = SimpleRNG()
+			Expect(b.Start()).To(Succeed())
+			return b
+		}
+
+		It("should not let the holder die", func() {
+			b := setup()
+			t, _ := b.SimulateRound()
+			holderTarget := target{
+				Pokemon:   b.getPokemonInBattle(0, 0),
+				party:     0,
+				partySlot: 0,
+				Team:      0,
+			}
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User:   b.getPokemonInBattle(1, 0),
+				Target: holderTarget,
+			}))
+			Expect(t).ToNot(HaveTransaction(FaintTransaction{
+				Target: holderTarget,
+			}))
+			Expect(b.parties[0].activePokemon[0].CurrentHP).To(BeEquivalentTo(1))
+		})
+
+		It("should consume the focus sash after damage is applied", func() {
+			b := setup()
+			t, _ := b.SimulateRound()
+			target := target{
+				Pokemon:   b.getPokemonInBattle(0, 0),
+				party:     0,
+				partySlot: 0,
+				Team:      0,
+			}
+			Expect(t).To(HaveTransactionsInOrder(
+				DamageTransaction{
+					User:   b.getPokemonInBattle(1, 0),
+					Target: target,
+				},
+				ItemTransaction{
+					Target: target,
+					IsHeld: true,
+					Item:   ItemFocusSash,
+				},
+			))
+			Expect(b.getPokemonInBattle(0, 0).HeldItem).To(Equal(ItemNone))
+			Expect(b.getPokemonInBattle(1, 0).HeldItem).To(Equal(ItemNone))
 		})
 	})
 })
@@ -805,16 +1180,14 @@ var _ = Describe("Battle end", func() {
 	)
 
 	BeforeEach(func() {
-		party1 := NewParty(&a1, 0)
-		pkmn1 = GeneratePokemon(PkmnCharmander, WithLevel(3), WithMoves(GetMove(MovePound)))
+		pkmn1 = GeneratePokemon(PkmnCharmander, WithLevel(3), defaultMoveOpt)
 		pkmn1.CurrentHP = 1
-		party1.AddPokemon(pkmn1)
-		party2 := NewParty(&a2, 1)
-		pkmn2 = GeneratePokemon(PkmnSquirtle, WithLevel(10), WithMoves(GetMove(MovePound)))
+		party1 := NewOccupiedParty(pkmn1)
+		pkmn2 = GeneratePokemon(PkmnSquirtle, WithLevel(10), defaultMoveOpt)
 		pkmn2.Stats[StatSpeed] = 255
-		party2.AddPokemon(pkmn2)
-		b = NewBattle()
-		b.AddParty(party1, party2)
+		party2 := NewOccupiedParty(pkmn2)
+		b = NewSingleBattle(party1, &a1, party2, &a2)
+		b.rng = SimpleRNG()
 	})
 
 	Context("when all Pokemon faint on one team", func() {
@@ -822,29 +1195,32 @@ var _ = Describe("Battle end", func() {
 			Expect(b.Start()).To(Succeed())
 			t, ended := b.SimulateRound()
 			Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
-			Expect(t).To(HaveLen(4))
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
 					Target: target{
-						Pokemon:   *pkmn1,
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
 					},
 				},
-				EndBattleTransaction{},
+				EndBattleTransaction{
+					Reason: EndKnockout,
+					Winner: 1,
+				},
 			))
 			Expect(t).ToNot(HaveTransaction(
 				DamageTransaction{
 					User: pkmn1,
 					Target: target{
-						Pokemon:   *pkmn2,
+						Pokemon:   pkmn2,
 						party:     1,
 						partySlot: 0,
 						Team:      1,
 					},
 				},
 			))
+			Expect(b.GetResults().Winner).To(Equal(1))
 		})
 	})
 })
@@ -854,20 +1230,16 @@ var _ = Describe("Battle metadata", func() {
 		It("should record the last used move of Pokemon in battle", func() {
 			a1 := Agent(new(dumbAgent))
 			razorLeaf := GetMove(MoveRazorLeaf)
-			p1 := NewOccupiedParty(&a1, 0,
-				GeneratePokemon(PkmnBulbasaur, WithMoves(razorLeaf)),
-			)
+			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveRazorLeaf))
 			ember := GetMove(MoveEmber)
-			p2 := NewOccupiedParty(&a1, 1, GeneratePokemon(
-				PkmnCharmander, WithMoves(ember)),
-			)
-			b := NewBattle()
-			b.AddParty(p1, p2)
+			p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveEmber))
+			b := New1v1Battle(p1, &a1, p2, &a1)
+			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
-			Expect(p1.pokemon[0].metadata).ToNot(HaveKeyWithValue(MetaLastMove, razorLeaf))
+			Expect(p1.metadata).ToNot(HaveKeyWithValue(MetaLastMove, razorLeaf))
 			b.SimulateRound()
-			Expect(p1.pokemon[0].metadata).To(HaveKeyWithValue(MetaLastMove, razorLeaf))
-			Expect(p2.pokemon[0].metadata).To(HaveKeyWithValue(MetaLastMove, ember))
+			Expect(p1.metadata).To(HaveKeyWithValue(MetaLastMove, razorLeaf))
+			Expect(p2.metadata).To(HaveKeyWithValue(MetaLastMove, ember))
 		})
 	})
 })
@@ -878,18 +1250,15 @@ var _ = Describe("Status Conditions", func() {
 
 	Context("when using certain moves in battle causes status effects", func() {
 		It("should inflict paralysis from MoveStunSpore", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveSplash)))
-			p2 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MoveStunSpore)))
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.rng = &AlwaysRNG
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSplash))
+			pkmn2 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveStunSpore))
+			b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
+			b.rng = AlwaysRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				InflictStatusTransaction{
-					Target:       p1,
+					Target:       pkmn1,
 					StatusEffect: StatusParalyze,
 				},
 			))
@@ -898,21 +1267,17 @@ var _ = Describe("Status Conditions", func() {
 
 	Context("when a Pokemon has a status effect, it affects the Pokemon in battle", func() {
 		It("should inflict burn and poison damage", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusPoison
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnIvysaur, WithMoves(GetMove(MovePound)))
-			p2.StatusEffects = StatusBurn
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.SetSeed(1337)
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, defaultMoveOpt)
+			pkmn1.StatusEffects = StatusPoison
+			pkmn2 := GeneratePokemon(PkmnIvysaur, defaultMoveOpt)
+			pkmn2.StatusEffects = StatusBurn
+			b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
+			b.rng = AlwaysRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(4), "Expected only 4 transactions to occur in a round")
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
-					Pokemon:   *p1,
+					Pokemon:   pkmn1,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -922,7 +1287,7 @@ var _ = Describe("Status Conditions", func() {
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
-					Pokemon:   *p2,
+					Pokemon:   pkmn2,
 					party:     1,
 					partySlot: 0,
 					Team:      1,
@@ -933,20 +1298,16 @@ var _ = Describe("Status Conditions", func() {
 		})
 
 		It("should inflict badly poisoned damage", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(100), WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusBadlyPoison
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnIvysaur, WithLevel(100), WithMoves(GetMove(MovePound)))
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.rng = &AlwaysRNG
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(100), defaultMoveOpt)
+			pkmn1.StatusEffects = StatusBadlyPoison
+			pkmn2 := GeneratePokemon(PkmnIvysaur, WithLevel(100), defaultMoveOpt)
+			b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
+			b.rng = AlwaysRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveLen(3), "Expected only 3 transactions to occur in a round")
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{
-					Pokemon:   *p1,
+					Pokemon:   pkmn1,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -957,20 +1318,17 @@ var _ = Describe("Status Conditions", func() {
 		})
 
 		It("should immobilize paralyzed Pokemon", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusParalyze
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.rng = &AlwaysRNG
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), defaultMoveOpt)
+			pkmn1.StatusEffects = StatusParalyze
+			pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), defaultMoveOpt)
+			b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
+			b.rng = AlwaysRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				ImmobilizeTransaction{
 					Target: target{
-						Pokemon:   *p1,
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -981,20 +1339,17 @@ var _ = Describe("Status Conditions", func() {
 		})
 
 		It("should immobilize frozen Pokemon", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusFreeze
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.rng = &AlwaysRNG
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), defaultMoveOpt)
+			pkmn1.StatusEffects = StatusFreeze
+			pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), defaultMoveOpt)
+			b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
+			b.rng = AlwaysRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				ImmobilizeTransaction{
 					Target: target{
-						Pokemon:   *p1,
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -1004,42 +1359,115 @@ var _ = Describe("Status Conditions", func() {
 			))
 		})
 
-		It("should immobilize sleeping Pokemon", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusSleep
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
-			b.SetSeed(1337)
-			Expect(b.Start()).To(Succeed())
-			t, _ := b.SimulateRound()
-			Expect(t).To(HaveTransaction(
-				ImmobilizeTransaction{
-					Target: target{
-						Pokemon:   *p1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+		Context("when a pokemon is asleep", func() {
+			It("should immobilize sleeping Pokemon", func() {
+				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), defaultMoveOpt)
+				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), defaultMoveOpt)
+				b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
+				b.rng = AlwaysRNG()
+				Expect(b.Start()).To(Succeed())
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       pkmn1,
 					StatusEffect: StatusSleep,
+				})
+				b.ProcessQueue()
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(
+					ImmobilizeTransaction{
+						Target: target{
+							Pokemon:   pkmn1,
+							party:     0,
+							partySlot: 0,
+							Team:      0,
+						},
+						StatusEffect: StatusSleep,
+					},
+				))
+			})
+
+			It("should allow sleeping Pokemon to wake up", func() {
+				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), defaultMoveOpt)
+				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), defaultMoveOpt)
+				b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
+				b.rng = AlwaysRNG()
+				Expect(b.Start()).To(Succeed())
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       pkmn1,
+					StatusEffect: StatusSleep,
+				})
+				b.ProcessQueue()
+				pkmn1.metadata[MetaSleepTime] = 0
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(
+					CureStatusTransaction{
+						Target: target{
+							Pokemon:   pkmn1,
+							party:     0,
+							partySlot: 0,
+							Team:      0,
+						},
+						StatusEffect: StatusSleep,
+					},
+				))
+				Expect(pkmn1.StatusEffects.check(StatusSleep)).To(BeFalse())
+			})
+
+			It("should decrement sleeping counter", func() {
+				pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), defaultMoveOpt)
+				pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), defaultMoveOpt)
+				b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
+				b.rng = AlwaysRNG()
+				Expect(b.Start()).To(Succeed())
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       pkmn1,
+					StatusEffect: StatusSleep,
+				})
+				b.ProcessQueue()
+				counter := pkmn1.metadata[MetaSleepTime].(int)
+				b.SimulateRound()
+				Expect(pkmn1.metadata[MetaSleepTime].(int)).To(Equal(counter - 1))
+			})
+
+			DescribeTable("Sleep walking",
+				func(moveid MoveId) {
+					pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(moveid, MoveRazorLeaf))
+					pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), defaultMoveOpt)
+					b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
+					b.rng = AlwaysRNG()
+					Expect(b.Start()).To(Succeed())
+					b.QueueTransaction(InflictStatusTransaction{
+						Target:       pkmn1,
+						StatusEffect: StatusSleep,
+					})
+					b.ProcessQueue()
+					t, _ := b.SimulateRound()
+					Expect(t).ToNot(HaveTransaction(
+						ImmobilizeTransaction{
+							Target: target{
+								Pokemon:   pkmn1,
+								party:     0,
+								partySlot: 0,
+								Team:      0,
+							},
+							StatusEffect: StatusSleep,
+						},
+					))
 				},
-			))
+				Entry("Snore", MoveSnore),
+				Entry("Sleep Talk", MoveSleepTalk),
+			)
 		})
 
 		It("should cure paralysis", func() {
-			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), WithMoves(GetMove(MovePound)))
-			p1.StatusEffects = StatusParalyze
-			party1 := NewOccupiedParty(&a1, 0, p1)
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(4), WithMoves(GetMove(MovePound)))
-			party2 := NewOccupiedParty(&a2, 1, p2)
-			b := NewBattle()
-			b.AddParty(party1, party2)
+			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithLevel(8), defaultMoveOpt)
+			pkmn1.StatusEffects = StatusParalyze
+			pkmn2 := GeneratePokemon(PkmnCharmander, WithLevel(4), defaultMoveOpt)
+			b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
+			b.rng = AlwaysRNG()
 			Expect(b.Start()).To(Succeed())
 			b.QueueTransaction(CureStatusTransaction{
 				Target: target{
-					Pokemon:   *p1,
+					Pokemon:   pkmn1,
 					party:     0,
 					partySlot: 0,
 					Team:      0,
@@ -1051,7 +1479,7 @@ var _ = Describe("Status Conditions", func() {
 			Expect(t).To(HaveTransaction(
 				CureStatusTransaction{
 					Target: target{
-						Pokemon:   *p1,
+						Pokemon:   pkmn1,
 						party:     0,
 						partySlot: 0,
 						Team:      0,
@@ -1061,4 +1489,266 @@ var _ = Describe("Status Conditions", func() {
 			))
 		})
 	})
+})
+
+var _ = Describe("Misc/held items", func() {
+	a1 := Agent(new(dumbAgent))
+	a2 := Agent(new(dumbAgent))
+	var holder *Pokemon
+
+	setup := func(item Item, pkmn int) (*Battle, *Pokemon) {
+		p1 := GeneratePokemon(PkmnSnorlax, WithLevel(25), WithMoves(MoveSplash))
+		holder = GeneratePokemon(pkmn, WithLevel(25), WithMoves(MoveSplash))
+		holder.HeldItem = item
+		b := New1v1Battle(p1, &a1, holder, &a2)
+		b.rng = SimpleRNG()
+		Expect(b.Start()).To(Succeed())
+		return b, holder
+	}
+
+	Context("when Pokemon hold certain misc. items in battle", func() {
+		It("handles Black Sludge", func() {
+			// Heal poison types for 1/16 HP
+			b, holder := setup(ItemBlackSludge, PkmnGrimer)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+			// Damage non-poison types for 1/8 HP
+			b, holder = setup(ItemBlackSludge, PkmnAerodactyl)
+			t, _ = b.SimulateRound()
+			Expect(t).ToNot(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   holder,
+				},
+				Damage: holder.MaxHP() / 8,
+			}))
+		})
+
+		It("handles Destiny Knot", func() {
+			b, holder := setup(ItemDestinyKnot, PkmnMimeJr)
+			attacker := b.getPokemonInBattle(0, 0)
+			attacker.Moves[0] = GetMove(MoveAttract)
+			attacker.Gender = GenderMale
+			holder.Gender = GenderFemale
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(InflictStatusTransaction{
+				Target:       attacker,
+				StatusEffect: StatusInfatuation,
+			}))
+		})
+
+		It("handles Leftovers", func() {
+			b, holder := setup(ItemLeftovers, PkmnSnorlax)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+		})
+
+		It("handles Life Orb", func() {
+			b, holder := setup(ItemLifeOrb, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Boost damage by 30%
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: holder,
+				Target: target{
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+					Pokemon:   b.getPokemonInBattle(0, 0),
+				},
+				Damage: 32,
+			}))
+			// Take 10% of max HP
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   holder,
+				},
+				Damage: holder.MaxHP() / 10,
+			}))
+		})
+
+		It("handles Muscle Band", func() {
+			b, holder := setup(ItemMuscleBand, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Boost physical move damage by 10%
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: holder,
+				Target: target{
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+					Pokemon:   b.getPokemonInBattle(0, 0),
+				},
+				Damage: 27,
+			}))
+		})
+
+		It("handles Shell Bell", func() {
+			b, holder := setup(ItemShellBell, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Self-inflict 1/8 of dealt damage
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   holder,
+				},
+				Damage: 3,
+			}))
+		})
+
+		It("handles White Herb", func() {
+			b, holder := setup(ItemWhiteHerb, PkmnSnorlax)
+			holder.StatModifiers = [9]int{-1, -1, -1, -1, -1, -1, 0, -1, -1}
+			b.SimulateRound()
+			// Consumed after use
+			Expect(holder.HeldItem).To(Equal(ItemNone))
+			// Reset all lowered stat modifiers
+			for _, stage := range holder.StatModifiers {
+				if stage < 0 {
+					Fail("Expected all lowered stats to be reset")
+				}
+			}
+		})
+
+		It("handles Wise Glasses", func() {
+			b, holder := setup(ItemWiseGlasses, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveSurf)
+			t, _ := b.SimulateRound()
+			// Boost special move damage by 10%
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: holder,
+				Target: target{
+					party:     0,
+					partySlot: 0,
+					Team:      0,
+					Pokemon:   b.getPokemonInBattle(0, 0),
+				},
+				Damage: 16,
+			}))
+		})
+
+		DescribeTable("Status curing held items",
+			func(item Item, status StatusCondition) {
+				b, holder := setup(item, PkmnSnorlax)
+				holder.StatusEffects.apply(status)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(CureStatusTransaction{
+					Target: target{
+						party:     1,
+						partySlot: 0,
+						Team:      1,
+						Pokemon:   holder,
+					},
+					StatusEffect: status,
+				}))
+				// Item should be consumed after use
+				Expect(holder.HeldItem).To(Equal(ItemNone))
+			},
+			Entry("Mental Herb", ItemMentalHerb, StatusInfatuation),
+		)
+
+		DescribeTable("Flinch inducing items",
+			func(item Item) {
+				b, holder := setup(ItemKingsRock, PkmnLucario)
+				holder.Moves[0] = GetMove(MoveTackle)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(InflictStatusTransaction{
+					Target:       b.getPokemonInBattle(0, 0),
+					StatusEffect: StatusFlinch,
+				}))
+			},
+			Entry("King's Rock", ItemKingsRock),
+			Entry("Razor Fang", ItemRazorFang),
+		)
+
+		DescribeTable("Weather duration boosting rocks",
+			func(item Item, weather Weather, move MoveId) {
+				b, holder := setup(item, PkmnCastform)
+				holder.Moves[0] = GetMove(move)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(WeatherTransaction{
+					Weather: weather,
+					Turns:   8,
+				}))
+			},
+			Entry("Damp Rock", ItemDampRock, WeatherRain, MoveRainDance),
+			Entry("Heat Rock", ItemHeatRock, WeatherHarshSunlight, MoveSunnyDay),
+			Entry("Icy Rock", ItemIcyRock, WeatherHail, MoveHail),
+			Entry("Smooth Rock", ItemSmoothRock, WeatherSandstorm, MoveSandstorm),
+		)
+	})
+})
+
+var _ = Describe("In-a-pinch Berries", func() {
+	a1 := Agent(new(dumbAgent))
+	a2 := Agent(new(dumbAgent))
+	var holder *Pokemon
+
+	setup := func(item Item) *Battle {
+		holder = GeneratePokemon(
+			PkmnGrotle,
+			WithLevel(25),
+			WithMoves(MoveSplash),
+			WithIVs([6]uint8{1, 1, 1, 20, 1, 1}),
+		)
+		holder.HeldItem = item
+		holder.CurrentHP = holder.MaxHP() / 4
+		b := New1v1Battle(
+			GeneratePokemon(PkmnCombusken, WithLevel(25), WithMoves(MoveSplash)), &a1,
+			holder, &a2,
+		)
+		b.rng = SimpleRNG()
+		Expect(b.Start()).To(Succeed())
+		return b
+	}
+
+	DescribeTable("Stat changing in-a-pinch berries",
+		func(item Item, stat, stages int) {
+			b := setup(item)
+			t, _ := b.SimulateRound()
+
+			Expect(t).To(HaveTransaction(ItemTransaction{
+				Target: target{
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+					Pokemon:   holder,
+				},
+				IsHeld: true,
+				Item:   holder.HeldItem,
+			}))
+			Expect(t).To(HaveTransaction(ModifyStatTransaction{
+				Target: holder,
+				Stat:   stat,
+				Stages: stages,
+			}))
+			Expect(b.parties[0].activePokemon[0].HeldItem).To(Equal(ItemNone))
+			Expect(b.parties[1].activePokemon[0].HeldItem).To(Equal(ItemNone))
+		},
+		Entry("Apicot Berry", ItemApicotBerry, StatSpDef, 1),
+		Entry("Ganlon Berry", ItemGanlonBerry, StatDef, 1),
+		Entry("Lansat Berry", ItemLansatBerry, StatCritChance, 2),
+		Entry("Liechi Berry", ItemLiechiBerry, StatAtk, 1),
+		Entry("Petaya Berry", ItemPetayaBerry, StatSpAtk, 1),
+		Entry("Salac Berry", ItemSalacBerry, StatSpeed, 1),
+	)
 })

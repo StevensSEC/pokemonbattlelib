@@ -3,501 +3,880 @@
 
 package pokemonbattlelib
 
-// A map of national pokedex numbers to pokemon names.
-var pokemonNames = map[uint16]string{
-	1:   "Bulbasaur",
-	2:   "Ivysaur",
-	3:   "Venusaur",
-	4:   "Charmander",
-	5:   "Charmeleon",
-	6:   "Charizard",
-	7:   "Squirtle",
-	8:   "Wartortle",
-	9:   "Blastoise",
-	10:  "Caterpie",
-	11:  "Metapod",
-	12:  "Butterfree",
-	13:  "Weedle",
-	14:  "Kakuna",
-	15:  "Beedrill",
-	16:  "Pidgey",
-	17:  "Pidgeotto",
-	18:  "Pidgeot",
-	19:  "Rattata",
-	20:  "Raticate",
-	21:  "Spearow",
-	22:  "Fearow",
-	23:  "Ekans",
-	24:  "Arbok",
-	25:  "Pikachu",
-	26:  "Raichu",
-	27:  "Sandshrew",
-	28:  "Sandslash",
-	29:  "Nidoran♀",
-	30:  "Nidorina",
-	31:  "Nidoqueen",
-	32:  "Nidoran♂",
-	33:  "Nidorino",
-	34:  "Nidoking",
-	35:  "Clefairy",
-	36:  "Clefable",
-	37:  "Vulpix",
-	38:  "Ninetales",
-	39:  "Jigglypuff",
-	40:  "Wigglytuff",
-	41:  "Zubat",
-	42:  "Golbat",
-	43:  "Oddish",
-	44:  "Gloom",
-	45:  "Vileplume",
-	46:  "Paras",
-	47:  "Parasect",
-	48:  "Venonat",
-	49:  "Venomoth",
-	50:  "Diglett",
-	51:  "Dugtrio",
-	52:  "Meowth",
-	53:  "Persian",
-	54:  "Psyduck",
-	55:  "Golduck",
-	56:  "Mankey",
-	57:  "Primeape",
-	58:  "Growlithe",
-	59:  "Arcanine",
-	60:  "Poliwag",
-	61:  "Poliwhirl",
-	62:  "Poliwrath",
-	63:  "Abra",
-	64:  "Kadabra",
-	65:  "Alakazam",
-	66:  "Machop",
-	67:  "Machoke",
-	68:  "Machamp",
-	69:  "Bellsprout",
-	70:  "Weepinbell",
-	71:  "Victreebel",
-	72:  "Tentacool",
-	73:  "Tentacruel",
-	74:  "Geodude",
-	75:  "Graveler",
-	76:  "Golem",
-	77:  "Ponyta",
-	78:  "Rapidash",
-	79:  "Slowpoke",
-	80:  "Slowbro",
-	81:  "Magnemite",
-	82:  "Magneton",
-	83:  "Farfetch’d",
-	84:  "Doduo",
-	85:  "Dodrio",
-	86:  "Seel",
-	87:  "Dewgong",
-	88:  "Grimer",
-	89:  "Muk",
-	90:  "Shellder",
-	91:  "Cloyster",
-	92:  "Gastly",
-	93:  "Haunter",
-	94:  "Gengar",
-	95:  "Onix",
-	96:  "Drowzee",
-	97:  "Hypno",
-	98:  "Krabby",
-	99:  "Kingler",
-	100: "Voltorb",
-	101: "Electrode",
-	102: "Exeggcute",
-	103: "Exeggutor",
-	104: "Cubone",
-	105: "Marowak",
-	106: "Hitmonlee",
-	107: "Hitmonchan",
-	108: "Lickitung",
-	109: "Koffing",
-	110: "Weezing",
-	111: "Rhyhorn",
-	112: "Rhydon",
-	113: "Chansey",
-	114: "Tangela",
-	115: "Kangaskhan",
-	116: "Horsea",
-	117: "Seadra",
-	118: "Goldeen",
-	119: "Seaking",
-	120: "Staryu",
-	121: "Starmie",
-	122: "Mr. Mime",
-	123: "Scyther",
-	124: "Jynx",
-	125: "Electabuzz",
-	126: "Magmar",
-	127: "Pinsir",
-	128: "Tauros",
-	129: "Magikarp",
-	130: "Gyarados",
-	131: "Lapras",
-	132: "Ditto",
-	133: "Eevee",
-	134: "Vaporeon",
-	135: "Jolteon",
-	136: "Flareon",
-	137: "Porygon",
-	138: "Omanyte",
-	139: "Omastar",
-	140: "Kabuto",
-	141: "Kabutops",
-	142: "Aerodactyl",
-	143: "Snorlax",
-	144: "Articuno",
-	145: "Zapdos",
-	146: "Moltres",
-	147: "Dratini",
-	148: "Dragonair",
-	149: "Dragonite",
-	150: "Mewtwo",
-	151: "Mew",
-	152: "Chikorita",
-	153: "Bayleef",
-	154: "Meganium",
-	155: "Cyndaquil",
-	156: "Quilava",
-	157: "Typhlosion",
-	158: "Totodile",
-	159: "Croconaw",
-	160: "Feraligatr",
-	161: "Sentret",
-	162: "Furret",
-	163: "Hoothoot",
-	164: "Noctowl",
-	165: "Ledyba",
-	166: "Ledian",
-	167: "Spinarak",
-	168: "Ariados",
-	169: "Crobat",
-	170: "Chinchou",
-	171: "Lanturn",
-	172: "Pichu",
-	173: "Cleffa",
-	174: "Igglybuff",
-	175: "Togepi",
-	176: "Togetic",
-	177: "Natu",
-	178: "Xatu",
-	179: "Mareep",
-	180: "Flaaffy",
-	181: "Ampharos",
-	182: "Bellossom",
-	183: "Marill",
-	184: "Azumarill",
-	185: "Sudowoodo",
-	186: "Politoed",
-	187: "Hoppip",
-	188: "Skiploom",
-	189: "Jumpluff",
-	190: "Aipom",
-	191: "Sunkern",
-	192: "Sunflora",
-	193: "Yanma",
-	194: "Wooper",
-	195: "Quagsire",
-	196: "Espeon",
-	197: "Umbreon",
-	198: "Murkrow",
-	199: "Slowking",
-	200: "Misdreavus",
-	201: "Unown",
-	202: "Wobbuffet",
-	203: "Girafarig",
-	204: "Pineco",
-	205: "Forretress",
-	206: "Dunsparce",
-	207: "Gligar",
-	208: "Steelix",
-	209: "Snubbull",
-	210: "Granbull",
-	211: "Qwilfish",
-	212: "Scizor",
-	213: "Shuckle",
-	214: "Heracross",
-	215: "Sneasel",
-	216: "Teddiursa",
-	217: "Ursaring",
-	218: "Slugma",
-	219: "Magcargo",
-	220: "Swinub",
-	221: "Piloswine",
-	222: "Corsola",
-	223: "Remoraid",
-	224: "Octillery",
-	225: "Delibird",
-	226: "Mantine",
-	227: "Skarmory",
-	228: "Houndour",
-	229: "Houndoom",
-	230: "Kingdra",
-	231: "Phanpy",
-	232: "Donphan",
-	233: "Porygon2",
-	234: "Stantler",
-	235: "Smeargle",
-	236: "Tyrogue",
-	237: "Hitmontop",
-	238: "Smoochum",
-	239: "Elekid",
-	240: "Magby",
-	241: "Miltank",
-	242: "Blissey",
-	243: "Raikou",
-	244: "Entei",
-	245: "Suicune",
-	246: "Larvitar",
-	247: "Pupitar",
-	248: "Tyranitar",
-	249: "Lugia",
-	250: "Ho-Oh",
-	251: "Celebi",
-	252: "Treecko",
-	253: "Grovyle",
-	254: "Sceptile",
-	255: "Torchic",
-	256: "Combusken",
-	257: "Blaziken",
-	258: "Mudkip",
-	259: "Marshtomp",
-	260: "Swampert",
-	261: "Poochyena",
-	262: "Mightyena",
-	263: "Zigzagoon",
-	264: "Linoone",
-	265: "Wurmple",
-	266: "Silcoon",
-	267: "Beautifly",
-	268: "Cascoon",
-	269: "Dustox",
-	270: "Lotad",
-	271: "Lombre",
-	272: "Ludicolo",
-	273: "Seedot",
-	274: "Nuzleaf",
-	275: "Shiftry",
-	276: "Taillow",
-	277: "Swellow",
-	278: "Wingull",
-	279: "Pelipper",
-	280: "Ralts",
-	281: "Kirlia",
-	282: "Gardevoir",
-	283: "Surskit",
-	284: "Masquerain",
-	285: "Shroomish",
-	286: "Breloom",
-	287: "Slakoth",
-	288: "Vigoroth",
-	289: "Slaking",
-	290: "Nincada",
-	291: "Ninjask",
-	292: "Shedinja",
-	293: "Whismur",
-	294: "Loudred",
-	295: "Exploud",
-	296: "Makuhita",
-	297: "Hariyama",
-	298: "Azurill",
-	299: "Nosepass",
-	300: "Skitty",
-	301: "Delcatty",
-	302: "Sableye",
-	303: "Mawile",
-	304: "Aron",
-	305: "Lairon",
-	306: "Aggron",
-	307: "Meditite",
-	308: "Medicham",
-	309: "Electrike",
-	310: "Manectric",
-	311: "Plusle",
-	312: "Minun",
-	313: "Volbeat",
-	314: "Illumise",
-	315: "Roselia",
-	316: "Gulpin",
-	317: "Swalot",
-	318: "Carvanha",
-	319: "Sharpedo",
-	320: "Wailmer",
-	321: "Wailord",
-	322: "Numel",
-	323: "Camerupt",
-	324: "Torkoal",
-	325: "Spoink",
-	326: "Grumpig",
-	327: "Spinda",
-	328: "Trapinch",
-	329: "Vibrava",
-	330: "Flygon",
-	331: "Cacnea",
-	332: "Cacturne",
-	333: "Swablu",
-	334: "Altaria",
-	335: "Zangoose",
-	336: "Seviper",
-	337: "Lunatone",
-	338: "Solrock",
-	339: "Barboach",
-	340: "Whiscash",
-	341: "Corphish",
-	342: "Crawdaunt",
-	343: "Baltoy",
-	344: "Claydol",
-	345: "Lileep",
-	346: "Cradily",
-	347: "Anorith",
-	348: "Armaldo",
-	349: "Feebas",
-	350: "Milotic",
-	351: "Castform",
-	352: "Kecleon",
-	353: "Shuppet",
-	354: "Banette",
-	355: "Duskull",
-	356: "Dusclops",
-	357: "Tropius",
-	358: "Chimecho",
-	359: "Absol",
-	360: "Wynaut",
-	361: "Snorunt",
-	362: "Glalie",
-	363: "Spheal",
-	364: "Sealeo",
-	365: "Walrein",
-	366: "Clamperl",
-	367: "Huntail",
-	368: "Gorebyss",
-	369: "Relicanth",
-	370: "Luvdisc",
-	371: "Bagon",
-	372: "Shelgon",
-	373: "Salamence",
-	374: "Beldum",
-	375: "Metang",
-	376: "Metagross",
-	377: "Regirock",
-	378: "Regice",
-	379: "Registeel",
-	380: "Latias",
-	381: "Latios",
-	382: "Kyogre",
-	383: "Groudon",
-	384: "Rayquaza",
-	385: "Jirachi",
-	386: "Deoxys",
-	387: "Turtwig",
-	388: "Grotle",
-	389: "Torterra",
-	390: "Chimchar",
-	391: "Monferno",
-	392: "Infernape",
-	393: "Piplup",
-	394: "Prinplup",
-	395: "Empoleon",
-	396: "Starly",
-	397: "Staravia",
-	398: "Staraptor",
-	399: "Bidoof",
-	400: "Bibarel",
-	401: "Kricketot",
-	402: "Kricketune",
-	403: "Shinx",
-	404: "Luxio",
-	405: "Luxray",
-	406: "Budew",
-	407: "Roserade",
-	408: "Cranidos",
-	409: "Rampardos",
-	410: "Shieldon",
-	411: "Bastiodon",
-	412: "Burmy",
-	413: "Wormadam",
-	414: "Mothim",
-	415: "Combee",
-	416: "Vespiquen",
-	417: "Pachirisu",
-	418: "Buizel",
-	419: "Floatzel",
-	420: "Cherubi",
-	421: "Cherrim",
-	422: "Shellos",
-	423: "Gastrodon",
-	424: "Ambipom",
-	425: "Drifloon",
-	426: "Drifblim",
-	427: "Buneary",
-	428: "Lopunny",
-	429: "Mismagius",
-	430: "Honchkrow",
-	431: "Glameow",
-	432: "Purugly",
-	433: "Chingling",
-	434: "Stunky",
-	435: "Skuntank",
-	436: "Bronzor",
-	437: "Bronzong",
-	438: "Bonsly",
-	439: "Mime Jr.",
-	440: "Happiny",
-	441: "Chatot",
-	442: "Spiritomb",
-	443: "Gible",
-	444: "Gabite",
-	445: "Garchomp",
-	446: "Munchlax",
-	447: "Riolu",
-	448: "Lucario",
-	449: "Hippopotas",
-	450: "Hippowdon",
-	451: "Skorupi",
-	452: "Drapion",
-	453: "Croagunk",
-	454: "Toxicroak",
-	455: "Carnivine",
-	456: "Finneon",
-	457: "Lumineon",
-	458: "Mantyke",
-	459: "Snover",
-	460: "Abomasnow",
-	461: "Weavile",
-	462: "Magnezone",
-	463: "Lickilicky",
-	464: "Rhyperior",
-	465: "Tangrowth",
-	466: "Electivire",
-	467: "Magmortar",
-	468: "Togekiss",
-	469: "Yanmega",
-	470: "Leafeon",
-	471: "Glaceon",
-	472: "Gliscor",
-	473: "Mamoswine",
-	474: "Porygon-Z",
-	475: "Gallade",
-	476: "Probopass",
-	477: "Dusknoir",
-	478: "Froslass",
-	479: "Rotom",
-	480: "Uxie",
-	481: "Mesprit",
-	482: "Azelf",
-	483: "Dialga",
-	484: "Palkia",
-	485: "Heatran",
-	486: "Regigigas",
-	487: "Giratina",
-	488: "Cresselia",
-	489: "Phione",
-	490: "Manaphy",
-	491: "Darkrai",
-	492: "Shaymin",
-	493: "Arceus",
+const (
+	AbilityAdaptability Ability = iota + 1
+	AbilityAftermath
+	AbilityAirLock
+	AbilityAngerPoint
+	AbilityAnticipation
+	AbilityArenaTrap
+	AbilityBadDreams
+	AbilityBattleArmor
+	AbilityBlaze
+	AbilityChlorophyll
+	AbilityClearBody
+	AbilityCloudNine
+	AbilityColorChange
+	AbilityCompoundEyes
+	AbilityCuteCharm
+	AbilityDamp
+	AbilityDownload
+	AbilityDrizzle
+	AbilityDrought
+	AbilityDrySkin
+	AbilityEarlyBird
+	AbilityEffectSpore
+	AbilityFilter
+	AbilityFlameBody
+	AbilityFlashFire
+	AbilityFlowerGift
+	AbilityForecast
+	AbilityForewarn
+	AbilityFrisk
+	AbilityGluttony
+	AbilityGuts
+	AbilityHeatproof
+	AbilityHoneyGather
+	AbilityHugePower
+	AbilityHustle
+	AbilityHydration
+	AbilityHyperCutter
+	AbilityIceBody
+	AbilityIlluminate
+	AbilityImmunity
+	AbilityInnerFocus
+	AbilityInsomnia
+	AbilityIntimidate
+	AbilityIronFist
+	AbilityKeenEye
+	AbilityKlutz
+	AbilityLeafGuard
+	AbilityLevitate
+	AbilityLightningRod
+	AbilityLimber
+	AbilityLiquidOoze
+	AbilityMagicGuard
+	AbilityMagmaArmor
+	AbilityMagnetPull
+	AbilityMarvelScale
+	AbilityMinus
+	AbilityMoldBreaker
+	AbilityMotorDrive
+	AbilityMultitype
+	AbilityNaturalCure
+	AbilityNoGuard
+	AbilityNormalize
+	AbilityOblivious
+	AbilityOvergrow
+	AbilityOwnTempo
+	AbilityPickup
+	AbilityPlus
+	AbilityPoisonHeal
+	AbilityPoisonPoint
+	AbilityPressure
+	AbilityPurePower
+	AbilityQuickFeet
+	AbilityRainDish
+	AbilityReckless
+	AbilityRivalry
+	AbilityRockHead
+	AbilityRoughSkin
+	AbilityRunAway
+	AbilitySandStream
+	AbilitySandVeil
+	AbilityScrappy
+	AbilitySereneGrace
+	AbilityShadowTag
+	AbilityShedSkin
+	AbilityShellArmor
+	AbilityShieldDust
+	AbilitySimple
+	AbilitySkillLink
+	AbilitySlowStart
+	AbilitySniper
+	AbilitySnowCloak
+	AbilitySnowWarning
+	AbilitySolarPower
+	AbilitySolidRock
+	AbilitySoundproof
+	AbilitySpeedBoost
+	AbilityStall
+	AbilityStatic
+	AbilitySteadfast
+	AbilityStench
+	AbilityStickyHold
+	AbilityStormDrain
+	AbilitySturdy
+	AbilitySuctionCups
+	AbilitySuperLuck
+	AbilitySwarm
+	AbilitySwiftSwim
+	AbilitySynchronize
+	AbilityTangledFeet
+	AbilityTechnician
+	AbilityThickFat
+	AbilityTintedLens
+	AbilityTorrent
+	AbilityTrace
+	AbilityTruant
+	AbilityUnaware
+	AbilityUnburden
+	AbilityVitalSpirit
+	AbilityVoltAbsorb
+	AbilityWaterAbsorb
+	AbilityWaterVeil
+	AbilityWhiteSmoke
+	AbilityWonderGuard
+)
+
+// Get the string name of this Ability.
+func (n Ability) String() string {
+	switch n {
+	case AbilityAdaptability:
+		return "Adaptability"
+	case AbilityAftermath:
+		return "Aftermath"
+	case AbilityAirLock:
+		return "Air Lock"
+	case AbilityAngerPoint:
+		return "Anger Point"
+	case AbilityAnticipation:
+		return "Anticipation"
+	case AbilityArenaTrap:
+		return "Arena Trap"
+	case AbilityBadDreams:
+		return "Bad Dreams"
+	case AbilityBattleArmor:
+		return "Battle Armor"
+	case AbilityBlaze:
+		return "Blaze"
+	case AbilityChlorophyll:
+		return "Chlorophyll"
+	case AbilityClearBody:
+		return "Clear Body"
+	case AbilityCloudNine:
+		return "Cloud Nine"
+	case AbilityColorChange:
+		return "Color Change"
+	case AbilityCompoundEyes:
+		return "Compound Eyes"
+	case AbilityCuteCharm:
+		return "Cute Charm"
+	case AbilityDamp:
+		return "Damp"
+	case AbilityDownload:
+		return "Download"
+	case AbilityDrizzle:
+		return "Drizzle"
+	case AbilityDrought:
+		return "Drought"
+	case AbilityDrySkin:
+		return "Dry Skin"
+	case AbilityEarlyBird:
+		return "Early Bird"
+	case AbilityEffectSpore:
+		return "Effect Spore"
+	case AbilityFilter:
+		return "Filter"
+	case AbilityFlameBody:
+		return "Flame Body"
+	case AbilityFlashFire:
+		return "Flash Fire"
+	case AbilityFlowerGift:
+		return "Flower Gift"
+	case AbilityForecast:
+		return "Forecast"
+	case AbilityForewarn:
+		return "Forewarn"
+	case AbilityFrisk:
+		return "Frisk"
+	case AbilityGluttony:
+		return "Gluttony"
+	case AbilityGuts:
+		return "Guts"
+	case AbilityHeatproof:
+		return "Heatproof"
+	case AbilityHoneyGather:
+		return "Honey Gather"
+	case AbilityHugePower:
+		return "Huge Power"
+	case AbilityHustle:
+		return "Hustle"
+	case AbilityHydration:
+		return "Hydration"
+	case AbilityHyperCutter:
+		return "Hyper Cutter"
+	case AbilityIceBody:
+		return "Ice Body"
+	case AbilityIlluminate:
+		return "Illuminate"
+	case AbilityImmunity:
+		return "Immunity"
+	case AbilityInnerFocus:
+		return "Inner Focus"
+	case AbilityInsomnia:
+		return "Insomnia"
+	case AbilityIntimidate:
+		return "Intimidate"
+	case AbilityIronFist:
+		return "Iron Fist"
+	case AbilityKeenEye:
+		return "Keen Eye"
+	case AbilityKlutz:
+		return "Klutz"
+	case AbilityLeafGuard:
+		return "Leaf Guard"
+	case AbilityLevitate:
+		return "Levitate"
+	case AbilityLightningRod:
+		return "Lightning Rod"
+	case AbilityLimber:
+		return "Limber"
+	case AbilityLiquidOoze:
+		return "Liquid Ooze"
+	case AbilityMagicGuard:
+		return "Magic Guard"
+	case AbilityMagmaArmor:
+		return "Magma Armor"
+	case AbilityMagnetPull:
+		return "Magnet Pull"
+	case AbilityMarvelScale:
+		return "Marvel Scale"
+	case AbilityMinus:
+		return "Minus"
+	case AbilityMoldBreaker:
+		return "Mold Breaker"
+	case AbilityMotorDrive:
+		return "Motor Drive"
+	case AbilityMultitype:
+		return "Multitype"
+	case AbilityNaturalCure:
+		return "Natural Cure"
+	case AbilityNoGuard:
+		return "No Guard"
+	case AbilityNormalize:
+		return "Normalize"
+	case AbilityOblivious:
+		return "Oblivious"
+	case AbilityOvergrow:
+		return "Overgrow"
+	case AbilityOwnTempo:
+		return "Own Tempo"
+	case AbilityPickup:
+		return "Pickup"
+	case AbilityPlus:
+		return "Plus"
+	case AbilityPoisonHeal:
+		return "Poison Heal"
+	case AbilityPoisonPoint:
+		return "Poison Point"
+	case AbilityPressure:
+		return "Pressure"
+	case AbilityPurePower:
+		return "Pure Power"
+	case AbilityQuickFeet:
+		return "Quick Feet"
+	case AbilityRainDish:
+		return "Rain Dish"
+	case AbilityReckless:
+		return "Reckless"
+	case AbilityRivalry:
+		return "Rivalry"
+	case AbilityRockHead:
+		return "Rock Head"
+	case AbilityRoughSkin:
+		return "Rough Skin"
+	case AbilityRunAway:
+		return "Run Away"
+	case AbilitySandStream:
+		return "Sand Stream"
+	case AbilitySandVeil:
+		return "Sand Veil"
+	case AbilityScrappy:
+		return "Scrappy"
+	case AbilitySereneGrace:
+		return "Serene Grace"
+	case AbilityShadowTag:
+		return "Shadow Tag"
+	case AbilityShedSkin:
+		return "Shed Skin"
+	case AbilityShellArmor:
+		return "Shell Armor"
+	case AbilityShieldDust:
+		return "Shield Dust"
+	case AbilitySimple:
+		return "Simple"
+	case AbilitySkillLink:
+		return "Skill Link"
+	case AbilitySlowStart:
+		return "Slow Start"
+	case AbilitySniper:
+		return "Sniper"
+	case AbilitySnowCloak:
+		return "Snow Cloak"
+	case AbilitySnowWarning:
+		return "Snow Warning"
+	case AbilitySolarPower:
+		return "Solar Power"
+	case AbilitySolidRock:
+		return "Solid Rock"
+	case AbilitySoundproof:
+		return "Soundproof"
+	case AbilitySpeedBoost:
+		return "Speed Boost"
+	case AbilityStall:
+		return "Stall"
+	case AbilityStatic:
+		return "Static"
+	case AbilitySteadfast:
+		return "Steadfast"
+	case AbilityStench:
+		return "Stench"
+	case AbilityStickyHold:
+		return "Sticky Hold"
+	case AbilityStormDrain:
+		return "Storm Drain"
+	case AbilitySturdy:
+		return "Sturdy"
+	case AbilitySuctionCups:
+		return "Suction Cups"
+	case AbilitySuperLuck:
+		return "Super Luck"
+	case AbilitySwarm:
+		return "Swarm"
+	case AbilitySwiftSwim:
+		return "Swift Swim"
+	case AbilitySynchronize:
+		return "Synchronize"
+	case AbilityTangledFeet:
+		return "Tangled Feet"
+	case AbilityTechnician:
+		return "Technician"
+	case AbilityThickFat:
+		return "Thick Fat"
+	case AbilityTintedLens:
+		return "Tinted Lens"
+	case AbilityTorrent:
+		return "Torrent"
+	case AbilityTrace:
+		return "Trace"
+	case AbilityTruant:
+		return "Truant"
+	case AbilityUnaware:
+		return "Unaware"
+	case AbilityUnburden:
+		return "Unburden"
+	case AbilityVitalSpirit:
+		return "Vital Spirit"
+	case AbilityVoltAbsorb:
+		return "Volt Absorb"
+	case AbilityWaterAbsorb:
+		return "Water Absorb"
+	case AbilityWaterVeil:
+		return "Water Veil"
+	case AbilityWhiteSmoke:
+		return "White Smoke"
+	case AbilityWonderGuard:
+		return "Wonder Guard"
+	}
+	panic("Unknown ability")
+}
+
+// A map of national pokedex numbers to pokemon data.
+var AllPokemonData = []PokemonData{
+	{NatDex: 1, Name: "Bulbasaur", Type: 2056, Ability: AbilityOvergrow, BaseStats: [6]int{45, 49, 49, 65, 65, 45}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 2, Name: "Ivysaur", Type: 2056, Ability: AbilityOvergrow, BaseStats: [6]int{60, 62, 63, 80, 80, 60}, EvYield: [6]int{0, 0, 0, 1, 1, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 3, Name: "Venusaur", Type: 2056, Ability: AbilityOvergrow, BaseStats: [6]int{80, 82, 83, 100, 100, 80}, EvYield: [6]int{0, 0, 0, 2, 1, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 4, Name: "Charmander", Type: 512, Ability: AbilityBlaze, BaseStats: [6]int{39, 52, 43, 60, 50, 65}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 5, Name: "Charmeleon", Type: 512, Ability: AbilityBlaze, BaseStats: [6]int{58, 64, 58, 80, 65, 80}, EvYield: [6]int{0, 0, 0, 1, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 6, Name: "Charizard", Type: 516, Ability: AbilityBlaze, BaseStats: [6]int{78, 84, 78, 109, 85, 100}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 7, Name: "Squirtle", Type: 1024, Ability: AbilityTorrent, BaseStats: [6]int{44, 48, 65, 50, 64, 43}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 8, Name: "Wartortle", Type: 1024, Ability: AbilityTorrent, BaseStats: [6]int{59, 63, 80, 65, 80, 58}, EvYield: [6]int{0, 0, 1, 0, 1, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 9, Name: "Blastoise", Type: 1024, Ability: AbilityTorrent, BaseStats: [6]int{79, 83, 100, 85, 105, 78}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 10, Name: "Caterpie", Type: 64, Ability: AbilityShieldDust, BaseStats: [6]int{45, 30, 35, 20, 20, 45}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 11, Name: "Metapod", Type: 64, Ability: AbilityShedSkin, BaseStats: [6]int{50, 20, 55, 25, 25, 30}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 12, Name: "Butterfree", Type: 68, Ability: AbilityCompoundEyes, BaseStats: [6]int{60, 45, 50, 90, 80, 70}, EvYield: [6]int{0, 0, 0, 2, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 13, Name: "Weedle", Type: 72, Ability: AbilityShieldDust, BaseStats: [6]int{40, 35, 30, 20, 20, 50}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 14, Name: "Kakuna", Type: 72, Ability: AbilityShedSkin, BaseStats: [6]int{45, 25, 50, 25, 25, 35}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 15, Name: "Beedrill", Type: 72, Ability: AbilitySwarm, BaseStats: [6]int{65, 90, 40, 45, 80, 75}, EvYield: [6]int{0, 2, 0, 0, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 16, Name: "Pidgey", Type: 5, Ability: AbilityTangledFeet, BaseStats: [6]int{40, 45, 40, 35, 35, 56}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 17, Name: "Pidgeotto", Type: 5, Ability: AbilityTangledFeet, BaseStats: [6]int{63, 60, 55, 50, 50, 71}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 18, Name: "Pidgeot", Type: 5, Ability: AbilityTangledFeet, BaseStats: [6]int{83, 80, 75, 70, 70, 101}, EvYield: [6]int{0, 0, 0, 0, 0, 3}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 19, Name: "Rattata", Type: 1, Ability: AbilityGuts, BaseStats: [6]int{30, 56, 35, 25, 35, 72}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 20, Name: "Raticate", Type: 1, Ability: AbilityGuts, BaseStats: [6]int{55, 81, 60, 50, 70, 97}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 21, Name: "Spearow", Type: 5, Ability: AbilityKeenEye, BaseStats: [6]int{40, 60, 30, 31, 31, 70}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 22, Name: "Fearow", Type: 5, Ability: AbilityKeenEye, BaseStats: [6]int{65, 90, 65, 61, 61, 100}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 23, Name: "Ekans", Type: 8, Ability: AbilityShedSkin, BaseStats: [6]int{35, 60, 44, 40, 54, 55}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 24, Name: "Arbok", Type: 8, Ability: AbilityShedSkin, BaseStats: [6]int{60, 95, 69, 65, 79, 80}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 25, Name: "Pikachu", Type: 4096, Ability: AbilityStatic, BaseStats: [6]int{35, 55, 40, 50, 50, 90}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 26, Name: "Raichu", Type: 4096, Ability: AbilityStatic, BaseStats: [6]int{60, 90, 55, 90, 80, 110}, EvYield: [6]int{0, 0, 0, 0, 0, 3}, GrowthRate: GrowthMediumFast},
+	{NatDex: 27, Name: "Sandshrew", Type: 16, Ability: AbilitySandVeil, BaseStats: [6]int{50, 75, 85, 20, 30, 40}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 28, Name: "Sandslash", Type: 16, Ability: AbilitySandVeil, BaseStats: [6]int{75, 100, 110, 45, 55, 65}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 29, Name: "Nidoran♀", Type: 8, Ability: AbilityRivalry, BaseStats: [6]int{55, 47, 52, 40, 40, 41}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 30, Name: "Nidorina", Type: 8, Ability: AbilityRivalry, BaseStats: [6]int{70, 62, 67, 55, 55, 56}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 31, Name: "Nidoqueen", Type: 24, Ability: AbilityRivalry, BaseStats: [6]int{90, 92, 87, 75, 85, 76}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 32, Name: "Nidoran♂", Type: 8, Ability: AbilityRivalry, BaseStats: [6]int{46, 57, 40, 40, 40, 50}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 33, Name: "Nidorino", Type: 8, Ability: AbilityRivalry, BaseStats: [6]int{61, 72, 57, 55, 55, 65}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 34, Name: "Nidoking", Type: 24, Ability: AbilityRivalry, BaseStats: [6]int{81, 102, 77, 85, 75, 85}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 35, Name: "Clefairy", Type: 131072, Ability: AbilityMagicGuard, BaseStats: [6]int{70, 45, 48, 60, 65, 35}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 36, Name: "Clefable", Type: 131072, Ability: AbilityMagicGuard, BaseStats: [6]int{95, 70, 73, 95, 90, 60}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 37, Name: "Vulpix", Type: 512, Ability: AbilityFlashFire, BaseStats: [6]int{38, 41, 40, 50, 65, 65}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 38, Name: "Ninetales", Type: 512, Ability: AbilityFlashFire, BaseStats: [6]int{73, 76, 75, 81, 100, 100}, EvYield: [6]int{0, 0, 0, 0, 1, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 39, Name: "Jigglypuff", Type: 131073, Ability: AbilityCuteCharm, BaseStats: [6]int{115, 45, 20, 45, 25, 20}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 40, Name: "Wigglytuff", Type: 131073, Ability: AbilityCuteCharm, BaseStats: [6]int{140, 70, 45, 85, 50, 45}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 41, Name: "Zubat", Type: 12, Ability: AbilityInnerFocus, BaseStats: [6]int{40, 45, 35, 30, 40, 55}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 42, Name: "Golbat", Type: 12, Ability: AbilityInnerFocus, BaseStats: [6]int{75, 80, 70, 65, 75, 90}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 43, Name: "Oddish", Type: 2056, Ability: AbilityChlorophyll, BaseStats: [6]int{45, 50, 55, 75, 65, 30}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 44, Name: "Gloom", Type: 2056, Ability: AbilityChlorophyll, BaseStats: [6]int{60, 65, 70, 85, 75, 40}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 45, Name: "Vileplume", Type: 2056, Ability: AbilityChlorophyll, BaseStats: [6]int{75, 80, 85, 110, 90, 50}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 46, Name: "Paras", Type: 2112, Ability: AbilityDrySkin, BaseStats: [6]int{35, 70, 55, 45, 55, 25}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 47, Name: "Parasect", Type: 2112, Ability: AbilityDrySkin, BaseStats: [6]int{60, 95, 80, 60, 80, 30}, EvYield: [6]int{0, 2, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 48, Name: "Venonat", Type: 72, Ability: AbilityTintedLens, BaseStats: [6]int{60, 55, 50, 40, 55, 45}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 49, Name: "Venomoth", Type: 72, Ability: AbilityTintedLens, BaseStats: [6]int{70, 65, 60, 90, 75, 90}, EvYield: [6]int{0, 0, 0, 1, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 50, Name: "Diglett", Type: 16, Ability: AbilityArenaTrap, BaseStats: [6]int{10, 55, 25, 35, 45, 95}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 51, Name: "Dugtrio", Type: 16, Ability: AbilityArenaTrap, BaseStats: [6]int{35, 100, 50, 50, 70, 120}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 52, Name: "Meowth", Type: 1, Ability: AbilityTechnician, BaseStats: [6]int{40, 45, 35, 40, 40, 90}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 53, Name: "Persian", Type: 1, Ability: AbilityTechnician, BaseStats: [6]int{65, 70, 60, 65, 65, 115}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 54, Name: "Psyduck", Type: 1024, Ability: AbilityCloudNine, BaseStats: [6]int{50, 52, 48, 65, 50, 55}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 55, Name: "Golduck", Type: 1024, Ability: AbilityCloudNine, BaseStats: [6]int{80, 82, 78, 95, 80, 85}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 56, Name: "Mankey", Type: 2, Ability: AbilityAngerPoint, BaseStats: [6]int{40, 80, 35, 35, 45, 70}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 57, Name: "Primeape", Type: 2, Ability: AbilityAngerPoint, BaseStats: [6]int{65, 105, 60, 60, 70, 95}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 58, Name: "Growlithe", Type: 512, Ability: AbilityFlashFire, BaseStats: [6]int{55, 70, 45, 70, 50, 60}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 59, Name: "Arcanine", Type: 512, Ability: AbilityFlashFire, BaseStats: [6]int{90, 110, 80, 100, 80, 95}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 60, Name: "Poliwag", Type: 1024, Ability: AbilityDamp, BaseStats: [6]int{40, 50, 40, 40, 40, 90}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 61, Name: "Poliwhirl", Type: 1024, Ability: AbilityDamp, BaseStats: [6]int{65, 65, 65, 50, 50, 90}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 62, Name: "Poliwrath", Type: 1026, Ability: AbilityDamp, BaseStats: [6]int{90, 95, 95, 70, 90, 70}, EvYield: [6]int{0, 0, 3, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 63, Name: "Abra", Type: 8192, Ability: AbilityInnerFocus, BaseStats: [6]int{25, 20, 15, 105, 55, 90}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 64, Name: "Kadabra", Type: 8192, Ability: AbilityInnerFocus, BaseStats: [6]int{40, 35, 30, 120, 70, 105}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 65, Name: "Alakazam", Type: 8192, Ability: AbilityInnerFocus, BaseStats: [6]int{55, 50, 45, 135, 95, 120}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 66, Name: "Machop", Type: 2, Ability: AbilityNoGuard, BaseStats: [6]int{70, 80, 50, 35, 35, 35}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 67, Name: "Machoke", Type: 2, Ability: AbilityNoGuard, BaseStats: [6]int{80, 100, 70, 50, 60, 45}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 68, Name: "Machamp", Type: 2, Ability: AbilityNoGuard, BaseStats: [6]int{90, 130, 80, 65, 85, 55}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 69, Name: "Bellsprout", Type: 2056, Ability: AbilityChlorophyll, BaseStats: [6]int{50, 75, 35, 70, 30, 40}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 70, Name: "Weepinbell", Type: 2056, Ability: AbilityChlorophyll, BaseStats: [6]int{65, 90, 50, 85, 45, 55}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 71, Name: "Victreebel", Type: 2056, Ability: AbilityChlorophyll, BaseStats: [6]int{80, 105, 65, 100, 70, 70}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 72, Name: "Tentacool", Type: 1032, Ability: AbilityLiquidOoze, BaseStats: [6]int{40, 40, 35, 50, 100, 70}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 73, Name: "Tentacruel", Type: 1032, Ability: AbilityLiquidOoze, BaseStats: [6]int{80, 70, 65, 80, 120, 100}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 74, Name: "Geodude", Type: 48, Ability: AbilitySturdy, BaseStats: [6]int{40, 80, 100, 30, 30, 20}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 75, Name: "Graveler", Type: 48, Ability: AbilitySturdy, BaseStats: [6]int{55, 95, 115, 45, 45, 35}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 76, Name: "Golem", Type: 48, Ability: AbilitySturdy, BaseStats: [6]int{80, 120, 130, 55, 65, 45}, EvYield: [6]int{0, 0, 3, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 77, Name: "Ponyta", Type: 512, Ability: AbilityFlashFire, BaseStats: [6]int{50, 85, 55, 65, 65, 90}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 78, Name: "Rapidash", Type: 512, Ability: AbilityFlashFire, BaseStats: [6]int{65, 100, 70, 80, 80, 105}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 79, Name: "Slowpoke", Type: 9216, Ability: AbilityOwnTempo, BaseStats: [6]int{90, 65, 65, 40, 40, 15}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 80, Name: "Slowbro", Type: 9216, Ability: AbilityOwnTempo, BaseStats: [6]int{95, 75, 110, 100, 80, 30}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 81, Name: "Magnemite", Type: 4352, Ability: AbilitySturdy, BaseStats: [6]int{25, 35, 70, 95, 55, 45}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 82, Name: "Magneton", Type: 4352, Ability: AbilitySturdy, BaseStats: [6]int{50, 60, 95, 120, 70, 70}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 83, Name: "Farfetch’d", Type: 5, Ability: AbilityInnerFocus, BaseStats: [6]int{52, 90, 55, 58, 62, 60}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 84, Name: "Doduo", Type: 5, Ability: AbilityEarlyBird, BaseStats: [6]int{35, 85, 45, 35, 35, 75}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 85, Name: "Dodrio", Type: 5, Ability: AbilityEarlyBird, BaseStats: [6]int{60, 110, 70, 60, 60, 110}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 86, Name: "Seel", Type: 1024, Ability: AbilityHydration, BaseStats: [6]int{65, 45, 55, 45, 70, 45}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 87, Name: "Dewgong", Type: 17408, Ability: AbilityHydration, BaseStats: [6]int{90, 70, 80, 70, 95, 70}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 88, Name: "Grimer", Type: 8, Ability: AbilityStickyHold, BaseStats: [6]int{80, 80, 50, 40, 50, 25}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 89, Name: "Muk", Type: 8, Ability: AbilityStickyHold, BaseStats: [6]int{105, 105, 75, 65, 100, 50}, EvYield: [6]int{1, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 90, Name: "Shellder", Type: 1024, Ability: AbilitySkillLink, BaseStats: [6]int{30, 65, 100, 45, 25, 40}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 91, Name: "Cloyster", Type: 17408, Ability: AbilitySkillLink, BaseStats: [6]int{50, 95, 180, 85, 45, 70}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 92, Name: "Gastly", Type: 136, Ability: AbilityLevitate, BaseStats: [6]int{30, 35, 30, 100, 35, 80}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 93, Name: "Haunter", Type: 136, Ability: AbilityLevitate, BaseStats: [6]int{45, 50, 45, 115, 55, 95}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 94, Name: "Gengar", Type: 136, Ability: AbilityLevitate, BaseStats: [6]int{60, 65, 60, 130, 75, 110}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 95, Name: "Onix", Type: 48, Ability: AbilitySturdy, BaseStats: [6]int{35, 45, 160, 30, 45, 70}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 96, Name: "Drowzee", Type: 8192, Ability: AbilityForewarn, BaseStats: [6]int{60, 48, 45, 43, 90, 42}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 97, Name: "Hypno", Type: 8192, Ability: AbilityForewarn, BaseStats: [6]int{85, 73, 70, 73, 115, 67}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 98, Name: "Krabby", Type: 1024, Ability: AbilityShellArmor, BaseStats: [6]int{30, 105, 90, 25, 25, 50}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 99, Name: "Kingler", Type: 1024, Ability: AbilityShellArmor, BaseStats: [6]int{55, 130, 115, 50, 50, 75}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 100, Name: "Voltorb", Type: 4096, Ability: AbilityStatic, BaseStats: [6]int{40, 30, 50, 55, 55, 100}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 101, Name: "Electrode", Type: 4096, Ability: AbilityStatic, BaseStats: [6]int{60, 50, 70, 80, 80, 150}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 102, Name: "Exeggcute", Type: 10240, Ability: AbilityChlorophyll, BaseStats: [6]int{60, 40, 80, 60, 45, 40}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 103, Name: "Exeggutor", Type: 10240, Ability: AbilityChlorophyll, BaseStats: [6]int{95, 95, 85, 125, 75, 55}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 104, Name: "Cubone", Type: 16, Ability: AbilityLightningRod, BaseStats: [6]int{50, 50, 95, 40, 50, 35}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 105, Name: "Marowak", Type: 16, Ability: AbilityLightningRod, BaseStats: [6]int{60, 80, 110, 50, 80, 45}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 106, Name: "Hitmonlee", Type: 2, Ability: AbilityReckless, BaseStats: [6]int{50, 120, 53, 35, 110, 87}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 107, Name: "Hitmonchan", Type: 2, Ability: AbilityIronFist, BaseStats: [6]int{50, 105, 79, 35, 110, 76}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 108, Name: "Lickitung", Type: 1, Ability: AbilityOblivious, BaseStats: [6]int{90, 55, 75, 60, 75, 30}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 109, Name: "Koffing", Type: 8, Ability: AbilityLevitate, BaseStats: [6]int{40, 65, 95, 60, 45, 35}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 110, Name: "Weezing", Type: 8, Ability: AbilityLevitate, BaseStats: [6]int{65, 90, 120, 85, 70, 60}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 111, Name: "Rhyhorn", Type: 48, Ability: AbilityRockHead, BaseStats: [6]int{80, 85, 95, 30, 30, 25}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 112, Name: "Rhydon", Type: 48, Ability: AbilityRockHead, BaseStats: [6]int{105, 130, 120, 45, 45, 40}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 113, Name: "Chansey", Type: 1, Ability: AbilitySereneGrace, BaseStats: [6]int{250, 5, 5, 35, 105, 50}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 114, Name: "Tangela", Type: 2048, Ability: AbilityLeafGuard, BaseStats: [6]int{65, 55, 115, 100, 40, 60}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 115, Name: "Kangaskhan", Type: 1, Ability: AbilityScrappy, BaseStats: [6]int{105, 95, 80, 40, 80, 90}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 116, Name: "Horsea", Type: 1024, Ability: AbilitySniper, BaseStats: [6]int{30, 40, 70, 70, 25, 60}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 117, Name: "Seadra", Type: 1024, Ability: AbilitySniper, BaseStats: [6]int{55, 65, 95, 95, 45, 85}, EvYield: [6]int{0, 0, 1, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 118, Name: "Goldeen", Type: 1024, Ability: AbilityWaterVeil, BaseStats: [6]int{45, 67, 60, 35, 50, 63}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 119, Name: "Seaking", Type: 1024, Ability: AbilityWaterVeil, BaseStats: [6]int{80, 92, 65, 65, 80, 68}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 120, Name: "Staryu", Type: 1024, Ability: AbilityNaturalCure, BaseStats: [6]int{30, 45, 55, 70, 55, 85}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthSlow},
+	{NatDex: 121, Name: "Starmie", Type: 9216, Ability: AbilityNaturalCure, BaseStats: [6]int{60, 75, 85, 100, 85, 115}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthSlow},
+	{NatDex: 122, Name: "Mr. Mime", Type: 139264, Ability: AbilityFilter, BaseStats: [6]int{40, 45, 65, 100, 120, 90}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 123, Name: "Scyther", Type: 68, Ability: AbilityTechnician, BaseStats: [6]int{70, 110, 80, 55, 80, 105}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 124, Name: "Jynx", Type: 24576, Ability: AbilityForewarn, BaseStats: [6]int{65, 50, 35, 115, 95, 95}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 125, Name: "Electabuzz", Type: 4096, Ability: AbilityStatic, BaseStats: [6]int{65, 83, 57, 95, 85, 105}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 126, Name: "Magmar", Type: 512, Ability: AbilityFlameBody, BaseStats: [6]int{65, 95, 57, 100, 85, 93}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 127, Name: "Pinsir", Type: 64, Ability: AbilityMoldBreaker, BaseStats: [6]int{65, 125, 100, 55, 70, 85}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 128, Name: "Tauros", Type: 1, Ability: AbilityAngerPoint, BaseStats: [6]int{75, 100, 95, 40, 70, 110}, EvYield: [6]int{0, 1, 0, 0, 0, 1}, GrowthRate: GrowthSlow},
+	{NatDex: 129, Name: "Magikarp", Type: 1024, Ability: AbilitySwiftSwim, BaseStats: [6]int{20, 10, 55, 15, 20, 80}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthSlow},
+	{NatDex: 130, Name: "Gyarados", Type: 1028, Ability: AbilityIntimidate, BaseStats: [6]int{95, 125, 79, 60, 100, 81}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 131, Name: "Lapras", Type: 17408, Ability: AbilityShellArmor, BaseStats: [6]int{130, 85, 80, 85, 95, 60}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 132, Name: "Ditto", Type: 1, Ability: AbilityLimber, BaseStats: [6]int{48, 48, 48, 48, 48, 48}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 133, Name: "Eevee", Type: 1, Ability: AbilityAdaptability, BaseStats: [6]int{55, 55, 50, 45, 65, 55}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 134, Name: "Vaporeon", Type: 1024, Ability: AbilityWaterAbsorb, BaseStats: [6]int{130, 65, 60, 110, 95, 65}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 135, Name: "Jolteon", Type: 4096, Ability: AbilityVoltAbsorb, BaseStats: [6]int{65, 65, 60, 110, 95, 130}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 136, Name: "Flareon", Type: 512, Ability: AbilityFlashFire, BaseStats: [6]int{65, 130, 60, 95, 110, 65}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 137, Name: "Porygon", Type: 1, Ability: AbilityDownload, BaseStats: [6]int{65, 60, 70, 85, 75, 40}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 138, Name: "Omanyte", Type: 1056, Ability: AbilityShellArmor, BaseStats: [6]int{35, 40, 100, 90, 55, 35}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 139, Name: "Omastar", Type: 1056, Ability: AbilityShellArmor, BaseStats: [6]int{70, 60, 125, 115, 70, 55}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 140, Name: "Kabuto", Type: 1056, Ability: AbilityBattleArmor, BaseStats: [6]int{30, 80, 90, 55, 45, 55}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 141, Name: "Kabutops", Type: 1056, Ability: AbilityBattleArmor, BaseStats: [6]int{60, 115, 105, 65, 70, 80}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 142, Name: "Aerodactyl", Type: 36, Ability: AbilityPressure, BaseStats: [6]int{80, 105, 65, 60, 75, 130}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthSlow},
+	{NatDex: 143, Name: "Snorlax", Type: 1, Ability: AbilityThickFat, BaseStats: [6]int{160, 110, 65, 65, 110, 30}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 144, Name: "Articuno", Type: 16388, Ability: AbilityPressure, BaseStats: [6]int{90, 85, 100, 95, 125, 85}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 145, Name: "Zapdos", Type: 4100, Ability: AbilityPressure, BaseStats: [6]int{90, 90, 85, 125, 90, 100}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 146, Name: "Moltres", Type: 516, Ability: AbilityPressure, BaseStats: [6]int{90, 100, 90, 125, 85, 90}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 147, Name: "Dratini", Type: 32768, Ability: AbilityShedSkin, BaseStats: [6]int{41, 64, 45, 50, 50, 50}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 148, Name: "Dragonair", Type: 32768, Ability: AbilityShedSkin, BaseStats: [6]int{61, 84, 65, 70, 70, 70}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 149, Name: "Dragonite", Type: 32772, Ability: AbilityInnerFocus, BaseStats: [6]int{91, 134, 95, 100, 100, 80}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 150, Name: "Mewtwo", Type: 8192, Ability: AbilityPressure, BaseStats: [6]int{106, 110, 90, 154, 90, 130}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 151, Name: "Mew", Type: 8192, Ability: AbilitySynchronize, BaseStats: [6]int{100, 100, 100, 100, 100, 100}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 152, Name: "Chikorita", Type: 2048, Ability: AbilityOvergrow, BaseStats: [6]int{45, 49, 65, 49, 65, 45}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 153, Name: "Bayleef", Type: 2048, Ability: AbilityOvergrow, BaseStats: [6]int{60, 62, 80, 63, 80, 60}, EvYield: [6]int{0, 0, 1, 0, 1, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 154, Name: "Meganium", Type: 2048, Ability: AbilityOvergrow, BaseStats: [6]int{80, 82, 100, 83, 100, 80}, EvYield: [6]int{0, 0, 1, 0, 2, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 155, Name: "Cyndaquil", Type: 512, Ability: AbilityBlaze, BaseStats: [6]int{39, 52, 43, 60, 50, 65}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 156, Name: "Quilava", Type: 512, Ability: AbilityBlaze, BaseStats: [6]int{58, 64, 58, 80, 65, 80}, EvYield: [6]int{0, 0, 0, 1, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 157, Name: "Typhlosion", Type: 512, Ability: AbilityBlaze, BaseStats: [6]int{78, 84, 78, 109, 85, 100}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 158, Name: "Totodile", Type: 1024, Ability: AbilityTorrent, BaseStats: [6]int{50, 65, 64, 44, 48, 43}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 159, Name: "Croconaw", Type: 1024, Ability: AbilityTorrent, BaseStats: [6]int{65, 80, 80, 59, 63, 58}, EvYield: [6]int{0, 1, 1, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 160, Name: "Feraligatr", Type: 1024, Ability: AbilityTorrent, BaseStats: [6]int{85, 105, 100, 79, 83, 78}, EvYield: [6]int{0, 2, 1, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 161, Name: "Sentret", Type: 1, Ability: AbilityKeenEye, BaseStats: [6]int{35, 46, 34, 35, 45, 20}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 162, Name: "Furret", Type: 1, Ability: AbilityKeenEye, BaseStats: [6]int{85, 76, 64, 45, 55, 90}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 163, Name: "Hoothoot", Type: 5, Ability: AbilityKeenEye, BaseStats: [6]int{60, 30, 30, 36, 56, 50}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 164, Name: "Noctowl", Type: 5, Ability: AbilityKeenEye, BaseStats: [6]int{100, 50, 50, 86, 96, 70}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 165, Name: "Ledyba", Type: 68, Ability: AbilityEarlyBird, BaseStats: [6]int{40, 20, 30, 40, 80, 55}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 166, Name: "Ledian", Type: 68, Ability: AbilityEarlyBird, BaseStats: [6]int{55, 35, 50, 55, 110, 85}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthFast},
+	{NatDex: 167, Name: "Spinarak", Type: 72, Ability: AbilityInsomnia, BaseStats: [6]int{40, 60, 40, 40, 40, 30}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 168, Name: "Ariados", Type: 72, Ability: AbilityInsomnia, BaseStats: [6]int{70, 90, 70, 60, 70, 40}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 169, Name: "Crobat", Type: 12, Ability: AbilityInnerFocus, BaseStats: [6]int{85, 90, 80, 70, 80, 130}, EvYield: [6]int{0, 0, 0, 0, 0, 3}, GrowthRate: GrowthMediumFast},
+	{NatDex: 170, Name: "Chinchou", Type: 5120, Ability: AbilityIlluminate, BaseStats: [6]int{75, 38, 38, 56, 56, 67}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 171, Name: "Lanturn", Type: 5120, Ability: AbilityIlluminate, BaseStats: [6]int{125, 58, 58, 76, 76, 67}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 172, Name: "Pichu", Type: 4096, Ability: AbilityStatic, BaseStats: [6]int{20, 40, 15, 35, 35, 60}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 173, Name: "Cleffa", Type: 131072, Ability: AbilityMagicGuard, BaseStats: [6]int{50, 25, 28, 45, 55, 15}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 174, Name: "Igglybuff", Type: 131073, Ability: AbilityCuteCharm, BaseStats: [6]int{90, 30, 15, 40, 20, 15}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 175, Name: "Togepi", Type: 131072, Ability: AbilitySereneGrace, BaseStats: [6]int{35, 20, 65, 40, 65, 20}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 176, Name: "Togetic", Type: 131076, Ability: AbilitySereneGrace, BaseStats: [6]int{55, 40, 85, 80, 105, 40}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthFast},
+	{NatDex: 177, Name: "Natu", Type: 8196, Ability: AbilityEarlyBird, BaseStats: [6]int{40, 50, 45, 70, 45, 70}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 178, Name: "Xatu", Type: 8196, Ability: AbilityEarlyBird, BaseStats: [6]int{65, 75, 70, 95, 70, 95}, EvYield: [6]int{0, 0, 0, 1, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 179, Name: "Mareep", Type: 4096, Ability: AbilityStatic, BaseStats: [6]int{55, 40, 40, 65, 45, 35}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 180, Name: "Flaaffy", Type: 4096, Ability: AbilityStatic, BaseStats: [6]int{70, 55, 55, 80, 60, 45}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 181, Name: "Ampharos", Type: 4096, Ability: AbilityStatic, BaseStats: [6]int{90, 75, 85, 115, 90, 55}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 182, Name: "Bellossom", Type: 2048, Ability: AbilityChlorophyll, BaseStats: [6]int{75, 80, 95, 90, 100, 50}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 183, Name: "Marill", Type: 132096, Ability: AbilityHugePower, BaseStats: [6]int{70, 20, 50, 20, 50, 40}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 184, Name: "Azumarill", Type: 132096, Ability: AbilityHugePower, BaseStats: [6]int{100, 50, 80, 60, 80, 50}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 185, Name: "Sudowoodo", Type: 32, Ability: AbilityRockHead, BaseStats: [6]int{70, 100, 115, 30, 65, 30}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 186, Name: "Politoed", Type: 1024, Ability: AbilityDamp, BaseStats: [6]int{90, 75, 75, 90, 100, 70}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 187, Name: "Hoppip", Type: 2052, Ability: AbilityLeafGuard, BaseStats: [6]int{35, 35, 40, 35, 55, 50}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 188, Name: "Skiploom", Type: 2052, Ability: AbilityLeafGuard, BaseStats: [6]int{55, 45, 50, 45, 65, 80}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 189, Name: "Jumpluff", Type: 2052, Ability: AbilityLeafGuard, BaseStats: [6]int{75, 55, 70, 55, 95, 110}, EvYield: [6]int{0, 0, 0, 0, 0, 3}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 190, Name: "Aipom", Type: 1, Ability: AbilityPickup, BaseStats: [6]int{55, 70, 55, 40, 55, 85}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthFast},
+	{NatDex: 191, Name: "Sunkern", Type: 2048, Ability: AbilitySolarPower, BaseStats: [6]int{30, 30, 30, 30, 30, 30}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 192, Name: "Sunflora", Type: 2048, Ability: AbilitySolarPower, BaseStats: [6]int{75, 75, 55, 105, 85, 30}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 193, Name: "Yanma", Type: 68, Ability: AbilityCompoundEyes, BaseStats: [6]int{65, 65, 45, 75, 45, 95}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 194, Name: "Wooper", Type: 1040, Ability: AbilityWaterAbsorb, BaseStats: [6]int{55, 45, 45, 25, 25, 15}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 195, Name: "Quagsire", Type: 1040, Ability: AbilityWaterAbsorb, BaseStats: [6]int{95, 85, 85, 65, 65, 35}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 196, Name: "Espeon", Type: 8192, Ability: AbilitySynchronize, BaseStats: [6]int{65, 65, 60, 130, 95, 110}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 197, Name: "Umbreon", Type: 65536, Ability: AbilitySynchronize, BaseStats: [6]int{95, 65, 110, 60, 130, 65}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 198, Name: "Murkrow", Type: 65540, Ability: AbilitySuperLuck, BaseStats: [6]int{60, 85, 42, 85, 42, 91}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 199, Name: "Slowking", Type: 9216, Ability: AbilityOwnTempo, BaseStats: [6]int{95, 75, 80, 100, 110, 30}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 200, Name: "Misdreavus", Type: 128, Ability: AbilityLevitate, BaseStats: [6]int{60, 60, 60, 85, 85, 85}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 201, Name: "Unown", Type: 8192, Ability: AbilityLevitate, BaseStats: [6]int{48, 72, 48, 72, 48, 48}, EvYield: [6]int{0, 1, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 202, Name: "Wobbuffet", Type: 8192, Ability: AbilityShadowTag, BaseStats: [6]int{190, 33, 58, 33, 58, 33}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 203, Name: "Girafarig", Type: 8193, Ability: AbilityEarlyBird, BaseStats: [6]int{70, 80, 65, 90, 65, 85}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 204, Name: "Pineco", Type: 64, Ability: AbilitySturdy, BaseStats: [6]int{50, 65, 90, 35, 35, 15}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 205, Name: "Forretress", Type: 320, Ability: AbilitySturdy, BaseStats: [6]int{75, 90, 140, 60, 60, 40}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 206, Name: "Dunsparce", Type: 1, Ability: AbilityRunAway, BaseStats: [6]int{100, 70, 70, 65, 65, 45}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 207, Name: "Gligar", Type: 20, Ability: AbilitySandVeil, BaseStats: [6]int{65, 75, 105, 35, 65, 85}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 208, Name: "Steelix", Type: 272, Ability: AbilitySturdy, BaseStats: [6]int{75, 85, 200, 55, 65, 30}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 209, Name: "Snubbull", Type: 131072, Ability: AbilityRunAway, BaseStats: [6]int{60, 80, 50, 40, 40, 30}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 210, Name: "Granbull", Type: 131072, Ability: AbilityQuickFeet, BaseStats: [6]int{90, 120, 75, 60, 60, 45}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 211, Name: "Qwilfish", Type: 1032, Ability: AbilitySwiftSwim, BaseStats: [6]int{65, 95, 85, 55, 55, 85}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 212, Name: "Scizor", Type: 320, Ability: AbilityTechnician, BaseStats: [6]int{70, 130, 100, 55, 80, 65}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 213, Name: "Shuckle", Type: 96, Ability: AbilityGluttony, BaseStats: [6]int{20, 10, 230, 10, 230, 5}, EvYield: [6]int{0, 0, 1, 0, 1, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 214, Name: "Heracross", Type: 66, Ability: AbilityGuts, BaseStats: [6]int{80, 125, 75, 40, 95, 85}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 215, Name: "Sneasel", Type: 81920, Ability: AbilityKeenEye, BaseStats: [6]int{55, 95, 55, 35, 75, 115}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 216, Name: "Teddiursa", Type: 1, Ability: AbilityQuickFeet, BaseStats: [6]int{60, 80, 50, 50, 50, 40}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 217, Name: "Ursaring", Type: 1, Ability: AbilityQuickFeet, BaseStats: [6]int{90, 130, 75, 75, 75, 55}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 218, Name: "Slugma", Type: 512, Ability: AbilityFlameBody, BaseStats: [6]int{40, 40, 40, 70, 40, 20}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 219, Name: "Magcargo", Type: 544, Ability: AbilityFlameBody, BaseStats: [6]int{60, 50, 120, 90, 80, 30}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 220, Name: "Swinub", Type: 16400, Ability: AbilitySnowCloak, BaseStats: [6]int{50, 50, 40, 30, 30, 50}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 221, Name: "Piloswine", Type: 16400, Ability: AbilitySnowCloak, BaseStats: [6]int{100, 100, 80, 60, 60, 50}, EvYield: [6]int{1, 1, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 222, Name: "Corsola", Type: 1056, Ability: AbilityNaturalCure, BaseStats: [6]int{65, 55, 95, 65, 95, 35}, EvYield: [6]int{0, 0, 1, 0, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 223, Name: "Remoraid", Type: 1024, Ability: AbilitySniper, BaseStats: [6]int{35, 65, 35, 65, 35, 65}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 224, Name: "Octillery", Type: 1024, Ability: AbilitySniper, BaseStats: [6]int{75, 105, 75, 105, 75, 45}, EvYield: [6]int{0, 1, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 225, Name: "Delibird", Type: 16388, Ability: AbilityHustle, BaseStats: [6]int{45, 55, 45, 65, 45, 75}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthFast},
+	{NatDex: 226, Name: "Mantine", Type: 1028, Ability: AbilityWaterAbsorb, BaseStats: [6]int{85, 40, 70, 80, 140, 70}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 227, Name: "Skarmory", Type: 260, Ability: AbilitySturdy, BaseStats: [6]int{65, 80, 140, 40, 70, 70}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 228, Name: "Houndour", Type: 66048, Ability: AbilityFlashFire, BaseStats: [6]int{45, 60, 30, 80, 50, 65}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 229, Name: "Houndoom", Type: 66048, Ability: AbilityFlashFire, BaseStats: [6]int{75, 90, 50, 110, 80, 95}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 230, Name: "Kingdra", Type: 33792, Ability: AbilitySniper, BaseStats: [6]int{75, 95, 95, 95, 95, 85}, EvYield: [6]int{0, 1, 0, 1, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 231, Name: "Phanpy", Type: 16, Ability: AbilityPickup, BaseStats: [6]int{90, 60, 60, 40, 40, 40}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 232, Name: "Donphan", Type: 16, Ability: AbilitySturdy, BaseStats: [6]int{90, 120, 120, 60, 60, 50}, EvYield: [6]int{0, 1, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 233, Name: "Porygon2", Type: 1, Ability: AbilityDownload, BaseStats: [6]int{85, 80, 90, 105, 95, 60}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 234, Name: "Stantler", Type: 1, Ability: AbilityFrisk, BaseStats: [6]int{73, 95, 62, 85, 65, 85}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 235, Name: "Smeargle", Type: 1, Ability: AbilityTechnician, BaseStats: [6]int{55, 20, 35, 20, 45, 75}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthFast},
+	{NatDex: 236, Name: "Tyrogue", Type: 2, Ability: AbilitySteadfast, BaseStats: [6]int{35, 35, 35, 35, 35, 35}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 237, Name: "Hitmontop", Type: 2, Ability: AbilityTechnician, BaseStats: [6]int{50, 95, 95, 35, 110, 70}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 238, Name: "Smoochum", Type: 24576, Ability: AbilityForewarn, BaseStats: [6]int{45, 30, 15, 85, 65, 65}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 239, Name: "Elekid", Type: 4096, Ability: AbilityStatic, BaseStats: [6]int{45, 63, 37, 65, 55, 95}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 240, Name: "Magby", Type: 512, Ability: AbilityFlameBody, BaseStats: [6]int{45, 75, 37, 70, 55, 83}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 241, Name: "Miltank", Type: 1, Ability: AbilityScrappy, BaseStats: [6]int{95, 80, 105, 40, 70, 100}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 242, Name: "Blissey", Type: 1, Ability: AbilitySereneGrace, BaseStats: [6]int{255, 10, 10, 75, 135, 55}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 243, Name: "Raikou", Type: 4096, Ability: AbilityPressure, BaseStats: [6]int{90, 85, 75, 115, 100, 115}, EvYield: [6]int{0, 0, 0, 1, 0, 2}, GrowthRate: GrowthSlow},
+	{NatDex: 244, Name: "Entei", Type: 512, Ability: AbilityPressure, BaseStats: [6]int{115, 115, 85, 90, 75, 100}, EvYield: [6]int{1, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 245, Name: "Suicune", Type: 1024, Ability: AbilityPressure, BaseStats: [6]int{100, 75, 115, 90, 115, 85}, EvYield: [6]int{0, 0, 1, 0, 2, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 246, Name: "Larvitar", Type: 48, Ability: AbilityGuts, BaseStats: [6]int{50, 64, 50, 45, 50, 41}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 247, Name: "Pupitar", Type: 48, Ability: AbilityShedSkin, BaseStats: [6]int{70, 84, 70, 65, 70, 51}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 248, Name: "Tyranitar", Type: 65568, Ability: AbilitySandStream, BaseStats: [6]int{100, 134, 110, 95, 100, 61}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 249, Name: "Lugia", Type: 8196, Ability: AbilityPressure, BaseStats: [6]int{106, 90, 130, 90, 154, 110}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 250, Name: "Ho-Oh", Type: 516, Ability: AbilityPressure, BaseStats: [6]int{106, 130, 90, 110, 154, 90}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 251, Name: "Celebi", Type: 10240, Ability: AbilityNaturalCure, BaseStats: [6]int{100, 100, 100, 100, 100, 100}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 252, Name: "Treecko", Type: 2048, Ability: AbilityOvergrow, BaseStats: [6]int{40, 45, 35, 65, 55, 70}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 253, Name: "Grovyle", Type: 2048, Ability: AbilityOvergrow, BaseStats: [6]int{50, 65, 45, 85, 65, 95}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 254, Name: "Sceptile", Type: 2048, Ability: AbilityOvergrow, BaseStats: [6]int{70, 85, 65, 105, 85, 120}, EvYield: [6]int{0, 0, 0, 0, 0, 3}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 255, Name: "Torchic", Type: 512, Ability: AbilityBlaze, BaseStats: [6]int{45, 60, 40, 70, 50, 45}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 256, Name: "Combusken", Type: 514, Ability: AbilityBlaze, BaseStats: [6]int{60, 85, 60, 85, 60, 55}, EvYield: [6]int{0, 1, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 257, Name: "Blaziken", Type: 514, Ability: AbilityBlaze, BaseStats: [6]int{80, 120, 70, 110, 70, 80}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 258, Name: "Mudkip", Type: 1024, Ability: AbilityTorrent, BaseStats: [6]int{50, 70, 50, 50, 50, 40}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 259, Name: "Marshtomp", Type: 1040, Ability: AbilityTorrent, BaseStats: [6]int{70, 85, 70, 60, 70, 50}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 260, Name: "Swampert", Type: 1040, Ability: AbilityTorrent, BaseStats: [6]int{100, 110, 90, 85, 90, 60}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 261, Name: "Poochyena", Type: 65536, Ability: AbilityQuickFeet, BaseStats: [6]int{35, 55, 35, 30, 30, 35}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 262, Name: "Mightyena", Type: 65536, Ability: AbilityQuickFeet, BaseStats: [6]int{70, 90, 70, 60, 60, 70}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 263, Name: "Zigzagoon", Type: 1, Ability: AbilityGluttony, BaseStats: [6]int{38, 30, 41, 30, 41, 60}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 264, Name: "Linoone", Type: 1, Ability: AbilityGluttony, BaseStats: [6]int{78, 70, 61, 50, 61, 100}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 265, Name: "Wurmple", Type: 64, Ability: AbilityShieldDust, BaseStats: [6]int{45, 45, 35, 20, 30, 20}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 266, Name: "Silcoon", Type: 64, Ability: AbilityShedSkin, BaseStats: [6]int{50, 35, 55, 25, 25, 15}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 267, Name: "Beautifly", Type: 68, Ability: AbilitySwarm, BaseStats: [6]int{60, 70, 50, 100, 50, 65}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 268, Name: "Cascoon", Type: 64, Ability: AbilityShedSkin, BaseStats: [6]int{50, 35, 55, 25, 25, 15}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 269, Name: "Dustox", Type: 72, Ability: AbilityShieldDust, BaseStats: [6]int{60, 50, 70, 50, 90, 65}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 270, Name: "Lotad", Type: 3072, Ability: AbilityRainDish, BaseStats: [6]int{40, 30, 30, 40, 50, 30}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 271, Name: "Lombre", Type: 3072, Ability: AbilityRainDish, BaseStats: [6]int{60, 50, 50, 60, 70, 50}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 272, Name: "Ludicolo", Type: 3072, Ability: AbilityRainDish, BaseStats: [6]int{80, 70, 70, 90, 100, 70}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 273, Name: "Seedot", Type: 2048, Ability: AbilityEarlyBird, BaseStats: [6]int{40, 40, 50, 30, 30, 30}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 274, Name: "Nuzleaf", Type: 67584, Ability: AbilityEarlyBird, BaseStats: [6]int{70, 70, 40, 60, 40, 60}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 275, Name: "Shiftry", Type: 67584, Ability: AbilityEarlyBird, BaseStats: [6]int{90, 100, 60, 90, 60, 80}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 276, Name: "Taillow", Type: 5, Ability: AbilityGuts, BaseStats: [6]int{40, 55, 30, 30, 30, 85}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 277, Name: "Swellow", Type: 5, Ability: AbilityGuts, BaseStats: [6]int{60, 85, 60, 75, 50, 125}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 278, Name: "Wingull", Type: 1028, Ability: AbilityHydration, BaseStats: [6]int{40, 30, 30, 55, 30, 85}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 279, Name: "Pelipper", Type: 1028, Ability: AbilityDrizzle, BaseStats: [6]int{60, 50, 100, 95, 70, 65}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 280, Name: "Ralts", Type: 139264, Ability: AbilityTrace, BaseStats: [6]int{28, 25, 25, 45, 35, 40}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 281, Name: "Kirlia", Type: 139264, Ability: AbilityTrace, BaseStats: [6]int{38, 35, 35, 65, 55, 50}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 282, Name: "Gardevoir", Type: 139264, Ability: AbilityTrace, BaseStats: [6]int{68, 65, 65, 125, 115, 80}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 283, Name: "Surskit", Type: 1088, Ability: AbilitySwiftSwim, BaseStats: [6]int{40, 30, 32, 50, 52, 65}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 284, Name: "Masquerain", Type: 68, Ability: AbilityIntimidate, BaseStats: [6]int{70, 60, 62, 100, 82, 80}, EvYield: [6]int{0, 0, 0, 1, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 285, Name: "Shroomish", Type: 2048, Ability: AbilityPoisonHeal, BaseStats: [6]int{60, 40, 60, 40, 60, 35}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 286, Name: "Breloom", Type: 2050, Ability: AbilityPoisonHeal, BaseStats: [6]int{60, 130, 80, 60, 60, 70}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 287, Name: "Slakoth", Type: 1, Ability: AbilityTruant, BaseStats: [6]int{60, 60, 60, 35, 35, 30}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 288, Name: "Vigoroth", Type: 1, Ability: AbilityVitalSpirit, BaseStats: [6]int{80, 80, 80, 55, 55, 90}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthSlow},
+	{NatDex: 289, Name: "Slaking", Type: 1, Ability: AbilityTruant, BaseStats: [6]int{150, 160, 100, 95, 65, 100}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 290, Name: "Nincada", Type: 80, Ability: AbilityCompoundEyes, BaseStats: [6]int{31, 45, 90, 30, 30, 40}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 291, Name: "Ninjask", Type: 68, Ability: AbilitySpeedBoost, BaseStats: [6]int{61, 90, 45, 50, 50, 160}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthErratic},
+	{NatDex: 292, Name: "Shedinja", Type: 192, Ability: AbilityWonderGuard, BaseStats: [6]int{1, 90, 45, 30, 30, 40}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 293, Name: "Whismur", Type: 1, Ability: AbilitySoundproof, BaseStats: [6]int{64, 51, 23, 51, 23, 28}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 294, Name: "Loudred", Type: 1, Ability: AbilitySoundproof, BaseStats: [6]int{84, 71, 43, 71, 43, 48}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 295, Name: "Exploud", Type: 1, Ability: AbilitySoundproof, BaseStats: [6]int{104, 91, 63, 91, 73, 68}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 296, Name: "Makuhita", Type: 2, Ability: AbilityGuts, BaseStats: [6]int{72, 60, 30, 20, 30, 25}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 297, Name: "Hariyama", Type: 2, Ability: AbilityGuts, BaseStats: [6]int{144, 120, 60, 40, 60, 50}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 298, Name: "Azurill", Type: 131073, Ability: AbilityHugePower, BaseStats: [6]int{50, 20, 40, 20, 40, 20}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 299, Name: "Nosepass", Type: 32, Ability: AbilityMagnetPull, BaseStats: [6]int{30, 45, 135, 45, 90, 30}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 300, Name: "Skitty", Type: 1, Ability: AbilityNormalize, BaseStats: [6]int{50, 45, 45, 35, 35, 50}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthFast},
+	{NatDex: 301, Name: "Delcatty", Type: 1, Ability: AbilityNormalize, BaseStats: [6]int{70, 65, 65, 55, 55, 90}, EvYield: [6]int{1, 0, 0, 0, 0, 1}, GrowthRate: GrowthFast},
+	{NatDex: 302, Name: "Sableye", Type: 65664, Ability: AbilityStall, BaseStats: [6]int{50, 75, 75, 65, 65, 50}, EvYield: [6]int{0, 1, 1, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 303, Name: "Mawile", Type: 131328, Ability: AbilityIntimidate, BaseStats: [6]int{50, 85, 85, 55, 55, 50}, EvYield: [6]int{0, 1, 1, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 304, Name: "Aron", Type: 288, Ability: AbilityRockHead, BaseStats: [6]int{50, 70, 100, 40, 40, 30}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 305, Name: "Lairon", Type: 288, Ability: AbilityRockHead, BaseStats: [6]int{60, 90, 140, 50, 50, 40}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 306, Name: "Aggron", Type: 288, Ability: AbilityRockHead, BaseStats: [6]int{70, 110, 180, 60, 60, 50}, EvYield: [6]int{0, 0, 3, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 307, Name: "Meditite", Type: 8194, Ability: AbilityPurePower, BaseStats: [6]int{30, 40, 55, 40, 55, 60}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 308, Name: "Medicham", Type: 8194, Ability: AbilityPurePower, BaseStats: [6]int{60, 60, 75, 60, 75, 80}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 309, Name: "Electrike", Type: 4096, Ability: AbilityLightningRod, BaseStats: [6]int{40, 45, 40, 65, 40, 65}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthSlow},
+	{NatDex: 310, Name: "Manectric", Type: 4096, Ability: AbilityLightningRod, BaseStats: [6]int{70, 75, 60, 105, 60, 105}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthSlow},
+	{NatDex: 311, Name: "Plusle", Type: 4096, Ability: AbilityPlus, BaseStats: [6]int{60, 50, 40, 85, 75, 95}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 312, Name: "Minun", Type: 4096, Ability: AbilityMinus, BaseStats: [6]int{60, 40, 50, 75, 85, 95}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 313, Name: "Volbeat", Type: 64, Ability: AbilitySwarm, BaseStats: [6]int{65, 73, 75, 47, 85, 85}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthErratic},
+	{NatDex: 314, Name: "Illumise", Type: 64, Ability: AbilityTintedLens, BaseStats: [6]int{65, 47, 75, 73, 85, 85}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthFluctuating},
+	{NatDex: 315, Name: "Roselia", Type: 2056, Ability: AbilityPoisonPoint, BaseStats: [6]int{50, 60, 45, 100, 80, 65}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 316, Name: "Gulpin", Type: 8, Ability: AbilityStickyHold, BaseStats: [6]int{70, 43, 53, 43, 53, 40}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 317, Name: "Swalot", Type: 8, Ability: AbilityStickyHold, BaseStats: [6]int{100, 73, 83, 73, 83, 55}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 318, Name: "Carvanha", Type: 66560, Ability: AbilityRoughSkin, BaseStats: [6]int{45, 90, 20, 65, 20, 65}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 319, Name: "Sharpedo", Type: 66560, Ability: AbilityRoughSkin, BaseStats: [6]int{70, 120, 40, 95, 40, 95}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 320, Name: "Wailmer", Type: 1024, Ability: AbilityOblivious, BaseStats: [6]int{130, 70, 35, 70, 35, 60}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 321, Name: "Wailord", Type: 1024, Ability: AbilityOblivious, BaseStats: [6]int{170, 90, 45, 90, 45, 60}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 322, Name: "Numel", Type: 528, Ability: AbilitySimple, BaseStats: [6]int{60, 60, 40, 65, 45, 35}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 323, Name: "Camerupt", Type: 528, Ability: AbilitySolidRock, BaseStats: [6]int{70, 100, 70, 105, 75, 40}, EvYield: [6]int{0, 1, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 324, Name: "Torkoal", Type: 512, Ability: AbilityDrought, BaseStats: [6]int{70, 85, 140, 85, 70, 20}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 325, Name: "Spoink", Type: 8192, Ability: AbilityOwnTempo, BaseStats: [6]int{60, 25, 35, 70, 80, 60}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 326, Name: "Grumpig", Type: 8192, Ability: AbilityOwnTempo, BaseStats: [6]int{80, 45, 65, 90, 110, 80}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthFast},
+	{NatDex: 327, Name: "Spinda", Type: 1, Ability: AbilityTangledFeet, BaseStats: [6]int{60, 60, 60, 60, 60, 60}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 328, Name: "Trapinch", Type: 16, Ability: AbilityArenaTrap, BaseStats: [6]int{45, 100, 45, 45, 45, 10}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 329, Name: "Vibrava", Type: 32784, Ability: AbilityLevitate, BaseStats: [6]int{50, 70, 50, 50, 50, 70}, EvYield: [6]int{0, 1, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 330, Name: "Flygon", Type: 32784, Ability: AbilityLevitate, BaseStats: [6]int{80, 100, 80, 80, 80, 100}, EvYield: [6]int{0, 1, 0, 0, 0, 2}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 331, Name: "Cacnea", Type: 2048, Ability: AbilitySandVeil, BaseStats: [6]int{50, 85, 40, 85, 40, 35}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 332, Name: "Cacturne", Type: 67584, Ability: AbilitySandVeil, BaseStats: [6]int{70, 115, 60, 115, 60, 55}, EvYield: [6]int{0, 1, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 333, Name: "Swablu", Type: 5, Ability: AbilityNaturalCure, BaseStats: [6]int{45, 40, 60, 40, 75, 50}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 334, Name: "Altaria", Type: 32772, Ability: AbilityNaturalCure, BaseStats: [6]int{75, 70, 90, 70, 105, 80}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 335, Name: "Zangoose", Type: 1, Ability: AbilityImmunity, BaseStats: [6]int{73, 115, 60, 60, 60, 90}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 336, Name: "Seviper", Type: 8, Ability: AbilityShedSkin, BaseStats: [6]int{73, 100, 60, 100, 60, 65}, EvYield: [6]int{0, 1, 0, 1, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 337, Name: "Lunatone", Type: 8224, Ability: AbilityLevitate, BaseStats: [6]int{90, 55, 65, 95, 85, 70}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 338, Name: "Solrock", Type: 8224, Ability: AbilityLevitate, BaseStats: [6]int{90, 95, 85, 55, 65, 70}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 339, Name: "Barboach", Type: 1040, Ability: AbilityAnticipation, BaseStats: [6]int{50, 48, 43, 46, 41, 60}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 340, Name: "Whiscash", Type: 1040, Ability: AbilityAnticipation, BaseStats: [6]int{110, 78, 73, 76, 71, 60}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 341, Name: "Corphish", Type: 1024, Ability: AbilityShellArmor, BaseStats: [6]int{43, 80, 65, 50, 35, 35}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 342, Name: "Crawdaunt", Type: 66560, Ability: AbilityShellArmor, BaseStats: [6]int{63, 120, 85, 90, 55, 55}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 343, Name: "Baltoy", Type: 8208, Ability: AbilityLevitate, BaseStats: [6]int{40, 40, 55, 40, 70, 55}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 344, Name: "Claydol", Type: 8208, Ability: AbilityLevitate, BaseStats: [6]int{60, 70, 105, 70, 120, 75}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 345, Name: "Lileep", Type: 2080, Ability: AbilitySuctionCups, BaseStats: [6]int{66, 41, 77, 61, 87, 23}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 346, Name: "Cradily", Type: 2080, Ability: AbilitySuctionCups, BaseStats: [6]int{86, 81, 97, 81, 107, 43}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 347, Name: "Anorith", Type: 96, Ability: AbilityBattleArmor, BaseStats: [6]int{45, 95, 50, 40, 50, 75}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 348, Name: "Armaldo", Type: 96, Ability: AbilityBattleArmor, BaseStats: [6]int{75, 125, 100, 70, 80, 45}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 349, Name: "Feebas", Type: 1024, Ability: AbilityOblivious, BaseStats: [6]int{20, 15, 20, 10, 55, 80}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthErratic},
+	{NatDex: 350, Name: "Milotic", Type: 1024, Ability: AbilityMarvelScale, BaseStats: [6]int{95, 60, 79, 100, 125, 81}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 351, Name: "Castform", Type: 1, Ability: AbilityForecast, BaseStats: [6]int{70, 70, 70, 70, 70, 70}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 352, Name: "Kecleon", Type: 1, Ability: AbilityColorChange, BaseStats: [6]int{60, 90, 70, 60, 120, 40}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 353, Name: "Shuppet", Type: 128, Ability: AbilityFrisk, BaseStats: [6]int{44, 75, 35, 63, 33, 45}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 354, Name: "Banette", Type: 128, Ability: AbilityFrisk, BaseStats: [6]int{64, 115, 65, 83, 63, 65}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 355, Name: "Duskull", Type: 128, Ability: AbilityLevitate, BaseStats: [6]int{20, 40, 90, 30, 90, 25}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 356, Name: "Dusclops", Type: 128, Ability: AbilityPressure, BaseStats: [6]int{40, 70, 130, 60, 130, 25}, EvYield: [6]int{0, 0, 1, 0, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 357, Name: "Tropius", Type: 2052, Ability: AbilitySolarPower, BaseStats: [6]int{99, 68, 83, 72, 87, 51}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 358, Name: "Chimecho", Type: 8192, Ability: AbilityLevitate, BaseStats: [6]int{75, 50, 80, 95, 90, 65}, EvYield: [6]int{0, 0, 0, 1, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 359, Name: "Absol", Type: 65536, Ability: AbilitySuperLuck, BaseStats: [6]int{65, 130, 60, 75, 60, 75}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 360, Name: "Wynaut", Type: 8192, Ability: AbilityShadowTag, BaseStats: [6]int{95, 23, 48, 23, 48, 23}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 361, Name: "Snorunt", Type: 16384, Ability: AbilityIceBody, BaseStats: [6]int{50, 50, 50, 50, 50, 50}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 362, Name: "Glalie", Type: 16384, Ability: AbilityIceBody, BaseStats: [6]int{80, 80, 80, 80, 80, 80}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 363, Name: "Spheal", Type: 17408, Ability: AbilityIceBody, BaseStats: [6]int{70, 40, 50, 55, 50, 25}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 364, Name: "Sealeo", Type: 17408, Ability: AbilityIceBody, BaseStats: [6]int{90, 60, 70, 75, 70, 45}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 365, Name: "Walrein", Type: 17408, Ability: AbilityIceBody, BaseStats: [6]int{110, 80, 90, 95, 90, 65}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 366, Name: "Clamperl", Type: 1024, Ability: AbilityShellArmor, BaseStats: [6]int{35, 64, 85, 74, 55, 32}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 367, Name: "Huntail", Type: 1024, Ability: AbilitySwiftSwim, BaseStats: [6]int{55, 104, 105, 94, 75, 52}, EvYield: [6]int{0, 1, 1, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 368, Name: "Gorebyss", Type: 1024, Ability: AbilitySwiftSwim, BaseStats: [6]int{55, 84, 105, 114, 75, 52}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 369, Name: "Relicanth", Type: 1056, Ability: AbilityRockHead, BaseStats: [6]int{100, 90, 130, 45, 65, 55}, EvYield: [6]int{1, 0, 1, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 370, Name: "Luvdisc", Type: 1024, Ability: AbilitySwiftSwim, BaseStats: [6]int{43, 30, 55, 40, 65, 97}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthFast},
+	{NatDex: 371, Name: "Bagon", Type: 32768, Ability: AbilityRockHead, BaseStats: [6]int{45, 75, 60, 40, 30, 50}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 372, Name: "Shelgon", Type: 32768, Ability: AbilityRockHead, BaseStats: [6]int{65, 95, 100, 60, 50, 50}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 373, Name: "Salamence", Type: 32772, Ability: AbilityIntimidate, BaseStats: [6]int{95, 135, 80, 110, 80, 100}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 374, Name: "Beldum", Type: 8448, Ability: AbilityClearBody, BaseStats: [6]int{40, 55, 80, 35, 60, 30}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 375, Name: "Metang", Type: 8448, Ability: AbilityClearBody, BaseStats: [6]int{60, 75, 100, 55, 80, 50}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 376, Name: "Metagross", Type: 8448, Ability: AbilityClearBody, BaseStats: [6]int{80, 135, 130, 95, 90, 70}, EvYield: [6]int{0, 0, 3, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 377, Name: "Regirock", Type: 32, Ability: AbilityClearBody, BaseStats: [6]int{80, 100, 200, 50, 100, 50}, EvYield: [6]int{0, 0, 3, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 378, Name: "Regice", Type: 16384, Ability: AbilityClearBody, BaseStats: [6]int{80, 50, 100, 100, 200, 50}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 379, Name: "Registeel", Type: 256, Ability: AbilityClearBody, BaseStats: [6]int{80, 75, 150, 75, 150, 50}, EvYield: [6]int{0, 0, 2, 0, 1, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 380, Name: "Latias", Type: 40960, Ability: AbilityLevitate, BaseStats: [6]int{80, 80, 90, 110, 130, 110}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 381, Name: "Latios", Type: 40960, Ability: AbilityLevitate, BaseStats: [6]int{80, 90, 80, 130, 110, 110}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 382, Name: "Kyogre", Type: 1024, Ability: AbilityDrizzle, BaseStats: [6]int{100, 100, 90, 150, 140, 90}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 383, Name: "Groudon", Type: 16, Ability: AbilityDrought, BaseStats: [6]int{100, 150, 140, 100, 90, 90}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 384, Name: "Rayquaza", Type: 32772, Ability: AbilityAirLock, BaseStats: [6]int{105, 150, 90, 150, 90, 95}, EvYield: [6]int{0, 2, 0, 1, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 385, Name: "Jirachi", Type: 8448, Ability: AbilitySereneGrace, BaseStats: [6]int{100, 100, 100, 100, 100, 100}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 386, Name: "Deoxys", Type: 8192, Ability: AbilityPressure, BaseStats: [6]int{50, 150, 50, 150, 50, 150}, EvYield: [6]int{0, 1, 0, 1, 0, 1}, GrowthRate: GrowthSlow},
+	{NatDex: 387, Name: "Turtwig", Type: 2048, Ability: AbilityOvergrow, BaseStats: [6]int{55, 68, 64, 45, 55, 31}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 388, Name: "Grotle", Type: 2048, Ability: AbilityOvergrow, BaseStats: [6]int{75, 89, 85, 55, 65, 36}, EvYield: [6]int{0, 1, 1, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 389, Name: "Torterra", Type: 2064, Ability: AbilityOvergrow, BaseStats: [6]int{95, 109, 105, 75, 85, 56}, EvYield: [6]int{0, 2, 1, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 390, Name: "Chimchar", Type: 512, Ability: AbilityBlaze, BaseStats: [6]int{44, 58, 44, 58, 44, 61}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 391, Name: "Monferno", Type: 514, Ability: AbilityBlaze, BaseStats: [6]int{64, 78, 52, 78, 52, 81}, EvYield: [6]int{0, 0, 0, 1, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 392, Name: "Infernape", Type: 514, Ability: AbilityBlaze, BaseStats: [6]int{76, 104, 71, 104, 71, 108}, EvYield: [6]int{0, 1, 0, 1, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 393, Name: "Piplup", Type: 1024, Ability: AbilityTorrent, BaseStats: [6]int{53, 51, 53, 61, 56, 40}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 394, Name: "Prinplup", Type: 1024, Ability: AbilityTorrent, BaseStats: [6]int{64, 66, 68, 81, 76, 50}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 395, Name: "Empoleon", Type: 1280, Ability: AbilityTorrent, BaseStats: [6]int{84, 86, 88, 111, 101, 60}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 396, Name: "Starly", Type: 5, Ability: AbilityKeenEye, BaseStats: [6]int{40, 55, 30, 30, 30, 60}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 397, Name: "Staravia", Type: 5, Ability: AbilityIntimidate, BaseStats: [6]int{55, 75, 50, 40, 40, 80}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 398, Name: "Staraptor", Type: 5, Ability: AbilityIntimidate, BaseStats: [6]int{85, 120, 70, 50, 60, 100}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 399, Name: "Bidoof", Type: 1, Ability: AbilityUnaware, BaseStats: [6]int{59, 45, 40, 35, 40, 31}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 400, Name: "Bibarel", Type: 1025, Ability: AbilityUnaware, BaseStats: [6]int{79, 85, 60, 55, 60, 71}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 401, Name: "Kricketot", Type: 64, Ability: AbilityShedSkin, BaseStats: [6]int{37, 25, 41, 25, 41, 25}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 402, Name: "Kricketune", Type: 64, Ability: AbilitySwarm, BaseStats: [6]int{77, 85, 51, 55, 51, 65}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 403, Name: "Shinx", Type: 4096, Ability: AbilityIntimidate, BaseStats: [6]int{45, 65, 34, 40, 34, 45}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 404, Name: "Luxio", Type: 4096, Ability: AbilityIntimidate, BaseStats: [6]int{60, 85, 49, 60, 49, 60}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 405, Name: "Luxray", Type: 4096, Ability: AbilityIntimidate, BaseStats: [6]int{80, 120, 79, 95, 79, 70}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 406, Name: "Budew", Type: 2056, Ability: AbilityPoisonPoint, BaseStats: [6]int{40, 30, 35, 50, 70, 55}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 407, Name: "Roserade", Type: 2056, Ability: AbilityPoisonPoint, BaseStats: [6]int{60, 70, 65, 125, 105, 90}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 408, Name: "Cranidos", Type: 32, Ability: AbilityMoldBreaker, BaseStats: [6]int{67, 125, 40, 30, 30, 58}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 409, Name: "Rampardos", Type: 32, Ability: AbilityMoldBreaker, BaseStats: [6]int{97, 165, 60, 65, 50, 58}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 410, Name: "Shieldon", Type: 288, Ability: AbilitySturdy, BaseStats: [6]int{30, 42, 118, 42, 88, 30}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 411, Name: "Bastiodon", Type: 288, Ability: AbilitySturdy, BaseStats: [6]int{60, 52, 168, 47, 138, 30}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthErratic},
+	{NatDex: 412, Name: "Burmy", Type: 64, Ability: AbilityShedSkin, BaseStats: [6]int{40, 29, 45, 29, 45, 36}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 413, Name: "Wormadam", Type: 2112, Ability: AbilityAnticipation, BaseStats: [6]int{60, 59, 85, 79, 105, 36}, EvYield: [6]int{0, 0, 0, 0, 2, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 414, Name: "Mothim", Type: 68, Ability: AbilitySwarm, BaseStats: [6]int{70, 94, 50, 94, 50, 66}, EvYield: [6]int{0, 1, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 415, Name: "Combee", Type: 68, Ability: AbilityHoneyGather, BaseStats: [6]int{30, 30, 42, 30, 42, 70}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 416, Name: "Vespiquen", Type: 68, Ability: AbilityPressure, BaseStats: [6]int{70, 80, 102, 80, 102, 40}, EvYield: [6]int{0, 0, 1, 0, 1, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 417, Name: "Pachirisu", Type: 4096, Ability: AbilityPickup, BaseStats: [6]int{60, 45, 70, 45, 90, 95}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 418, Name: "Buizel", Type: 1024, Ability: AbilitySwiftSwim, BaseStats: [6]int{55, 65, 35, 60, 30, 85}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 419, Name: "Floatzel", Type: 1024, Ability: AbilitySwiftSwim, BaseStats: [6]int{85, 105, 55, 85, 50, 115}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 420, Name: "Cherubi", Type: 2048, Ability: AbilityChlorophyll, BaseStats: [6]int{45, 35, 45, 62, 53, 35}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 421, Name: "Cherrim", Type: 2048, Ability: AbilityFlowerGift, BaseStats: [6]int{70, 60, 70, 87, 78, 85}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 422, Name: "Shellos", Type: 1024, Ability: AbilityStormDrain, BaseStats: [6]int{76, 48, 48, 57, 62, 34}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 423, Name: "Gastrodon", Type: 1040, Ability: AbilityStormDrain, BaseStats: [6]int{111, 83, 68, 92, 82, 39}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 424, Name: "Ambipom", Type: 1, Ability: AbilityPickup, BaseStats: [6]int{75, 100, 66, 60, 66, 115}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthFast},
+	{NatDex: 425, Name: "Drifloon", Type: 132, Ability: AbilityUnburden, BaseStats: [6]int{90, 50, 34, 60, 44, 70}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 426, Name: "Drifblim", Type: 132, Ability: AbilityUnburden, BaseStats: [6]int{150, 80, 44, 90, 54, 80}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthFluctuating},
+	{NatDex: 427, Name: "Buneary", Type: 1, Ability: AbilityKlutz, BaseStats: [6]int{55, 66, 44, 44, 56, 85}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 428, Name: "Lopunny", Type: 1, Ability: AbilityKlutz, BaseStats: [6]int{65, 76, 84, 54, 96, 105}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 429, Name: "Mismagius", Type: 128, Ability: AbilityLevitate, BaseStats: [6]int{60, 60, 60, 105, 105, 105}, EvYield: [6]int{0, 0, 0, 1, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 430, Name: "Honchkrow", Type: 65540, Ability: AbilitySuperLuck, BaseStats: [6]int{100, 125, 52, 105, 52, 71}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 431, Name: "Glameow", Type: 1, Ability: AbilityOwnTempo, BaseStats: [6]int{49, 55, 42, 42, 37, 85}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthFast},
+	{NatDex: 432, Name: "Purugly", Type: 1, Ability: AbilityOwnTempo, BaseStats: [6]int{71, 82, 64, 64, 59, 112}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthFast},
+	{NatDex: 433, Name: "Chingling", Type: 8192, Ability: AbilityLevitate, BaseStats: [6]int{45, 30, 50, 65, 50, 45}, EvYield: [6]int{0, 0, 0, 1, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 434, Name: "Stunky", Type: 65544, Ability: AbilityAftermath, BaseStats: [6]int{63, 63, 47, 41, 41, 74}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 435, Name: "Skuntank", Type: 65544, Ability: AbilityAftermath, BaseStats: [6]int{103, 93, 67, 71, 61, 84}, EvYield: [6]int{2, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 436, Name: "Bronzor", Type: 8448, Ability: AbilityHeatproof, BaseStats: [6]int{57, 24, 86, 24, 86, 23}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 437, Name: "Bronzong", Type: 8448, Ability: AbilityHeatproof, BaseStats: [6]int{67, 89, 116, 79, 116, 33}, EvYield: [6]int{0, 0, 1, 0, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 438, Name: "Bonsly", Type: 32, Ability: AbilityRockHead, BaseStats: [6]int{50, 80, 95, 10, 45, 10}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 439, Name: "Mime Jr.", Type: 139264, Ability: AbilityFilter, BaseStats: [6]int{20, 25, 45, 70, 90, 60}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 440, Name: "Happiny", Type: 1, Ability: AbilitySereneGrace, BaseStats: [6]int{100, 5, 5, 15, 65, 30}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthFast},
+	{NatDex: 441, Name: "Chatot", Type: 5, Ability: AbilityTangledFeet, BaseStats: [6]int{76, 65, 45, 92, 42, 91}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 442, Name: "Spiritomb", Type: 65664, Ability: AbilityPressure, BaseStats: [6]int{50, 92, 108, 92, 108, 35}, EvYield: [6]int{0, 0, 1, 0, 1, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 443, Name: "Gible", Type: 32784, Ability: AbilitySandVeil, BaseStats: [6]int{58, 70, 45, 40, 45, 42}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 444, Name: "Gabite", Type: 32784, Ability: AbilitySandVeil, BaseStats: [6]int{68, 90, 65, 50, 55, 82}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 445, Name: "Garchomp", Type: 32784, Ability: AbilitySandVeil, BaseStats: [6]int{108, 130, 95, 80, 85, 102}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 446, Name: "Munchlax", Type: 1, Ability: AbilityThickFat, BaseStats: [6]int{135, 85, 40, 40, 85, 5}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 447, Name: "Riolu", Type: 2, Ability: AbilityInnerFocus, BaseStats: [6]int{40, 70, 40, 35, 40, 60}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 448, Name: "Lucario", Type: 258, Ability: AbilityInnerFocus, BaseStats: [6]int{70, 110, 70, 115, 70, 90}, EvYield: [6]int{0, 1, 0, 1, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 449, Name: "Hippopotas", Type: 16, Ability: AbilitySandStream, BaseStats: [6]int{68, 72, 78, 38, 42, 32}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 450, Name: "Hippowdon", Type: 16, Ability: AbilitySandStream, BaseStats: [6]int{108, 112, 118, 68, 72, 47}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 451, Name: "Skorupi", Type: 72, Ability: AbilitySniper, BaseStats: [6]int{40, 50, 90, 30, 55, 65}, EvYield: [6]int{0, 0, 1, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 452, Name: "Drapion", Type: 65544, Ability: AbilitySniper, BaseStats: [6]int{70, 90, 110, 60, 75, 95}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 453, Name: "Croagunk", Type: 10, Ability: AbilityDrySkin, BaseStats: [6]int{48, 61, 40, 61, 40, 50}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 454, Name: "Toxicroak", Type: 10, Ability: AbilityDrySkin, BaseStats: [6]int{83, 106, 65, 86, 65, 85}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 455, Name: "Carnivine", Type: 2048, Ability: AbilityLevitate, BaseStats: [6]int{74, 100, 72, 90, 72, 46}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 456, Name: "Finneon", Type: 1024, Ability: AbilityStormDrain, BaseStats: [6]int{49, 49, 56, 49, 61, 66}, EvYield: [6]int{0, 0, 0, 0, 0, 1}, GrowthRate: GrowthErratic},
+	{NatDex: 457, Name: "Lumineon", Type: 1024, Ability: AbilityStormDrain, BaseStats: [6]int{69, 69, 76, 69, 86, 91}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthErratic},
+	{NatDex: 458, Name: "Mantyke", Type: 1028, Ability: AbilityWaterAbsorb, BaseStats: [6]int{45, 20, 50, 60, 120, 50}, EvYield: [6]int{0, 0, 0, 0, 1, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 459, Name: "Snover", Type: 18432, Ability: AbilitySnowWarning, BaseStats: [6]int{60, 62, 50, 62, 60, 40}, EvYield: [6]int{0, 1, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 460, Name: "Abomasnow", Type: 18432, Ability: AbilitySnowWarning, BaseStats: [6]int{90, 92, 75, 92, 85, 60}, EvYield: [6]int{0, 1, 0, 1, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 461, Name: "Weavile", Type: 81920, Ability: AbilityPressure, BaseStats: [6]int{70, 120, 65, 45, 85, 125}, EvYield: [6]int{0, 1, 0, 0, 0, 1}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 462, Name: "Magnezone", Type: 4352, Ability: AbilitySturdy, BaseStats: [6]int{70, 70, 115, 130, 90, 60}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 463, Name: "Lickilicky", Type: 1, Ability: AbilityOblivious, BaseStats: [6]int{110, 85, 95, 80, 95, 50}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 464, Name: "Rhyperior", Type: 48, Ability: AbilitySolidRock, BaseStats: [6]int{115, 140, 130, 55, 55, 40}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 465, Name: "Tangrowth", Type: 2048, Ability: AbilityLeafGuard, BaseStats: [6]int{100, 100, 125, 110, 50, 50}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 466, Name: "Electivire", Type: 4096, Ability: AbilityMotorDrive, BaseStats: [6]int{75, 123, 67, 95, 85, 95}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 467, Name: "Magmortar", Type: 512, Ability: AbilityFlameBody, BaseStats: [6]int{75, 95, 67, 125, 95, 83}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 468, Name: "Togekiss", Type: 131076, Ability: AbilitySereneGrace, BaseStats: [6]int{85, 50, 95, 120, 115, 80}, EvYield: [6]int{0, 0, 0, 2, 1, 0}, GrowthRate: GrowthFast},
+	{NatDex: 469, Name: "Yanmega", Type: 68, Ability: AbilityTintedLens, BaseStats: [6]int{86, 76, 86, 116, 56, 95}, EvYield: [6]int{0, 2, 0, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 470, Name: "Leafeon", Type: 2048, Ability: AbilityLeafGuard, BaseStats: [6]int{65, 110, 130, 60, 65, 95}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 471, Name: "Glaceon", Type: 16384, Ability: AbilitySnowCloak, BaseStats: [6]int{65, 60, 110, 130, 95, 65}, EvYield: [6]int{0, 0, 0, 2, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 472, Name: "Gliscor", Type: 20, Ability: AbilitySandVeil, BaseStats: [6]int{75, 95, 125, 45, 75, 95}, EvYield: [6]int{0, 0, 2, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 473, Name: "Mamoswine", Type: 16400, Ability: AbilitySnowCloak, BaseStats: [6]int{110, 130, 80, 70, 60, 80}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 474, Name: "Porygon-Z", Type: 1, Ability: AbilityDownload, BaseStats: [6]int{85, 80, 70, 135, 75, 90}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 475, Name: "Gallade", Type: 8194, Ability: AbilitySteadfast, BaseStats: [6]int{68, 125, 65, 65, 115, 80}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 476, Name: "Probopass", Type: 288, Ability: AbilityMagnetPull, BaseStats: [6]int{60, 55, 145, 75, 150, 40}, EvYield: [6]int{0, 0, 1, 0, 2, 0}, GrowthRate: GrowthMediumFast},
+	{NatDex: 477, Name: "Dusknoir", Type: 128, Ability: AbilityPressure, BaseStats: [6]int{45, 100, 135, 65, 135, 45}, EvYield: [6]int{0, 0, 1, 0, 2, 0}, GrowthRate: GrowthFast},
+	{NatDex: 478, Name: "Froslass", Type: 16512, Ability: AbilitySnowCloak, BaseStats: [6]int{70, 80, 70, 80, 70, 110}, EvYield: [6]int{0, 0, 0, 0, 0, 2}, GrowthRate: GrowthMediumFast},
+	{NatDex: 479, Name: "Rotom", Type: 4224, Ability: AbilityLevitate, BaseStats: [6]int{50, 50, 77, 95, 77, 91}, EvYield: [6]int{0, 0, 0, 1, 0, 1}, GrowthRate: GrowthMediumFast},
+	{NatDex: 480, Name: "Uxie", Type: 8192, Ability: AbilityLevitate, BaseStats: [6]int{75, 75, 130, 75, 130, 95}, EvYield: [6]int{0, 0, 2, 0, 1, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 481, Name: "Mesprit", Type: 8192, Ability: AbilityLevitate, BaseStats: [6]int{80, 105, 105, 105, 105, 80}, EvYield: [6]int{0, 1, 0, 1, 1, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 482, Name: "Azelf", Type: 8192, Ability: AbilityLevitate, BaseStats: [6]int{75, 125, 70, 125, 70, 115}, EvYield: [6]int{0, 2, 0, 1, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 483, Name: "Dialga", Type: 33024, Ability: AbilityPressure, BaseStats: [6]int{100, 120, 120, 150, 100, 90}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 484, Name: "Palkia", Type: 33792, Ability: AbilityPressure, BaseStats: [6]int{90, 120, 100, 150, 120, 100}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 485, Name: "Heatran", Type: 768, Ability: AbilityFlashFire, BaseStats: [6]int{91, 90, 106, 130, 106, 77}, EvYield: [6]int{0, 0, 0, 3, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 486, Name: "Regigigas", Type: 1, Ability: AbilitySlowStart, BaseStats: [6]int{110, 160, 110, 80, 110, 100}, EvYield: [6]int{0, 3, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 487, Name: "Giratina", Type: 32896, Ability: AbilityPressure, BaseStats: [6]int{150, 100, 120, 100, 120, 90}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 488, Name: "Cresselia", Type: 8192, Ability: AbilityLevitate, BaseStats: [6]int{120, 70, 120, 75, 130, 85}, EvYield: [6]int{0, 0, 0, 0, 3, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 489, Name: "Phione", Type: 1024, Ability: AbilityHydration, BaseStats: [6]int{80, 80, 80, 80, 80, 80}, EvYield: [6]int{1, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 490, Name: "Manaphy", Type: 1024, Ability: AbilityHydration, BaseStats: [6]int{100, 100, 100, 100, 100, 100}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
+	{NatDex: 491, Name: "Darkrai", Type: 65536, Ability: AbilityBadDreams, BaseStats: [6]int{70, 90, 90, 135, 90, 125}, EvYield: [6]int{0, 0, 0, 2, 0, 1}, GrowthRate: GrowthSlow},
+	{NatDex: 492, Name: "Shaymin", Type: 2048, Ability: AbilityNaturalCure, BaseStats: [6]int{100, 100, 100, 100, 100, 100}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthMediumSlow},
+	{NatDex: 493, Name: "Arceus", Type: 1, Ability: AbilityMultitype, BaseStats: [6]int{120, 120, 120, 120, 120, 120}, EvYield: [6]int{3, 0, 0, 0, 0, 0}, GrowthRate: GrowthSlow},
 }
 
 // Pokemon const enum for quick lookup
@@ -997,1435 +1376,1437 @@ const (
 	PkmnArceus     = 493
 )
 
-var AllMoves = []Move{
-	{ID: 1, Name: "Pound", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 2, Name: "Karate Chop", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 3, Name: "Double Slap", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 15, Accuracy: 85},
-	{ID: 4, Name: "Comet Punch", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 18, Accuracy: 85},
-	{ID: 5, Name: "Mega Punch", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 85},
-	{ID: 6, Name: "Pay Day", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 7, Name: "Fire Punch", Type: 512, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 8, Name: "Ice Punch", Type: 16384, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 9, Name: "Thunder Punch", Type: 4096, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 10, Name: "Scratch", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 11, Name: "Vice Grip", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 55, Accuracy: 100},
-	{ID: 12, Name: "Guillotine", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 30},
-	{ID: 13, Name: "Razor Wind", Type: 1, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 14, Name: "Swords Dance", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 15, Name: "Cut", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 50, Accuracy: 95},
-	{ID: 16, Name: "Gust", Type: 4, Category: MoveCategorySpecial, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 17, Name: "Wing Attack", Type: 4, Category: MoveCategoryPhysical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 18, Name: "Whirlwind", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: -6, Power: 0, Accuracy: 0},
-	{ID: 19, Name: "Fly", Type: 4, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 90, Accuracy: 95},
-	{ID: 20, Name: "Bind", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 15, Accuracy: 85},
-	{ID: 21, Name: "Slam", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 75},
-	{ID: 22, Name: "Vine Whip", Type: 2048, Category: MoveCategoryPhysical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 45, Accuracy: 100},
-	{ID: 23, Name: "Stomp", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 24, Name: "Double Kick", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 30, Accuracy: 100},
-	{ID: 25, Name: "Mega Kick", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 75},
-	{ID: 26, Name: "Jump Kick", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 95},
-	{ID: 27, Name: "Rolling Kick", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 60, Accuracy: 85},
-	{ID: 28, Name: "Sand Attack", Type: 16, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 29, Name: "Headbutt", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 30, Name: "Horn Attack", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 31, Name: "Fury Attack", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 15, Accuracy: 85},
-	{ID: 32, Name: "Horn Drill", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 30},
-	{ID: 33, Name: "Tackle", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 34, Name: "Body Slam", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 85, Accuracy: 100},
-	{ID: 35, Name: "Wrap", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 15, Accuracy: 90},
-	{ID: 36, Name: "Take Down", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 90, Accuracy: 85},
-	{ID: 37, Name: "Thrash", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 8, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 38, Name: "Double-Edge", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 39, Name: "Tail Whip", Type: 1, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 40, Name: "Poison Sting", Type: 8, Category: MoveCategoryPhysical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 15, Accuracy: 100},
-	{ID: 41, Name: "Twineedle", Type: 64, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 25, Accuracy: 100},
-	{ID: 42, Name: "Pin Missile", Type: 64, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 25, Accuracy: 95},
-	{ID: 43, Name: "Leer", Type: 1, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 44, Name: "Bite", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 45, Name: "Growl", Type: 1, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 46, Name: "Roar", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: -6, Power: 0, Accuracy: 0},
-	{ID: 47, Name: "Sing", Type: 1, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 55},
-	{ID: 48, Name: "Supersonic", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 55},
-	{ID: 49, Name: "Sonic Boom", Type: 1, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 50, Name: "Disable", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 51, Name: "Acid", Type: 8, Category: MoveCategorySpecial, CurrentPP: 30, MaxPP: 30, Targets: 11, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 52, Name: "Ember", Type: 512, Category: MoveCategorySpecial, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 53, Name: "Flamethrower", Type: 512, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 54, Name: "Mist", Type: 16384, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 55, Name: "Water Gun", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 56, Name: "Hydro Pump", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 110, Accuracy: 80},
-	{ID: 57, Name: "Surf", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 9, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 58, Name: "Ice Beam", Type: 16384, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 59, Name: "Blizzard", Type: 16384, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 11, Priority: 0, Power: 110, Accuracy: 70},
-	{ID: 60, Name: "Psybeam", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 61, Name: "Bubble Beam", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 62, Name: "Aurora Beam", Type: 16384, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 63, Name: "Hyper Beam", Type: 1, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 64, Name: "Peck", Type: 4, Category: MoveCategoryPhysical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 35, Accuracy: 100},
-	{ID: 65, Name: "Drill Peck", Type: 4, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 66, Name: "Submission", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 80},
-	{ID: 67, Name: "Low Kick", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 68, Name: "Counter", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 1, Priority: -5, Power: 0, Accuracy: 100},
-	{ID: 69, Name: "Seismic Toss", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 70, Name: "Strength", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 71, Name: "Absorb", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 20, Accuracy: 100},
-	{ID: 72, Name: "Mega Drain", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 73, Name: "Leech Seed", Type: 2048, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 74, Name: "Growth", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 75, Name: "Razor Leaf", Type: 2048, Category: MoveCategoryPhysical, CurrentPP: 25, MaxPP: 25, Targets: 11, Priority: 0, Power: 55, Accuracy: 95},
-	{ID: 76, Name: "Solar Beam", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 77, Name: "Poison Powder", Type: 8, Category: MoveCategoryStatus, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 0, Accuracy: 75},
-	{ID: 78, Name: "Stun Spore", Type: 2048, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 0, Accuracy: 75},
-	{ID: 79, Name: "Sleep Powder", Type: 2048, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 75},
-	{ID: 80, Name: "Petal Dance", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 8, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 81, Name: "String Shot", Type: 64, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 11, Priority: 0, Power: 0, Accuracy: 95},
-	{ID: 82, Name: "Dragon Rage", Type: 32768, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 83, Name: "Fire Spin", Type: 512, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 35, Accuracy: 85},
-	{ID: 84, Name: "Thunder Shock", Type: 4096, Category: MoveCategorySpecial, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 85, Name: "Thunderbolt", Type: 4096, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 86, Name: "Thunder Wave", Type: 4096, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 87, Name: "Thunder", Type: 4096, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 110, Accuracy: 70},
-	{ID: 88, Name: "Rock Throw", Type: 32, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 50, Accuracy: 90},
-	{ID: 89, Name: "Earthquake", Type: 16, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 9, Priority: 0, Power: 100, Accuracy: 100},
-	{ID: 90, Name: "Fissure", Type: 16, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 30},
-	{ID: 91, Name: "Dig", Type: 16, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 92, Name: "Toxic", Type: 8, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 93, Name: "Confusion", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 94, Name: "Psychic", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 95, Name: "Hypnosis", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 60},
-	{ID: 96, Name: "Meditate", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 97, Name: "Agility", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 98, Name: "Quick Attack", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 99, Name: "Rage", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 20, Accuracy: 100},
-	{ID: 100, Name: "Teleport", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 101, Name: "Night Shade", Type: 128, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 102, Name: "Mimic", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 103, Name: "Screech", Type: 1, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 0, Accuracy: 85},
-	{ID: 104, Name: "Double Team", Type: 1, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 105, Name: "Recover", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 106, Name: "Harden", Type: 1, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 107, Name: "Minimize", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 108, Name: "Smokescreen", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 109, Name: "Confuse Ray", Type: 128, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 110, Name: "Withdraw", Type: 1024, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 111, Name: "Defense Curl", Type: 1, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 112, Name: "Barrier", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 113, Name: "Light Screen", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 114, Name: "Haze", Type: 16384, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 115, Name: "Reflect", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 116, Name: "Focus Energy", Type: 1, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 117, Name: "Bide", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 1, Power: 0, Accuracy: 0},
-	{ID: 118, Name: "Metronome", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 119, Name: "Mirror Move", Type: 4, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 120, Name: "Self-Destruct", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 9, Priority: 0, Power: 200, Accuracy: 100},
-	{ID: 121, Name: "Egg Bomb", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 75},
-	{ID: 122, Name: "Lick", Type: 128, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 30, Accuracy: 100},
-	{ID: 123, Name: "Smog", Type: 8, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 30, Accuracy: 70},
-	{ID: 124, Name: "Sludge", Type: 8, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 125, Name: "Bone Club", Type: 16, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 85},
-	{ID: 126, Name: "Fire Blast", Type: 512, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 110, Accuracy: 85},
-	{ID: 127, Name: "Waterfall", Type: 1024, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 128, Name: "Clamp", Type: 1024, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 35, Accuracy: 85},
-	{ID: 129, Name: "Swift", Type: 1, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 11, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 130, Name: "Skull Bash", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 130, Accuracy: 100},
-	{ID: 131, Name: "Spike Cannon", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 20, Accuracy: 100},
-	{ID: 132, Name: "Constrict", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 10, Accuracy: 100},
-	{ID: 133, Name: "Amnesia", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 134, Name: "Kinesis", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 80},
-	{ID: 135, Name: "Soft-Boiled", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 136, Name: "High Jump Kick", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 130, Accuracy: 90},
-	{ID: 137, Name: "Glare", Type: 1, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 138, Name: "Dream Eater", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 100, Accuracy: 100},
-	{ID: 139, Name: "Poison Gas", Type: 8, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 11, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 140, Name: "Barrage", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 15, Accuracy: 85},
-	{ID: 141, Name: "Leech Life", Type: 64, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 142, Name: "Lovely Kiss", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 75},
-	{ID: 143, Name: "Sky Attack", Type: 4, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 140, Accuracy: 90},
-	{ID: 144, Name: "Transform", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 145, Name: "Bubble", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 30, MaxPP: 30, Targets: 11, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 146, Name: "Dizzy Punch", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 147, Name: "Spore", Type: 2048, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 148, Name: "Flash", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 149, Name: "Psywave", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 150, Name: "Splash", Type: 1, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 151, Name: "Acid Armor", Type: 8, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 152, Name: "Crabhammer", Type: 1024, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 90},
-	{ID: 153, Name: "Explosion", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 9, Priority: 0, Power: 250, Accuracy: 100},
-	{ID: 154, Name: "Fury Swipes", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 18, Accuracy: 80},
-	{ID: 155, Name: "Bonemerang", Type: 16, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 50, Accuracy: 90},
-	{ID: 156, Name: "Rest", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 157, Name: "Rock Slide", Type: 32, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 75, Accuracy: 90},
-	{ID: 158, Name: "Hyper Fang", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 90},
-	{ID: 159, Name: "Sharpen", Type: 1, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 160, Name: "Conversion", Type: 1, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 161, Name: "Tri Attack", Type: 1, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 162, Name: "Super Fang", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 163, Name: "Slash", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 164, Name: "Substitute", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 165, Name: "Struggle", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 1, MaxPP: 1, Targets: 8, Priority: 0, Power: 50, Accuracy: 0},
-	{ID: 166, Name: "Sketch", Type: 1, Category: MoveCategoryStatus, CurrentPP: 1, MaxPP: 1, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 167, Name: "Triple Kick", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 10, Accuracy: 90},
-	{ID: 168, Name: "Thief", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 169, Name: "Spider Web", Type: 64, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 170, Name: "Mind Reader", Type: 1, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 171, Name: "Nightmare", Type: 128, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 172, Name: "Flame Wheel", Type: 512, Category: MoveCategoryPhysical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 173, Name: "Snore", Type: 1, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 174, Name: "Curse", Type: 128, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 1, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 175, Name: "Flail", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 176, Name: "Conversion 2", Type: 1, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 177, Name: "Aeroblast", Type: 4, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 95},
-	{ID: 178, Name: "Cotton Spore", Type: 2048, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 179, Name: "Reversal", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 180, Name: "Spite", Type: 128, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 181, Name: "Powder Snow", Type: 16384, Category: MoveCategorySpecial, CurrentPP: 25, MaxPP: 25, Targets: 11, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 182, Name: "Protect", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 4, Power: 0, Accuracy: 0},
-	{ID: 183, Name: "Mach Punch", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 184, Name: "Scary Face", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 185, Name: "Feint Attack", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 186, Name: "Sweet Kiss", Type: 131072, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 75},
-	{ID: 187, Name: "Belly Drum", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 188, Name: "Sludge Bomb", Type: 8, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 189, Name: "Mud-Slap", Type: 16, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 20, Accuracy: 100},
-	{ID: 190, Name: "Octazooka", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 65, Accuracy: 85},
-	{ID: 191, Name: "Spikes", Type: 16, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 6, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 192, Name: "Zap Cannon", Type: 4096, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 50},
-	{ID: 193, Name: "Foresight", Type: 1, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 194, Name: "Destiny Bond", Type: 128, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 195, Name: "Perish Song", Type: 1, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 14, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 196, Name: "Icy Wind", Type: 16384, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 11, Priority: 0, Power: 55, Accuracy: 95},
-	{ID: 197, Name: "Detect", Type: 2, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 4, Power: 0, Accuracy: 0},
-	{ID: 198, Name: "Bone Rush", Type: 16, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 25, Accuracy: 90},
-	{ID: 199, Name: "Lock-On", Type: 1, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 200, Name: "Outrage", Type: 32768, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 8, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 201, Name: "Sandstorm", Type: 32, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 202, Name: "Giga Drain", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 203, Name: "Endure", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 4, Power: 0, Accuracy: 0},
-	{ID: 204, Name: "Charm", Type: 131072, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 205, Name: "Rollout", Type: 32, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 30, Accuracy: 90},
-	{ID: 206, Name: "False Swipe", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 207, Name: "Swagger", Type: 1, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 85},
-	{ID: 208, Name: "Milk Drink", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 209, Name: "Spark", Type: 4096, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 210, Name: "Fury Cutter", Type: 64, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 40, Accuracy: 95},
-	{ID: 211, Name: "Steel Wing", Type: 256, Category: MoveCategoryPhysical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 70, Accuracy: 90},
-	{ID: 212, Name: "Mean Look", Type: 1, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 213, Name: "Attract", Type: 1, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 214, Name: "Sleep Talk", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 215, Name: "Heal Bell", Type: 1, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 13, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 216, Name: "Return", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 217, Name: "Present", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 218, Name: "Frustration", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 219, Name: "Safeguard", Type: 1, Category: MoveCategoryStatus, CurrentPP: 25, MaxPP: 25, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 220, Name: "Pain Split", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 221, Name: "Sacred Fire", Type: 512, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 95},
-	{ID: 222, Name: "Magnitude", Type: 16, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 9, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 223, Name: "Dynamic Punch", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 50},
-	{ID: 224, Name: "Megahorn", Type: 64, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 120, Accuracy: 85},
-	{ID: 225, Name: "Dragon Breath", Type: 32768, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 226, Name: "Baton Pass", Type: 1, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 227, Name: "Encore", Type: 1, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 228, Name: "Pursuit", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 229, Name: "Rapid Spin", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 20, Accuracy: 100},
-	{ID: 230, Name: "Sweet Scent", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 231, Name: "Iron Tail", Type: 256, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 100, Accuracy: 75},
-	{ID: 232, Name: "Metal Claw", Type: 256, Category: MoveCategoryPhysical, CurrentPP: 35, MaxPP: 35, Targets: 10, Priority: 0, Power: 50, Accuracy: 95},
-	{ID: 233, Name: "Vital Throw", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: -1, Power: 70, Accuracy: 0},
-	{ID: 234, Name: "Morning Sun", Type: 1, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 235, Name: "Synthesis", Type: 2048, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 236, Name: "Moonlight", Type: 131072, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 237, Name: "Hidden Power", Type: 1, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 238, Name: "Cross Chop", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 80},
-	{ID: 239, Name: "Twister", Type: 32768, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 11, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 240, Name: "Rain Dance", Type: 1024, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 241, Name: "Sunny Day", Type: 512, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 242, Name: "Crunch", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 243, Name: "Mirror Coat", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 1, Priority: -5, Power: 0, Accuracy: 100},
-	{ID: 244, Name: "Psych Up", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 245, Name: "Extreme Speed", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 2, Power: 80, Accuracy: 100},
-	{ID: 246, Name: "Ancient Power", Type: 32, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 247, Name: "Shadow Ball", Type: 128, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 248, Name: "Future Sight", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 249, Name: "Rock Smash", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 250, Name: "Whirlpool", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 35, Accuracy: 85},
-	{ID: 251, Name: "Beat Up", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 252, Name: "Fake Out", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 3, Power: 40, Accuracy: 100},
-	{ID: 253, Name: "Uproar", Type: 1, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 8, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 254, Name: "Stockpile", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 255, Name: "Spit Up", Type: 1, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 256, Name: "Swallow", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 257, Name: "Heat Wave", Type: 512, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 95, Accuracy: 90},
-	{ID: 258, Name: "Hail", Type: 16384, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 259, Name: "Torment", Type: 65536, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 260, Name: "Flatter", Type: 65536, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 261, Name: "Will-O-Wisp", Type: 512, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 85},
-	{ID: 262, Name: "Memento", Type: 65536, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 263, Name: "Facade", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 264, Name: "Focus Punch", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: -3, Power: 150, Accuracy: 100},
-	{ID: 265, Name: "Smelling Salts", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 266, Name: "Follow Me", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 2, Power: 0, Accuracy: 0},
-	{ID: 267, Name: "Nature Power", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 268, Name: "Charge", Type: 4096, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 269, Name: "Taunt", Type: 65536, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 270, Name: "Helping Hand", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 3, Priority: 5, Power: 0, Accuracy: 0},
-	{ID: 271, Name: "Trick", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 272, Name: "Role Play", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 273, Name: "Wish", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 274, Name: "Assist", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 275, Name: "Ingrain", Type: 2048, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 276, Name: "Superpower", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 277, Name: "Magic Coat", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 7, Priority: 4, Power: 0, Accuracy: 0},
-	{ID: 278, Name: "Recycle", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 279, Name: "Revenge", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: -4, Power: 60, Accuracy: 100},
-	{ID: 280, Name: "Brick Break", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 281, Name: "Yawn", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 282, Name: "Knock Off", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 283, Name: "Endeavor", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 284, Name: "Eruption", Type: 512, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 11, Priority: 0, Power: 150, Accuracy: 100},
-	{ID: 285, Name: "Skill Swap", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 286, Name: "Imprison", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 287, Name: "Refresh", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 288, Name: "Grudge", Type: 128, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 289, Name: "Snatch", Type: 65536, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 4, Power: 0, Accuracy: 0},
-	{ID: 290, Name: "Secret Power", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 291, Name: "Dive", Type: 1024, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 292, Name: "Arm Thrust", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 15, Accuracy: 100},
-	{ID: 293, Name: "Camouflage", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 294, Name: "Tail Glow", Type: 64, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 295, Name: "Luster Purge", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 296, Name: "Mist Ball", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 297, Name: "Feather Dance", Type: 4, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 298, Name: "Teeter Dance", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 9, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 299, Name: "Blaze Kick", Type: 512, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 85, Accuracy: 90},
-	{ID: 300, Name: "Mud Sport", Type: 16, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 301, Name: "Ice Ball", Type: 16384, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 30, Accuracy: 90},
-	{ID: 302, Name: "Needle Arm", Type: 2048, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 303, Name: "Slack Off", Type: 1, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 304, Name: "Hyper Voice", Type: 1, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 305, Name: "Poison Fang", Type: 8, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 306, Name: "Crush Claw", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 75, Accuracy: 95},
-	{ID: 307, Name: "Blast Burn", Type: 512, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 308, Name: "Hydro Cannon", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 309, Name: "Meteor Mash", Type: 256, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 90},
-	{ID: 310, Name: "Astonish", Type: 128, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 30, Accuracy: 100},
-	{ID: 311, Name: "Weather Ball", Type: 1, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 312, Name: "Aromatherapy", Type: 2048, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 13, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 313, Name: "Fake Tears", Type: 65536, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 314, Name: "Air Cutter", Type: 4, Category: MoveCategorySpecial, CurrentPP: 25, MaxPP: 25, Targets: 11, Priority: 0, Power: 60, Accuracy: 95},
-	{ID: 315, Name: "Overheat", Type: 512, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 130, Accuracy: 90},
-	{ID: 316, Name: "Odor Sleuth", Type: 1, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 317, Name: "Rock Tomb", Type: 32, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 60, Accuracy: 95},
-	{ID: 318, Name: "Silver Wind", Type: 64, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 319, Name: "Metal Sound", Type: 256, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 0, Accuracy: 85},
-	{ID: 320, Name: "Grass Whistle", Type: 2048, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 55},
-	{ID: 321, Name: "Tickle", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 322, Name: "Cosmic Power", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 323, Name: "Water Spout", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 11, Priority: 0, Power: 150, Accuracy: 100},
-	{ID: 324, Name: "Signal Beam", Type: 64, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 325, Name: "Shadow Punch", Type: 128, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 326, Name: "Extrasensory", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 327, Name: "Sky Uppercut", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 85, Accuracy: 90},
-	{ID: 328, Name: "Sand Tomb", Type: 16, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 35, Accuracy: 85},
-	{ID: 329, Name: "Sheer Cold", Type: 16384, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 30},
-	{ID: 330, Name: "Muddy Water", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 90, Accuracy: 85},
-	{ID: 331, Name: "Bullet Seed", Type: 2048, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 25, Accuracy: 100},
-	{ID: 332, Name: "Aerial Ace", Type: 4, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 333, Name: "Icicle Spear", Type: 16384, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 0, Power: 25, Accuracy: 100},
-	{ID: 334, Name: "Iron Defense", Type: 256, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 335, Name: "Block", Type: 1, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 336, Name: "Howl", Type: 1, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 337, Name: "Dragon Claw", Type: 32768, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 338, Name: "Frenzy Plant", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 339, Name: "Bulk Up", Type: 2, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 340, Name: "Bounce", Type: 4, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 85, Accuracy: 85},
-	{ID: 341, Name: "Mud Shot", Type: 16, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 55, Accuracy: 95},
-	{ID: 342, Name: "Poison Tail", Type: 8, Category: MoveCategoryPhysical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 343, Name: "Covet", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 25, MaxPP: 25, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 344, Name: "Volt Tackle", Type: 4096, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 345, Name: "Magical Leaf", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 346, Name: "Water Sport", Type: 1024, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 347, Name: "Calm Mind", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 348, Name: "Leaf Blade", Type: 2048, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 349, Name: "Dragon Dance", Type: 32768, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 350, Name: "Rock Blast", Type: 32, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 25, Accuracy: 90},
-	{ID: 351, Name: "Shock Wave", Type: 4096, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 352, Name: "Water Pulse", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 353, Name: "Doom Desire", Type: 256, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 140, Accuracy: 100},
-	{ID: 354, Name: "Psycho Boost", Type: 8192, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 140, Accuracy: 90},
-	{ID: 355, Name: "Roost", Type: 4, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 356, Name: "Gravity", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 357, Name: "Miracle Eye", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 40, MaxPP: 40, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 358, Name: "Wake-Up Slap", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 359, Name: "Hammer Arm", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 90},
-	{ID: 360, Name: "Gyro Ball", Type: 256, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 361, Name: "Healing Wish", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 362, Name: "Brine", Type: 1024, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 363, Name: "Natural Gift", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 364, Name: "Feint", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 2, Power: 30, Accuracy: 100},
-	{ID: 365, Name: "Pluck", Type: 4, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 366, Name: "Tailwind", Type: 4, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 367, Name: "Acupressure", Type: 1, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 5, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 368, Name: "Metal Burst", Type: 256, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 1, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 369, Name: "U-turn", Type: 64, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 370, Name: "Close Combat", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 371, Name: "Payback", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 372, Name: "Assurance", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 373, Name: "Embargo", Type: 65536, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 374, Name: "Fling", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 375, Name: "Psycho Shift", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 376, Name: "Trump Card", Type: 1, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 377, Name: "Heal Block", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 378, Name: "Wring Out", Type: 1, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 379, Name: "Power Trick", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 380, Name: "Gastro Acid", Type: 8, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 381, Name: "Lucky Chant", Type: 1, Category: MoveCategoryStatus, CurrentPP: 30, MaxPP: 30, Targets: 4, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 382, Name: "Me First", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 2, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 383, Name: "Copycat", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 384, Name: "Power Swap", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 385, Name: "Guard Swap", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 386, Name: "Punishment", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 387, Name: "Last Resort", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 140, Accuracy: 100},
-	{ID: 388, Name: "Worry Seed", Type: 2048, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 389, Name: "Sucker Punch", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 1, Power: 70, Accuracy: 100},
-	{ID: 390, Name: "Toxic Spikes", Type: 8, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 6, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 391, Name: "Heart Swap", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 392, Name: "Aqua Ring", Type: 1024, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 393, Name: "Magnet Rise", Type: 4096, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 394, Name: "Flare Blitz", Type: 512, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 395, Name: "Force Palm", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 396, Name: "Aura Sphere", Type: 2, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 0},
-	{ID: 397, Name: "Rock Polish", Type: 32, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 398, Name: "Poison Jab", Type: 8, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 399, Name: "Dark Pulse", Type: 65536, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 400, Name: "Night Slash", Type: 65536, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 401, Name: "Aqua Tail", Type: 1024, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 90},
-	{ID: 402, Name: "Seed Bomb", Type: 2048, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 403, Name: "Air Slash", Type: 4, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 75, Accuracy: 95},
-	{ID: 404, Name: "X-Scissor", Type: 64, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 405, Name: "Bug Buzz", Type: 64, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 406, Name: "Dragon Pulse", Type: 32768, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 85, Accuracy: 100},
-	{ID: 407, Name: "Dragon Rush", Type: 32768, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 75},
-	{ID: 408, Name: "Power Gem", Type: 32, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 409, Name: "Drain Punch", Type: 2, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 410, Name: "Vacuum Wave", Type: 2, Category: MoveCategorySpecial, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 411, Name: "Focus Blast", Type: 2, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 70},
-	{ID: 412, Name: "Energy Ball", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 413, Name: "Brave Bird", Type: 4, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 414, Name: "Earth Power", Type: 16, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 415, Name: "Switcheroo", Type: 65536, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 416, Name: "Giga Impact", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 417, Name: "Nasty Plot", Type: 65536, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 418, Name: "Bullet Punch", Type: 256, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 419, Name: "Avalanche", Type: 16384, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: -4, Power: 60, Accuracy: 100},
-	{ID: 420, Name: "Ice Shard", Type: 16384, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 421, Name: "Shadow Claw", Type: 128, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 422, Name: "Thunder Fang", Type: 4096, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 65, Accuracy: 95},
-	{ID: 423, Name: "Ice Fang", Type: 16384, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 65, Accuracy: 95},
-	{ID: 424, Name: "Fire Fang", Type: 512, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 65, Accuracy: 95},
-	{ID: 425, Name: "Shadow Sneak", Type: 128, Category: MoveCategoryPhysical, CurrentPP: 30, MaxPP: 30, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 426, Name: "Mud Bomb", Type: 16, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 65, Accuracy: 85},
-	{ID: 427, Name: "Psycho Cut", Type: 8192, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 428, Name: "Zen Headbutt", Type: 8192, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 90},
-	{ID: 429, Name: "Mirror Shot", Type: 256, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 65, Accuracy: 85},
-	{ID: 430, Name: "Flash Cannon", Type: 256, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 431, Name: "Rock Climb", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 90, Accuracy: 85},
-	{ID: 432, Name: "Defog", Type: 4, Category: MoveCategoryStatus, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 433, Name: "Trick Room", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 5, MaxPP: 5, Targets: 12, Priority: -7, Power: 0, Accuracy: 0},
-	{ID: 434, Name: "Draco Meteor", Type: 32768, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 130, Accuracy: 90},
-	{ID: 435, Name: "Discharge", Type: 4096, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 9, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 436, Name: "Lava Plume", Type: 512, Category: MoveCategorySpecial, CurrentPP: 15, MaxPP: 15, Targets: 9, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 437, Name: "Leaf Storm", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 130, Accuracy: 90},
-	{ID: 438, Name: "Power Whip", Type: 2048, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 120, Accuracy: 85},
-	{ID: 439, Name: "Rock Wrecker", Type: 32, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 440, Name: "Cross Poison", Type: 8, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 441, Name: "Gunk Shot", Type: 8, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 80},
-	{ID: 442, Name: "Iron Head", Type: 256, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 443, Name: "Magnet Bomb", Type: 256, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 0},
-	{ID: 444, Name: "Stone Edge", Type: 32, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 80},
-	{ID: 445, Name: "Captivate", Type: 1, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 11, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 446, Name: "Stealth Rock", Type: 32, Category: MoveCategoryStatus, CurrentPP: 20, MaxPP: 20, Targets: 6, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 447, Name: "Grass Knot", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 448, Name: "Chatter", Type: 4, Category: MoveCategorySpecial, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 65, Accuracy: 100},
-	{ID: 449, Name: "Judgment", Type: 1, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 100, Accuracy: 100},
-	{ID: 450, Name: "Bug Bite", Type: 64, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 451, Name: "Charge Beam", Type: 4096, Category: MoveCategorySpecial, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 50, Accuracy: 90},
-	{ID: 452, Name: "Wood Hammer", Type: 2048, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 453, Name: "Aqua Jet", Type: 1024, Category: MoveCategoryPhysical, CurrentPP: 20, MaxPP: 20, Targets: 10, Priority: 1, Power: 40, Accuracy: 100},
-	{ID: 454, Name: "Attack Order", Type: 64, Category: MoveCategoryPhysical, CurrentPP: 15, MaxPP: 15, Targets: 10, Priority: 0, Power: 90, Accuracy: 100},
-	{ID: 455, Name: "Defend Order", Type: 64, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 456, Name: "Heal Order", Type: 64, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 457, Name: "Head Smash", Type: 32, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 80},
-	{ID: 458, Name: "Double Hit", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 10, MaxPP: 10, Targets: 10, Priority: 0, Power: 35, Accuracy: 90},
-	{ID: 459, Name: "Roar of Time", Type: 32768, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 150, Accuracy: 90},
-	{ID: 460, Name: "Spacial Rend", Type: 32768, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 95},
-	{ID: 461, Name: "Lunar Dance", Type: 8192, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 7, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 462, Name: "Crush Grip", Type: 1, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 463, Name: "Magma Storm", Type: 512, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 100, Accuracy: 75},
-	{ID: 464, Name: "Dark Void", Type: 65536, Category: MoveCategoryStatus, CurrentPP: 10, MaxPP: 10, Targets: 11, Priority: 0, Power: 0, Accuracy: 50},
-	{ID: 465, Name: "Seed Flare", Type: 2048, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 85},
-	{ID: 466, Name: "Ominous Wind", Type: 128, Category: MoveCategorySpecial, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 60, Accuracy: 100},
-	{ID: 467, Name: "Shadow Force", Type: 128, Category: MoveCategoryPhysical, CurrentPP: 5, MaxPP: 5, Targets: 10, Priority: 0, Power: 120, Accuracy: 100},
-	{ID: 10001, Name: "Shadow Rush", Type: 0, Category: MoveCategoryPhysical, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 55, Accuracy: 100},
-	{ID: 10002, Name: "Shadow Blast", Type: 0, Category: MoveCategoryPhysical, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 80, Accuracy: 100},
-	{ID: 10003, Name: "Shadow Blitz", Type: 0, Category: MoveCategoryPhysical, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 40, Accuracy: 100},
-	{ID: 10004, Name: "Shadow Bolt", Type: 0, Category: MoveCategorySpecial, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 10005, Name: "Shadow Break", Type: 0, Category: MoveCategoryPhysical, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 10006, Name: "Shadow Chill", Type: 0, Category: MoveCategorySpecial, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 10007, Name: "Shadow End", Type: 0, Category: MoveCategoryPhysical, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 120, Accuracy: 60},
-	{ID: 10008, Name: "Shadow Fire", Type: 0, Category: MoveCategorySpecial, CurrentPP: 0, MaxPP: 0, Targets: 10, Priority: 0, Power: 75, Accuracy: 100},
-	{ID: 10009, Name: "Shadow Rave", Type: 0, Category: MoveCategorySpecial, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 70, Accuracy: 100},
-	{ID: 10010, Name: "Shadow Storm", Type: 0, Category: MoveCategorySpecial, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 95, Accuracy: 100},
-	{ID: 10011, Name: "Shadow Wave", Type: 0, Category: MoveCategorySpecial, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 50, Accuracy: 100},
-	{ID: 10012, Name: "Shadow Down", Type: 0, Category: MoveCategoryStatus, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 10013, Name: "Shadow Half", Type: 0, Category: MoveCategorySpecial, CurrentPP: 0, MaxPP: 0, Targets: 12, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 10014, Name: "Shadow Hold", Type: 0, Category: MoveCategoryStatus, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 10015, Name: "Shadow Mist", Type: 0, Category: MoveCategoryStatus, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 0, Accuracy: 100},
-	{ID: 10016, Name: "Shadow Panic", Type: 0, Category: MoveCategoryStatus, CurrentPP: 0, MaxPP: 0, Targets: 6, Priority: 0, Power: 0, Accuracy: 90},
-	{ID: 10017, Name: "Shadow Shed", Type: 0, Category: MoveCategoryStatus, CurrentPP: 0, MaxPP: 0, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
-	{ID: 10018, Name: "Shadow Sky", Type: 0, Category: MoveCategoryStatus, CurrentPP: 0, MaxPP: 0, Targets: 12, Priority: 0, Power: 0, Accuracy: 0},
+var AllMoves = []MoveData{
+	{"Pound", 1, MoveCategoryPhysical, 10, 0, 40, 100, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Karate Chop", 2, MoveCategoryPhysical, 10, 0, 50, 100, 25, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Double Slap", 1, MoveCategoryPhysical, 10, 0, 15, 85, 10, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Comet Punch", 1, MoveCategoryPhysical, 10, 0, 18, 85, 15, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Mega Punch", 1, MoveCategoryPhysical, 10, 0, 80, 85, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Pay Day", 1, MoveCategoryPhysical, 10, 0, 40, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Fire Punch", 512, MoveCategoryPhysical, 10, 0, 75, 100, 15, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Ice Punch", 16384, MoveCategoryPhysical, 10, 0, 75, 100, 15, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Thunder Punch", 4096, MoveCategoryPhysical, 10, 0, 75, 100, 15, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Scratch", 1, MoveCategoryPhysical, 10, 0, 40, 100, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Vice Grip", 1, MoveCategoryPhysical, 10, 0, 55, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Guillotine", 1, MoveCategoryPhysical, 10, 0, 0, 30, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Razor Wind", 1, MoveCategorySpecial, 11, 0, 80, 100, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagCharge | FlagProtect | FlagMirror},
+	{"Swords Dance", 1, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagDance},
+	{"Cut", 1, MoveCategoryPhysical, 10, 0, 50, 95, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Gust", 4, MoveCategorySpecial, 10, 0, 40, 100, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagDistance},
+	{"Wing Attack", 4, MoveCategoryPhysical, 10, 0, 60, 100, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagDistance},
+	{"Whirlwind", 1, MoveCategoryStatus, 10, -6, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagReflectable | FlagMirror | FlagAuthentic},
+	{"Fly", 4, MoveCategoryPhysical, 10, 0, 90, 95, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagCharge | FlagProtect | FlagMirror | FlagGravity | FlagDistance},
+	{"Bind", 1, MoveCategoryPhysical, 10, 0, 15, 85, 20, 0, 0, 5, 6, 0, 0, 0, 100, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Slam", 1, MoveCategoryPhysical, 10, 0, 80, 75, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Vine Whip", 2048, MoveCategoryPhysical, 10, 0, 45, 100, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Stomp", 1, MoveCategoryPhysical, 10, 0, 65, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, FlagContact | FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Double Kick", 2, MoveCategoryPhysical, 10, 0, 30, 100, 30, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Mega Kick", 1, MoveCategoryPhysical, 10, 0, 120, 75, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Jump Kick", 2, MoveCategoryPhysical, 10, 0, 100, 95, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagGravity},
+	{"Rolling Kick", 2, MoveCategoryPhysical, 10, 0, 60, 85, 15, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Sand Attack", 16, MoveCategoryStatus, 10, 0, 0, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Headbutt", 1, MoveCategoryPhysical, 10, 0, 70, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Horn Attack", 1, MoveCategoryPhysical, 10, 0, 65, 100, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Fury Attack", 1, MoveCategoryPhysical, 10, 0, 15, 85, 20, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Horn Drill", 1, MoveCategoryPhysical, 10, 0, 0, 30, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Tackle", 1, MoveCategoryPhysical, 10, 0, 40, 100, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Body Slam", 1, MoveCategoryPhysical, 10, 0, 85, 100, 15, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Wrap", 1, MoveCategoryPhysical, 10, 0, 15, 90, 20, 0, 0, 5, 6, 0, 0, 0, 100, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Take Down", 1, MoveCategoryPhysical, 10, 0, 90, 85, 20, 0, 0, 0, 0, -25, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Thrash", 1, MoveCategoryPhysical, 8, 0, 120, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Double-Edge", 1, MoveCategoryPhysical, 10, 0, 120, 100, 15, 0, 0, 0, 0, -33, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Tail Whip", 1, MoveCategoryStatus, 11, 0, 0, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Poison Sting", 8, MoveCategoryPhysical, 10, 0, 15, 100, 35, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagProtect | FlagMirror},
+	{"Twineedle", 64, MoveCategoryPhysical, 10, 0, 25, 100, 20, 2, 2, 0, 0, 0, 0, 0, 20, 0, 0, FlagProtect | FlagMirror},
+	{"Pin Missile", 64, MoveCategoryPhysical, 10, 0, 25, 95, 20, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Leer", 1, MoveCategoryStatus, 11, 0, 0, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagProtect | FlagReflectable | FlagMirror},
+	{"Bite", 65536, MoveCategoryPhysical, 10, 0, 60, 100, 25, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, FlagContact | FlagProtect | FlagMirror | FlagBite},
+	{"Growl", 1, MoveCategoryStatus, 11, 0, 0, 100, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagSound | FlagAuthentic},
+	{"Roar", 1, MoveCategoryStatus, 10, -6, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagReflectable | FlagMirror | FlagSound | FlagAuthentic},
+	{"Sing", 1, MoveCategoryStatus, 10, 0, 0, 55, 15, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagSound | FlagAuthentic},
+	{"Supersonic", 1, MoveCategoryStatus, 10, 0, 0, 55, 20, 0, 0, 2, 5, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagSound | FlagAuthentic},
+	{"Sonic Boom", 1, MoveCategorySpecial, 10, 0, 0, 90, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Disable", 1, MoveCategoryStatus, 10, 0, 0, 100, 20, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagAuthentic},
+	{"Acid", 8, MoveCategorySpecial, 11, 0, 40, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror},
+	{"Ember", 512, MoveCategorySpecial, 10, 0, 40, 100, 25, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Flamethrower", 512, MoveCategorySpecial, 10, 0, 90, 100, 15, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Mist", 16384, MoveCategoryStatus, 4, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Water Gun", 1024, MoveCategorySpecial, 10, 0, 40, 100, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Hydro Pump", 1024, MoveCategorySpecial, 10, 0, 110, 80, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Surf", 1024, MoveCategorySpecial, 9, 0, 90, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Ice Beam", 16384, MoveCategorySpecial, 10, 0, 90, 100, 10, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Blizzard", 16384, MoveCategorySpecial, 11, 0, 110, 70, 5, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Psybeam", 8192, MoveCategorySpecial, 10, 0, 65, 100, 20, 0, 0, 2, 5, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Bubble Beam", 1024, MoveCategorySpecial, 10, 0, 65, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror},
+	{"Aurora Beam", 16384, MoveCategorySpecial, 10, 0, 65, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror},
+	{"Hyper Beam", 1, MoveCategorySpecial, 10, 0, 150, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagRecharge | FlagProtect | FlagMirror},
+	{"Peck", 4, MoveCategoryPhysical, 10, 0, 35, 100, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagDistance},
+	{"Drill Peck", 4, MoveCategoryPhysical, 10, 0, 80, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagDistance},
+	{"Submission", 2, MoveCategoryPhysical, 10, 0, 80, 80, 20, 0, 0, 0, 0, -25, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Low Kick", 2, MoveCategoryPhysical, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Counter", 2, MoveCategoryPhysical, 1, -5, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect},
+	{"Seismic Toss", 2, MoveCategoryPhysical, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Strength", 1, MoveCategoryPhysical, 10, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Absorb", 2048, MoveCategorySpecial, 10, 0, 20, 100, 25, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagHeal},
+	{"Mega Drain", 2048, MoveCategorySpecial, 10, 0, 40, 100, 15, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagHeal},
+	{"Leech Seed", 2048, MoveCategoryStatus, 10, 0, 0, 90, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Growth", 1, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Razor Leaf", 2048, MoveCategoryPhysical, 11, 0, 55, 95, 25, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Solar Beam", 2048, MoveCategorySpecial, 10, 0, 120, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagCharge | FlagProtect | FlagMirror},
+	{"Poison Powder", 8, MoveCategoryStatus, 10, 0, 0, 75, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagPowder},
+	{"Stun Spore", 2048, MoveCategoryStatus, 10, 0, 0, 75, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagPowder},
+	{"Sleep Powder", 2048, MoveCategoryStatus, 10, 0, 0, 75, 15, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagPowder},
+	{"Petal Dance", 2048, MoveCategorySpecial, 8, 0, 120, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagDance},
+	{"String Shot", 64, MoveCategoryStatus, 11, 0, 0, 95, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Dragon Rage", 32768, MoveCategorySpecial, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Fire Spin", 512, MoveCategorySpecial, 10, 0, 35, 85, 15, 0, 0, 5, 6, 0, 0, 0, 100, 0, 0, FlagProtect | FlagMirror},
+	{"Thunder Shock", 4096, MoveCategorySpecial, 10, 0, 40, 100, 30, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Thunderbolt", 4096, MoveCategorySpecial, 10, 0, 90, 100, 15, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Thunder Wave", 4096, MoveCategoryStatus, 10, 0, 0, 90, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Thunder", 4096, MoveCategorySpecial, 10, 0, 110, 70, 10, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagProtect | FlagMirror},
+	{"Rock Throw", 32, MoveCategoryPhysical, 10, 0, 50, 90, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Earthquake", 16, MoveCategoryPhysical, 9, 0, 100, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Fissure", 16, MoveCategoryPhysical, 10, 0, 0, 30, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Dig", 16, MoveCategoryPhysical, 10, 0, 80, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagCharge | FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Toxic", 8, MoveCategoryStatus, 10, 0, 0, 90, 10, 0, 0, 15, 15, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Confusion", 8192, MoveCategorySpecial, 10, 0, 50, 100, 25, 0, 0, 2, 5, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Psychic", 8192, MoveCategorySpecial, 10, 0, 90, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror},
+	{"Hypnosis", 8192, MoveCategoryStatus, 10, 0, 0, 60, 20, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Meditate", 8192, MoveCategoryStatus, 7, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Agility", 8192, MoveCategoryStatus, 7, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Quick Attack", 1, MoveCategoryPhysical, 10, 1, 40, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Rage", 1, MoveCategoryPhysical, 10, 0, 20, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Teleport", 8192, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Night Shade", 128, MoveCategorySpecial, 10, 0, 0, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Mimic", 1, MoveCategoryStatus, 10, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagAuthentic},
+	{"Screech", 1, MoveCategoryStatus, 10, 0, 0, 85, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagSound | FlagAuthentic},
+	{"Double Team", 1, MoveCategoryStatus, 7, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Recover", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Harden", 1, MoveCategoryStatus, 7, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Minimize", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Smokescreen", 1, MoveCategoryStatus, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Confuse Ray", 128, MoveCategoryStatus, 10, 0, 0, 100, 10, 0, 0, 2, 5, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Withdraw", 1024, MoveCategoryStatus, 7, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Defense Curl", 1, MoveCategoryStatus, 7, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Barrier", 8192, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Light Screen", 8192, MoveCategoryStatus, 4, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Haze", 16384, MoveCategoryStatus, 12, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagAuthentic},
+	{"Reflect", 8192, MoveCategoryStatus, 4, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Focus Energy", 1, MoveCategoryStatus, 7, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Bide", 1, MoveCategoryPhysical, 7, 1, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect},
+	{"Metronome", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Mirror Move", 4, MoveCategoryStatus, 10, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Self-Destruct", 1, MoveCategoryPhysical, 9, 0, 200, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Egg Bomb", 1, MoveCategoryPhysical, 10, 0, 100, 75, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagBallistics},
+	{"Lick", 128, MoveCategoryPhysical, 10, 0, 30, 100, 30, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Smog", 8, MoveCategorySpecial, 10, 0, 30, 70, 20, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, FlagProtect | FlagMirror},
+	{"Sludge", 8, MoveCategorySpecial, 10, 0, 65, 100, 20, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagProtect | FlagMirror},
+	{"Bone Club", 16, MoveCategoryPhysical, 10, 0, 65, 85, 20, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, FlagProtect | FlagMirror},
+	{"Fire Blast", 512, MoveCategorySpecial, 10, 0, 110, 85, 5, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Waterfall", 1024, MoveCategoryPhysical, 10, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Clamp", 1024, MoveCategoryPhysical, 10, 0, 35, 85, 15, 0, 0, 5, 6, 0, 0, 0, 100, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Swift", 1, MoveCategorySpecial, 11, 0, 60, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Skull Bash", 1, MoveCategoryPhysical, 10, 0, 130, 100, 10, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, FlagContact | FlagCharge | FlagProtect | FlagMirror},
+	{"Spike Cannon", 1, MoveCategoryPhysical, 10, 0, 20, 100, 15, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Constrict", 1, MoveCategoryPhysical, 10, 0, 10, 100, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagContact | FlagProtect | FlagMirror},
+	{"Amnesia", 8192, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Kinesis", 8192, MoveCategoryStatus, 10, 0, 0, 80, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Soft-Boiled", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"High Jump Kick", 2, MoveCategoryPhysical, 10, 0, 130, 90, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagGravity},
+	{"Glare", 1, MoveCategoryStatus, 10, 0, 0, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Dream Eater", 8192, MoveCategorySpecial, 10, 0, 100, 100, 15, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagHeal},
+	{"Poison Gas", 8, MoveCategoryStatus, 11, 0, 0, 90, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Barrage", 1, MoveCategoryPhysical, 10, 0, 15, 85, 20, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagBallistics},
+	{"Leech Life", 64, MoveCategoryPhysical, 10, 0, 80, 100, 10, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagHeal},
+	{"Lovely Kiss", 1, MoveCategoryStatus, 10, 0, 0, 75, 10, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Sky Attack", 4, MoveCategoryPhysical, 10, 0, 140, 90, 5, 0, 0, 0, 0, 0, 0, 1, 0, 30, 0, FlagCharge | FlagProtect | FlagMirror | FlagDistance},
+	{"Transform", 1, MoveCategoryStatus, 10, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Bubble", 1024, MoveCategorySpecial, 11, 0, 40, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror},
+	{"Dizzy Punch", 1, MoveCategoryPhysical, 10, 0, 70, 100, 10, 0, 0, 2, 5, 0, 0, 0, 20, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Spore", 2048, MoveCategoryStatus, 10, 0, 0, 100, 15, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagPowder},
+	{"Flash", 1, MoveCategoryStatus, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Psywave", 8192, MoveCategorySpecial, 10, 0, 0, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Splash", 1, MoveCategoryStatus, 7, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagGravity},
+	{"Acid Armor", 8, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Crabhammer", 1024, MoveCategoryPhysical, 10, 0, 100, 90, 10, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Explosion", 1, MoveCategoryPhysical, 9, 0, 250, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Fury Swipes", 1, MoveCategoryPhysical, 10, 0, 18, 80, 15, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Bonemerang", 16, MoveCategoryPhysical, 10, 0, 50, 90, 10, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Rest", 8192, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Rock Slide", 32, MoveCategoryPhysical, 11, 0, 75, 90, 10, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, FlagProtect | FlagMirror},
+	{"Hyper Fang", 1, MoveCategoryPhysical, 10, 0, 80, 90, 15, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Sharpen", 1, MoveCategoryStatus, 7, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Conversion", 1, MoveCategoryStatus, 7, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Tri Attack", 1, MoveCategorySpecial, 10, 0, 80, 100, 10, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, FlagProtect | FlagMirror},
+	{"Super Fang", 1, MoveCategoryPhysical, 10, 0, 0, 90, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Slash", 1, MoveCategoryPhysical, 10, 0, 70, 100, 20, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Substitute", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagNonSkyBattle},
+	{"Struggle", 1, MoveCategoryPhysical, 8, 0, 50, 0, 1, 0, 0, 0, 0, 0, -25, 0, 0, 0, 0, FlagContact | FlagProtect},
+	{"Sketch", 1, MoveCategoryStatus, 10, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagAuthentic},
+	{"Triple Kick", 2, MoveCategoryPhysical, 10, 0, 10, 90, 10, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Thief", 65536, MoveCategoryPhysical, 10, 0, 60, 100, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Spider Web", 64, MoveCategoryStatus, 10, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Mind Reader", 1, MoveCategoryStatus, 10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Nightmare", 128, MoveCategoryStatus, 10, 0, 0, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Flame Wheel", 512, MoveCategoryPhysical, 10, 0, 60, 100, 25, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagDefrost},
+	{"Snore", 1, MoveCategorySpecial, 10, 0, 50, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, FlagProtect | FlagMirror | FlagSound | FlagAuthentic},
+	{"Curse", 128, MoveCategoryStatus, 1, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagAuthentic},
+	{"Flail", 1, MoveCategoryPhysical, 10, 0, 0, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Conversion 2", 1, MoveCategoryStatus, 10, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagAuthentic},
+	{"Aeroblast", 4, MoveCategorySpecial, 10, 0, 100, 95, 5, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagProtect | FlagMirror | FlagDistance},
+	{"Cotton Spore", 2048, MoveCategoryStatus, 11, 0, 0, 100, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagPowder},
+	{"Reversal", 2, MoveCategoryPhysical, 10, 0, 0, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Spite", 128, MoveCategoryStatus, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagAuthentic},
+	{"Powder Snow", 16384, MoveCategorySpecial, 11, 0, 40, 100, 25, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Protect", 1, MoveCategoryStatus, 7, 4, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Mach Punch", 2, MoveCategoryPhysical, 10, 1, 40, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Scary Face", 1, MoveCategoryStatus, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Feint Attack", 65536, MoveCategoryPhysical, 10, 0, 60, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Sweet Kiss", 131072, MoveCategoryStatus, 10, 0, 0, 75, 10, 0, 0, 2, 5, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Belly Drum", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Sludge Bomb", 8, MoveCategorySpecial, 10, 0, 90, 100, 10, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagProtect | FlagMirror | FlagBallistics},
+	{"Mud-Slap", 16, MoveCategorySpecial, 10, 0, 20, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagProtect | FlagMirror},
+	{"Octazooka", 1024, MoveCategorySpecial, 10, 0, 65, 85, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, FlagProtect | FlagMirror | FlagBallistics},
+	{"Spikes", 16, MoveCategoryStatus, 6, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagReflectable | FlagNonSkyBattle},
+	{"Zap Cannon", 4096, MoveCategorySpecial, 10, 0, 120, 50, 5, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, FlagProtect | FlagMirror},
+	{"Foresight", 1, MoveCategoryStatus, 10, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagAuthentic},
+	{"Destiny Bond", 128, MoveCategoryStatus, 7, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagAuthentic},
+	{"Perish Song", 1, MoveCategoryStatus, 14, 0, 0, 0, 5, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, FlagSound | FlagDistance | FlagAuthentic},
+	{"Icy Wind", 16384, MoveCategorySpecial, 11, 0, 55, 95, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagProtect | FlagMirror},
+	{"Detect", 2, MoveCategoryStatus, 7, 4, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Bone Rush", 16, MoveCategoryPhysical, 10, 0, 25, 90, 10, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Lock-On", 1, MoveCategoryStatus, 10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Outrage", 32768, MoveCategoryPhysical, 8, 0, 120, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Sandstorm", 32, MoveCategoryStatus, 12, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Giga Drain", 2048, MoveCategorySpecial, 10, 0, 75, 100, 10, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagHeal},
+	{"Endure", 1, MoveCategoryStatus, 7, 4, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Charm", 131072, MoveCategoryStatus, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Rollout", 32, MoveCategoryPhysical, 10, 0, 30, 90, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"False Swipe", 1, MoveCategoryPhysical, 10, 0, 40, 100, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Swagger", 1, MoveCategoryStatus, 10, 0, 0, 85, 15, 0, 0, 2, 5, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Milk Drink", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Spark", 4096, MoveCategoryPhysical, 10, 0, 65, 100, 20, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Fury Cutter", 64, MoveCategoryPhysical, 10, 0, 40, 95, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Steel Wing", 256, MoveCategoryPhysical, 10, 0, 70, 90, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagContact | FlagProtect | FlagMirror},
+	{"Mean Look", 1, MoveCategoryStatus, 10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagReflectable | FlagMirror},
+	{"Attract", 1, MoveCategoryStatus, 10, 0, 0, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagAuthentic | FlagMental},
+	{"Sleep Talk", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Heal Bell", 1, MoveCategoryStatus, 13, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagSound | FlagDistance | FlagAuthentic},
+	{"Return", 1, MoveCategoryPhysical, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Present", 1, MoveCategoryPhysical, 10, 0, 0, 90, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Frustration", 1, MoveCategoryPhysical, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Safeguard", 1, MoveCategoryStatus, 4, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Pain Split", 1, MoveCategoryStatus, 10, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Sacred Fire", 512, MoveCategoryPhysical, 10, 0, 100, 95, 5, 0, 0, 0, 0, 0, 0, 0, 50, 0, 0, FlagProtect | FlagMirror | FlagDefrost},
+	{"Magnitude", 16, MoveCategoryPhysical, 9, 0, 0, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Dynamic Punch", 2, MoveCategoryPhysical, 10, 0, 100, 50, 5, 0, 0, 2, 5, 0, 0, 0, 100, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Megahorn", 64, MoveCategoryPhysical, 10, 0, 120, 85, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Dragon Breath", 32768, MoveCategorySpecial, 10, 0, 60, 100, 20, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagProtect | FlagMirror},
+	{"Baton Pass", 1, MoveCategoryStatus, 7, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Encore", 1, MoveCategoryStatus, 10, 0, 0, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagAuthentic | FlagMental},
+	{"Pursuit", 65536, MoveCategoryPhysical, 10, 0, 40, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Rapid Spin", 1, MoveCategoryPhysical, 10, 0, 20, 100, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Sweet Scent", 1, MoveCategoryStatus, 11, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Iron Tail", 256, MoveCategoryPhysical, 10, 0, 100, 75, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, FlagContact | FlagProtect | FlagMirror},
+	{"Metal Claw", 256, MoveCategoryPhysical, 10, 0, 50, 95, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagContact | FlagProtect | FlagMirror},
+	{"Vital Throw", 2, MoveCategoryPhysical, 10, -1, 70, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Morning Sun", 1, MoveCategoryStatus, 7, 0, 0, 0, 5, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Synthesis", 2048, MoveCategoryStatus, 7, 0, 0, 0, 5, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Moonlight", 131072, MoveCategoryStatus, 7, 0, 0, 0, 5, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Hidden Power", 1, MoveCategorySpecial, 10, 0, 60, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Cross Chop", 2, MoveCategoryPhysical, 10, 0, 100, 80, 5, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Twister", 32768, MoveCategorySpecial, 11, 0, 40, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, FlagProtect | FlagMirror},
+	{"Rain Dance", 1024, MoveCategoryStatus, 12, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Sunny Day", 512, MoveCategoryStatus, 12, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Crunch", 65536, MoveCategoryPhysical, 10, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, FlagContact | FlagProtect | FlagMirror | FlagBite},
+	{"Mirror Coat", 8192, MoveCategorySpecial, 1, -5, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect},
+	{"Psych Up", 1, MoveCategoryStatus, 10, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagAuthentic},
+	{"Extreme Speed", 1, MoveCategoryPhysical, 10, 2, 80, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Ancient Power", 32, MoveCategorySpecial, 10, 0, 60, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror},
+	{"Shadow Ball", 128, MoveCategorySpecial, 10, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, FlagProtect | FlagMirror | FlagBallistics},
+	{"Future Sight", 8192, MoveCategorySpecial, 10, 0, 120, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Rock Smash", 2, MoveCategoryPhysical, 10, 0, 40, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, FlagContact | FlagProtect | FlagMirror},
+	{"Whirlpool", 1024, MoveCategorySpecial, 10, 0, 35, 85, 15, 0, 0, 5, 6, 0, 0, 0, 100, 0, 0, FlagProtect | FlagMirror | FlagMental},
+	{"Beat Up", 65536, MoveCategoryPhysical, 10, 0, 0, 100, 10, 6, 6, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Fake Out", 1, MoveCategoryPhysical, 10, 3, 40, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Uproar", 1, MoveCategorySpecial, 8, 0, 90, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagSound | FlagAuthentic},
+	{"Stockpile", 1, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Spit Up", 1, MoveCategorySpecial, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect},
+	{"Swallow", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Heat Wave", 512, MoveCategorySpecial, 11, 0, 95, 90, 10, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Hail", 16384, MoveCategoryStatus, 12, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Torment", 65536, MoveCategoryStatus, 10, 0, 0, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagAuthentic | FlagMental},
+	{"Flatter", 65536, MoveCategoryStatus, 10, 0, 0, 100, 15, 0, 0, 2, 5, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Will-O-Wisp", 512, MoveCategoryStatus, 10, 0, 0, 85, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Memento", 65536, MoveCategoryStatus, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Facade", 1, MoveCategoryPhysical, 10, 0, 70, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Focus Punch", 2, MoveCategoryPhysical, 10, -3, 150, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagPunch},
+	{"Smelling Salts", 1, MoveCategoryPhysical, 10, 0, 70, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Follow Me", 1, MoveCategoryStatus, 7, 2, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Nature Power", 1, MoveCategoryStatus, 10, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Charge", 4096, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Taunt", 65536, MoveCategoryStatus, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagAuthentic | FlagMental},
+	{"Helping Hand", 1, MoveCategoryStatus, 3, 5, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagAuthentic},
+	{"Trick", 8192, MoveCategoryStatus, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Role Play", 8192, MoveCategoryStatus, 10, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagAuthentic},
+	{"Wish", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Assist", 1, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Ingrain", 2048, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagNonSkyBattle},
+	{"Superpower", 2, MoveCategoryPhysical, 10, 0, 120, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagContact | FlagProtect | FlagMirror},
+	{"Magic Coat", 8192, MoveCategoryStatus, 7, 4, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Recycle", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Revenge", 2, MoveCategoryPhysical, 10, -4, 60, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Brick Break", 2, MoveCategoryPhysical, 10, 0, 75, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Yawn", 1, MoveCategoryStatus, 10, 0, 0, 0, 10, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Knock Off", 65536, MoveCategoryPhysical, 10, 0, 65, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Endeavor", 1, MoveCategoryPhysical, 10, 0, 0, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Eruption", 512, MoveCategorySpecial, 11, 0, 150, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Skill Swap", 8192, MoveCategoryStatus, 10, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagAuthentic},
+	{"Imprison", 8192, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagAuthentic},
+	{"Refresh", 1, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Grudge", 128, MoveCategoryStatus, 7, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagAuthentic},
+	{"Snatch", 65536, MoveCategoryStatus, 7, 4, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagAuthentic},
+	{"Secret Power", 1, MoveCategoryPhysical, 10, 0, 70, 100, 20, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagProtect | FlagMirror},
+	{"Dive", 1024, MoveCategoryPhysical, 10, 0, 80, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagCharge | FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Arm Thrust", 2, MoveCategoryPhysical, 10, 0, 15, 100, 20, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Camouflage", 1, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Tail Glow", 64, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Luster Purge", 8192, MoveCategorySpecial, 10, 0, 70, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, FlagProtect | FlagMirror},
+	{"Mist Ball", 8192, MoveCategorySpecial, 10, 0, 70, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, FlagProtect | FlagMirror},
+	{"Feather Dance", 4, MoveCategoryStatus, 10, 0, 0, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagDance},
+	{"Teeter Dance", 1, MoveCategoryStatus, 9, 0, 0, 100, 20, 0, 0, 2, 5, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagDance},
+	{"Blaze Kick", 512, MoveCategoryPhysical, 10, 0, 85, 90, 10, 0, 0, 0, 0, 0, 0, 1, 10, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Mud Sport", 16, MoveCategoryStatus, 12, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagNonSkyBattle},
+	{"Ice Ball", 16384, MoveCategoryPhysical, 10, 0, 30, 90, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagBallistics},
+	{"Needle Arm", 2048, MoveCategoryPhysical, 10, 0, 60, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Slack Off", 1, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Hyper Voice", 1, MoveCategorySpecial, 11, 0, 90, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagSound | FlagAuthentic},
+	{"Poison Fang", 8, MoveCategoryPhysical, 10, 0, 50, 100, 15, 0, 0, 15, 15, 0, 0, 0, 50, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagBite},
+	{"Crush Claw", 1, MoveCategoryPhysical, 10, 0, 75, 95, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, FlagContact | FlagProtect | FlagMirror},
+	{"Blast Burn", 512, MoveCategorySpecial, 10, 0, 150, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagRecharge | FlagProtect | FlagMirror},
+	{"Hydro Cannon", 1024, MoveCategorySpecial, 10, 0, 150, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagRecharge | FlagProtect | FlagMirror},
+	{"Meteor Mash", 256, MoveCategoryPhysical, 10, 0, 90, 90, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Astonish", 128, MoveCategoryPhysical, 10, 0, 30, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Weather Ball", 1, MoveCategorySpecial, 10, 0, 50, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagBallistics},
+	{"Aromatherapy", 2048, MoveCategoryStatus, 13, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagDistance},
+	{"Fake Tears", 65536, MoveCategoryStatus, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Air Cutter", 4, MoveCategorySpecial, 11, 0, 60, 95, 25, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Overheat", 512, MoveCategorySpecial, 10, 0, 130, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagProtect | FlagMirror},
+	{"Odor Sleuth", 1, MoveCategoryStatus, 10, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagAuthentic},
+	{"Rock Tomb", 32, MoveCategoryPhysical, 10, 0, 60, 95, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagProtect | FlagMirror},
+	{"Silver Wind", 64, MoveCategorySpecial, 10, 0, 60, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror},
+	{"Metal Sound", 256, MoveCategoryStatus, 10, 0, 0, 85, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagSound | FlagAuthentic},
+	{"Grass Whistle", 2048, MoveCategoryStatus, 10, 0, 0, 55, 15, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagSound | FlagAuthentic},
+	{"Tickle", 1, MoveCategoryStatus, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Cosmic Power", 8192, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Water Spout", 1024, MoveCategorySpecial, 11, 0, 150, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Signal Beam", 64, MoveCategorySpecial, 10, 0, 75, 100, 15, 0, 0, 2, 5, 0, 0, 0, 10, 0, 0, FlagProtect | FlagMirror},
+	{"Shadow Punch", 128, MoveCategoryPhysical, 10, 0, 60, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Extrasensory", 8192, MoveCategorySpecial, 10, 0, 80, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, FlagProtect | FlagMirror},
+	{"Sky Uppercut", 2, MoveCategoryPhysical, 10, 0, 85, 90, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Sand Tomb", 16, MoveCategoryPhysical, 10, 0, 35, 85, 15, 0, 0, 5, 6, 0, 0, 0, 100, 0, 0, FlagProtect | FlagMirror},
+	{"Sheer Cold", 16384, MoveCategorySpecial, 10, 0, 0, 30, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Muddy Water", 1024, MoveCategorySpecial, 11, 0, 90, 85, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Bullet Seed", 2048, MoveCategoryPhysical, 10, 0, 25, 100, 30, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagBallistics},
+	{"Aerial Ace", 4, MoveCategoryPhysical, 10, 0, 60, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagDistance},
+	{"Icicle Spear", 16384, MoveCategoryPhysical, 10, 0, 25, 100, 30, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Iron Defense", 256, MoveCategoryStatus, 7, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Block", 1, MoveCategoryStatus, 10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagReflectable | FlagMirror},
+	{"Howl", 1, MoveCategoryStatus, 7, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Dragon Claw", 32768, MoveCategoryPhysical, 10, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Frenzy Plant", 2048, MoveCategorySpecial, 10, 0, 150, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagRecharge | FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Bulk Up", 2, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Bounce", 4, MoveCategoryPhysical, 10, 0, 85, 85, 5, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagContact | FlagCharge | FlagProtect | FlagMirror | FlagGravity | FlagDistance},
+	{"Mud Shot", 16, MoveCategorySpecial, 10, 0, 55, 95, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagProtect | FlagMirror},
+	{"Poison Tail", 8, MoveCategoryPhysical, 10, 0, 50, 100, 25, 0, 0, 0, 0, 0, 0, 1, 10, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Covet", 1, MoveCategoryPhysical, 10, 0, 60, 100, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Volt Tackle", 4096, MoveCategoryPhysical, 10, 0, 120, 100, 15, 0, 0, 0, 0, -33, 0, 0, 10, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Magical Leaf", 2048, MoveCategorySpecial, 10, 0, 60, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Water Sport", 1024, MoveCategoryStatus, 12, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagNonSkyBattle},
+	{"Calm Mind", 8192, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Leaf Blade", 2048, MoveCategoryPhysical, 10, 0, 90, 100, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Dragon Dance", 32768, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagDance},
+	{"Rock Blast", 32, MoveCategoryPhysical, 10, 0, 25, 90, 10, 2, 5, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Shock Wave", 4096, MoveCategorySpecial, 10, 0, 60, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Water Pulse", 1024, MoveCategorySpecial, 10, 0, 60, 100, 20, 0, 0, 2, 5, 0, 0, 0, 20, 0, 0, FlagProtect | FlagMirror | FlagDistance | FlagPulse},
+	{"Doom Desire", 256, MoveCategorySpecial, 10, 0, 140, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Psycho Boost", 8192, MoveCategorySpecial, 10, 0, 140, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagProtect | FlagMirror},
+	{"Roost", 4, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Gravity", 8192, MoveCategoryStatus, 12, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagNonSkyBattle},
+	{"Miracle Eye", 8192, MoveCategoryStatus, 10, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagAuthentic},
+	{"Wake-Up Slap", 2, MoveCategoryPhysical, 10, 0, 70, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Hammer Arm", 2, MoveCategoryPhysical, 10, 0, 100, 90, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Gyro Ball", 256, MoveCategoryPhysical, 10, 0, 0, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagBallistics},
+	{"Healing Wish", 8192, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Brine", 1024, MoveCategorySpecial, 10, 0, 65, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Natural Gift", 1, MoveCategoryPhysical, 10, 0, 0, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Feint", 1, MoveCategoryPhysical, 10, 2, 30, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagMirror},
+	{"Pluck", 4, MoveCategoryPhysical, 10, 0, 60, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagDistance},
+	{"Tailwind", 4, MoveCategoryStatus, 4, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Acupressure", 1, MoveCategoryStatus, 5, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Metal Burst", 256, MoveCategoryPhysical, 1, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"U-turn", 64, MoveCategoryPhysical, 10, 0, 70, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Close Combat", 2, MoveCategoryPhysical, 10, 0, 120, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagContact | FlagProtect | FlagMirror},
+	{"Payback", 65536, MoveCategoryPhysical, 10, 0, 50, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Assurance", 65536, MoveCategoryPhysical, 10, 0, 60, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Embargo", 65536, MoveCategoryStatus, 10, 0, 0, 100, 15, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Fling", 65536, MoveCategoryPhysical, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Psycho Shift", 8192, MoveCategoryStatus, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Trump Card", 1, MoveCategorySpecial, 10, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Heal Block", 8192, MoveCategoryStatus, 11, 0, 0, 100, 15, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Wring Out", 1, MoveCategorySpecial, 10, 0, 0, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Power Trick", 8192, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Gastro Acid", 8, MoveCategoryStatus, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Lucky Chant", 1, MoveCategoryStatus, 4, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Me First", 1, MoveCategoryStatus, 2, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagAuthentic},
+	{"Copycat", 1, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	{"Power Swap", 8192, MoveCategoryStatus, 10, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagAuthentic},
+	{"Guard Swap", 8192, MoveCategoryStatus, 10, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagAuthentic},
+	{"Punishment", 65536, MoveCategoryPhysical, 10, 0, 0, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Last Resort", 1, MoveCategoryPhysical, 10, 0, 140, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Worry Seed", 2048, MoveCategoryStatus, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Sucker Punch", 65536, MoveCategoryPhysical, 10, 1, 70, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Toxic Spikes", 8, MoveCategoryStatus, 6, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagReflectable | FlagNonSkyBattle},
+	{"Heart Swap", 8192, MoveCategoryStatus, 10, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagAuthentic},
+	{"Aqua Ring", 1024, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Magnet Rise", 4096, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagGravity},
+	{"Flare Blitz", 512, MoveCategoryPhysical, 10, 0, 120, 100, 15, 0, 0, 0, 0, -33, 0, 0, 10, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagDefrost},
+	{"Force Palm", 2, MoveCategoryPhysical, 10, 0, 60, 100, 10, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Aura Sphere", 2, MoveCategorySpecial, 10, 0, 80, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagDistance | FlagPulse | FlagBallistics},
+	{"Rock Polish", 32, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Poison Jab", 8, MoveCategoryPhysical, 10, 0, 80, 100, 20, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Dark Pulse", 65536, MoveCategorySpecial, 10, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, FlagProtect | FlagMirror | FlagDistance | FlagPulse},
+	{"Night Slash", 65536, MoveCategoryPhysical, 10, 0, 70, 100, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Aqua Tail", 1024, MoveCategoryPhysical, 10, 0, 90, 90, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Seed Bomb", 2048, MoveCategoryPhysical, 10, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagBallistics},
+	{"Air Slash", 4, MoveCategorySpecial, 10, 0, 75, 95, 15, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, FlagProtect | FlagMirror | FlagDistance},
+	{"X-Scissor", 64, MoveCategoryPhysical, 10, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Bug Buzz", 64, MoveCategorySpecial, 10, 0, 90, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror | FlagSound | FlagAuthentic},
+	{"Dragon Pulse", 32768, MoveCategorySpecial, 10, 0, 85, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagDistance | FlagPulse},
+	{"Dragon Rush", 32768, MoveCategoryPhysical, 10, 0, 100, 75, 10, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Power Gem", 32, MoveCategorySpecial, 10, 0, 80, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Drain Punch", 2, MoveCategoryPhysical, 10, 0, 75, 100, 10, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch | FlagHeal},
+	{"Vacuum Wave", 2, MoveCategorySpecial, 10, 1, 40, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Focus Blast", 2, MoveCategorySpecial, 10, 0, 120, 70, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror | FlagBallistics},
+	{"Energy Ball", 2048, MoveCategorySpecial, 10, 0, 90, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror | FlagBallistics},
+	{"Brave Bird", 4, MoveCategoryPhysical, 10, 0, 120, 100, 15, 0, 0, 0, 0, -33, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagDistance},
+	{"Earth Power", 16, MoveCategorySpecial, 10, 0, 90, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Switcheroo", 65536, MoveCategoryStatus, 10, 0, 0, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Giga Impact", 1, MoveCategoryPhysical, 10, 0, 150, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagRecharge | FlagProtect | FlagMirror},
+	{"Nasty Plot", 65536, MoveCategoryStatus, 7, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Bullet Punch", 256, MoveCategoryPhysical, 10, 1, 40, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagPunch},
+	{"Avalanche", 16384, MoveCategoryPhysical, 10, -4, 60, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Ice Shard", 16384, MoveCategoryPhysical, 10, 1, 40, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Shadow Claw", 128, MoveCategoryPhysical, 10, 0, 70, 100, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Thunder Fang", 4096, MoveCategoryPhysical, 10, 0, 65, 95, 15, 0, 0, 0, 0, 0, 0, 0, 10, 10, 0, FlagContact | FlagProtect | FlagMirror | FlagBite},
+	{"Ice Fang", 16384, MoveCategoryPhysical, 10, 0, 65, 95, 15, 0, 0, 0, 0, 0, 0, 0, 10, 10, 0, FlagContact | FlagProtect | FlagMirror | FlagBite},
+	{"Fire Fang", 512, MoveCategoryPhysical, 10, 0, 65, 95, 15, 0, 0, 0, 0, 0, 0, 0, 10, 10, 0, FlagContact | FlagProtect | FlagMirror | FlagBite},
+	{"Shadow Sneak", 128, MoveCategoryPhysical, 10, 1, 40, 100, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Mud Bomb", 16, MoveCategorySpecial, 10, 0, 65, 85, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, FlagProtect | FlagMirror | FlagBallistics},
+	{"Psycho Cut", 8192, MoveCategoryPhysical, 10, 0, 70, 100, 20, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Zen Headbutt", 8192, MoveCategoryPhysical, 10, 0, 80, 90, 15, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Mirror Shot", 256, MoveCategorySpecial, 10, 0, 65, 85, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, FlagProtect | FlagMirror},
+	{"Flash Cannon", 256, MoveCategorySpecial, 10, 0, 80, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, FlagProtect | FlagMirror},
+	{"Rock Climb", 1, MoveCategoryPhysical, 10, 0, 90, 85, 20, 0, 0, 2, 5, 0, 0, 0, 20, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Defog", 4, MoveCategoryStatus, 10, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror | FlagAuthentic},
+	{"Trick Room", 8192, MoveCategoryStatus, 12, -7, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagMirror},
+	{"Draco Meteor", 32768, MoveCategorySpecial, 10, 0, 130, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagProtect | FlagMirror},
+	{"Discharge", 4096, MoveCategorySpecial, 9, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagProtect | FlagMirror},
+	{"Lava Plume", 512, MoveCategorySpecial, 9, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagProtect | FlagMirror},
+	{"Leaf Storm", 2048, MoveCategorySpecial, 10, 0, 130, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, FlagProtect | FlagMirror},
+	{"Power Whip", 2048, MoveCategoryPhysical, 10, 0, 120, 85, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Rock Wrecker", 32, MoveCategoryPhysical, 10, 0, 150, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagRecharge | FlagProtect | FlagMirror},
+	{"Cross Poison", 8, MoveCategoryPhysical, 10, 0, 70, 100, 20, 0, 0, 0, 0, 0, 0, 1, 10, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Gunk Shot", 8, MoveCategoryPhysical, 10, 0, 120, 80, 5, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, FlagProtect | FlagMirror},
+	{"Iron Head", 256, MoveCategoryPhysical, 10, 0, 80, 100, 15, 0, 0, 0, 0, 0, 0, 0, 0, 30, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Magnet Bomb", 256, MoveCategoryPhysical, 10, 0, 60, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagBallistics},
+	{"Stone Edge", 32, MoveCategoryPhysical, 10, 0, 100, 80, 5, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Captivate", 1, MoveCategoryStatus, 11, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Stealth Rock", 32, MoveCategoryStatus, 6, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagReflectable},
+	{"Grass Knot", 2048, MoveCategorySpecial, 10, 0, 0, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror | FlagNonSkyBattle},
+	{"Chatter", 4, MoveCategorySpecial, 10, 0, 65, 100, 20, 0, 0, 2, 5, 0, 0, 0, 100, 0, 0, FlagProtect | FlagMirror | FlagSound | FlagDistance | FlagAuthentic},
+	{"Judgment", 1, MoveCategorySpecial, 10, 0, 100, 100, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Bug Bite", 64, MoveCategoryPhysical, 10, 0, 60, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Charge Beam", 4096, MoveCategorySpecial, 10, 0, 50, 90, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 70, FlagProtect | FlagMirror},
+	{"Wood Hammer", 2048, MoveCategoryPhysical, 10, 0, 120, 100, 15, 0, 0, 0, 0, -33, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Aqua Jet", 1024, MoveCategoryPhysical, 10, 1, 40, 100, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Attack Order", 64, MoveCategoryPhysical, 10, 0, 90, 100, 15, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Defend Order", 64, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch},
+	{"Heal Order", 64, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, FlagSnatch | FlagHeal},
+	{"Head Smash", 32, MoveCategoryPhysical, 10, 0, 150, 80, 5, 0, 0, 0, 0, -50, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Double Hit", 1, MoveCategoryPhysical, 10, 0, 35, 90, 10, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Roar of Time", 32768, MoveCategorySpecial, 10, 0, 150, 90, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagRecharge | FlagProtect | FlagMirror},
+	{"Spacial Rend", 32768, MoveCategorySpecial, 10, 0, 100, 95, 5, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Lunar Dance", 8192, MoveCategoryStatus, 7, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagSnatch | FlagHeal | FlagDance},
+	{"Crush Grip", 1, MoveCategoryPhysical, 10, 0, 0, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Magma Storm", 512, MoveCategorySpecial, 10, 0, 100, 75, 5, 0, 0, 5, 6, 0, 0, 0, 100, 0, 0, FlagProtect | FlagMirror},
+	{"Dark Void", 65536, MoveCategoryStatus, 11, 0, 0, 50, 10, 0, 0, 2, 4, 0, 0, 0, 0, 0, 0, FlagProtect | FlagReflectable | FlagMirror},
+	{"Seed Flare", 2048, MoveCategorySpecial, 10, 0, 120, 85, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, FlagProtect | FlagMirror},
+	{"Ominous Wind", 128, MoveCategorySpecial, 10, 0, 60, 100, 5, 0, 0, 0, 0, 0, 0, 0, 10, 0, 10, FlagProtect | FlagMirror},
+	{"Shadow Force", 128, MoveCategoryPhysical, 10, 0, 120, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagCharge | FlagMirror},
+	{"Shadow Rush", 0, MoveCategoryPhysical, 10, 0, 55, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect},
+	{"Shadow Blast", 0, MoveCategoryPhysical, 10, 0, 80, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect},
+	{"Shadow Blitz", 0, MoveCategoryPhysical, 10, 0, 40, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Shadow Bolt", 0, MoveCategorySpecial, 10, 0, 75, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect},
+	{"Shadow Break", 0, MoveCategoryPhysical, 10, 0, 75, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Shadow Chill", 0, MoveCategorySpecial, 10, 0, 75, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Shadow End", 0, MoveCategoryPhysical, 10, 0, 120, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror},
+	{"Shadow Fire", 0, MoveCategorySpecial, 10, 0, 75, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Shadow Rave", 0, MoveCategorySpecial, 6, 0, 70, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Shadow Storm", 0, MoveCategorySpecial, 6, 0, 95, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect},
+	{"Shadow Wave", 0, MoveCategorySpecial, 6, 0, 50, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect},
+	{"Shadow Down", 0, MoveCategoryStatus, 6, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Shadow Half", 0, MoveCategorySpecial, 12, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagRecharge | FlagProtect},
+	{"Shadow Hold", 0, MoveCategoryStatus, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Shadow Mist", 0, MoveCategoryStatus, 6, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror},
+	{"Shadow Panic", 0, MoveCategoryStatus, 6, 0, 0, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagSound},
+	{"Shadow Shed", 0, MoveCategoryStatus, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect},
+	{"Shadow Sky", 0, MoveCategoryStatus, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect},
 }
 
 // Create move constant enum for quick reference
 const (
-	MovePound         = 1
-	MoveKarateChop    = 2
-	MoveDoubleSlap    = 3
-	MoveCometPunch    = 4
-	MoveMegaPunch     = 5
-	MovePayDay        = 6
-	MoveFirePunch     = 7
-	MoveIcePunch      = 8
-	MoveThunderPunch  = 9
-	MoveScratch       = 10
-	MoveViceGrip      = 11
-	MoveGuillotine    = 12
-	MoveRazorWind     = 13
-	MoveSwordsDance   = 14
-	MoveCut           = 15
-	MoveGust          = 16
-	MoveWingAttack    = 17
-	MoveWhirlwind     = 18
-	MoveFly           = 19
-	MoveBind          = 20
-	MoveSlam          = 21
-	MoveVineWhip      = 22
-	MoveStomp         = 23
-	MoveDoubleKick    = 24
-	MoveMegaKick      = 25
-	MoveJumpKick      = 26
-	MoveRollingKick   = 27
-	MoveSandAttack    = 28
-	MoveHeadbutt      = 29
-	MoveHornAttack    = 30
-	MoveFuryAttack    = 31
-	MoveHornDrill     = 32
-	MoveTackle        = 33
-	MoveBodySlam      = 34
-	MoveWrap          = 35
-	MoveTakeDown      = 36
-	MoveThrash        = 37
-	MoveDoubleEdge    = 38
-	MoveTailWhip      = 39
-	MovePoisonSting   = 40
-	MoveTwineedle     = 41
-	MovePinMissile    = 42
-	MoveLeer          = 43
-	MoveBite          = 44
-	MoveGrowl         = 45
-	MoveRoar          = 46
-	MoveSing          = 47
-	MoveSupersonic    = 48
-	MoveSonicBoom     = 49
-	MoveDisable       = 50
-	MoveAcid          = 51
-	MoveEmber         = 52
-	MoveFlamethrower  = 53
-	MoveMist          = 54
-	MoveWaterGun      = 55
-	MoveHydroPump     = 56
-	MoveSurf          = 57
-	MoveIceBeam       = 58
-	MoveBlizzard      = 59
-	MovePsybeam       = 60
-	MoveBubbleBeam    = 61
-	MoveAuroraBeam    = 62
-	MoveHyperBeam     = 63
-	MovePeck          = 64
-	MoveDrillPeck     = 65
-	MoveSubmission    = 66
-	MoveLowKick       = 67
-	MoveCounter       = 68
-	MoveSeismicToss   = 69
-	MoveStrength      = 70
-	MoveAbsorb        = 71
-	MoveMegaDrain     = 72
-	MoveLeechSeed     = 73
-	MoveGrowth        = 74
-	MoveRazorLeaf     = 75
-	MoveSolarBeam     = 76
-	MovePoisonPowder  = 77
-	MoveStunSpore     = 78
-	MoveSleepPowder   = 79
-	MovePetalDance    = 80
-	MoveStringShot    = 81
-	MoveDragonRage    = 82
-	MoveFireSpin      = 83
-	MoveThunderShock  = 84
-	MoveThunderbolt   = 85
-	MoveThunderWave   = 86
-	MoveThunder       = 87
-	MoveRockThrow     = 88
-	MoveEarthquake    = 89
-	MoveFissure       = 90
-	MoveDig           = 91
-	MoveToxic         = 92
-	MoveConfusion     = 93
-	MovePsychic       = 94
-	MoveHypnosis      = 95
-	MoveMeditate      = 96
-	MoveAgility       = 97
-	MoveQuickAttack   = 98
-	MoveRage          = 99
-	MoveTeleport      = 100
-	MoveNightShade    = 101
-	MoveMimic         = 102
-	MoveScreech       = 103
-	MoveDoubleTeam    = 104
-	MoveRecover       = 105
-	MoveHarden        = 106
-	MoveMinimize      = 107
-	MoveSmokescreen   = 108
-	MoveConfuseRay    = 109
-	MoveWithdraw      = 110
-	MoveDefenseCurl   = 111
-	MoveBarrier       = 112
-	MoveLightScreen   = 113
-	MoveHaze          = 114
-	MoveReflect       = 115
-	MoveFocusEnergy   = 116
-	MoveBide          = 117
-	MoveMetronome     = 118
-	MoveMirrorMove    = 119
-	MoveSelfDestruct  = 120
-	MoveEggBomb       = 121
-	MoveLick          = 122
-	MoveSmog          = 123
-	MoveSludge        = 124
-	MoveBoneClub      = 125
-	MoveFireBlast     = 126
-	MoveWaterfall     = 127
-	MoveClamp         = 128
-	MoveSwift         = 129
-	MoveSkullBash     = 130
-	MoveSpikeCannon   = 131
-	MoveConstrict     = 132
-	MoveAmnesia       = 133
-	MoveKinesis       = 134
-	MoveSoftBoiled    = 135
-	MoveHighJumpKick  = 136
-	MoveGlare         = 137
-	MoveDreamEater    = 138
-	MovePoisonGas     = 139
-	MoveBarrage       = 140
-	MoveLeechLife     = 141
-	MoveLovelyKiss    = 142
-	MoveSkyAttack     = 143
-	MoveTransform     = 144
-	MoveBubble        = 145
-	MoveDizzyPunch    = 146
-	MoveSpore         = 147
-	MoveFlash         = 148
-	MovePsywave       = 149
-	MoveSplash        = 150
-	MoveAcidArmor     = 151
-	MoveCrabhammer    = 152
-	MoveExplosion     = 153
-	MoveFurySwipes    = 154
-	MoveBonemerang    = 155
-	MoveRest          = 156
-	MoveRockSlide     = 157
-	MoveHyperFang     = 158
-	MoveSharpen       = 159
-	MoveConversion    = 160
-	MoveTriAttack     = 161
-	MoveSuperFang     = 162
-	MoveSlash         = 163
-	MoveSubstitute    = 164
-	MoveStruggle      = 165
-	MoveSketch        = 166
-	MoveTripleKick    = 167
-	MoveThief         = 168
-	MoveSpiderWeb     = 169
-	MoveMindReader    = 170
-	MoveNightmare     = 171
-	MoveFlameWheel    = 172
-	MoveSnore         = 173
-	MoveCurse         = 174
-	MoveFlail         = 175
-	MoveConversion2   = 176
-	MoveAeroblast     = 177
-	MoveCottonSpore   = 178
-	MoveReversal      = 179
-	MoveSpite         = 180
-	MovePowderSnow    = 181
-	MoveProtect       = 182
-	MoveMachPunch     = 183
-	MoveScaryFace     = 184
-	MoveFeintAttack   = 185
-	MoveSweetKiss     = 186
-	MoveBellyDrum     = 187
-	MoveSludgeBomb    = 188
-	MoveMudSlap       = 189
-	MoveOctazooka     = 190
-	MoveSpikes        = 191
-	MoveZapCannon     = 192
-	MoveForesight     = 193
-	MoveDestinyBond   = 194
-	MovePerishSong    = 195
-	MoveIcyWind       = 196
-	MoveDetect        = 197
-	MoveBoneRush      = 198
-	MoveLockOn        = 199
-	MoveOutrage       = 200
-	MoveSandstorm     = 201
-	MoveGigaDrain     = 202
-	MoveEndure        = 203
-	MoveCharm         = 204
-	MoveRollout       = 205
-	MoveFalseSwipe    = 206
-	MoveSwagger       = 207
-	MoveMilkDrink     = 208
-	MoveSpark         = 209
-	MoveFuryCutter    = 210
-	MoveSteelWing     = 211
-	MoveMeanLook      = 212
-	MoveAttract       = 213
-	MoveSleepTalk     = 214
-	MoveHealBell      = 215
-	MoveReturn        = 216
-	MovePresent       = 217
-	MoveFrustration   = 218
-	MoveSafeguard     = 219
-	MovePainSplit     = 220
-	MoveSacredFire    = 221
-	MoveMagnitude     = 222
-	MoveDynamicPunch  = 223
-	MoveMegahorn      = 224
-	MoveDragonBreath  = 225
-	MoveBatonPass     = 226
-	MoveEncore        = 227
-	MovePursuit       = 228
-	MoveRapidSpin     = 229
-	MoveSweetScent    = 230
-	MoveIronTail      = 231
-	MoveMetalClaw     = 232
-	MoveVitalThrow    = 233
-	MoveMorningSun    = 234
-	MoveSynthesis     = 235
-	MoveMoonlight     = 236
-	MoveHiddenPower   = 237
-	MoveCrossChop     = 238
-	MoveTwister       = 239
-	MoveRainDance     = 240
-	MoveSunnyDay      = 241
-	MoveCrunch        = 242
-	MoveMirrorCoat    = 243
-	MovePsychUp       = 244
-	MoveExtremeSpeed  = 245
-	MoveAncientPower  = 246
-	MoveShadowBall    = 247
-	MoveFutureSight   = 248
-	MoveRockSmash     = 249
-	MoveWhirlpool     = 250
-	MoveBeatUp        = 251
-	MoveFakeOut       = 252
-	MoveUproar        = 253
-	MoveStockpile     = 254
-	MoveSpitUp        = 255
-	MoveSwallow       = 256
-	MoveHeatWave      = 257
-	MoveHail          = 258
-	MoveTorment       = 259
-	MoveFlatter       = 260
-	MoveWillOWisp     = 261
-	MoveMemento       = 262
-	MoveFacade        = 263
-	MoveFocusPunch    = 264
-	MoveSmellingSalts = 265
-	MoveFollowMe      = 266
-	MoveNaturePower   = 267
-	MoveCharge        = 268
-	MoveTaunt         = 269
-	MoveHelpingHand   = 270
-	MoveTrick         = 271
-	MoveRolePlay      = 272
-	MoveWish          = 273
-	MoveAssist        = 274
-	MoveIngrain       = 275
-	MoveSuperpower    = 276
-	MoveMagicCoat     = 277
-	MoveRecycle       = 278
-	MoveRevenge       = 279
-	MoveBrickBreak    = 280
-	MoveYawn          = 281
-	MoveKnockOff      = 282
-	MoveEndeavor      = 283
-	MoveEruption      = 284
-	MoveSkillSwap     = 285
-	MoveImprison      = 286
-	MoveRefresh       = 287
-	MoveGrudge        = 288
-	MoveSnatch        = 289
-	MoveSecretPower   = 290
-	MoveDive          = 291
-	MoveArmThrust     = 292
-	MoveCamouflage    = 293
-	MoveTailGlow      = 294
-	MoveLusterPurge   = 295
-	MoveMistBall      = 296
-	MoveFeatherDance  = 297
-	MoveTeeterDance   = 298
-	MoveBlazeKick     = 299
-	MoveMudSport      = 300
-	MoveIceBall       = 301
-	MoveNeedleArm     = 302
-	MoveSlackOff      = 303
-	MoveHyperVoice    = 304
-	MovePoisonFang    = 305
-	MoveCrushClaw     = 306
-	MoveBlastBurn     = 307
-	MoveHydroCannon   = 308
-	MoveMeteorMash    = 309
-	MoveAstonish      = 310
-	MoveWeatherBall   = 311
-	MoveAromatherapy  = 312
-	MoveFakeTears     = 313
-	MoveAirCutter     = 314
-	MoveOverheat      = 315
-	MoveOdorSleuth    = 316
-	MoveRockTomb      = 317
-	MoveSilverWind    = 318
-	MoveMetalSound    = 319
-	MoveGrassWhistle  = 320
-	MoveTickle        = 321
-	MoveCosmicPower   = 322
-	MoveWaterSpout    = 323
-	MoveSignalBeam    = 324
-	MoveShadowPunch   = 325
-	MoveExtrasensory  = 326
-	MoveSkyUppercut   = 327
-	MoveSandTomb      = 328
-	MoveSheerCold     = 329
-	MoveMuddyWater    = 330
-	MoveBulletSeed    = 331
-	MoveAerialAce     = 332
-	MoveIcicleSpear   = 333
-	MoveIronDefense   = 334
-	MoveBlock         = 335
-	MoveHowl          = 336
-	MoveDragonClaw    = 337
-	MoveFrenzyPlant   = 338
-	MoveBulkUp        = 339
-	MoveBounce        = 340
-	MoveMudShot       = 341
-	MovePoisonTail    = 342
-	MoveCovet         = 343
-	MoveVoltTackle    = 344
-	MoveMagicalLeaf   = 345
-	MoveWaterSport    = 346
-	MoveCalmMind      = 347
-	MoveLeafBlade     = 348
-	MoveDragonDance   = 349
-	MoveRockBlast     = 350
-	MoveShockWave     = 351
-	MoveWaterPulse    = 352
-	MoveDoomDesire    = 353
-	MovePsychoBoost   = 354
-	MoveRoost         = 355
-	MoveGravity       = 356
-	MoveMiracleEye    = 357
-	MoveWakeUpSlap    = 358
-	MoveHammerArm     = 359
-	MoveGyroBall      = 360
-	MoveHealingWish   = 361
-	MoveBrine         = 362
-	MoveNaturalGift   = 363
-	MoveFeint         = 364
-	MovePluck         = 365
-	MoveTailwind      = 366
-	MoveAcupressure   = 367
-	MoveMetalBurst    = 368
-	MoveUturn         = 369
-	MoveCloseCombat   = 370
-	MovePayback       = 371
-	MoveAssurance     = 372
-	MoveEmbargo       = 373
-	MoveFling         = 374
-	MovePsychoShift   = 375
-	MoveTrumpCard     = 376
-	MoveHealBlock     = 377
-	MoveWringOut      = 378
-	MovePowerTrick    = 379
-	MoveGastroAcid    = 380
-	MoveLuckyChant    = 381
-	MoveMeFirst       = 382
-	MoveCopycat       = 383
-	MovePowerSwap     = 384
-	MoveGuardSwap     = 385
-	MovePunishment    = 386
-	MoveLastResort    = 387
-	MoveWorrySeed     = 388
-	MoveSuckerPunch   = 389
-	MoveToxicSpikes   = 390
-	MoveHeartSwap     = 391
-	MoveAquaRing      = 392
-	MoveMagnetRise    = 393
-	MoveFlareBlitz    = 394
-	MoveForcePalm     = 395
-	MoveAuraSphere    = 396
-	MoveRockPolish    = 397
-	MovePoisonJab     = 398
-	MoveDarkPulse     = 399
-	MoveNightSlash    = 400
-	MoveAquaTail      = 401
-	MoveSeedBomb      = 402
-	MoveAirSlash      = 403
-	MoveXScissor      = 404
-	MoveBugBuzz       = 405
-	MoveDragonPulse   = 406
-	MoveDragonRush    = 407
-	MovePowerGem      = 408
-	MoveDrainPunch    = 409
-	MoveVacuumWave    = 410
-	MoveFocusBlast    = 411
-	MoveEnergyBall    = 412
-	MoveBraveBird     = 413
-	MoveEarthPower    = 414
-	MoveSwitcheroo    = 415
-	MoveGigaImpact    = 416
-	MoveNastyPlot     = 417
-	MoveBulletPunch   = 418
-	MoveAvalanche     = 419
-	MoveIceShard      = 420
-	MoveShadowClaw    = 421
-	MoveThunderFang   = 422
-	MoveIceFang       = 423
-	MoveFireFang      = 424
-	MoveShadowSneak   = 425
-	MoveMudBomb       = 426
-	MovePsychoCut     = 427
-	MoveZenHeadbutt   = 428
-	MoveMirrorShot    = 429
-	MoveFlashCannon   = 430
-	MoveRockClimb     = 431
-	MoveDefog         = 432
-	MoveTrickRoom     = 433
-	MoveDracoMeteor   = 434
-	MoveDischarge     = 435
-	MoveLavaPlume     = 436
-	MoveLeafStorm     = 437
-	MovePowerWhip     = 438
-	MoveRockWrecker   = 439
-	MoveCrossPoison   = 440
-	MoveGunkShot      = 441
-	MoveIronHead      = 442
-	MoveMagnetBomb    = 443
-	MoveStoneEdge     = 444
-	MoveCaptivate     = 445
-	MoveStealthRock   = 446
-	MoveGrassKnot     = 447
-	MoveChatter       = 448
-	MoveJudgment      = 449
-	MoveBugBite       = 450
-	MoveChargeBeam    = 451
-	MoveWoodHammer    = 452
-	MoveAquaJet       = 453
-	MoveAttackOrder   = 454
-	MoveDefendOrder   = 455
-	MoveHealOrder     = 456
-	MoveHeadSmash     = 457
-	MoveDoubleHit     = 458
-	MoveRoarofTime    = 459
-	MoveSpacialRend   = 460
-	MoveLunarDance    = 461
-	MoveCrushGrip     = 462
-	MoveMagmaStorm    = 463
-	MoveDarkVoid      = 464
-	MoveSeedFlare     = 465
-	MoveOminousWind   = 466
-	MoveShadowForce   = 467
-	MoveShadowRush    = 10001
-	MoveShadowBlast   = 10002
-	MoveShadowBlitz   = 10003
-	MoveShadowBolt    = 10004
-	MoveShadowBreak   = 10005
-	MoveShadowChill   = 10006
-	MoveShadowEnd     = 10007
-	MoveShadowFire    = 10008
-	MoveShadowRave    = 10009
-	MoveShadowStorm   = 10010
-	MoveShadowWave    = 10011
-	MoveShadowDown    = 10012
-	MoveShadowHalf    = 10013
-	MoveShadowHold    = 10014
-	MoveShadowMist    = 10015
-	MoveShadowPanic   = 10016
-	MoveShadowShed    = 10017
-	MoveShadowSky     = 10018
+	MoveNone MoveId = iota
+	MovePound
+	MoveKarateChop
+	MoveDoubleSlap
+	MoveCometPunch
+	MoveMegaPunch
+	MovePayDay
+	MoveFirePunch
+	MoveIcePunch
+	MoveThunderPunch
+	MoveScratch
+	MoveViceGrip
+	MoveGuillotine
+	MoveRazorWind
+	MoveSwordsDance
+	MoveCut
+	MoveGust
+	MoveWingAttack
+	MoveWhirlwind
+	MoveFly
+	MoveBind
+	MoveSlam
+	MoveVineWhip
+	MoveStomp
+	MoveDoubleKick
+	MoveMegaKick
+	MoveJumpKick
+	MoveRollingKick
+	MoveSandAttack
+	MoveHeadbutt
+	MoveHornAttack
+	MoveFuryAttack
+	MoveHornDrill
+	MoveTackle
+	MoveBodySlam
+	MoveWrap
+	MoveTakeDown
+	MoveThrash
+	MoveDoubleEdge
+	MoveTailWhip
+	MovePoisonSting
+	MoveTwineedle
+	MovePinMissile
+	MoveLeer
+	MoveBite
+	MoveGrowl
+	MoveRoar
+	MoveSing
+	MoveSupersonic
+	MoveSonicBoom
+	MoveDisable
+	MoveAcid
+	MoveEmber
+	MoveFlamethrower
+	MoveMist
+	MoveWaterGun
+	MoveHydroPump
+	MoveSurf
+	MoveIceBeam
+	MoveBlizzard
+	MovePsybeam
+	MoveBubbleBeam
+	MoveAuroraBeam
+	MoveHyperBeam
+	MovePeck
+	MoveDrillPeck
+	MoveSubmission
+	MoveLowKick
+	MoveCounter
+	MoveSeismicToss
+	MoveStrength
+	MoveAbsorb
+	MoveMegaDrain
+	MoveLeechSeed
+	MoveGrowth
+	MoveRazorLeaf
+	MoveSolarBeam
+	MovePoisonPowder
+	MoveStunSpore
+	MoveSleepPowder
+	MovePetalDance
+	MoveStringShot
+	MoveDragonRage
+	MoveFireSpin
+	MoveThunderShock
+	MoveThunderbolt
+	MoveThunderWave
+	MoveThunder
+	MoveRockThrow
+	MoveEarthquake
+	MoveFissure
+	MoveDig
+	MoveToxic
+	MoveConfusion
+	MovePsychic
+	MoveHypnosis
+	MoveMeditate
+	MoveAgility
+	MoveQuickAttack
+	MoveRage
+	MoveTeleport
+	MoveNightShade
+	MoveMimic
+	MoveScreech
+	MoveDoubleTeam
+	MoveRecover
+	MoveHarden
+	MoveMinimize
+	MoveSmokescreen
+	MoveConfuseRay
+	MoveWithdraw
+	MoveDefenseCurl
+	MoveBarrier
+	MoveLightScreen
+	MoveHaze
+	MoveReflect
+	MoveFocusEnergy
+	MoveBide
+	MoveMetronome
+	MoveMirrorMove
+	MoveSelfDestruct
+	MoveEggBomb
+	MoveLick
+	MoveSmog
+	MoveSludge
+	MoveBoneClub
+	MoveFireBlast
+	MoveWaterfall
+	MoveClamp
+	MoveSwift
+	MoveSkullBash
+	MoveSpikeCannon
+	MoveConstrict
+	MoveAmnesia
+	MoveKinesis
+	MoveSoftBoiled
+	MoveHighJumpKick
+	MoveGlare
+	MoveDreamEater
+	MovePoisonGas
+	MoveBarrage
+	MoveLeechLife
+	MoveLovelyKiss
+	MoveSkyAttack
+	MoveTransform
+	MoveBubble
+	MoveDizzyPunch
+	MoveSpore
+	MoveFlash
+	MovePsywave
+	MoveSplash
+	MoveAcidArmor
+	MoveCrabhammer
+	MoveExplosion
+	MoveFurySwipes
+	MoveBonemerang
+	MoveRest
+	MoveRockSlide
+	MoveHyperFang
+	MoveSharpen
+	MoveConversion
+	MoveTriAttack
+	MoveSuperFang
+	MoveSlash
+	MoveSubstitute
+	MoveStruggle
+	MoveSketch
+	MoveTripleKick
+	MoveThief
+	MoveSpiderWeb
+	MoveMindReader
+	MoveNightmare
+	MoveFlameWheel
+	MoveSnore
+	MoveCurse
+	MoveFlail
+	MoveConversion2
+	MoveAeroblast
+	MoveCottonSpore
+	MoveReversal
+	MoveSpite
+	MovePowderSnow
+	MoveProtect
+	MoveMachPunch
+	MoveScaryFace
+	MoveFeintAttack
+	MoveSweetKiss
+	MoveBellyDrum
+	MoveSludgeBomb
+	MoveMudSlap
+	MoveOctazooka
+	MoveSpikes
+	MoveZapCannon
+	MoveForesight
+	MoveDestinyBond
+	MovePerishSong
+	MoveIcyWind
+	MoveDetect
+	MoveBoneRush
+	MoveLockOn
+	MoveOutrage
+	MoveSandstorm
+	MoveGigaDrain
+	MoveEndure
+	MoveCharm
+	MoveRollout
+	MoveFalseSwipe
+	MoveSwagger
+	MoveMilkDrink
+	MoveSpark
+	MoveFuryCutter
+	MoveSteelWing
+	MoveMeanLook
+	MoveAttract
+	MoveSleepTalk
+	MoveHealBell
+	MoveReturn
+	MovePresent
+	MoveFrustration
+	MoveSafeguard
+	MovePainSplit
+	MoveSacredFire
+	MoveMagnitude
+	MoveDynamicPunch
+	MoveMegahorn
+	MoveDragonBreath
+	MoveBatonPass
+	MoveEncore
+	MovePursuit
+	MoveRapidSpin
+	MoveSweetScent
+	MoveIronTail
+	MoveMetalClaw
+	MoveVitalThrow
+	MoveMorningSun
+	MoveSynthesis
+	MoveMoonlight
+	MoveHiddenPower
+	MoveCrossChop
+	MoveTwister
+	MoveRainDance
+	MoveSunnyDay
+	MoveCrunch
+	MoveMirrorCoat
+	MovePsychUp
+	MoveExtremeSpeed
+	MoveAncientPower
+	MoveShadowBall
+	MoveFutureSight
+	MoveRockSmash
+	MoveWhirlpool
+	MoveBeatUp
+	MoveFakeOut
+	MoveUproar
+	MoveStockpile
+	MoveSpitUp
+	MoveSwallow
+	MoveHeatWave
+	MoveHail
+	MoveTorment
+	MoveFlatter
+	MoveWillOWisp
+	MoveMemento
+	MoveFacade
+	MoveFocusPunch
+	MoveSmellingSalts
+	MoveFollowMe
+	MoveNaturePower
+	MoveCharge
+	MoveTaunt
+	MoveHelpingHand
+	MoveTrick
+	MoveRolePlay
+	MoveWish
+	MoveAssist
+	MoveIngrain
+	MoveSuperpower
+	MoveMagicCoat
+	MoveRecycle
+	MoveRevenge
+	MoveBrickBreak
+	MoveYawn
+	MoveKnockOff
+	MoveEndeavor
+	MoveEruption
+	MoveSkillSwap
+	MoveImprison
+	MoveRefresh
+	MoveGrudge
+	MoveSnatch
+	MoveSecretPower
+	MoveDive
+	MoveArmThrust
+	MoveCamouflage
+	MoveTailGlow
+	MoveLusterPurge
+	MoveMistBall
+	MoveFeatherDance
+	MoveTeeterDance
+	MoveBlazeKick
+	MoveMudSport
+	MoveIceBall
+	MoveNeedleArm
+	MoveSlackOff
+	MoveHyperVoice
+	MovePoisonFang
+	MoveCrushClaw
+	MoveBlastBurn
+	MoveHydroCannon
+	MoveMeteorMash
+	MoveAstonish
+	MoveWeatherBall
+	MoveAromatherapy
+	MoveFakeTears
+	MoveAirCutter
+	MoveOverheat
+	MoveOdorSleuth
+	MoveRockTomb
+	MoveSilverWind
+	MoveMetalSound
+	MoveGrassWhistle
+	MoveTickle
+	MoveCosmicPower
+	MoveWaterSpout
+	MoveSignalBeam
+	MoveShadowPunch
+	MoveExtrasensory
+	MoveSkyUppercut
+	MoveSandTomb
+	MoveSheerCold
+	MoveMuddyWater
+	MoveBulletSeed
+	MoveAerialAce
+	MoveIcicleSpear
+	MoveIronDefense
+	MoveBlock
+	MoveHowl
+	MoveDragonClaw
+	MoveFrenzyPlant
+	MoveBulkUp
+	MoveBounce
+	MoveMudShot
+	MovePoisonTail
+	MoveCovet
+	MoveVoltTackle
+	MoveMagicalLeaf
+	MoveWaterSport
+	MoveCalmMind
+	MoveLeafBlade
+	MoveDragonDance
+	MoveRockBlast
+	MoveShockWave
+	MoveWaterPulse
+	MoveDoomDesire
+	MovePsychoBoost
+	MoveRoost
+	MoveGravity
+	MoveMiracleEye
+	MoveWakeUpSlap
+	MoveHammerArm
+	MoveGyroBall
+	MoveHealingWish
+	MoveBrine
+	MoveNaturalGift
+	MoveFeint
+	MovePluck
+	MoveTailwind
+	MoveAcupressure
+	MoveMetalBurst
+	MoveUturn
+	MoveCloseCombat
+	MovePayback
+	MoveAssurance
+	MoveEmbargo
+	MoveFling
+	MovePsychoShift
+	MoveTrumpCard
+	MoveHealBlock
+	MoveWringOut
+	MovePowerTrick
+	MoveGastroAcid
+	MoveLuckyChant
+	MoveMeFirst
+	MoveCopycat
+	MovePowerSwap
+	MoveGuardSwap
+	MovePunishment
+	MoveLastResort
+	MoveWorrySeed
+	MoveSuckerPunch
+	MoveToxicSpikes
+	MoveHeartSwap
+	MoveAquaRing
+	MoveMagnetRise
+	MoveFlareBlitz
+	MoveForcePalm
+	MoveAuraSphere
+	MoveRockPolish
+	MovePoisonJab
+	MoveDarkPulse
+	MoveNightSlash
+	MoveAquaTail
+	MoveSeedBomb
+	MoveAirSlash
+	MoveXScissor
+	MoveBugBuzz
+	MoveDragonPulse
+	MoveDragonRush
+	MovePowerGem
+	MoveDrainPunch
+	MoveVacuumWave
+	MoveFocusBlast
+	MoveEnergyBall
+	MoveBraveBird
+	MoveEarthPower
+	MoveSwitcheroo
+	MoveGigaImpact
+	MoveNastyPlot
+	MoveBulletPunch
+	MoveAvalanche
+	MoveIceShard
+	MoveShadowClaw
+	MoveThunderFang
+	MoveIceFang
+	MoveFireFang
+	MoveShadowSneak
+	MoveMudBomb
+	MovePsychoCut
+	MoveZenHeadbutt
+	MoveMirrorShot
+	MoveFlashCannon
+	MoveRockClimb
+	MoveDefog
+	MoveTrickRoom
+	MoveDracoMeteor
+	MoveDischarge
+	MoveLavaPlume
+	MoveLeafStorm
+	MovePowerWhip
+	MoveRockWrecker
+	MoveCrossPoison
+	MoveGunkShot
+	MoveIronHead
+	MoveMagnetBomb
+	MoveStoneEdge
+	MoveCaptivate
+	MoveStealthRock
+	MoveGrassKnot
+	MoveChatter
+	MoveJudgment
+	MoveBugBite
+	MoveChargeBeam
+	MoveWoodHammer
+	MoveAquaJet
+	MoveAttackOrder
+	MoveDefendOrder
+	MoveHealOrder
+	MoveHeadSmash
+	MoveDoubleHit
+	MoveRoarofTime
+	MoveSpacialRend
+	MoveLunarDance
+	MoveCrushGrip
+	MoveMagmaStorm
+	MoveDarkVoid
+	MoveSeedFlare
+	MoveOminousWind
+	MoveShadowForce
+	MoveShadowRush
+	MoveShadowBlast
+	MoveShadowBlitz
+	MoveShadowBolt
+	MoveShadowBreak
+	MoveShadowChill
+	MoveShadowEnd
+	MoveShadowFire
+	MoveShadowRave
+	MoveShadowStorm
+	MoveShadowWave
+	MoveShadowDown
+	MoveShadowHalf
+	MoveShadowHold
+	MoveShadowMist
+	MoveShadowPanic
+	MoveShadowShed
+	MoveShadowSky
 )
 
 // Create item constant enum for quick reference
 const (
-	ItemMasterBall   = 1
-	ItemUltraBall    = 2
-	ItemGreatBall    = 3
-	ItemPokBall      = 4
-	ItemSafariBall   = 5
-	ItemNetBall      = 6
-	ItemDiveBall     = 7
-	ItemNestBall     = 8
-	ItemRepeatBall   = 9
-	ItemTimerBall    = 10
-	ItemLuxuryBall   = 11
-	ItemPremierBall  = 12
-	ItemDuskBall     = 13
-	ItemHealBall     = 14
-	ItemQuickBall    = 15
-	ItemCherishBall  = 16
-	ItemPotion       = 17
-	ItemAntidote     = 18
-	ItemBurnHeal     = 19
-	ItemIceHeal      = 20
-	ItemAwakening    = 21
-	ItemParalyzeHeal = 22
-	ItemFullRestore  = 23
-	ItemMaxPotion    = 24
-	ItemHyperPotion  = 25
-	ItemSuperPotion  = 26
-	ItemFullHeal     = 27
-	ItemRevive       = 28
-	ItemMaxRevive    = 29
-	ItemFreshWater   = 30
-	ItemSodaPop      = 31
-	ItemLemonade     = 32
-	ItemMoomooMilk   = 33
-	ItemEnergyPowder = 34
-	ItemEnergyRoot   = 35
-	ItemHealPowder   = 36
-	ItemRevivalHerb  = 37
-	ItemEther        = 38
-	ItemMaxEther     = 39
-	ItemElixir       = 40
-	ItemMaxElixir    = 41
-	ItemLavaCookie   = 42
-	ItemBerryJuice   = 43
-	ItemSacredAsh    = 44
-	ItemHPUp         = 45
-	ItemProtein      = 46
-	ItemIron         = 47
-	ItemCarbos       = 48
-	ItemCalcium      = 49
-	ItemRareCandy    = 50
-	ItemPPUp         = 51
-	ItemZinc         = 52
-	ItemPPMax        = 53
-	ItemOldGateau    = 54
-	ItemGuardSpec    = 55
-	ItemDireHit      = 56
-	ItemXAttack      = 57
-	ItemXDefense     = 58
-	ItemXSpeed       = 59
-	ItemXAccuracy    = 60
-	ItemXSpAtk       = 61
-	ItemXSpDef       = 62
-	ItemPokDoll      = 63
-	ItemFluffyTail   = 64
-	ItemBlueFlute    = 65
-	ItemYellowFlute  = 66
-	ItemRedFlute     = 67
-	ItemBlackFlute   = 68
-	ItemWhiteFlute   = 69
-	ItemAdamantOrb   = 112
-	ItemLustrousOrb  = 113
-	ItemCheriBerry   = 126
-	ItemChestoBerry  = 127
-	ItemPechaBerry   = 128
-	ItemRawstBerry   = 129
-	ItemAspearBerry  = 130
-	ItemLeppaBerry   = 131
-	ItemOranBerry    = 132
-	ItemPersimBerry  = 133
-	ItemLumBerry     = 134
-	ItemSitrusBerry  = 135
-	ItemFigyBerry    = 136
-	ItemWikiBerry    = 137
-	ItemMagoBerry    = 138
-	ItemAguavBerry   = 139
-	ItemIapapaBerry  = 140
-	ItemOccaBerry    = 161
-	ItemPasshoBerry  = 162
-	ItemWacanBerry   = 163
-	ItemRindoBerry   = 164
-	ItemYacheBerry   = 165
-	ItemChopleBerry  = 166
-	ItemKebiaBerry   = 167
-	ItemShucaBerry   = 168
-	ItemCobaBerry    = 169
-	ItemPayapaBerry  = 170
-	ItemTangaBerry   = 171
-	ItemChartiBerry  = 172
-	ItemKasibBerry   = 173
-	ItemHabanBerry   = 174
-	ItemColburBerry  = 175
-	ItemBabiriBerry  = 176
-	ItemChilanBerry  = 177
-	ItemLiechiBerry  = 178
-	ItemGanlonBerry  = 179
-	ItemSalacBerry   = 180
-	ItemPetayaBerry  = 181
-	ItemApicotBerry  = 182
-	ItemLansatBerry  = 183
-	ItemStarfBerry   = 184
-	ItemEnigmaBerry  = 185
-	ItemMicleBerry   = 186
-	ItemCustapBerry  = 187
-	ItemJabocaBerry  = 188
-	ItemRowapBerry   = 189
-	ItemBrightPowder = 190
-	ItemWhiteHerb    = 191
-	ItemMachoBrace   = 192
-	ItemExpShare     = 193
-	ItemQuickClaw    = 194
-	ItemSootheBell   = 195
-	ItemMentalHerb   = 196
-	ItemChoiceBand   = 197
-	ItemKingsRock    = 198
-	ItemSilverPowder = 199
-	ItemAmuletCoin   = 200
-	ItemCleanseTag   = 201
-	ItemSoulDew      = 202
-	ItemDeepSeaTooth = 203
-	ItemDeepSeaScale = 204
-	ItemSmokeBall    = 205
-	ItemEverstone    = 206
-	ItemFocusBand    = 207
-	ItemLuckyEgg     = 208
-	ItemScopeLens    = 209
-	ItemMetalCoat    = 210
-	ItemLeftovers    = 211
-	ItemLightBall    = 213
-	ItemSoftSand     = 214
-	ItemHardStone    = 215
-	ItemMiracleSeed  = 216
-	ItemBlackGlasses = 217
-	ItemBlackBelt    = 218
-	ItemMagnet       = 219
-	ItemMysticWater  = 220
-	ItemSharpBeak    = 221
-	ItemPoisonBarb   = 222
-	ItemNeverMeltIce = 223
-	ItemSpellTag     = 224
-	ItemTwistedSpoon = 225
-	ItemCharcoal     = 226
-	ItemDragonFang   = 227
-	ItemSilkScarf    = 228
-	ItemShellBell    = 230
-	ItemSeaIncense   = 231
-	ItemLaxIncense   = 232
-	ItemLuckyPunch   = 233
-	ItemMetalPowder  = 234
-	ItemThickClub    = 235
-	ItemStick        = 236
-	ItemRedScarf     = 237
-	ItemBlueScarf    = 238
-	ItemPinkScarf    = 239
-	ItemGreenScarf   = 240
-	ItemYellowScarf  = 241
-	ItemWideLens     = 242
-	ItemMuscleBand   = 243
-	ItemWiseGlasses  = 244
-	ItemExpertBelt   = 245
-	ItemLightClay    = 246
-	ItemLifeOrb      = 247
-	ItemPowerHerb    = 248
-	ItemToxicOrb     = 249
-	ItemFlameOrb     = 250
-	ItemQuickPowder  = 251
-	ItemFocusSash    = 252
-	ItemZoomLens     = 253
-	ItemMetronome    = 254
-	ItemIronBall     = 255
-	ItemLaggingTail  = 256
-	ItemDestinyKnot  = 257
-	ItemBlackSludge  = 258
-	ItemIcyRock      = 259
-	ItemSmoothRock   = 260
-	ItemHeatRock     = 261
-	ItemDampRock     = 262
-	ItemGripClaw     = 263
-	ItemChoiceScarf  = 264
-	ItemStickyBarb   = 265
-	ItemPowerBracer  = 266
-	ItemPowerBelt    = 267
-	ItemPowerLens    = 268
-	ItemPowerBand    = 269
-	ItemPowerAnklet  = 270
-	ItemPowerWeight  = 271
-	ItemShedShell    = 272
-	ItemBigRoot      = 273
-	ItemChoiceSpecs  = 274
-	ItemFlamePlate   = 275
-	ItemSplashPlate  = 276
-	ItemZapPlate     = 277
-	ItemMeadowPlate  = 278
-	ItemIciclePlate  = 279
-	ItemFistPlate    = 280
-	ItemToxicPlate   = 281
-	ItemEarthPlate   = 282
-	ItemSkyPlate     = 283
-	ItemMindPlate    = 284
-	ItemInsectPlate  = 285
-	ItemStonePlate   = 286
-	ItemSpookyPlate  = 287
-	ItemDracoPlate   = 288
-	ItemDreadPlate   = 289
-	ItemIronPlate    = 290
-	ItemOddIncense   = 291
-	ItemRockIncense  = 292
-	ItemFullIncense  = 293
-	ItemWaveIncense  = 294
-	ItemRoseIncense  = 295
-	ItemLuckIncense  = 296
-	ItemPureIncense  = 297
-	ItemRazorClaw    = 303
-	ItemRazorFang    = 304
+	ItemNone Item = iota
+	ItemMasterBall
+	ItemUltraBall
+	ItemGreatBall
+	ItemPokBall
+	ItemSafariBall
+	ItemNetBall
+	ItemDiveBall
+	ItemNestBall
+	ItemRepeatBall
+	ItemTimerBall
+	ItemLuxuryBall
+	ItemPremierBall
+	ItemDuskBall
+	ItemHealBall
+	ItemQuickBall
+	ItemCherishBall
+	ItemPotion
+	ItemAntidote
+	ItemBurnHeal
+	ItemIceHeal
+	ItemAwakening
+	ItemParalyzeHeal
+	ItemFullRestore
+	ItemMaxPotion
+	ItemHyperPotion
+	ItemSuperPotion
+	ItemFullHeal
+	ItemRevive
+	ItemMaxRevive
+	ItemFreshWater
+	ItemSodaPop
+	ItemLemonade
+	ItemMoomooMilk
+	ItemEnergyPowder
+	ItemEnergyRoot
+	ItemHealPowder
+	ItemRevivalHerb
+	ItemEther
+	ItemMaxEther
+	ItemElixir
+	ItemMaxElixir
+	ItemLavaCookie
+	ItemBerryJuice
+	ItemSacredAsh
+	ItemHPUp
+	ItemProtein
+	ItemIron
+	ItemCarbos
+	ItemCalcium
+	ItemRareCandy
+	ItemPPUp
+	ItemZinc
+	ItemPPMax
+	ItemOldGateau
+	ItemGuardSpec
+	ItemDireHit
+	ItemXAttack
+	ItemXDefense
+	ItemXSpeed
+	ItemXAccuracy
+	ItemXSpAtk
+	ItemXSpDef
+	ItemPokDoll
+	ItemFluffyTail
+	ItemBlueFlute
+	ItemYellowFlute
+	ItemRedFlute
+	ItemBlackFlute
+	ItemWhiteFlute
+	ItemAdamantOrb
+	ItemLustrousOrb
+	ItemCheriBerry
+	ItemChestoBerry
+	ItemPechaBerry
+	ItemRawstBerry
+	ItemAspearBerry
+	ItemLeppaBerry
+	ItemOranBerry
+	ItemPersimBerry
+	ItemLumBerry
+	ItemSitrusBerry
+	ItemFigyBerry
+	ItemWikiBerry
+	ItemMagoBerry
+	ItemAguavBerry
+	ItemIapapaBerry
+	ItemOccaBerry
+	ItemPasshoBerry
+	ItemWacanBerry
+	ItemRindoBerry
+	ItemYacheBerry
+	ItemChopleBerry
+	ItemKebiaBerry
+	ItemShucaBerry
+	ItemCobaBerry
+	ItemPayapaBerry
+	ItemTangaBerry
+	ItemChartiBerry
+	ItemKasibBerry
+	ItemHabanBerry
+	ItemColburBerry
+	ItemBabiriBerry
+	ItemChilanBerry
+	ItemLiechiBerry
+	ItemGanlonBerry
+	ItemSalacBerry
+	ItemPetayaBerry
+	ItemApicotBerry
+	ItemLansatBerry
+	ItemStarfBerry
+	ItemEnigmaBerry
+	ItemMicleBerry
+	ItemCustapBerry
+	ItemJabocaBerry
+	ItemRowapBerry
+	ItemBrightPowder
+	ItemWhiteHerb
+	ItemMachoBrace
+	ItemExpShare
+	ItemQuickClaw
+	ItemSootheBell
+	ItemMentalHerb
+	ItemChoiceBand
+	ItemKingsRock
+	ItemSilverPowder
+	ItemAmuletCoin
+	ItemCleanseTag
+	ItemSoulDew
+	ItemDeepSeaTooth
+	ItemDeepSeaScale
+	ItemSmokeBall
+	ItemEverstone
+	ItemFocusBand
+	ItemLuckyEgg
+	ItemScopeLens
+	ItemMetalCoat
+	ItemLeftovers
+	ItemLightBall
+	ItemSoftSand
+	ItemHardStone
+	ItemMiracleSeed
+	ItemBlackGlasses
+	ItemBlackBelt
+	ItemMagnet
+	ItemMysticWater
+	ItemSharpBeak
+	ItemPoisonBarb
+	ItemNeverMeltIce
+	ItemSpellTag
+	ItemTwistedSpoon
+	ItemCharcoal
+	ItemDragonFang
+	ItemSilkScarf
+	ItemShellBell
+	ItemSeaIncense
+	ItemLaxIncense
+	ItemLuckyPunch
+	ItemMetalPowder
+	ItemThickClub
+	ItemStick
+	ItemRedScarf
+	ItemBlueScarf
+	ItemPinkScarf
+	ItemGreenScarf
+	ItemYellowScarf
+	ItemWideLens
+	ItemMuscleBand
+	ItemWiseGlasses
+	ItemExpertBelt
+	ItemLightClay
+	ItemLifeOrb
+	ItemPowerHerb
+	ItemToxicOrb
+	ItemFlameOrb
+	ItemQuickPowder
+	ItemFocusSash
+	ItemZoomLens
+	ItemMetronome
+	ItemIronBall
+	ItemLaggingTail
+	ItemDestinyKnot
+	ItemBlackSludge
+	ItemIcyRock
+	ItemSmoothRock
+	ItemHeatRock
+	ItemDampRock
+	ItemGripClaw
+	ItemChoiceScarf
+	ItemStickyBarb
+	ItemPowerBracer
+	ItemPowerBelt
+	ItemPowerLens
+	ItemPowerBand
+	ItemPowerAnklet
+	ItemPowerWeight
+	ItemShedShell
+	ItemBigRoot
+	ItemChoiceSpecs
+	ItemFlamePlate
+	ItemSplashPlate
+	ItemZapPlate
+	ItemMeadowPlate
+	ItemIciclePlate
+	ItemFistPlate
+	ItemToxicPlate
+	ItemEarthPlate
+	ItemSkyPlate
+	ItemMindPlate
+	ItemInsectPlate
+	ItemStonePlate
+	ItemSpookyPlate
+	ItemDracoPlate
+	ItemDreadPlate
+	ItemIronPlate
+	ItemOddIncense
+	ItemRockIncense
+	ItemFullIncense
+	ItemWaveIncense
+	ItemRoseIncense
+	ItemLuckIncense
+	ItemPureIncense
+	ItemRazorClaw
+	ItemRazorFang
 )
 
 // A collection of all items in the game
-var AllItems = []Item{
-	{ID: 1, Name: "Master Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 2, Name: "Ultra Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 3, Name: "Great Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 4, Name: "Poké Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 5, Name: "Safari Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 6, Name: "Net Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 7, Name: "Dive Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 8, Name: "Nest Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 9, Name: "Repeat Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 10, Name: "Timer Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 11, Name: "Luxury Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 12, Name: "Premier Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 13, Name: "Dusk Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 14, Name: "Heal Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 15, Name: "Quick Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 16, Name: "Cherish Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 17, Name: "Potion", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 18, Name: "Antidote", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 19, Name: "Burn Heal", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 20, Name: "Ice Heal", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 21, Name: "Awakening", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 22, Name: "Paralyze Heal", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 23, Name: "Full Restore", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 24, Name: "Max Potion", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 25, Name: "Hyper Potion", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 26, Name: "Super Potion", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 27, Name: "Full Heal", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 28, Name: "Revive", Category: 29, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 29, Name: "Max Revive", Category: 29, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 30, Name: "Fresh Water", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 31, Name: "Soda Pop", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 32, Name: "Lemonade", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 33, Name: "Moomoo Milk", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 34, Name: "Energy Powder", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 35, Name: "Energy Root", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 36, Name: "Heal Powder", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 37, Name: "Revival Herb", Category: 29, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 38, Name: "Ether", Category: 28, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 39, Name: "Max Ether", Category: 28, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 40, Name: "Elixir", Category: 28, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 41, Name: "Max Elixir", Category: 28, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 42, Name: "Lava Cookie", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 43, Name: "Berry Juice", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 44, Name: "Sacred Ash", Category: 29, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 45, Name: "HP Up", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 46, Name: "Protein", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 47, Name: "Iron", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 48, Name: "Carbos", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 49, Name: "Calcium", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 50, Name: "Rare Candy", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 51, Name: "PP Up", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 52, Name: "Zinc", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 53, Name: "PP Max", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 54, Name: "Old Gateau", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 55, Name: "Guard Spec.", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 56, Name: "Dire Hit", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 57, Name: "X Attack", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 58, Name: "X Defense", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 59, Name: "X Speed", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 60, Name: "X Accuracy", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 61, Name: "X Sp. Atk", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 62, Name: "X Sp. Def", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 63, Name: "Poké Doll", Category: 11, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 64, Name: "Fluffy Tail", Category: 11, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 65, Name: "Blue Flute", Category: 38, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 66, Name: "Yellow Flute", Category: 38, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 67, Name: "Red Flute", Category: 38, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
-	{ID: 68, Name: "Black Flute", Category: 11, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagHoldable},
-	{ID: 69, Name: "White Flute", Category: 11, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagHoldable},
-	{ID: 112, Name: "Adamant Orb", Category: 18, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 113, Name: "Lustrous Orb", Category: 18, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 126, Name: "Cheri Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 127, Name: "Chesto Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 128, Name: "Pecha Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 129, Name: "Rawst Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 130, Name: "Aspear Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 131, Name: "Leppa Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 132, Name: "Oran Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 133, Name: "Persim Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 134, Name: "Lum Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 135, Name: "Sitrus Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 136, Name: "Figy Berry", Category: 6, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 137, Name: "Wiki Berry", Category: 6, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 138, Name: "Mago Berry", Category: 6, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 139, Name: "Aguav Berry", Category: 6, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 140, Name: "Iapapa Berry", Category: 6, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 161, Name: "Occa Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 162, Name: "Passho Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 163, Name: "Wacan Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 164, Name: "Rindo Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 165, Name: "Yache Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 166, Name: "Chople Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 167, Name: "Kebia Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 168, Name: "Shuca Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 169, Name: "Coba Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 170, Name: "Payapa Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 171, Name: "Tanga Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 172, Name: "Charti Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 173, Name: "Kasib Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 174, Name: "Haban Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 175, Name: "Colbur Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 176, Name: "Babiri Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 177, Name: "Chilan Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 178, Name: "Liechi Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 179, Name: "Ganlon Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 180, Name: "Salac Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 181, Name: "Petaya Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 182, Name: "Apicot Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 183, Name: "Lansat Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 184, Name: "Starf Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 185, Name: "Enigma Berry", Category: 4, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 186, Name: "Micle Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive},
-	{ID: 187, Name: "Custap Berry", Category: 5, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 188, Name: "Jaboca Berry", Category: 4, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 189, Name: "Rowap Berry", Category: 4, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 190, Name: "Bright Powder", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 191, Name: "White Herb", Category: 12, FlingPower: 10, FlingEffect: 4, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 192, Name: "Macho Brace", Category: 14, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 193, Name: "Exp. Share", Category: 16, FlingPower: 0, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 194, Name: "Quick Claw", Category: 12, FlingPower: 80, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 195, Name: "Soothe Bell", Category: 16, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 196, Name: "Mental Herb", Category: 12, FlingPower: 10, FlingEffect: 4, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 197, Name: "Choice Band", Category: 13, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 198, Name: "King’s Rock", Category: 12, FlingPower: 30, FlingEffect: 7, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 199, Name: "Silver Powder", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 200, Name: "Amulet Coin", Category: 16, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 201, Name: "Cleanse Tag", Category: 16, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 202, Name: "Soul Dew", Category: 18, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 203, Name: "Deep Sea Tooth", Category: 18, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 204, Name: "Deep Sea Scale", Category: 18, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 205, Name: "Smoke Ball", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 206, Name: "Everstone", Category: 16, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 207, Name: "Focus Band", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 208, Name: "Lucky Egg", Category: 16, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 209, Name: "Scope Lens", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 210, Name: "Metal Coat", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 211, Name: "Leftovers", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 213, Name: "Light Ball", Category: 18, FlingPower: 30, FlingEffect: 5, Flags: FlagHoldable},
-	{ID: 214, Name: "Soft Sand", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 215, Name: "Hard Stone", Category: 19, FlingPower: 100, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 216, Name: "Miracle Seed", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 217, Name: "Black Glasses", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 218, Name: "Black Belt", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 219, Name: "Magnet", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 220, Name: "Mystic Water", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 221, Name: "Sharp Beak", Category: 19, FlingPower: 50, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 222, Name: "Poison Barb", Category: 19, FlingPower: 70, FlingEffect: 6, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 223, Name: "Never-Melt Ice", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 224, Name: "Spell Tag", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 225, Name: "Twisted Spoon", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 226, Name: "Charcoal", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 227, Name: "Dragon Fang", Category: 19, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 228, Name: "Silk Scarf", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 230, Name: "Shell Bell", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 231, Name: "Sea Incense", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 232, Name: "Lax Incense", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 233, Name: "Lucky Punch", Category: 18, FlingPower: 40, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 234, Name: "Metal Powder", Category: 18, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 235, Name: "Thick Club", Category: 18, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 236, Name: "Stick", Category: 18, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 237, Name: "Red Scarf", Category: 36, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 238, Name: "Blue Scarf", Category: 36, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 239, Name: "Pink Scarf", Category: 36, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 240, Name: "Green Scarf", Category: 36, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 241, Name: "Yellow Scarf", Category: 36, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
-	{ID: 242, Name: "Wide Lens", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 243, Name: "Muscle Band", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 244, Name: "Wise Glasses", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 245, Name: "Expert Belt", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 246, Name: "Light Clay", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 247, Name: "Life Orb", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 248, Name: "Power Herb", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 249, Name: "Toxic Orb", Category: 15, FlingPower: 30, FlingEffect: 1, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 250, Name: "Flame Orb", Category: 15, FlingPower: 30, FlingEffect: 2, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 251, Name: "Quick Powder", Category: 18, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 252, Name: "Focus Sash", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 253, Name: "Zoom Lens", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 254, Name: "Metronome", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 255, Name: "Iron Ball", Category: 15, FlingPower: 130, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 256, Name: "Lagging Tail", Category: 15, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 257, Name: "Destiny Knot", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 258, Name: "Black Sludge", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 259, Name: "Icy Rock", Category: 12, FlingPower: 40, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 260, Name: "Smooth Rock", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 261, Name: "Heat Rock", Category: 12, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 262, Name: "Damp Rock", Category: 12, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 263, Name: "Grip Claw", Category: 12, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 264, Name: "Choice Scarf", Category: 13, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 265, Name: "Sticky Barb", Category: 15, FlingPower: 80, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 266, Name: "Power Bracer", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 267, Name: "Power Belt", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 268, Name: "Power Lens", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 269, Name: "Power Band", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 270, Name: "Power Anklet", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 271, Name: "Power Weight", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 272, Name: "Shed Shell", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 273, Name: "Big Root", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 274, Name: "Choice Specs", Category: 13, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 275, Name: "Flame Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 276, Name: "Splash Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 277, Name: "Zap Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 278, Name: "Meadow Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 279, Name: "Icicle Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 280, Name: "Fist Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 281, Name: "Toxic Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 282, Name: "Earth Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 283, Name: "Sky Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 284, Name: "Mind Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 285, Name: "Insect Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 286, Name: "Stone Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 287, Name: "Spooky Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 288, Name: "Draco Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 289, Name: "Dread Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 290, Name: "Iron Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 291, Name: "Odd Incense", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 292, Name: "Rock Incense", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 293, Name: "Full Incense", Category: 15, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 294, Name: "Wave Incense", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 295, Name: "Rose Incense", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 296, Name: "Luck Incense", Category: 16, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 297, Name: "Pure Incense", Category: 16, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable},
-	{ID: 303, Name: "Razor Claw", Category: 12, FlingPower: 80, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
-	{ID: 304, Name: "Razor Fang", Category: 12, FlingPower: 30, FlingEffect: 7, Flags: FlagHoldable | FlagHoldableActive},
+var AllItems = []ItemData{
+	{Name: "Master Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Ultra Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Great Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Poké Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Safari Ball", Category: 34, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Net Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Dive Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Nest Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Repeat Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Timer Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Luxury Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Premier Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Dusk Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Heal Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Quick Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Cherish Ball", Category: 33, FlingPower: 0, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Potion", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Antidote", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Burn Heal", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Ice Heal", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Awakening", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Paralyze Heal", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Full Restore", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Max Potion", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Hyper Potion", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Super Potion", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Full Heal", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Revive", Category: 29, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Max Revive", Category: 29, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Fresh Water", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Soda Pop", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Lemonade", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Moomoo Milk", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Energy Powder", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Energy Root", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Heal Powder", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Revival Herb", Category: 29, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Ether", Category: 28, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Max Ether", Category: 28, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Elixir", Category: 28, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Max Elixir", Category: 28, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Lava Cookie", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Berry Juice", Category: 27, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Sacred Ash", Category: 29, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "HP Up", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Protein", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Iron", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Carbos", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Calcium", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Rare Candy", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "PP Up", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Zinc", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "PP Max", Category: 26, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Old Gateau", Category: 30, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Guard Spec.", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Dire Hit", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "X Attack", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "X Defense", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "X Speed", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "X Accuracy", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "X Sp. Atk", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "X Sp. Def", Category: 1, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Poké Doll", Category: 11, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Fluffy Tail", Category: 11, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Blue Flute", Category: 38, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Yellow Flute", Category: 38, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Red Flute", Category: 38, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagUsableInBattle | FlagHoldable},
+	{Name: "Black Flute", Category: 11, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagHoldable},
+	{Name: "White Flute", Category: 11, FlingPower: 30, FlingEffect: 0, Flags: FlagConsumable | FlagHoldable},
+	{Name: "Adamant Orb", Category: 18, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Lustrous Orb", Category: 18, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Cheri Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Chesto Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Pecha Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Rawst Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Aspear Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Leppa Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Oran Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Persim Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Lum Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Sitrus Berry", Category: 3, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Figy Berry", Category: 6, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Wiki Berry", Category: 6, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Mago Berry", Category: 6, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Aguav Berry", Category: 6, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Iapapa Berry", Category: 6, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Occa Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Passho Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Wacan Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Rindo Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Yache Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Chople Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Kebia Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Shuca Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Coba Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Payapa Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Tanga Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Charti Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Kasib Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Haban Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Colbur Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Babiri Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Chilan Berry", Category: 7, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Liechi Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Ganlon Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Salac Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Petaya Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Apicot Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Lansat Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Starf Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Enigma Berry", Category: 4, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
+	{Name: "Micle Berry", Category: 5, FlingPower: 10, FlingEffect: 3, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Custap Berry", Category: 5, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive | FlagUsableInBattle | FlagConsumable | FlagHoldable},
+	{Name: "Jaboca Berry", Category: 4, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
+	{Name: "Rowap Berry", Category: 4, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
+	{Name: "Bright Powder", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "White Herb", Category: 12, FlingPower: 10, FlingEffect: 4, Flags: FlagConsumable | FlagHoldable | FlagHoldableActive},
+	{Name: "Macho Brace", Category: 14, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Exp. Share", Category: 16, FlingPower: 0, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Quick Claw", Category: 12, FlingPower: 80, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Soothe Bell", Category: 16, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Mental Herb", Category: 12, FlingPower: 10, FlingEffect: 4, Flags: FlagConsumable | FlagHoldable | FlagHoldableActive},
+	{Name: "Choice Band", Category: 13, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "King’s Rock", Category: 12, FlingPower: 30, FlingEffect: 7, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Silver Powder", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Amulet Coin", Category: 16, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Cleanse Tag", Category: 16, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Soul Dew", Category: 18, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Deep Sea Tooth", Category: 18, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Deep Sea Scale", Category: 18, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Smoke Ball", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Everstone", Category: 16, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Focus Band", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Lucky Egg", Category: 16, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Scope Lens", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Metal Coat", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Leftovers", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Light Ball", Category: 18, FlingPower: 30, FlingEffect: 5, Flags: FlagHoldable},
+	{Name: "Soft Sand", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Hard Stone", Category: 19, FlingPower: 100, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Miracle Seed", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Black Glasses", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Black Belt", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Magnet", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Mystic Water", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Sharp Beak", Category: 19, FlingPower: 50, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Poison Barb", Category: 19, FlingPower: 70, FlingEffect: 6, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Never-Melt Ice", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Spell Tag", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Twisted Spoon", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Charcoal", Category: 19, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Dragon Fang", Category: 19, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Silk Scarf", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Shell Bell", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Sea Incense", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Lax Incense", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Lucky Punch", Category: 18, FlingPower: 40, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Metal Powder", Category: 18, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Thick Club", Category: 18, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Stick", Category: 18, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Red Scarf", Category: 36, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
+	{Name: "Blue Scarf", Category: 36, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
+	{Name: "Pink Scarf", Category: 36, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
+	{Name: "Green Scarf", Category: 36, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
+	{Name: "Yellow Scarf", Category: 36, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldableActive},
+	{Name: "Wide Lens", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Muscle Band", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Wise Glasses", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Expert Belt", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Light Clay", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Life Orb", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Power Herb", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Toxic Orb", Category: 15, FlingPower: 30, FlingEffect: 1, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Flame Orb", Category: 15, FlingPower: 30, FlingEffect: 2, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Quick Powder", Category: 18, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Focus Sash", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagConsumable | FlagHoldable | FlagHoldableActive},
+	{Name: "Zoom Lens", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Metronome", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Iron Ball", Category: 15, FlingPower: 130, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Lagging Tail", Category: 15, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Destiny Knot", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Black Sludge", Category: 12, FlingPower: 30, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Icy Rock", Category: 12, FlingPower: 40, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Smooth Rock", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Heat Rock", Category: 12, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Damp Rock", Category: 12, FlingPower: 60, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Grip Claw", Category: 12, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Choice Scarf", Category: 13, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Sticky Barb", Category: 15, FlingPower: 80, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Power Bracer", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Power Belt", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Power Lens", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Power Band", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Power Anklet", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Power Weight", Category: 14, FlingPower: 70, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Shed Shell", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Big Root", Category: 12, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Choice Specs", Category: 13, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Flame Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Splash Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Zap Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Meadow Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Icicle Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Fist Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Toxic Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Earth Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Sky Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Mind Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Insect Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Stone Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Spooky Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Draco Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Dread Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Iron Plate", Category: 17, FlingPower: 90, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldable | FlagHoldablePassive},
+	{Name: "Odd Incense", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Rock Incense", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Full Incense", Category: 15, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Wave Incense", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Rose Incense", Category: 19, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive | FlagHoldablePassive},
+	{Name: "Luck Incense", Category: 16, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Pure Incense", Category: 16, FlingPower: 10, FlingEffect: 0, Flags: FlagHoldable},
+	{Name: "Razor Claw", Category: 12, FlingPower: 80, FlingEffect: 0, Flags: FlagHoldable | FlagHoldableActive},
+	{Name: "Razor Fang", Category: 12, FlingPower: 30, FlingEffect: 7, Flags: FlagHoldable | FlagHoldableActive},
 }
 
 //A table of levels mapped to the total experience at that level for each growth rate
@@ -3044,996 +3425,144 @@ var ExpTable = map[int]map[int]int{
 		100: 1640000,
 	}}
 
-// A map of national pokedex numbers to Pokemon growth rates
-var pokemonGrowthRates = map[int]int{
-	1:   GrowthMediumSlow,
-	2:   GrowthMediumSlow,
-	3:   GrowthMediumSlow,
-	4:   GrowthMediumSlow,
-	5:   GrowthMediumSlow,
-	6:   GrowthMediumSlow,
-	7:   GrowthMediumSlow,
-	8:   GrowthMediumSlow,
-	9:   GrowthMediumSlow,
-	10:  GrowthMediumFast,
-	11:  GrowthMediumFast,
-	12:  GrowthMediumFast,
-	13:  GrowthMediumFast,
-	14:  GrowthMediumFast,
-	15:  GrowthMediumFast,
-	16:  GrowthMediumSlow,
-	17:  GrowthMediumSlow,
-	18:  GrowthMediumSlow,
-	19:  GrowthMediumFast,
-	20:  GrowthMediumFast,
-	21:  GrowthMediumFast,
-	22:  GrowthMediumFast,
-	23:  GrowthMediumFast,
-	24:  GrowthMediumFast,
-	25:  GrowthMediumFast,
-	26:  GrowthMediumFast,
-	27:  GrowthMediumFast,
-	28:  GrowthMediumFast,
-	29:  GrowthMediumSlow,
-	30:  GrowthMediumSlow,
-	31:  GrowthMediumSlow,
-	32:  GrowthMediumSlow,
-	33:  GrowthMediumSlow,
-	34:  GrowthMediumSlow,
-	35:  GrowthFast,
-	36:  GrowthFast,
-	37:  GrowthMediumFast,
-	38:  GrowthMediumFast,
-	39:  GrowthFast,
-	40:  GrowthFast,
-	41:  GrowthMediumFast,
-	42:  GrowthMediumFast,
-	43:  GrowthMediumSlow,
-	44:  GrowthMediumSlow,
-	45:  GrowthMediumSlow,
-	46:  GrowthMediumFast,
-	47:  GrowthMediumFast,
-	48:  GrowthMediumFast,
-	49:  GrowthMediumFast,
-	50:  GrowthMediumFast,
-	51:  GrowthMediumFast,
-	52:  GrowthMediumFast,
-	53:  GrowthMediumFast,
-	54:  GrowthMediumFast,
-	55:  GrowthMediumFast,
-	56:  GrowthMediumFast,
-	57:  GrowthMediumFast,
-	58:  GrowthSlow,
-	59:  GrowthSlow,
-	60:  GrowthMediumSlow,
-	61:  GrowthMediumSlow,
-	62:  GrowthMediumSlow,
-	63:  GrowthMediumSlow,
-	64:  GrowthMediumSlow,
-	65:  GrowthMediumSlow,
-	66:  GrowthMediumSlow,
-	67:  GrowthMediumSlow,
-	68:  GrowthMediumSlow,
-	69:  GrowthMediumSlow,
-	70:  GrowthMediumSlow,
-	71:  GrowthMediumSlow,
-	72:  GrowthSlow,
-	73:  GrowthSlow,
-	74:  GrowthMediumSlow,
-	75:  GrowthMediumSlow,
-	76:  GrowthMediumSlow,
-	77:  GrowthMediumFast,
-	78:  GrowthMediumFast,
-	79:  GrowthMediumFast,
-	80:  GrowthMediumFast,
-	81:  GrowthMediumFast,
-	82:  GrowthMediumFast,
-	83:  GrowthMediumFast,
-	84:  GrowthMediumFast,
-	85:  GrowthMediumFast,
-	86:  GrowthMediumFast,
-	87:  GrowthMediumFast,
-	88:  GrowthMediumFast,
-	89:  GrowthMediumFast,
-	90:  GrowthSlow,
-	91:  GrowthSlow,
-	92:  GrowthMediumSlow,
-	93:  GrowthMediumSlow,
-	94:  GrowthMediumSlow,
-	95:  GrowthMediumFast,
-	96:  GrowthMediumFast,
-	97:  GrowthMediumFast,
-	98:  GrowthMediumFast,
-	99:  GrowthMediumFast,
-	100: GrowthMediumFast,
-	101: GrowthMediumFast,
-	102: GrowthSlow,
-	103: GrowthSlow,
-	104: GrowthMediumFast,
-	105: GrowthMediumFast,
-	106: GrowthMediumFast,
-	107: GrowthMediumFast,
-	108: GrowthMediumFast,
-	109: GrowthMediumFast,
-	110: GrowthMediumFast,
-	111: GrowthSlow,
-	112: GrowthSlow,
-	113: GrowthFast,
-	114: GrowthMediumFast,
-	115: GrowthMediumFast,
-	116: GrowthMediumFast,
-	117: GrowthMediumFast,
-	118: GrowthMediumFast,
-	119: GrowthMediumFast,
-	120: GrowthSlow,
-	121: GrowthSlow,
-	122: GrowthMediumFast,
-	123: GrowthMediumFast,
-	124: GrowthMediumFast,
-	125: GrowthMediumFast,
-	126: GrowthMediumFast,
-	127: GrowthSlow,
-	128: GrowthSlow,
-	129: GrowthSlow,
-	130: GrowthSlow,
-	131: GrowthSlow,
-	132: GrowthMediumFast,
-	133: GrowthMediumFast,
-	134: GrowthMediumFast,
-	135: GrowthMediumFast,
-	136: GrowthMediumFast,
-	137: GrowthMediumFast,
-	138: GrowthMediumFast,
-	139: GrowthMediumFast,
-	140: GrowthMediumFast,
-	141: GrowthMediumFast,
-	142: GrowthSlow,
-	143: GrowthSlow,
-	144: GrowthSlow,
-	145: GrowthSlow,
-	146: GrowthSlow,
-	147: GrowthSlow,
-	148: GrowthSlow,
-	149: GrowthSlow,
-	150: GrowthSlow,
-	151: GrowthMediumSlow,
-	152: GrowthMediumSlow,
-	153: GrowthMediumSlow,
-	154: GrowthMediumSlow,
-	155: GrowthMediumSlow,
-	156: GrowthMediumSlow,
-	157: GrowthMediumSlow,
-	158: GrowthMediumSlow,
-	159: GrowthMediumSlow,
-	160: GrowthMediumSlow,
-	161: GrowthMediumFast,
-	162: GrowthMediumFast,
-	163: GrowthMediumFast,
-	164: GrowthMediumFast,
-	165: GrowthFast,
-	166: GrowthFast,
-	167: GrowthFast,
-	168: GrowthFast,
-	169: GrowthMediumFast,
-	170: GrowthSlow,
-	171: GrowthSlow,
-	172: GrowthMediumFast,
-	173: GrowthFast,
-	174: GrowthFast,
-	175: GrowthFast,
-	176: GrowthFast,
-	177: GrowthMediumFast,
-	178: GrowthMediumFast,
-	179: GrowthMediumSlow,
-	180: GrowthMediumSlow,
-	181: GrowthMediumSlow,
-	182: GrowthMediumSlow,
-	183: GrowthFast,
-	184: GrowthFast,
-	185: GrowthMediumFast,
-	186: GrowthMediumSlow,
-	187: GrowthMediumSlow,
-	188: GrowthMediumSlow,
-	189: GrowthMediumSlow,
-	190: GrowthFast,
-	191: GrowthMediumSlow,
-	192: GrowthMediumSlow,
-	193: GrowthMediumFast,
-	194: GrowthMediumFast,
-	195: GrowthMediumFast,
-	196: GrowthMediumFast,
-	197: GrowthMediumFast,
-	198: GrowthMediumSlow,
-	199: GrowthMediumFast,
-	200: GrowthFast,
-	201: GrowthMediumFast,
-	202: GrowthMediumFast,
-	203: GrowthMediumFast,
-	204: GrowthMediumFast,
-	205: GrowthMediumFast,
-	206: GrowthMediumFast,
-	207: GrowthMediumSlow,
-	208: GrowthMediumFast,
-	209: GrowthFast,
-	210: GrowthFast,
-	211: GrowthMediumFast,
-	212: GrowthMediumFast,
-	213: GrowthMediumSlow,
-	214: GrowthSlow,
-	215: GrowthMediumSlow,
-	216: GrowthMediumFast,
-	217: GrowthMediumFast,
-	218: GrowthMediumFast,
-	219: GrowthMediumFast,
-	220: GrowthSlow,
-	221: GrowthSlow,
-	222: GrowthFast,
-	223: GrowthMediumFast,
-	224: GrowthMediumFast,
-	225: GrowthFast,
-	226: GrowthSlow,
-	227: GrowthSlow,
-	228: GrowthSlow,
-	229: GrowthSlow,
-	230: GrowthMediumFast,
-	231: GrowthMediumFast,
-	232: GrowthMediumFast,
-	233: GrowthMediumFast,
-	234: GrowthSlow,
-	235: GrowthFast,
-	236: GrowthMediumFast,
-	237: GrowthMediumFast,
-	238: GrowthMediumFast,
-	239: GrowthMediumFast,
-	240: GrowthMediumFast,
-	241: GrowthSlow,
-	242: GrowthFast,
-	243: GrowthSlow,
-	244: GrowthSlow,
-	245: GrowthSlow,
-	246: GrowthSlow,
-	247: GrowthSlow,
-	248: GrowthSlow,
-	249: GrowthSlow,
-	250: GrowthSlow,
-	251: GrowthMediumSlow,
-	252: GrowthMediumSlow,
-	253: GrowthMediumSlow,
-	254: GrowthMediumSlow,
-	255: GrowthMediumSlow,
-	256: GrowthMediumSlow,
-	257: GrowthMediumSlow,
-	258: GrowthMediumSlow,
-	259: GrowthMediumSlow,
-	260: GrowthMediumSlow,
-	261: GrowthMediumFast,
-	262: GrowthMediumFast,
-	263: GrowthMediumFast,
-	264: GrowthMediumFast,
-	265: GrowthMediumFast,
-	266: GrowthMediumFast,
-	267: GrowthMediumFast,
-	268: GrowthMediumFast,
-	269: GrowthMediumFast,
-	270: GrowthMediumSlow,
-	271: GrowthMediumSlow,
-	272: GrowthMediumSlow,
-	273: GrowthMediumSlow,
-	274: GrowthMediumSlow,
-	275: GrowthMediumSlow,
-	276: GrowthMediumSlow,
-	277: GrowthMediumSlow,
-	278: GrowthMediumFast,
-	279: GrowthMediumFast,
-	280: GrowthSlow,
-	281: GrowthSlow,
-	282: GrowthSlow,
-	283: GrowthMediumFast,
-	284: GrowthMediumFast,
-	285: GrowthFluctuating,
-	286: GrowthFluctuating,
-	287: GrowthSlow,
-	288: GrowthSlow,
-	289: GrowthSlow,
-	290: GrowthErratic,
-	291: GrowthErratic,
-	292: GrowthErratic,
-	293: GrowthMediumSlow,
-	294: GrowthMediumSlow,
-	295: GrowthMediumSlow,
-	296: GrowthFluctuating,
-	297: GrowthFluctuating,
-	298: GrowthFast,
-	299: GrowthMediumFast,
-	300: GrowthFast,
-	301: GrowthFast,
-	302: GrowthMediumSlow,
-	303: GrowthFast,
-	304: GrowthSlow,
-	305: GrowthSlow,
-	306: GrowthSlow,
-	307: GrowthMediumFast,
-	308: GrowthMediumFast,
-	309: GrowthSlow,
-	310: GrowthSlow,
-	311: GrowthMediumFast,
-	312: GrowthMediumFast,
-	313: GrowthErratic,
-	314: GrowthFluctuating,
-	315: GrowthMediumSlow,
-	316: GrowthFluctuating,
-	317: GrowthFluctuating,
-	318: GrowthSlow,
-	319: GrowthSlow,
-	320: GrowthFluctuating,
-	321: GrowthFluctuating,
-	322: GrowthMediumFast,
-	323: GrowthMediumFast,
-	324: GrowthMediumFast,
-	325: GrowthFast,
-	326: GrowthFast,
-	327: GrowthFast,
-	328: GrowthMediumSlow,
-	329: GrowthMediumSlow,
-	330: GrowthMediumSlow,
-	331: GrowthMediumSlow,
-	332: GrowthMediumSlow,
-	333: GrowthErratic,
-	334: GrowthErratic,
-	335: GrowthErratic,
-	336: GrowthFluctuating,
-	337: GrowthFast,
-	338: GrowthFast,
-	339: GrowthMediumFast,
-	340: GrowthMediumFast,
-	341: GrowthFluctuating,
-	342: GrowthFluctuating,
-	343: GrowthMediumFast,
-	344: GrowthMediumFast,
-	345: GrowthErratic,
-	346: GrowthErratic,
-	347: GrowthErratic,
-	348: GrowthErratic,
-	349: GrowthErratic,
-	350: GrowthErratic,
-	351: GrowthMediumFast,
-	352: GrowthMediumSlow,
-	353: GrowthFast,
-	354: GrowthFast,
-	355: GrowthFast,
-	356: GrowthFast,
-	357: GrowthSlow,
-	358: GrowthFast,
-	359: GrowthMediumSlow,
-	360: GrowthMediumFast,
-	361: GrowthMediumFast,
-	362: GrowthMediumFast,
-	363: GrowthMediumSlow,
-	364: GrowthMediumSlow,
-	365: GrowthMediumSlow,
-	366: GrowthErratic,
-	367: GrowthErratic,
-	368: GrowthErratic,
-	369: GrowthSlow,
-	370: GrowthFast,
-	371: GrowthSlow,
-	372: GrowthSlow,
-	373: GrowthSlow,
-	374: GrowthSlow,
-	375: GrowthSlow,
-	376: GrowthSlow,
-	377: GrowthSlow,
-	378: GrowthSlow,
-	379: GrowthSlow,
-	380: GrowthSlow,
-	381: GrowthSlow,
-	382: GrowthSlow,
-	383: GrowthSlow,
-	384: GrowthSlow,
-	385: GrowthSlow,
-	386: GrowthSlow,
-	387: GrowthMediumSlow,
-	388: GrowthMediumSlow,
-	389: GrowthMediumSlow,
-	390: GrowthMediumSlow,
-	391: GrowthMediumSlow,
-	392: GrowthMediumSlow,
-	393: GrowthMediumSlow,
-	394: GrowthMediumSlow,
-	395: GrowthMediumSlow,
-	396: GrowthMediumSlow,
-	397: GrowthMediumSlow,
-	398: GrowthMediumSlow,
-	399: GrowthMediumFast,
-	400: GrowthMediumFast,
-	401: GrowthMediumSlow,
-	402: GrowthMediumSlow,
-	403: GrowthMediumSlow,
-	404: GrowthMediumSlow,
-	405: GrowthMediumSlow,
-	406: GrowthMediumSlow,
-	407: GrowthMediumSlow,
-	408: GrowthErratic,
-	409: GrowthErratic,
-	410: GrowthErratic,
-	411: GrowthErratic,
-	412: GrowthMediumFast,
-	413: GrowthMediumFast,
-	414: GrowthMediumFast,
-	415: GrowthMediumSlow,
-	416: GrowthMediumSlow,
-	417: GrowthMediumFast,
-	418: GrowthMediumFast,
-	419: GrowthMediumFast,
-	420: GrowthMediumFast,
-	421: GrowthMediumFast,
-	422: GrowthMediumFast,
-	423: GrowthMediumFast,
-	424: GrowthFast,
-	425: GrowthFluctuating,
-	426: GrowthFluctuating,
-	427: GrowthMediumFast,
-	428: GrowthMediumFast,
-	429: GrowthFast,
-	430: GrowthMediumSlow,
-	431: GrowthFast,
-	432: GrowthFast,
-	433: GrowthFast,
-	434: GrowthMediumFast,
-	435: GrowthMediumFast,
-	436: GrowthMediumFast,
-	437: GrowthMediumFast,
-	438: GrowthMediumFast,
-	439: GrowthMediumFast,
-	440: GrowthFast,
-	441: GrowthMediumSlow,
-	442: GrowthMediumFast,
-	443: GrowthSlow,
-	444: GrowthSlow,
-	445: GrowthSlow,
-	446: GrowthSlow,
-	447: GrowthMediumSlow,
-	448: GrowthMediumSlow,
-	449: GrowthSlow,
-	450: GrowthSlow,
-	451: GrowthSlow,
-	452: GrowthSlow,
-	453: GrowthMediumFast,
-	454: GrowthMediumFast,
-	455: GrowthSlow,
-	456: GrowthErratic,
-	457: GrowthErratic,
-	458: GrowthSlow,
-	459: GrowthSlow,
-	460: GrowthSlow,
-	461: GrowthMediumSlow,
-	462: GrowthMediumFast,
-	463: GrowthMediumFast,
-	464: GrowthSlow,
-	465: GrowthMediumFast,
-	466: GrowthMediumFast,
-	467: GrowthMediumFast,
-	468: GrowthFast,
-	469: GrowthMediumFast,
-	470: GrowthMediumFast,
-	471: GrowthMediumFast,
-	472: GrowthMediumSlow,
-	473: GrowthSlow,
-	474: GrowthMediumFast,
-	475: GrowthSlow,
-	476: GrowthMediumFast,
-	477: GrowthFast,
-	478: GrowthMediumFast,
-	479: GrowthMediumFast,
-	480: GrowthSlow,
-	481: GrowthSlow,
-	482: GrowthSlow,
-	483: GrowthSlow,
-	484: GrowthSlow,
-	485: GrowthSlow,
-	486: GrowthSlow,
-	487: GrowthSlow,
-	488: GrowthSlow,
-	489: GrowthSlow,
-	490: GrowthSlow,
-	491: GrowthSlow,
-	492: GrowthMediumSlow,
-	493: GrowthSlow,
+const (
+	NatureAdamant Nature = iota
+	NatureBashful
+	NatureBold
+	NatureBrave
+	NatureCalm
+	NatureCareful
+	NatureDocile
+	NatureGentle
+	NatureHardy
+	NatureHasty
+	NatureImpish
+	NatureJolly
+	NatureLax
+	NatureLonely
+	NatureMild
+	NatureModest
+	NatureNaive
+	NatureNaughty
+	NatureQuiet
+	NatureQuirky
+	NatureRash
+	NatureRelaxed
+	NatureSassy
+	NatureSerious
+	NatureTimid
+)
+
+// Get the stat modifiers that this nature gives.
+func (n Nature) GetStatModifiers() (statUp, statDown int) {
+	switch n {
+	case NatureAdamant:
+		return StatAtk, StatSpAtk
+	case NatureBashful:
+		return StatSpAtk, StatSpAtk
+	case NatureBold:
+		return StatDef, StatAtk
+	case NatureBrave:
+		return StatAtk, StatSpeed
+	case NatureCalm:
+		return StatSpDef, StatAtk
+	case NatureCareful:
+		return StatSpDef, StatSpAtk
+	case NatureDocile:
+		return StatDef, StatDef
+	case NatureGentle:
+		return StatSpDef, StatDef
+	case NatureHardy:
+		return StatAtk, StatAtk
+	case NatureHasty:
+		return StatSpeed, StatDef
+	case NatureImpish:
+		return StatDef, StatSpAtk
+	case NatureJolly:
+		return StatSpeed, StatSpAtk
+	case NatureLax:
+		return StatDef, StatSpDef
+	case NatureLonely:
+		return StatAtk, StatDef
+	case NatureMild:
+		return StatSpAtk, StatDef
+	case NatureModest:
+		return StatSpAtk, StatAtk
+	case NatureNaive:
+		return StatSpeed, StatSpDef
+	case NatureNaughty:
+		return StatAtk, StatSpDef
+	case NatureQuiet:
+		return StatSpAtk, StatSpeed
+	case NatureQuirky:
+		return StatSpDef, StatSpDef
+	case NatureRash:
+		return StatSpAtk, StatSpDef
+	case NatureRelaxed:
+		return StatDef, StatSpeed
+	case NatureSassy:
+		return StatSpDef, StatSpeed
+	case NatureSerious:
+		return StatSpeed, StatSpeed
+	case NatureTimid:
+		return StatSpeed, StatAtk
+	}
+	panic("Unknown nature")
 }
 
-// A map of national pokedex numbers to Pokemon base stats
-var pokemonBaseStats = map[int][6]int{
-	1:   {45, 49, 49, 65, 65, 45},
-	2:   {60, 62, 63, 80, 80, 60},
-	3:   {80, 82, 83, 100, 100, 80},
-	4:   {39, 52, 43, 60, 50, 65},
-	5:   {58, 64, 58, 80, 65, 80},
-	6:   {78, 84, 78, 109, 85, 100},
-	7:   {44, 48, 65, 50, 64, 43},
-	8:   {59, 63, 80, 65, 80, 58},
-	9:   {79, 83, 100, 85, 105, 78},
-	10:  {45, 30, 35, 20, 20, 45},
-	11:  {50, 20, 55, 25, 25, 30},
-	12:  {60, 45, 50, 90, 80, 70},
-	13:  {40, 35, 30, 20, 20, 50},
-	14:  {45, 25, 50, 25, 25, 35},
-	15:  {65, 90, 40, 45, 80, 75},
-	16:  {40, 45, 40, 35, 35, 56},
-	17:  {63, 60, 55, 50, 50, 71},
-	18:  {83, 80, 75, 70, 70, 101},
-	19:  {30, 56, 35, 25, 35, 72},
-	20:  {55, 81, 60, 50, 70, 97},
-	21:  {40, 60, 30, 31, 31, 70},
-	22:  {65, 90, 65, 61, 61, 100},
-	23:  {35, 60, 44, 40, 54, 55},
-	24:  {60, 95, 69, 65, 79, 80},
-	25:  {35, 55, 40, 50, 50, 90},
-	26:  {60, 90, 55, 90, 80, 110},
-	27:  {50, 75, 85, 20, 30, 40},
-	28:  {75, 100, 110, 45, 55, 65},
-	29:  {55, 47, 52, 40, 40, 41},
-	30:  {70, 62, 67, 55, 55, 56},
-	31:  {90, 92, 87, 75, 85, 76},
-	32:  {46, 57, 40, 40, 40, 50},
-	33:  {61, 72, 57, 55, 55, 65},
-	34:  {81, 102, 77, 85, 75, 85},
-	35:  {70, 45, 48, 60, 65, 35},
-	36:  {95, 70, 73, 95, 90, 60},
-	37:  {38, 41, 40, 50, 65, 65},
-	38:  {73, 76, 75, 81, 100, 100},
-	39:  {115, 45, 20, 45, 25, 20},
-	40:  {140, 70, 45, 85, 50, 45},
-	41:  {40, 45, 35, 30, 40, 55},
-	42:  {75, 80, 70, 65, 75, 90},
-	43:  {45, 50, 55, 75, 65, 30},
-	44:  {60, 65, 70, 85, 75, 40},
-	45:  {75, 80, 85, 110, 90, 50},
-	46:  {35, 70, 55, 45, 55, 25},
-	47:  {60, 95, 80, 60, 80, 30},
-	48:  {60, 55, 50, 40, 55, 45},
-	49:  {70, 65, 60, 90, 75, 90},
-	50:  {10, 55, 25, 35, 45, 95},
-	51:  {35, 100, 50, 50, 70, 120},
-	52:  {40, 45, 35, 40, 40, 90},
-	53:  {65, 70, 60, 65, 65, 115},
-	54:  {50, 52, 48, 65, 50, 55},
-	55:  {80, 82, 78, 95, 80, 85},
-	56:  {40, 80, 35, 35, 45, 70},
-	57:  {65, 105, 60, 60, 70, 95},
-	58:  {55, 70, 45, 70, 50, 60},
-	59:  {90, 110, 80, 100, 80, 95},
-	60:  {40, 50, 40, 40, 40, 90},
-	61:  {65, 65, 65, 50, 50, 90},
-	62:  {90, 95, 95, 70, 90, 70},
-	63:  {25, 20, 15, 105, 55, 90},
-	64:  {40, 35, 30, 120, 70, 105},
-	65:  {55, 50, 45, 135, 95, 120},
-	66:  {70, 80, 50, 35, 35, 35},
-	67:  {80, 100, 70, 50, 60, 45},
-	68:  {90, 130, 80, 65, 85, 55},
-	69:  {50, 75, 35, 70, 30, 40},
-	70:  {65, 90, 50, 85, 45, 55},
-	71:  {80, 105, 65, 100, 70, 70},
-	72:  {40, 40, 35, 50, 100, 70},
-	73:  {80, 70, 65, 80, 120, 100},
-	74:  {40, 80, 100, 30, 30, 20},
-	75:  {55, 95, 115, 45, 45, 35},
-	76:  {80, 120, 130, 55, 65, 45},
-	77:  {50, 85, 55, 65, 65, 90},
-	78:  {65, 100, 70, 80, 80, 105},
-	79:  {90, 65, 65, 40, 40, 15},
-	80:  {95, 75, 110, 100, 80, 30},
-	81:  {25, 35, 70, 95, 55, 45},
-	82:  {50, 60, 95, 120, 70, 70},
-	83:  {52, 90, 55, 58, 62, 60},
-	84:  {35, 85, 45, 35, 35, 75},
-	85:  {60, 110, 70, 60, 60, 110},
-	86:  {65, 45, 55, 45, 70, 45},
-	87:  {90, 70, 80, 70, 95, 70},
-	88:  {80, 80, 50, 40, 50, 25},
-	89:  {105, 105, 75, 65, 100, 50},
-	90:  {30, 65, 100, 45, 25, 40},
-	91:  {50, 95, 180, 85, 45, 70},
-	92:  {30, 35, 30, 100, 35, 80},
-	93:  {45, 50, 45, 115, 55, 95},
-	94:  {60, 65, 60, 130, 75, 110},
-	95:  {35, 45, 160, 30, 45, 70},
-	96:  {60, 48, 45, 43, 90, 42},
-	97:  {85, 73, 70, 73, 115, 67},
-	98:  {30, 105, 90, 25, 25, 50},
-	99:  {55, 130, 115, 50, 50, 75},
-	100: {40, 30, 50, 55, 55, 100},
-	101: {60, 50, 70, 80, 80, 150},
-	102: {60, 40, 80, 60, 45, 40},
-	103: {95, 95, 85, 125, 75, 55},
-	104: {50, 50, 95, 40, 50, 35},
-	105: {60, 80, 110, 50, 80, 45},
-	106: {50, 120, 53, 35, 110, 87},
-	107: {50, 105, 79, 35, 110, 76},
-	108: {90, 55, 75, 60, 75, 30},
-	109: {40, 65, 95, 60, 45, 35},
-	110: {65, 90, 120, 85, 70, 60},
-	111: {80, 85, 95, 30, 30, 25},
-	112: {105, 130, 120, 45, 45, 40},
-	113: {250, 5, 5, 35, 105, 50},
-	114: {65, 55, 115, 100, 40, 60},
-	115: {105, 95, 80, 40, 80, 90},
-	116: {30, 40, 70, 70, 25, 60},
-	117: {55, 65, 95, 95, 45, 85},
-	118: {45, 67, 60, 35, 50, 63},
-	119: {80, 92, 65, 65, 80, 68},
-	120: {30, 45, 55, 70, 55, 85},
-	121: {60, 75, 85, 100, 85, 115},
-	122: {40, 45, 65, 100, 120, 90},
-	123: {70, 110, 80, 55, 80, 105},
-	124: {65, 50, 35, 115, 95, 95},
-	125: {65, 83, 57, 95, 85, 105},
-	126: {65, 95, 57, 100, 85, 93},
-	127: {65, 125, 100, 55, 70, 85},
-	128: {75, 100, 95, 40, 70, 110},
-	129: {20, 10, 55, 15, 20, 80},
-	130: {95, 125, 79, 60, 100, 81},
-	131: {130, 85, 80, 85, 95, 60},
-	132: {48, 48, 48, 48, 48, 48},
-	133: {55, 55, 50, 45, 65, 55},
-	134: {130, 65, 60, 110, 95, 65},
-	135: {65, 65, 60, 110, 95, 130},
-	136: {65, 130, 60, 95, 110, 65},
-	137: {65, 60, 70, 85, 75, 40},
-	138: {35, 40, 100, 90, 55, 35},
-	139: {70, 60, 125, 115, 70, 55},
-	140: {30, 80, 90, 55, 45, 55},
-	141: {60, 115, 105, 65, 70, 80},
-	142: {80, 105, 65, 60, 75, 130},
-	143: {160, 110, 65, 65, 110, 30},
-	144: {90, 85, 100, 95, 125, 85},
-	145: {90, 90, 85, 125, 90, 100},
-	146: {90, 100, 90, 125, 85, 90},
-	147: {41, 64, 45, 50, 50, 50},
-	148: {61, 84, 65, 70, 70, 70},
-	149: {91, 134, 95, 100, 100, 80},
-	150: {106, 110, 90, 154, 90, 130},
-	151: {100, 100, 100, 100, 100, 100},
-	152: {45, 49, 65, 49, 65, 45},
-	153: {60, 62, 80, 63, 80, 60},
-	154: {80, 82, 100, 83, 100, 80},
-	155: {39, 52, 43, 60, 50, 65},
-	156: {58, 64, 58, 80, 65, 80},
-	157: {78, 84, 78, 109, 85, 100},
-	158: {50, 65, 64, 44, 48, 43},
-	159: {65, 80, 80, 59, 63, 58},
-	160: {85, 105, 100, 79, 83, 78},
-	161: {35, 46, 34, 35, 45, 20},
-	162: {85, 76, 64, 45, 55, 90},
-	163: {60, 30, 30, 36, 56, 50},
-	164: {100, 50, 50, 86, 96, 70},
-	165: {40, 20, 30, 40, 80, 55},
-	166: {55, 35, 50, 55, 110, 85},
-	167: {40, 60, 40, 40, 40, 30},
-	168: {70, 90, 70, 60, 70, 40},
-	169: {85, 90, 80, 70, 80, 130},
-	170: {75, 38, 38, 56, 56, 67},
-	171: {125, 58, 58, 76, 76, 67},
-	172: {20, 40, 15, 35, 35, 60},
-	173: {50, 25, 28, 45, 55, 15},
-	174: {90, 30, 15, 40, 20, 15},
-	175: {35, 20, 65, 40, 65, 20},
-	176: {55, 40, 85, 80, 105, 40},
-	177: {40, 50, 45, 70, 45, 70},
-	178: {65, 75, 70, 95, 70, 95},
-	179: {55, 40, 40, 65, 45, 35},
-	180: {70, 55, 55, 80, 60, 45},
-	181: {90, 75, 85, 115, 90, 55},
-	182: {75, 80, 95, 90, 100, 50},
-	183: {70, 20, 50, 20, 50, 40},
-	184: {100, 50, 80, 60, 80, 50},
-	185: {70, 100, 115, 30, 65, 30},
-	186: {90, 75, 75, 90, 100, 70},
-	187: {35, 35, 40, 35, 55, 50},
-	188: {55, 45, 50, 45, 65, 80},
-	189: {75, 55, 70, 55, 95, 110},
-	190: {55, 70, 55, 40, 55, 85},
-	191: {30, 30, 30, 30, 30, 30},
-	192: {75, 75, 55, 105, 85, 30},
-	193: {65, 65, 45, 75, 45, 95},
-	194: {55, 45, 45, 25, 25, 15},
-	195: {95, 85, 85, 65, 65, 35},
-	196: {65, 65, 60, 130, 95, 110},
-	197: {95, 65, 110, 60, 130, 65},
-	198: {60, 85, 42, 85, 42, 91},
-	199: {95, 75, 80, 100, 110, 30},
-	200: {60, 60, 60, 85, 85, 85},
-	201: {48, 72, 48, 72, 48, 48},
-	202: {190, 33, 58, 33, 58, 33},
-	203: {70, 80, 65, 90, 65, 85},
-	204: {50, 65, 90, 35, 35, 15},
-	205: {75, 90, 140, 60, 60, 40},
-	206: {100, 70, 70, 65, 65, 45},
-	207: {65, 75, 105, 35, 65, 85},
-	208: {75, 85, 200, 55, 65, 30},
-	209: {60, 80, 50, 40, 40, 30},
-	210: {90, 120, 75, 60, 60, 45},
-	211: {65, 95, 85, 55, 55, 85},
-	212: {70, 130, 100, 55, 80, 65},
-	213: {20, 10, 230, 10, 230, 5},
-	214: {80, 125, 75, 40, 95, 85},
-	215: {55, 95, 55, 35, 75, 115},
-	216: {60, 80, 50, 50, 50, 40},
-	217: {90, 130, 75, 75, 75, 55},
-	218: {40, 40, 40, 70, 40, 20},
-	219: {60, 50, 120, 90, 80, 30},
-	220: {50, 50, 40, 30, 30, 50},
-	221: {100, 100, 80, 60, 60, 50},
-	222: {65, 55, 95, 65, 95, 35},
-	223: {35, 65, 35, 65, 35, 65},
-	224: {75, 105, 75, 105, 75, 45},
-	225: {45, 55, 45, 65, 45, 75},
-	226: {85, 40, 70, 80, 140, 70},
-	227: {65, 80, 140, 40, 70, 70},
-	228: {45, 60, 30, 80, 50, 65},
-	229: {75, 90, 50, 110, 80, 95},
-	230: {75, 95, 95, 95, 95, 85},
-	231: {90, 60, 60, 40, 40, 40},
-	232: {90, 120, 120, 60, 60, 50},
-	233: {85, 80, 90, 105, 95, 60},
-	234: {73, 95, 62, 85, 65, 85},
-	235: {55, 20, 35, 20, 45, 75},
-	236: {35, 35, 35, 35, 35, 35},
-	237: {50, 95, 95, 35, 110, 70},
-	238: {45, 30, 15, 85, 65, 65},
-	239: {45, 63, 37, 65, 55, 95},
-	240: {45, 75, 37, 70, 55, 83},
-	241: {95, 80, 105, 40, 70, 100},
-	242: {255, 10, 10, 75, 135, 55},
-	243: {90, 85, 75, 115, 100, 115},
-	244: {115, 115, 85, 90, 75, 100},
-	245: {100, 75, 115, 90, 115, 85},
-	246: {50, 64, 50, 45, 50, 41},
-	247: {70, 84, 70, 65, 70, 51},
-	248: {100, 134, 110, 95, 100, 61},
-	249: {106, 90, 130, 90, 154, 110},
-	250: {106, 130, 90, 110, 154, 90},
-	251: {100, 100, 100, 100, 100, 100},
-	252: {40, 45, 35, 65, 55, 70},
-	253: {50, 65, 45, 85, 65, 95},
-	254: {70, 85, 65, 105, 85, 120},
-	255: {45, 60, 40, 70, 50, 45},
-	256: {60, 85, 60, 85, 60, 55},
-	257: {80, 120, 70, 110, 70, 80},
-	258: {50, 70, 50, 50, 50, 40},
-	259: {70, 85, 70, 60, 70, 50},
-	260: {100, 110, 90, 85, 90, 60},
-	261: {35, 55, 35, 30, 30, 35},
-	262: {70, 90, 70, 60, 60, 70},
-	263: {38, 30, 41, 30, 41, 60},
-	264: {78, 70, 61, 50, 61, 100},
-	265: {45, 45, 35, 20, 30, 20},
-	266: {50, 35, 55, 25, 25, 15},
-	267: {60, 70, 50, 100, 50, 65},
-	268: {50, 35, 55, 25, 25, 15},
-	269: {60, 50, 70, 50, 90, 65},
-	270: {40, 30, 30, 40, 50, 30},
-	271: {60, 50, 50, 60, 70, 50},
-	272: {80, 70, 70, 90, 100, 70},
-	273: {40, 40, 50, 30, 30, 30},
-	274: {70, 70, 40, 60, 40, 60},
-	275: {90, 100, 60, 90, 60, 80},
-	276: {40, 55, 30, 30, 30, 85},
-	277: {60, 85, 60, 75, 50, 125},
-	278: {40, 30, 30, 55, 30, 85},
-	279: {60, 50, 100, 95, 70, 65},
-	280: {28, 25, 25, 45, 35, 40},
-	281: {38, 35, 35, 65, 55, 50},
-	282: {68, 65, 65, 125, 115, 80},
-	283: {40, 30, 32, 50, 52, 65},
-	284: {70, 60, 62, 100, 82, 80},
-	285: {60, 40, 60, 40, 60, 35},
-	286: {60, 130, 80, 60, 60, 70},
-	287: {60, 60, 60, 35, 35, 30},
-	288: {80, 80, 80, 55, 55, 90},
-	289: {150, 160, 100, 95, 65, 100},
-	290: {31, 45, 90, 30, 30, 40},
-	291: {61, 90, 45, 50, 50, 160},
-	292: {1, 90, 45, 30, 30, 40},
-	293: {64, 51, 23, 51, 23, 28},
-	294: {84, 71, 43, 71, 43, 48},
-	295: {104, 91, 63, 91, 73, 68},
-	296: {72, 60, 30, 20, 30, 25},
-	297: {144, 120, 60, 40, 60, 50},
-	298: {50, 20, 40, 20, 40, 20},
-	299: {30, 45, 135, 45, 90, 30},
-	300: {50, 45, 45, 35, 35, 50},
-	301: {70, 65, 65, 55, 55, 90},
-	302: {50, 75, 75, 65, 65, 50},
-	303: {50, 85, 85, 55, 55, 50},
-	304: {50, 70, 100, 40, 40, 30},
-	305: {60, 90, 140, 50, 50, 40},
-	306: {70, 110, 180, 60, 60, 50},
-	307: {30, 40, 55, 40, 55, 60},
-	308: {60, 60, 75, 60, 75, 80},
-	309: {40, 45, 40, 65, 40, 65},
-	310: {70, 75, 60, 105, 60, 105},
-	311: {60, 50, 40, 85, 75, 95},
-	312: {60, 40, 50, 75, 85, 95},
-	313: {65, 73, 75, 47, 85, 85},
-	314: {65, 47, 75, 73, 85, 85},
-	315: {50, 60, 45, 100, 80, 65},
-	316: {70, 43, 53, 43, 53, 40},
-	317: {100, 73, 83, 73, 83, 55},
-	318: {45, 90, 20, 65, 20, 65},
-	319: {70, 120, 40, 95, 40, 95},
-	320: {130, 70, 35, 70, 35, 60},
-	321: {170, 90, 45, 90, 45, 60},
-	322: {60, 60, 40, 65, 45, 35},
-	323: {70, 100, 70, 105, 75, 40},
-	324: {70, 85, 140, 85, 70, 20},
-	325: {60, 25, 35, 70, 80, 60},
-	326: {80, 45, 65, 90, 110, 80},
-	327: {60, 60, 60, 60, 60, 60},
-	328: {45, 100, 45, 45, 45, 10},
-	329: {50, 70, 50, 50, 50, 70},
-	330: {80, 100, 80, 80, 80, 100},
-	331: {50, 85, 40, 85, 40, 35},
-	332: {70, 115, 60, 115, 60, 55},
-	333: {45, 40, 60, 40, 75, 50},
-	334: {75, 70, 90, 70, 105, 80},
-	335: {73, 115, 60, 60, 60, 90},
-	336: {73, 100, 60, 100, 60, 65},
-	337: {90, 55, 65, 95, 85, 70},
-	338: {90, 95, 85, 55, 65, 70},
-	339: {50, 48, 43, 46, 41, 60},
-	340: {110, 78, 73, 76, 71, 60},
-	341: {43, 80, 65, 50, 35, 35},
-	342: {63, 120, 85, 90, 55, 55},
-	343: {40, 40, 55, 40, 70, 55},
-	344: {60, 70, 105, 70, 120, 75},
-	345: {66, 41, 77, 61, 87, 23},
-	346: {86, 81, 97, 81, 107, 43},
-	347: {45, 95, 50, 40, 50, 75},
-	348: {75, 125, 100, 70, 80, 45},
-	349: {20, 15, 20, 10, 55, 80},
-	350: {95, 60, 79, 100, 125, 81},
-	351: {70, 70, 70, 70, 70, 70},
-	352: {60, 90, 70, 60, 120, 40},
-	353: {44, 75, 35, 63, 33, 45},
-	354: {64, 115, 65, 83, 63, 65},
-	355: {20, 40, 90, 30, 90, 25},
-	356: {40, 70, 130, 60, 130, 25},
-	357: {99, 68, 83, 72, 87, 51},
-	358: {75, 50, 80, 95, 90, 65},
-	359: {65, 130, 60, 75, 60, 75},
-	360: {95, 23, 48, 23, 48, 23},
-	361: {50, 50, 50, 50, 50, 50},
-	362: {80, 80, 80, 80, 80, 80},
-	363: {70, 40, 50, 55, 50, 25},
-	364: {90, 60, 70, 75, 70, 45},
-	365: {110, 80, 90, 95, 90, 65},
-	366: {35, 64, 85, 74, 55, 32},
-	367: {55, 104, 105, 94, 75, 52},
-	368: {55, 84, 105, 114, 75, 52},
-	369: {100, 90, 130, 45, 65, 55},
-	370: {43, 30, 55, 40, 65, 97},
-	371: {45, 75, 60, 40, 30, 50},
-	372: {65, 95, 100, 60, 50, 50},
-	373: {95, 135, 80, 110, 80, 100},
-	374: {40, 55, 80, 35, 60, 30},
-	375: {60, 75, 100, 55, 80, 50},
-	376: {80, 135, 130, 95, 90, 70},
-	377: {80, 100, 200, 50, 100, 50},
-	378: {80, 50, 100, 100, 200, 50},
-	379: {80, 75, 150, 75, 150, 50},
-	380: {80, 80, 90, 110, 130, 110},
-	381: {80, 90, 80, 130, 110, 110},
-	382: {100, 100, 90, 150, 140, 90},
-	383: {100, 150, 140, 100, 90, 90},
-	384: {105, 150, 90, 150, 90, 95},
-	385: {100, 100, 100, 100, 100, 100},
-	386: {50, 150, 50, 150, 50, 150},
-	387: {55, 68, 64, 45, 55, 31},
-	388: {75, 89, 85, 55, 65, 36},
-	389: {95, 109, 105, 75, 85, 56},
-	390: {44, 58, 44, 58, 44, 61},
-	391: {64, 78, 52, 78, 52, 81},
-	392: {76, 104, 71, 104, 71, 108},
-	393: {53, 51, 53, 61, 56, 40},
-	394: {64, 66, 68, 81, 76, 50},
-	395: {84, 86, 88, 111, 101, 60},
-	396: {40, 55, 30, 30, 30, 60},
-	397: {55, 75, 50, 40, 40, 80},
-	398: {85, 120, 70, 50, 60, 100},
-	399: {59, 45, 40, 35, 40, 31},
-	400: {79, 85, 60, 55, 60, 71},
-	401: {37, 25, 41, 25, 41, 25},
-	402: {77, 85, 51, 55, 51, 65},
-	403: {45, 65, 34, 40, 34, 45},
-	404: {60, 85, 49, 60, 49, 60},
-	405: {80, 120, 79, 95, 79, 70},
-	406: {40, 30, 35, 50, 70, 55},
-	407: {60, 70, 65, 125, 105, 90},
-	408: {67, 125, 40, 30, 30, 58},
-	409: {97, 165, 60, 65, 50, 58},
-	410: {30, 42, 118, 42, 88, 30},
-	411: {60, 52, 168, 47, 138, 30},
-	412: {40, 29, 45, 29, 45, 36},
-	413: {60, 59, 85, 79, 105, 36},
-	414: {70, 94, 50, 94, 50, 66},
-	415: {30, 30, 42, 30, 42, 70},
-	416: {70, 80, 102, 80, 102, 40},
-	417: {60, 45, 70, 45, 90, 95},
-	418: {55, 65, 35, 60, 30, 85},
-	419: {85, 105, 55, 85, 50, 115},
-	420: {45, 35, 45, 62, 53, 35},
-	421: {70, 60, 70, 87, 78, 85},
-	422: {76, 48, 48, 57, 62, 34},
-	423: {111, 83, 68, 92, 82, 39},
-	424: {75, 100, 66, 60, 66, 115},
-	425: {90, 50, 34, 60, 44, 70},
-	426: {150, 80, 44, 90, 54, 80},
-	427: {55, 66, 44, 44, 56, 85},
-	428: {65, 76, 84, 54, 96, 105},
-	429: {60, 60, 60, 105, 105, 105},
-	430: {100, 125, 52, 105, 52, 71},
-	431: {49, 55, 42, 42, 37, 85},
-	432: {71, 82, 64, 64, 59, 112},
-	433: {45, 30, 50, 65, 50, 45},
-	434: {63, 63, 47, 41, 41, 74},
-	435: {103, 93, 67, 71, 61, 84},
-	436: {57, 24, 86, 24, 86, 23},
-	437: {67, 89, 116, 79, 116, 33},
-	438: {50, 80, 95, 10, 45, 10},
-	439: {20, 25, 45, 70, 90, 60},
-	440: {100, 5, 5, 15, 65, 30},
-	441: {76, 65, 45, 92, 42, 91},
-	442: {50, 92, 108, 92, 108, 35},
-	443: {58, 70, 45, 40, 45, 42},
-	444: {68, 90, 65, 50, 55, 82},
-	445: {108, 130, 95, 80, 85, 102},
-	446: {135, 85, 40, 40, 85, 5},
-	447: {40, 70, 40, 35, 40, 60},
-	448: {70, 110, 70, 115, 70, 90},
-	449: {68, 72, 78, 38, 42, 32},
-	450: {108, 112, 118, 68, 72, 47},
-	451: {40, 50, 90, 30, 55, 65},
-	452: {70, 90, 110, 60, 75, 95},
-	453: {48, 61, 40, 61, 40, 50},
-	454: {83, 106, 65, 86, 65, 85},
-	455: {74, 100, 72, 90, 72, 46},
-	456: {49, 49, 56, 49, 61, 66},
-	457: {69, 69, 76, 69, 86, 91},
-	458: {45, 20, 50, 60, 120, 50},
-	459: {60, 62, 50, 62, 60, 40},
-	460: {90, 92, 75, 92, 85, 60},
-	461: {70, 120, 65, 45, 85, 125},
-	462: {70, 70, 115, 130, 90, 60},
-	463: {110, 85, 95, 80, 95, 50},
-	464: {115, 140, 130, 55, 55, 40},
-	465: {100, 100, 125, 110, 50, 50},
-	466: {75, 123, 67, 95, 85, 95},
-	467: {75, 95, 67, 125, 95, 83},
-	468: {85, 50, 95, 120, 115, 80},
-	469: {86, 76, 86, 116, 56, 95},
-	470: {65, 110, 130, 60, 65, 95},
-	471: {65, 60, 110, 130, 95, 65},
-	472: {75, 95, 125, 45, 75, 95},
-	473: {110, 130, 80, 70, 60, 80},
-	474: {85, 80, 70, 135, 75, 90},
-	475: {68, 125, 65, 65, 115, 80},
-	476: {60, 55, 145, 75, 150, 40},
-	477: {45, 100, 135, 65, 135, 45},
-	478: {70, 80, 70, 80, 70, 110},
-	479: {50, 50, 77, 95, 77, 91},
-	480: {75, 75, 130, 75, 130, 95},
-	481: {80, 105, 105, 105, 105, 80},
-	482: {75, 125, 70, 125, 70, 115},
-	483: {100, 120, 120, 150, 100, 90},
-	484: {90, 120, 100, 150, 120, 100},
-	485: {91, 90, 106, 130, 106, 77},
-	486: {110, 160, 110, 80, 110, 100},
-	487: {150, 100, 120, 100, 120, 90},
-	488: {120, 70, 120, 75, 130, 85},
-	489: {80, 80, 80, 80, 80, 80},
-	490: {100, 100, 100, 100, 100, 100},
-	491: {70, 90, 90, 135, 90, 125},
-	492: {100, 100, 100, 100, 100, 100},
-	493: {120, 120, 120, 120, 120, 120},
+// Get the string name of this Nature.
+func (n Nature) String() string {
+	switch n {
+	case NatureAdamant:
+		return "Adamant"
+	case NatureBashful:
+		return "Bashful"
+	case NatureBold:
+		return "Bold"
+	case NatureBrave:
+		return "Brave"
+	case NatureCalm:
+		return "Calm"
+	case NatureCareful:
+		return "Careful"
+	case NatureDocile:
+		return "Docile"
+	case NatureGentle:
+		return "Gentle"
+	case NatureHardy:
+		return "Hardy"
+	case NatureHasty:
+		return "Hasty"
+	case NatureImpish:
+		return "Impish"
+	case NatureJolly:
+		return "Jolly"
+	case NatureLax:
+		return "Lax"
+	case NatureLonely:
+		return "Lonely"
+	case NatureMild:
+		return "Mild"
+	case NatureModest:
+		return "Modest"
+	case NatureNaive:
+		return "Naive"
+	case NatureNaughty:
+		return "Naughty"
+	case NatureQuiet:
+		return "Quiet"
+	case NatureQuirky:
+		return "Quirky"
+	case NatureRash:
+		return "Rash"
+	case NatureRelaxed:
+		return "Relaxed"
+	case NatureSassy:
+		return "Sassy"
+	case NatureSerious:
+		return "Serious"
+	case NatureTimid:
+		return "Timid"
+	}
+	panic("Unknown nature")
 }
