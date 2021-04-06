@@ -366,7 +366,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 			} else {
 				// Physical/Special Moves
-				damage := calcMoveDamage(b.Weather, user, receiver, move)
+				damage := CalcMoveDamage(b.Weather, user, receiver, move)
 				var crit uint = 1
 				if b.rng.Roll(1, user.CritChance()) {
 					crit = 2
