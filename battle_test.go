@@ -353,39 +353,34 @@ var _ = Describe("One round of battle", func() {
 var _ = Describe("Using items in battle", func() {
 	agent := Agent(new(healAgent))
 	var (
-		pkmn   *Pokemon
-		pkmn2  *Pokemon
-		battle *Battle
+		pkmn  *Pokemon
+		pkmn2 *Pokemon
+		b     *Battle
 	)
 
 	BeforeEach(func() {
 		pkmn = GeneratePokemon(PkmnVenusaur, WithLevel(50), defaultMoveOpt)
 		pkmn.CurrentHP = 10
 		pkmn2 = GeneratePokemon(PkmnWartortle, WithLevel(50), defaultMoveOpt)
-		battle = New1v1Battle(pkmn, &agent, pkmn2, &agent)
+		b = New1v1Battle(pkmn, &agent, pkmn2, &agent)
 	})
 
 	Context("when the battle processes item turns", func() {
 		It("should create ItemTransaction(s) properly", func() {
-			Expect(battle.Start()).To(Succeed())
-			t, _ := battle.SimulateRound()
+			Expect(b.Start()).To(Succeed())
+			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				ItemTransaction{
-					Target: target{
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-						Pokemon:   pkmn,
-					},
-					Item: ItemPotion,
-					Move: nil,
+					Target: b.getTarget(0, 0),
+					Item:   ItemPotion,
+					Move:   nil,
 				},
 			))
 		})
 
 		It("should heal the Pokemon by 20 HP", func() {
-			Expect(battle.Start()).To(Succeed())
-			battle.SimulateRound()
+			Expect(b.Start()).To(Succeed())
+			b.SimulateRound()
 			Expect(pkmn.CurrentHP).To(BeEquivalentTo(30))
 		})
 	})
@@ -463,13 +458,8 @@ var _ = Describe("Turn priority", func() {
 					Amount: 0,
 				},
 				DamageTransaction{
-					User: bulbasaur,
-					Target: target{
-						Pokemon:   charmander,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   bulbasaur,
+					Target: b.getTarget(1, 0),
 					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
@@ -489,24 +479,14 @@ var _ = Describe("Turn priority", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
-					User: p2,
-					Target: target{
-						Pokemon:   p1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					User:   p2,
+					Target: b.getTarget(0, 0),
 					Damage: 5,
 					Move:   GetMove(MoveFakeOut),
 				},
 				DamageTransaction{
-					User: p1,
-					Target: target{
-						Pokemon:   p2,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   p1,
+					Target: b.getTarget(1, 0),
 					Damage: 5,
 					Move:   GetMove(MovePound),
 				},
@@ -522,24 +502,14 @@ var _ = Describe("Turn priority", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
-					User: ninjask,
-					Target: target{
-						Pokemon:   charmander,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					User:   ninjask,
+					Target: b.getTarget(0, 0),
 					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
 				DamageTransaction{
-					User: charmander,
-					Target: target{
-						Pokemon:   ninjask,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   charmander,
+					Target: b.getTarget(1, 0),
 					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
@@ -585,8 +555,6 @@ var _ = Describe("Weather", func() {
 	})
 
 	Context("when weather is present, battles are affected", func() {
-		solarBeam := GetMove(MoveSolarBeam)
-		weatherBall := GetMove(MoveWeatherBall)
 		moonlight := GetMove(MoveMoonlight)
 		It("should use metadata to track weather and clear weather over time", func() {
 			b := New1v1Battle(
@@ -618,18 +586,7 @@ var _ = Describe("Weather", func() {
 				b.Weather = WeatherHarshSunlight
 				Expect(b.Start()).To(Succeed())
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(
-					DamageTransaction{
-						User: machamp,
-						Target: target{
-							Pokemon:   bidoof,
-							party:     1,
-							partySlot: 0,
-							Team:      1,
-						},
-						Damage: 183,
-					},
-				))
+				Expect(DamageDealt(t, machamp)).To(BeEquivalentTo(183))
 			})
 
 			It("should weaken water type moves", func() {
@@ -641,18 +598,7 @@ var _ = Describe("Weather", func() {
 				b.Weather = WeatherHarshSunlight
 				Expect(b.Start()).To(Succeed())
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(
-					DamageTransaction{
-						User: lileep,
-						Target: target{
-							Pokemon:   bidoof,
-							party:     1,
-							partySlot: 0,
-							Team:      1,
-						},
-						Damage: 41,
-					},
-				))
+				Expect(DamageDealt(t, lileep)).To(BeEquivalentTo(41))
 			})
 		})
 
@@ -667,18 +613,7 @@ var _ = Describe("Weather", func() {
 				Expect(b.Start()).To(Succeed())
 				t, _ := b.SimulateRound()
 				// Fire weakened
-				Expect(t).To(HaveTransaction(
-					DamageTransaction{
-						User: machamp,
-						Target: target{
-							Pokemon:   bidoof,
-							party:     1,
-							partySlot: 0,
-							Team:      1,
-						},
-						Damage: 61,
-					},
-				))
+				Expect(DamageDealt(t, machamp)).To(BeEquivalentTo(61))
 			})
 
 			It("should affect water type moves", func() {
@@ -691,18 +626,7 @@ var _ = Describe("Weather", func() {
 				Expect(b.Start()).To(Succeed())
 				t, _ := b.SimulateRound()
 				// Water boosted
-				Expect(t).To(HaveTransaction(
-					DamageTransaction{
-						User: lileep,
-						Target: target{
-							Pokemon:   bidoof,
-							party:     1,
-							partySlot: 0,
-							Team:      1,
-						},
-						Damage: 124,
-					},
-				))
+				Expect(DamageDealt(t, lileep)).To(BeEquivalentTo(124))
 			})
 		})
 
@@ -724,23 +648,10 @@ var _ = Describe("Weather", func() {
 				b := New1v1Battle(bidoof, &a1, bulbasaur, &a2)
 				b.rng = SimpleRNG()
 				Expect(b.Start()).To(Succeed())
-
-				// TODO: compare doing solar beam WITH sandstorm deals less damage than WITHOUT sandstorm.
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: bulbasaur,
-					Target: target{
-						Pokemon:   bidoof,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
-					Move:   solarBeam,
-					Damage: 18,
-				}))
-
+				solarbeamDamage := DamageDealt(t, bulbasaur)
+				Expect(solarbeamDamage).To(BeEquivalentTo(18))
 				Expect(t).ToNot(HaveTransaction(FaintTransaction{}))
-
 				b.QueueTransaction(
 					WeatherTransaction{
 						Weather: WeatherSandstorm,
@@ -756,19 +667,8 @@ var _ = Describe("Weather", func() {
 					},
 				)
 				b.ProcessQueue()
-
 				t, _ = b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: bulbasaur,
-					Target: target{
-						Pokemon:   bidoof,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
-					Move:   solarBeam,
-					Damage: 10,
-				}))
+				Expect(DamageDealt(t, bulbasaur)).To(BeNumerically("<", solarbeamDamage))
 			})
 
 			It("should cause sandstorm damage", func() {
@@ -780,15 +680,9 @@ var _ = Describe("Weather", func() {
 				b.metadata[MetaWeatherTurns] = 5
 				Expect(b.Start()).To(Succeed())
 				t, _ := b.SimulateRound()
-
 				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: nil,
-					Target: target{
-						Pokemon:   bulbasaur,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   nil,
+					Target: b.getTarget(1, 0),
 					Move:   nil,
 					Damage: 0,
 				}))
@@ -812,23 +706,10 @@ var _ = Describe("Weather", func() {
 				b := New1v1Battle(bidoof, &a1, bulbasaur, &a2)
 				b.rng = SimpleRNG()
 				Expect(b.Start()).To(Succeed())
-
-				// TODO: compare doing solar beam WITH hail deals less damage than WITHOUT hail.
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: bulbasaur,
-					Target: target{
-						Pokemon:   bidoof,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
-					Move:   solarBeam,
-					Damage: 18,
-				}))
-
+				solarbeamDamage := DamageDealt(t, bulbasaur)
+				Expect(solarbeamDamage).To(BeEquivalentTo(18))
 				Expect(t).ToNot(HaveTransaction(FaintTransaction{}))
-
 				b.QueueTransaction(
 					WeatherTransaction{
 						Weather: WeatherHail,
@@ -844,19 +725,8 @@ var _ = Describe("Weather", func() {
 					},
 				)
 				b.ProcessQueue()
-
 				t, _ = b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: bulbasaur,
-					Target: target{
-						Pokemon:   bidoof,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
-					Move:   solarBeam,
-					Damage: 10,
-				}))
+				Expect(DamageDealt(t, bulbasaur)).To(BeNumerically("<", solarbeamDamage))
 			})
 
 			It("should cause hail damage", func() {
@@ -870,13 +740,8 @@ var _ = Describe("Weather", func() {
 				t, _ := b.SimulateRound()
 
 				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: nil,
-					Target: target{
-						Pokemon:   bulbasaur,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   nil,
+					Target: b.getTarget(1, 0),
 					Move:   nil,
 					Damage: 0,
 				}))
@@ -894,32 +759,12 @@ var _ = Describe("Weather", func() {
 			t, _ := b.SimulateRound()
 			// TODO: Accuracy decreases from fog
 			// Solar beam weakened
-			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: bulbasaur,
-				Target: target{
-					Pokemon:   castform,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
-				Move:   solarBeam,
-				Damage: 12,
-			}))
+			Expect(DamageDealt(t, bulbasaur)).To(BeEquivalentTo(12))
 			bulbasaur.Moves[0] = moonlight
 			bulbasaur.CurrentHP = bulbasaur.MaxHP()
 			t, _ = b.SimulateRound()
 			// Moonlight heals 1/4 max HP, weather ball boosted
-			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: castform,
-				Target: target{
-					Pokemon:   bulbasaur,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
-				Move:   weatherBall,
-				Damage: 21,
-			}))
+			Expect(DamageDealt(t, castform)).To(BeEquivalentTo(21))
 			Expect(t).To(HaveTransaction(HealTransaction{
 				Target: bulbasaur,
 				Amount: 7,
