@@ -23,9 +23,6 @@ func (t DamageTransaction) Mutate(b *Battle) {
 		t.Damage = 1
 	}
 	receiver := t.Target.Pokemon
-	if t.Move != nil {
-		t.User.metadata[MetaLastMove] = t.Move
-	}
 	if receiver.CurrentHP >= t.Damage {
 		receiver.CurrentHP -= t.Damage
 	} else {

@@ -451,6 +451,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				}
 			}
+			user.metadata[MetaLastMove] = move
 		case ItemTurn:
 			b.QueueTransaction(ItemTransaction{
 				Target: t.Target,

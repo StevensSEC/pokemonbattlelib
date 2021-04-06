@@ -1539,6 +1539,22 @@ var _ = Describe("Misc/held items", func() {
 			Entry("Lagging Tail", ItemLaggingTail),
 		)
 
+		DescribeTable("Choice Items",
+			func(item Item, stat func(*Pokemon) uint) {
+				b, holder := setup(item, PkmnMachamp)
+				b.SimulateRound()
+				// Restricts user to one move
+				Expect(holder.metadata[MetaLastMove]).To(BeEquivalentTo(GetMove(MoveSplash)))
+				// Stats are boosted by 50%
+				effective := stat(holder)
+				holder.HeldItem = ItemNone
+				Expect(stat(holder)).To(BeNumerically("<", effective))
+			},
+			Entry("Choice Band", ItemChoiceBand, func(p *Pokemon) uint { return p.Attack() }),
+			Entry("Choice Scarf", ItemChoiceScarf, func(p *Pokemon) uint { return p.Speed() }),
+			Entry("Choice Specs", ItemChoiceSpecs, func(p *Pokemon) uint { return p.SpecialAttack() }),
+		)
+
 		It("handles Iron Ball", func() {
 			b, holder := setup(ItemIronBall, PkmnPidgeot)
 			attacker := b.getPokemonInBattle(0, 0)

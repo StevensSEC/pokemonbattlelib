@@ -55,11 +55,7 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	}
 	// Item modifiers
 	switch user.HeldItem {
-	case ItemIronBall:
-		// TODO: make flying not immune to ground
 	case ItemChoiceBand, ItemChoiceScarf, ItemChoiceSpecs:
-		// TODO: boost attack by 50% (in p.GetAttack)
-		// TODO: boost special attak by 50% (in p.GetSpAtk)
 		if lastMove := user.metadata[MetaLastMove]; lastMove != nil && lastMove != move {
 			blog.Panicf("cannot use move blocked by %s", user.HeldItem.Name())
 		}
@@ -74,6 +70,5 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 			damage = (damage * 110) / 100
 		}
 	}
-
 	return damage
 }

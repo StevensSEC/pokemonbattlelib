@@ -285,9 +285,11 @@ func (p *Pokemon) MaxHP() uint {
 }
 
 func (p *Pokemon) Attack() uint {
-	effective := float64(p.Stats[StatAtk])
-	// TODO: attack modifiers
-	return uint(effective)
+	effective := p.Stats[StatAtk]
+	if p.HeldItem == ItemChoiceBand {
+		effective = (effective * 150) / 100
+	}
+	return effective
 }
 
 func (p *Pokemon) Defense() uint {
@@ -297,9 +299,11 @@ func (p *Pokemon) Defense() uint {
 }
 
 func (p *Pokemon) SpecialAttack() uint {
-	effective := float64(p.Stats[StatSpAtk])
-	// TODO: special attack modifiers
-	return uint(effective)
+	effective := p.Stats[StatSpAtk]
+	if p.HeldItem == ItemChoiceSpecs {
+		effective = (effective * 150) / 100
+	}
+	return effective
 }
 
 func (p *Pokemon) SpecialDefense() uint {
