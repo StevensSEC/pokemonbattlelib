@@ -135,10 +135,6 @@ func (b *Battle) Start() error {
 // Handles all pre-turn logic
 func (b *Battle) preRound() {
 	for _, t := range b.GetTargetsRef() {
-		switch t.Pokemon.HeldItem {
-		case ItemFullIncense, ItemLaggingTail:
-			t.Pokemon.metadata[MetaPriorityLast] = true
-		}
 		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
 			b.QueueTransaction(CureStatusTransaction{
 				Target:       *t,
@@ -165,8 +161,18 @@ func (b *Battle) sortTurns(turns *[]TurnContext) {
 					return mvA.Priority() > mvB.Priority()
 				}
 				// Held item priority
-				if v, ok := pkmnA.metadata[MetaPriorityLast].(bool); ok && v {
-					return false
+				itemLastA := 0
+				itemLastB := 0
+				switch pkmnA.HeldItem {
+				case ItemFullIncense, ItemLaggingTail:
+					itemLastA = 1
+				}
+				switch pkmnB.HeldItem {
+				case ItemFullIncense, ItemLaggingTail:
+					itemLastB = 1
+				}
+				if itemLastA != itemLastB {
+					return itemLastA < itemLastB
 				}
 				// speedy pokemon should go first
 				return pkmnA.Speed() > pkmnB.Speed()

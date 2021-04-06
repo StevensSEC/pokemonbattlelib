@@ -34,6 +34,10 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 
 	// Other modifiers
 	elementalEffect := GetElementalEffect(move.Type(), receiver.EffectiveType(), receiver.HeldItem)
+	// Account for ground type moves on grounded Pokemon
+	if move.Type()&TypeGround > 0 && receiver.Type&TypeFlying > 0 && receiver.IsGrounded() {
+		elementalEffect -= NoEffect
+	}
 	if elementalEffect > NormalEffect {
 		damage <<= elementalEffect
 	} else if elementalEffect < NormalEffect {

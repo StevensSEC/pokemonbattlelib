@@ -1570,7 +1570,7 @@ var _ = Describe("Misc/held items", func() {
 					Team:      1,
 				},
 				Move:   GetMove(MoveEarthquake),
-				Damage: 36,
+				Damage: 1,
 			}))
 			speed := holder.Speed()
 			holder.HeldItem = ItemNone

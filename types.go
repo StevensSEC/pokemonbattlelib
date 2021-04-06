@@ -158,11 +158,7 @@ func GetElementalEffect(move, def Type, item Item) Effectiveness {
 	increase := bits.OnesCount32(uint32(doubleEffect[move] & def))
 	effect := increase - reduce
 	if noEffect[move]&def > 0 {
-		if move&TypeGround > 0 && def&TypeFlying > 0 && item == ItemIronBall {
-			// Flying immunity negated
-		} else {
-			return NoEffect
-		}
+		return NoEffect
 	}
 	return Effectiveness(effect)
 }

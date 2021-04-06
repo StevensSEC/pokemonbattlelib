@@ -56,7 +56,6 @@ type PokemonMeta int
 
 const (
 	MetaLastMove PokemonMeta = iota
-	MetaPriorityLast
 	MetaSleepTime
 )
 
@@ -338,6 +337,15 @@ func (p *Pokemon) CritChance() int {
 func (p *Pokemon) Evasion() uint {
 	stage := p.StatModifiers[StatEvasion]
 	return EvasionFactor[stage]
+}
+
+// Check if the Pokemon is grounded
+func (p *Pokemon) IsGrounded() bool {
+	// TODO: More grounded effects - https://bulbapedia.bulbagarden.net/wiki/Grounded
+	if p.HeldItem == ItemIronBall {
+		return true
+	}
+	return p.Type&TypeFlying == 0 && p.Ability != AbilityLevitate
 }
 
 // display a Pokemon close to how it would appear in a Pokemon battle
