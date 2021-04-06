@@ -392,7 +392,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 							Target: turn.User,
 							Damage: user.MaxHP() / 8,
 						})
-						if user.HeldItem == ItemNone {
+						if move.Flags()&FlagContact != 0 && user.HeldItem == ItemNone {
 							b.QueueTransaction(
 								SwapItemTransaction{
 									Target: user,

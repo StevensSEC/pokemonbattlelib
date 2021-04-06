@@ -200,8 +200,6 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			Target:       t.Target.Pokemon,
 			StatusEffect: StatusBurn,
 		})
-	case ItemIronBall:
-		// TODO: set PokemonMeta[MetaIronBall]
 	case ItemStickyBarb:
 		b.QueueTransaction(DamageTransaction{
 			Target: t.Target,
@@ -210,7 +208,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 	case ItemToxicOrb:
 		b.QueueTransaction(InflictStatusTransaction{
 			Target:       t.Target.Pokemon,
-			StatusEffect: StatusPoison,
+			StatusEffect: StatusBadlyPoison,
 		})
 	}
 	// In a pinch consumption

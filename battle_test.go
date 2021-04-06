@@ -1507,14 +1507,18 @@ var _ = Describe("Misc/held items", func() {
 	}
 
 	When("Pokemon hold bad held items in battle", func() {
-		It("inflicts burn from Flame Orb", func() {
-			b, holder := setup(ItemFlameOrb, PkmnBulbasaur)
-			t, _ := b.SimulateRound()
-			Expect(t).To(HaveTransaction(InflictStatusTransaction{
-				Target:       holder,
-				StatusEffect: StatusBurn,
-			}))
-		})
+		DescribeTable("Inflicts status after turn",
+			func(item Item, status StatusCondition) {
+				b, holder := setup(item, PkmnBulbasaur)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(InflictStatusTransaction{
+					Target:       holder,
+					StatusEffect: status,
+				}))
+			},
+			Entry("Flame Orb", ItemFlameOrb, StatusBurn),
+			Entry("Toxic Orb", ItemToxicOrb, StatusBadlyPoison),
+		)
 
 		DescribeTable("Move last in priority bracket items",
 			func(item Item) {
@@ -1555,6 +1559,45 @@ var _ = Describe("Misc/held items", func() {
 			speed := holder.Speed()
 			holder.HeldItem = ItemNone
 			Expect(holder.Speed()).To(BeNumerically(">", speed))
+		})
+
+		It("handles Sticky Barb", func() {
+			b, holder := setup(ItemStickyBarb, PkmnGrimer)
+			attacker := b.getPokemonInBattle(0, 0)
+			t, _ := b.SimulateRound()
+			// Holder takes 1/8 HP damage after every turn
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					Pokemon:   holder,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Damage: holder.MaxHP() / 8,
+			}))
+			// Contact moves damage attacker and pass the sticky barb to the attacker
+			attacker.Moves[0] = GetMove(MoveTackle)
+			t, _ = b.SimulateRound()
+			Expect(t).To(HaveTransactionsInOrder(
+				DamageTransaction{
+					Target: target{
+						Pokemon:   attacker,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Damage: attacker.MaxHP() / 8,
+				},
+				SwapItemTransaction{
+					Target: attacker,
+					Item:   ItemStickyBarb,
+				},
+				SwapItemTransaction{
+					Target: holder,
+					Item:   ItemNone,
+				},
+			))
+			Expect(attacker.HeldItem).To(BeEquivalentTo(ItemStickyBarb))
 		})
 	})
 
