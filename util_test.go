@@ -343,7 +343,19 @@ func (matcher *orderedTransactionMatcher) NegatedFailureMessage(actual interface
 	)
 }
 
-// Tools for testing the library
+/* Tools for testing the library */
+// Check for damage dealt (if any) by a Pokemon in battle
+func DamageDealt(t []Transaction, p *Pokemon) uint {
+	for _, x := range t {
+		if v, ok := x.(DamageTransaction); !ok {
+			continue
+		} else if v.User == p {
+			return v.Damage
+		}
+	}
+	return 0
+}
+
 // Custom RNG struct which allows for predictable RNG output in a battle
 type TestRNG struct {
 	rolls  []bool

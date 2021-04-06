@@ -249,22 +249,11 @@ var _ = Describe("One round of battle", func() {
 				b.rng = SimpleRNG()
 				Expect(b.Start()).To(Succeed())
 
-				// TODO: test the difference in damage between the transactions rather than the exact values of the transactions
-				// TODO: make it so that target doesn't need to include `Pokemon` or `Team`
-				a1 <- FightTurn{Move: 1, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
-				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
+				a1 <- FightTurn{Move: 1, Target: b.getTarget(1, 0)}
+				a2 <- FightTurn{Move: 0, Target: b.getTarget(0, 0)}
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: pkmn1,
-					Target: target{
-						Pokemon:   pkmn2,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
-					Move:   GetMove(MoveTackle),
-					Damage: 3,
-				}))
+				damage := DamageDealt(t, pkmn1)
+				Expect(damage).To(BeEquivalentTo(3))
 
 				b.QueueTransaction(HealTransaction{
 					Target: pkmn2,
@@ -272,20 +261,10 @@ var _ = Describe("One round of battle", func() {
 				})
 				b.ProcessQueue()
 
-				a1 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
-				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
+				a1 <- FightTurn{Move: 0, Target: b.getTarget(1, 0)}
+				a2 <- FightTurn{Move: 0, Target: b.getTarget(0, 0)}
 				t, _ = b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: pkmn1,
-					Target: target{
-						Pokemon:   pkmn2,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
-					Move:   GetMove(MoveFireFang),
-					Damage: 8,
-				}))
+				Expect(DamageDealt(t, pkmn1)).To(BeNumerically(">", damage))
 			})
 
 			It("should have no effect", func() {
@@ -295,32 +274,11 @@ var _ = Describe("One round of battle", func() {
 				b.rng = SimpleRNG()
 				Expect(b.Start()).To(Succeed())
 
-				// TODO: make it so that target doesn't need to include `Pokemon` or `Team`
-				a1 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
-				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
+				a1 <- FightTurn{Move: 0, Target: b.getTarget(1, 0)}
+				a2 <- FightTurn{Move: 0, Target: b.getTarget(0, 0)}
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: pkmn1,
-					Target: target{
-						Pokemon:   pkmn2,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
-					Move:   GetMove(MoveShadowBall),
-					Damage: 0,
-				}))
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: pkmn2,
-					Target: target{
-						Pokemon:   pkmn1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
-					Move:   GetMove(MoveTackle),
-					Damage: 0,
-				}))
+				Expect(DamageDealt(t, pkmn1)).To(BeEquivalentTo(0))
+				Expect(DamageDealt(t, pkmn2)).To(BeEquivalentTo(0))
 			})
 		})
 

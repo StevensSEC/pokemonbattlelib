@@ -540,6 +540,18 @@ type target struct {
 	Pokemon   *Pokemon // Pokemon that is a candidate target
 }
 
+// Create a new target object from party and slot
+func (b *Battle) getTarget(party, slot int) target {
+	p := b.getPokemonInBattle(party, slot)
+	team := b.parties[party].team
+	return target{
+		Pokemon:   p,
+		party:     party,
+		partySlot: slot,
+		Team:      team,
+	}
+}
+
 func (t target) String() string {
 	return fmt.Sprintf("Party %d (Slot %d) | Team %d | Pokemon:\n%s",
 		t.party, t.partySlot, t.Team, t.Pokemon)
