@@ -160,6 +160,20 @@ func (b *Battle) sortTurns(turns *[]TurnContext) {
 				if mvA.Priority() != mvB.Priority() {
 					return mvA.Priority() > mvB.Priority()
 				}
+				// Held item priority
+				itemLastA := 0
+				itemLastB := 0
+				switch pkmnA.HeldItem {
+				case ItemFullIncense, ItemLaggingTail:
+					itemLastA = 1
+				}
+				switch pkmnB.HeldItem {
+				case ItemFullIncense, ItemLaggingTail:
+					itemLastB = 1
+				}
+				if itemLastA != itemLastB {
+					return itemLastA < itemLastB
+				}
 				// speedy pokemon should go first
 				return pkmnA.Speed() > pkmnB.Speed()
 			}
@@ -339,6 +353,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Stat:   StatAtk,
 						Stages: +1,
 					})
+				case MoveSplash:
+					b.QueueTransaction(MoveFailTransaction{
+						User:   user,
+						Reason: FailOther,
+					})
 				case MoveDefog:
 					if b.Weather == WeatherFog {
 						b.QueueTransaction(WeatherTransaction{
@@ -361,6 +380,28 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				var crit uint = 1
 				if b.rng.Roll(1, user.CritChance()) {
 					crit = 2
+				}
+				// Receiver effects
+				if receiver.HeldItem != ItemNone {
+					switch receiver.HeldItem {
+					case ItemStickyBarb:
+						b.QueueTransaction(DamageTransaction{
+							Target: turn.User,
+							Damage: user.MaxHP() / 8,
+						})
+						if move.Flags()&FlagContact != 0 && user.HeldItem == ItemNone {
+							b.QueueTransaction(
+								GiveItemTransaction{
+									Target: user,
+									Item:   receiver.HeldItem,
+								},
+								GiveItemTransaction{
+									Target: receiver,
+									Item:   ItemNone,
+								},
+							)
+						}
+					}
 				}
 				damage *= crit
 				b.QueueTransaction(DamageTransaction{
@@ -407,6 +448,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					})
 				}
 			}
+			user.metadata[MetaLastMove] = move
 		case ItemTurn:
 			b.QueueTransaction(ItemTransaction{
 				Target: t.Target,
@@ -416,7 +458,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		default:
 			blog.Panicf("Unknown turn of type %v", t)
 		}
-
 		b.ProcessQueue()
 		if b.State == BattleEnd {
 			break
@@ -472,6 +513,13 @@ func (b *Battle) postRound() {
 				b.QueueTransaction(DamageTransaction{
 					Target: *t,
 					Damage: damage,
+				})
+			}
+			// Held item effects
+			if pkmn.HeldItem != ItemNone {
+				b.QueueTransaction(ItemTransaction{
+					Target: *t,
+					Item:   pkmn.HeldItem,
 				})
 			}
 		}
@@ -585,7 +633,10 @@ func (b *Battle) GetTargets() []target {
 		for slot, active := range party.activePokemon {
 			var pkmn Pokemon
 			bytes, _ := json.Marshal(active)
-			json.Unmarshal(bytes, &pkmn)
+			err := json.Unmarshal(bytes, &pkmn)
+			if err != nil {
+				panic(err)
+			}
 			target := target{
 				party:     partyID,
 				partySlot: slot,
@@ -621,7 +672,10 @@ func (b *Battle) getContext(party *battleParty, pokemon *Pokemon) *BattleContext
 	// although I didn't benchmark it myself, so I don't know that for a fact.
 	var pkmn Pokemon
 	bytes, _ := json.Marshal(pokemon)
-	json.Unmarshal(bytes, &pkmn)
+	err := json.Unmarshal(bytes, &pkmn)
+	if err != nil {
+		panic(err)
+	}
 	return &BattleContext{
 		Battle:    *b,
 		Pokemon:   pkmn,

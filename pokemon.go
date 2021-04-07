@@ -284,9 +284,11 @@ func (p *Pokemon) MaxHP() uint {
 }
 
 func (p *Pokemon) Attack() uint {
-	effective := float64(p.Stats[StatAtk])
-	// TODO: attack modifiers
-	return uint(effective)
+	effective := p.Stats[StatAtk]
+	if p.HeldItem == ItemChoiceBand {
+		effective = (effective * 150) / 100
+	}
+	return effective
 }
 
 func (p *Pokemon) Defense() uint {
@@ -296,9 +298,11 @@ func (p *Pokemon) Defense() uint {
 }
 
 func (p *Pokemon) SpecialAttack() uint {
-	effective := float64(p.Stats[StatSpAtk])
-	// TODO: special attack modifiers
-	return uint(effective)
+	effective := p.Stats[StatSpAtk]
+	if p.HeldItem == ItemChoiceSpecs {
+		effective = (effective * 150) / 100
+	}
+	return effective
 }
 
 func (p *Pokemon) SpecialDefense() uint {
@@ -308,9 +312,14 @@ func (p *Pokemon) SpecialDefense() uint {
 }
 
 func (p *Pokemon) Speed() uint {
-	effective := float64(p.Stats[StatSpeed])
-	// TODO: speed modifiers
-	return uint(effective)
+	effective := p.Stats[StatSpeed]
+	switch p.HeldItem {
+	case ItemIronBall:
+		effective /= 2
+	case ItemChoiceScarf:
+		effective = (effective * 150) / 100
+	}
+	return effective
 }
 
 // Returns denominator for critical hit chance
@@ -334,6 +343,15 @@ func (p *Pokemon) Accuracy() uint {
 func (p *Pokemon) Evasion() uint {
 	stage := p.StatModifiers[StatEvasion]
 	return AccuracyEvasionMultiplier[stage]
+}
+
+// Check if the Pokemon is grounded
+func (p *Pokemon) IsGrounded() bool {
+	// TODO: More grounded effects - https://bulbapedia.bulbagarden.net/wiki/Grounded
+	if p.HeldItem == ItemIronBall {
+		return true
+	}
+	return p.Type&TypeFlying == 0 && p.Ability != AbilityLevitate
 }
 
 // display a Pokemon close to how it would appear in a Pokemon battle

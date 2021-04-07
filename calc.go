@@ -32,20 +32,24 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	}
 	damage = uint((((levelEffect * movePower * attack / defense) / 50) + 2))
 
-	// apply modifiers
-	elementalEffect := GetElementalEffect(move.Type(), receiver.EffectiveType())
+	// Other modifiers
+	elementalEffect := GetElementalEffect(move.Type(), receiver.EffectiveType(), receiver.HeldItem)
+	// Account for ground type moves on grounded Pokemon
+	if move.Type()&TypeGround > 0 && receiver.Type&TypeFlying > 0 && receiver.IsGrounded() {
+		elementalEffect -= NoEffect
+	}
 	if elementalEffect > NormalEffect {
 		damage <<= elementalEffect
 	} else if elementalEffect < NormalEffect {
 		damage >>= elementalEffect * -1 // bitshift operand must be positive
 	}
-
+	// Weather type modifier
 	if rain, sun := weather == WeatherRain, weather == WeatherHarshSunlight; (rain && move.Type() == TypeWater) || (sun && move.Type() == TypeFire) {
 		damage = (damage * 150) / 100
 	} else if (rain && move.Type() == TypeFire) || (sun && move.Type() == TypeWater) {
 		damage /= 2
 	}
-
+	// Stab modifier
 	if move != nil && user.EffectiveType()&move.Type() != 0 {
 		if user.Ability == AbilityAdaptability {
 			damage *= 2
@@ -53,12 +57,15 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 			damage = (damage * 150) / 100
 		}
 	}
-
 	// Item modifiers
 	switch user.HeldItem {
 	case ItemExpertBelt:
 		if elementalEffect >= SuperEffective {
 			damage = (damage * 120) / 100
+		}
+	case ItemChoiceBand, ItemChoiceScarf, ItemChoiceSpecs:
+		if lastMove := user.metadata[MetaLastMove]; lastMove != nil && lastMove != move {
+			blog.Panicf("cannot use move blocked by %s", user.HeldItem.Name())
 		}
 	case ItemLifeOrb:
 		damage = (damage * 130) / 100
@@ -71,7 +78,6 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 			damage = (damage * 110) / 100
 		}
 	}
-
 	return damage
 }
 
