@@ -1362,6 +1362,25 @@ var _ = Describe("Misc/held items", func() {
 			}))
 		})
 
+		It("handles Expert Belt", func() {
+			b, holder := setup(ItemExpertBelt, PkmnMachamp)
+			holder.Moves[0] = GetMove(MoveCloseCombat)
+			t, _ := b.SimulateRound()
+			// Damage boosted by 20%
+			Expect(t).To(HaveTransaction(
+				DamageTransaction{
+					User: holder,
+					Target: target{
+						Pokemon:   b.getPokemonInBattle(0, 0),
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Damage: 201,
+				},
+			))
+		})
+
 		It("handles Leftovers", func() {
 			b, holder := setup(ItemLeftovers, PkmnSnorlax)
 			t, _ := b.SimulateRound()

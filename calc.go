@@ -59,6 +59,10 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	}
 	// Item modifiers
 	switch user.HeldItem {
+	case ItemExpertBelt:
+		if elementalEffect >= SuperEffective {
+			damage = (damage * 120) / 100
+		}
 	case ItemChoiceBand, ItemChoiceScarf, ItemChoiceSpecs:
 		if lastMove := user.metadata[MetaLastMove]; lastMove != nil && lastMove != move {
 			blog.Panicf("cannot use move blocked by %s", user.HeldItem.Name())
