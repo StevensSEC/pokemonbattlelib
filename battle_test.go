@@ -249,22 +249,11 @@ var _ = Describe("One round of battle", func() {
 				b.rng = SimpleRNG()
 				Expect(b.Start()).To(Succeed())
 
-				// TODO: test the difference in damage between the transactions rather than the exact values of the transactions
-				// TODO: make it so that target doesn't need to include `Pokemon` or `Team`
-				a1 <- FightTurn{Move: 1, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
-				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
+				a1 <- FightTurn{Move: 1, Target: b.getTarget(1, 0)}
+				a2 <- FightTurn{Move: 0, Target: b.getTarget(0, 0)}
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: pkmn1,
-					Target: target{
-						Pokemon:   pkmn2,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
-					Move:   GetMove(MoveTackle),
-					Damage: 3,
-				}))
+				damage := DamageDealt(t, pkmn1)
+				Expect(damage).To(Equal(3))
 
 				b.QueueTransaction(HealTransaction{
 					Target: pkmn2,
@@ -272,20 +261,10 @@ var _ = Describe("One round of battle", func() {
 				})
 				b.ProcessQueue()
 
-				a1 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
-				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
+				a1 <- FightTurn{Move: 0, Target: b.getTarget(1, 0)}
+				a2 <- FightTurn{Move: 0, Target: b.getTarget(0, 0)}
 				t, _ = b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: pkmn1,
-					Target: target{
-						Pokemon:   pkmn2,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
-					Move:   GetMove(MoveFireFang),
-					Damage: 8,
-				}))
+				Expect(DamageDealt(t, pkmn1)).To(BeNumerically(">", damage))
 			})
 
 			It("should have no effect", func() {
@@ -295,32 +274,11 @@ var _ = Describe("One round of battle", func() {
 				b.rng = SimpleRNG()
 				Expect(b.Start()).To(Succeed())
 
-				// TODO: make it so that target doesn't need to include `Pokemon` or `Team`
-				a1 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn2, party: 1, partySlot: 0, Team: 1}}
-				a2 <- FightTurn{Move: 0, Target: target{Pokemon: pkmn1, party: 0, partySlot: 0, Team: 0}}
+				a1 <- FightTurn{Move: 0, Target: b.getTarget(1, 0)}
+				a2 <- FightTurn{Move: 0, Target: b.getTarget(0, 0)}
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: pkmn1,
-					Target: target{
-						Pokemon:   pkmn2,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
-					Move:   GetMove(MoveShadowBall),
-					Damage: 0,
-				}))
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: pkmn2,
-					Target: target{
-						Pokemon:   pkmn1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
-					Move:   GetMove(MoveTackle),
-					Damage: 0,
-				}))
+				Expect(DamageDealt(t, pkmn1)).To(Equal(0))
+				Expect(DamageDealt(t, pkmn2)).To(Equal(0))
 			})
 		})
 
@@ -395,39 +353,34 @@ var _ = Describe("One round of battle", func() {
 var _ = Describe("Using items in battle", func() {
 	agent := Agent(new(healAgent))
 	var (
-		pkmn   *Pokemon
-		pkmn2  *Pokemon
-		battle *Battle
+		pkmn  *Pokemon
+		pkmn2 *Pokemon
+		b     *Battle
 	)
 
 	BeforeEach(func() {
 		pkmn = GeneratePokemon(PkmnVenusaur, WithLevel(50), defaultMoveOpt)
 		pkmn.CurrentHP = 10
 		pkmn2 = GeneratePokemon(PkmnWartortle, WithLevel(50), defaultMoveOpt)
-		battle = New1v1Battle(pkmn, &agent, pkmn2, &agent)
+		b = New1v1Battle(pkmn, &agent, pkmn2, &agent)
 	})
 
 	Context("when the battle processes item turns", func() {
 		It("should create ItemTransaction(s) properly", func() {
-			Expect(battle.Start()).To(Succeed())
-			t, _ := battle.SimulateRound()
+			Expect(b.Start()).To(Succeed())
+			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				ItemTransaction{
-					Target: target{
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-						Pokemon:   pkmn,
-					},
-					Item: ItemPotion,
-					Move: nil,
+					Target: b.getTarget(0, 0),
+					Item:   ItemPotion,
+					Move:   nil,
 				},
 			))
 		})
 
 		It("should heal the Pokemon by 20 HP", func() {
-			Expect(battle.Start()).To(Succeed())
-			battle.SimulateRound()
+			Expect(b.Start()).To(Succeed())
+			b.SimulateRound()
 			Expect(pkmn.CurrentHP).To(BeEquivalentTo(30))
 		})
 	})
@@ -505,13 +458,8 @@ var _ = Describe("Turn priority", func() {
 					Amount: 0,
 				},
 				DamageTransaction{
-					User: bulbasaur,
-					Target: target{
-						Pokemon:   charmander,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   bulbasaur,
+					Target: b.getTarget(1, 0),
 					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
@@ -531,24 +479,14 @@ var _ = Describe("Turn priority", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
-					User: p2,
-					Target: target{
-						Pokemon:   p1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					User:   p2,
+					Target: b.getTarget(0, 0),
 					Damage: 5,
 					Move:   GetMove(MoveFakeOut),
 				},
 				DamageTransaction{
-					User: p1,
-					Target: target{
-						Pokemon:   p2,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   p1,
+					Target: b.getTarget(1, 0),
 					Damage: 5,
 					Move:   GetMove(MovePound),
 				},
@@ -564,24 +502,14 @@ var _ = Describe("Turn priority", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
-					User: ninjask,
-					Target: target{
-						Pokemon:   charmander,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					User:   ninjask,
+					Target: b.getTarget(0, 0),
 					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
 				DamageTransaction{
-					User: charmander,
-					Target: target{
-						Pokemon:   ninjask,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   charmander,
+					Target: b.getTarget(1, 0),
 					Move:   GetMove(MovePound),
 					Damage: 3,
 				},
@@ -627,8 +555,6 @@ var _ = Describe("Weather", func() {
 	})
 
 	Context("when weather is present, battles are affected", func() {
-		solarBeam := GetMove(MoveSolarBeam)
-		weatherBall := GetMove(MoveWeatherBall)
 		moonlight := GetMove(MoveMoonlight)
 		It("should use metadata to track weather and clear weather over time", func() {
 			b := New1v1Battle(
@@ -660,18 +586,7 @@ var _ = Describe("Weather", func() {
 				b.Weather = WeatherHarshSunlight
 				Expect(b.Start()).To(Succeed())
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(
-					DamageTransaction{
-						User: machamp,
-						Target: target{
-							Pokemon:   bidoof,
-							party:     1,
-							partySlot: 0,
-							Team:      1,
-						},
-						Damage: 183,
-					},
-				))
+				Expect(DamageDealt(t, machamp)).To(Equal(183))
 			})
 
 			It("should weaken water type moves", func() {
@@ -683,18 +598,7 @@ var _ = Describe("Weather", func() {
 				b.Weather = WeatherHarshSunlight
 				Expect(b.Start()).To(Succeed())
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(
-					DamageTransaction{
-						User: lileep,
-						Target: target{
-							Pokemon:   bidoof,
-							party:     1,
-							partySlot: 0,
-							Team:      1,
-						},
-						Damage: 41,
-					},
-				))
+				Expect(DamageDealt(t, lileep)).To(Equal(41))
 			})
 		})
 
@@ -709,18 +613,7 @@ var _ = Describe("Weather", func() {
 				Expect(b.Start()).To(Succeed())
 				t, _ := b.SimulateRound()
 				// Fire weakened
-				Expect(t).To(HaveTransaction(
-					DamageTransaction{
-						User: machamp,
-						Target: target{
-							Pokemon:   bidoof,
-							party:     1,
-							partySlot: 0,
-							Team:      1,
-						},
-						Damage: 61,
-					},
-				))
+				Expect(DamageDealt(t, machamp)).To(Equal(61))
 			})
 
 			It("should affect water type moves", func() {
@@ -733,18 +626,7 @@ var _ = Describe("Weather", func() {
 				Expect(b.Start()).To(Succeed())
 				t, _ := b.SimulateRound()
 				// Water boosted
-				Expect(t).To(HaveTransaction(
-					DamageTransaction{
-						User: lileep,
-						Target: target{
-							Pokemon:   bidoof,
-							party:     1,
-							partySlot: 0,
-							Team:      1,
-						},
-						Damage: 124,
-					},
-				))
+				Expect(DamageDealt(t, lileep)).To(Equal(124))
 			})
 		})
 
@@ -766,23 +648,10 @@ var _ = Describe("Weather", func() {
 				b := New1v1Battle(bidoof, &a1, bulbasaur, &a2)
 				b.rng = SimpleRNG()
 				Expect(b.Start()).To(Succeed())
-
-				// TODO: compare doing solar beam WITH sandstorm deals less damage than WITHOUT sandstorm.
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: bulbasaur,
-					Target: target{
-						Pokemon:   bidoof,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
-					Move:   solarBeam,
-					Damage: 18,
-				}))
-
+				solarbeamDamage := DamageDealt(t, bulbasaur)
+				Expect(solarbeamDamage).To(Equal(18))
 				Expect(t).ToNot(HaveTransaction(FaintTransaction{}))
-
 				b.QueueTransaction(
 					WeatherTransaction{
 						Weather: WeatherSandstorm,
@@ -798,19 +667,8 @@ var _ = Describe("Weather", func() {
 					},
 				)
 				b.ProcessQueue()
-
 				t, _ = b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: bulbasaur,
-					Target: target{
-						Pokemon:   bidoof,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
-					Move:   solarBeam,
-					Damage: 10,
-				}))
+				Expect(DamageDealt(t, bulbasaur)).To(BeNumerically("<", solarbeamDamage))
 			})
 
 			It("should cause sandstorm damage", func() {
@@ -822,15 +680,9 @@ var _ = Describe("Weather", func() {
 				b.metadata[MetaWeatherTurns] = 5
 				Expect(b.Start()).To(Succeed())
 				t, _ := b.SimulateRound()
-
 				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: nil,
-					Target: target{
-						Pokemon:   bulbasaur,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   nil,
+					Target: b.getTarget(1, 0),
 					Move:   nil,
 					Damage: 0,
 				}))
@@ -854,23 +706,10 @@ var _ = Describe("Weather", func() {
 				b := New1v1Battle(bidoof, &a1, bulbasaur, &a2)
 				b.rng = SimpleRNG()
 				Expect(b.Start()).To(Succeed())
-
-				// TODO: compare doing solar beam WITH hail deals less damage than WITHOUT hail.
 				t, _ := b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: bulbasaur,
-					Target: target{
-						Pokemon:   bidoof,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
-					Move:   solarBeam,
-					Damage: 18,
-				}))
-
+				solarbeamDamage := DamageDealt(t, bulbasaur)
+				Expect(solarbeamDamage).To(Equal(18))
 				Expect(t).ToNot(HaveTransaction(FaintTransaction{}))
-
 				b.QueueTransaction(
 					WeatherTransaction{
 						Weather: WeatherHail,
@@ -886,19 +725,8 @@ var _ = Describe("Weather", func() {
 					},
 				)
 				b.ProcessQueue()
-
 				t, _ = b.SimulateRound()
-				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: bulbasaur,
-					Target: target{
-						Pokemon:   bidoof,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
-					Move:   solarBeam,
-					Damage: 10,
-				}))
+				Expect(DamageDealt(t, bulbasaur)).To(BeNumerically("<", solarbeamDamage))
 			})
 
 			It("should cause hail damage", func() {
@@ -912,13 +740,8 @@ var _ = Describe("Weather", func() {
 				t, _ := b.SimulateRound()
 
 				Expect(t).To(HaveTransaction(DamageTransaction{
-					User: nil,
-					Target: target{
-						Pokemon:   bulbasaur,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   nil,
+					Target: b.getTarget(1, 0),
 					Move:   nil,
 					Damage: 0,
 				}))
@@ -938,32 +761,12 @@ var _ = Describe("Weather", func() {
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			// Solar beam weakened
-			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: bulbasaur,
-				Target: target{
-					Pokemon:   castform,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
-				Move:   solarBeam,
-				Damage: 12,
-			}))
+			Expect(DamageDealt(t, bulbasaur)).To(Equal(12))
 			bulbasaur.Moves[0] = moonlight
 			bulbasaur.CurrentHP = bulbasaur.MaxHP()
 			t, _ = b.SimulateRound()
 			// Moonlight heals 1/4 max HP, weather ball boosted
-			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: castform,
-				Target: target{
-					Pokemon:   bulbasaur,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
-				Move:   weatherBall,
-				Damage: 21,
-			}))
+			Expect(DamageDealt(t, castform)).To(Equal(21))
 			Expect(t).To(HaveTransaction(HealTransaction{
 				Target: bulbasaur,
 				Amount: 7,
@@ -1009,19 +812,9 @@ var _ = Describe("Fainting", func() {
 			// really gone forever? Please tell me I'm dreaming, this can't be real!"
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
-					Target: target{
-						Pokemon:   b.parties[0].pokemon()[0],
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					Target: b.getTarget(0, 0),
 				}, SendOutTransaction{
-					Target: target{
-						Pokemon:   b.parties[0].pokemon()[1],
-						party:     0,
-						partySlot: 1,
-						Team:      0,
-					},
+					Target: b.getTarget(0, 1),
 				}))
 		})
 
@@ -1041,31 +834,16 @@ var _ = Describe("Fainting", func() {
 			Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
-					Target: target{
-						Pokemon:   pkmn1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					Target: b.getTarget(0, 0),
 				},
 				SendOutTransaction{
-					Target: target{
-						Pokemon:   pkmn3,
-						party:     0,
-						partySlot: 1,
-						Team:      0,
-					},
+					Target: b.getTarget(0, 1),
 				},
 			))
 			Expect(t).ToNot(HaveTransaction(
 				DamageTransaction{
-					User: pkmn1,
-					Target: target{
-						Pokemon:   pkmn2,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   pkmn1,
+					Target: b.getTarget(1, 0),
 				},
 			))
 		})
@@ -1130,12 +908,7 @@ var _ = Describe("Fainting", func() {
 		It("should not let the holder die", func() {
 			b := setup()
 			t, _ := b.SimulateRound()
-			holderTarget := target{
-				Pokemon:   b.getPokemonInBattle(0, 0),
-				party:     0,
-				partySlot: 0,
-				Team:      0,
-			}
+			holderTarget := b.getTarget(0, 0)
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User:   b.getPokemonInBattle(1, 0),
 				Target: holderTarget,
@@ -1149,12 +922,7 @@ var _ = Describe("Fainting", func() {
 		It("should consume the focus sash after damage is applied", func() {
 			b := setup()
 			t, _ := b.SimulateRound()
-			target := target{
-				Pokemon:   b.getPokemonInBattle(0, 0),
-				party:     0,
-				partySlot: 0,
-				Team:      0,
-			}
+			target := b.getTarget(0, 0)
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
 					User:   b.getPokemonInBattle(1, 0),
@@ -1199,12 +967,7 @@ var _ = Describe("Battle end", func() {
 			Expect(ended).To(BeTrue(), "Expected SimulateRound to indicate that the battle has ended, but it did not.")
 			Expect(t).To(HaveTransactionsInOrder(
 				FaintTransaction{
-					Target: target{
-						Pokemon:   pkmn1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					Target: b.getTarget(0, 0),
 				},
 				EndBattleTransaction{
 					Reason: EndKnockout,
@@ -1213,13 +976,8 @@ var _ = Describe("Battle end", func() {
 			))
 			Expect(t).ToNot(HaveTransaction(
 				DamageTransaction{
-					User: pkmn1,
-					Target: target{
-						Pokemon:   pkmn2,
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-					},
+					User:   pkmn1,
+					Target: b.getTarget(1, 0),
 				},
 			))
 			Expect(b.GetResults().Winner).To(Equal(1))
@@ -1278,22 +1036,12 @@ var _ = Describe("Status Conditions", func() {
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: target{
-					Pokemon:   pkmn1,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
+				Target:       b.getTarget(0, 0),
 				Damage:       1,
 				StatusEffect: StatusPoison,
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: target{
-					Pokemon:   pkmn2,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
+				Target:       b.getTarget(1, 0),
 				Damage:       1,
 				StatusEffect: StatusBurn,
 			}))
@@ -1308,12 +1056,7 @@ var _ = Describe("Status Conditions", func() {
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: target{
-					Pokemon:   pkmn1,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
+				Target:       b.getTarget(0, 0),
 				Damage:       12,
 				StatusEffect: StatusBadlyPoison,
 			}))
@@ -1329,12 +1072,7 @@ var _ = Describe("Status Conditions", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				ImmobilizeTransaction{
-					Target: target{
-						Pokemon:   pkmn1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					Target:       b.getTarget(0, 0),
 					StatusEffect: StatusParalyze,
 				},
 			))
@@ -1350,12 +1088,7 @@ var _ = Describe("Status Conditions", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				ImmobilizeTransaction{
-					Target: target{
-						Pokemon:   pkmn1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					Target:       b.getTarget(0, 0),
 					StatusEffect: StatusFreeze,
 				},
 			))
@@ -1376,12 +1109,7 @@ var _ = Describe("Status Conditions", func() {
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransaction(
 					ImmobilizeTransaction{
-						Target: target{
-							Pokemon:   pkmn1,
-							party:     0,
-							partySlot: 0,
-							Team:      0,
-						},
+						Target:       b.getTarget(0, 0),
 						StatusEffect: StatusSleep,
 					},
 				))
@@ -1402,12 +1130,7 @@ var _ = Describe("Status Conditions", func() {
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransaction(
 					CureStatusTransaction{
-						Target: target{
-							Pokemon:   pkmn1,
-							party:     0,
-							partySlot: 0,
-							Team:      0,
-						},
+						Target:       b.getTarget(0, 0),
 						StatusEffect: StatusSleep,
 					},
 				))
@@ -1445,12 +1168,7 @@ var _ = Describe("Status Conditions", func() {
 					t, _ := b.SimulateRound()
 					Expect(t).ToNot(HaveTransaction(
 						ImmobilizeTransaction{
-							Target: target{
-								Pokemon:   pkmn1,
-								party:     0,
-								partySlot: 0,
-								Team:      0,
-							},
+							Target:       b.getTarget(0, 0),
 							StatusEffect: StatusSleep,
 						},
 					))
@@ -1468,24 +1186,14 @@ var _ = Describe("Status Conditions", func() {
 			b.rng = AlwaysRNG()
 			Expect(b.Start()).To(Succeed())
 			b.QueueTransaction(CureStatusTransaction{
-				Target: target{
-					Pokemon:   pkmn1,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
+				Target:       b.getTarget(0, 0),
 				StatusEffect: StatusParalyze,
 			})
 			b.ProcessQueue()
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(
 				CureStatusTransaction{
-					Target: target{
-						Pokemon:   pkmn1,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					Target:       b.getTarget(0, 0),
 					StatusEffect: StatusParalyze,
 				},
 			))
@@ -1636,12 +1344,7 @@ var _ = Describe("Misc/held items", func() {
 				Amount: holder.MaxHP() / 16,
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: target{
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-					Pokemon:   holder,
-				},
+				Target: b.getTarget(1, 0),
 				Damage: holder.MaxHP() / 8,
 			}))
 		})
@@ -1673,24 +1376,10 @@ var _ = Describe("Misc/held items", func() {
 			holder.Moves[0] = GetMove(MoveTackle)
 			t, _ := b.SimulateRound()
 			// Boost damage by 30%
-			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: holder,
-				Target: target{
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-					Pokemon:   b.getPokemonInBattle(0, 0),
-				},
-				Damage: 32,
-			}))
+			Expect(DamageDealt(t, holder)).To(Equal(32))
 			// Take 10% of max HP
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: target{
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-					Pokemon:   holder,
-				},
+				Target: b.getTarget(1, 0),
 				Damage: holder.MaxHP() / 10,
 			}))
 		})
@@ -1700,16 +1389,7 @@ var _ = Describe("Misc/held items", func() {
 			holder.Moves[0] = GetMove(MoveTackle)
 			t, _ := b.SimulateRound()
 			// Boost physical move damage by 10%
-			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: holder,
-				Target: target{
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-					Pokemon:   b.getPokemonInBattle(0, 0),
-				},
-				Damage: 27,
-			}))
+			Expect(DamageDealt(t, holder)).To(Equal(27))
 		})
 
 		It("handles Shell Bell", func() {
@@ -1718,12 +1398,7 @@ var _ = Describe("Misc/held items", func() {
 			t, _ := b.SimulateRound()
 			// Self-inflict 1/8 of dealt damage
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: target{
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-					Pokemon:   holder,
-				},
+				Target: b.getTarget(1, 0),
 				Damage: 3,
 			}))
 		})
@@ -1747,16 +1422,7 @@ var _ = Describe("Misc/held items", func() {
 			holder.Moves[0] = GetMove(MoveSurf)
 			t, _ := b.SimulateRound()
 			// Boost special move damage by 10%
-			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: holder,
-				Target: target{
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-					Pokemon:   b.getPokemonInBattle(0, 0),
-				},
-				Damage: 16,
-			}))
+			Expect(DamageDealt(t, holder)).To(Equal(16))
 		})
 
 		DescribeTable("Accuracy/evasion items",
@@ -1780,12 +1446,7 @@ var _ = Describe("Misc/held items", func() {
 				holder.StatusEffects.apply(status)
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransaction(CureStatusTransaction{
-					Target: target{
-						party:     1,
-						partySlot: 0,
-						Team:      1,
-						Pokemon:   holder,
-					},
+					Target:       b.getTarget(1, 0),
 					StatusEffect: status,
 				}))
 				// Item should be consumed after use
@@ -1855,12 +1516,7 @@ var _ = Describe("In-a-pinch Berries", func() {
 			t, _ := b.SimulateRound()
 
 			Expect(t).To(HaveTransaction(ItemTransaction{
-				Target: target{
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-					Pokemon:   holder,
-				},
+				Target: b.getTarget(1, 0),
 				IsHeld: true,
 				Item:   holder.HeldItem,
 			}))
@@ -1869,8 +1525,8 @@ var _ = Describe("In-a-pinch Berries", func() {
 				Stat:   stat,
 				Stages: stages,
 			}))
-			Expect(b.parties[0].activePokemon[0].HeldItem).To(Equal(ItemNone))
-			Expect(b.parties[1].activePokemon[0].HeldItem).To(Equal(ItemNone))
+			Expect(b.getPokemonInBattle(0, 0).HeldItem).To(Equal(ItemNone))
+			Expect(b.getPokemonInBattle(1, 0).HeldItem).To(Equal(ItemNone))
 		},
 		Entry("Apicot Berry", ItemApicotBerry, StatSpDef, 1),
 		Entry("Ganlon Berry", ItemGanlonBerry, StatDef, 1),
@@ -1908,16 +1564,10 @@ var _ = Describe("Draining moves", func() {
 
 	It("should damage the target and heal the user", func() {
 		t, _ := b.SimulateRound()
-
 		Expect(t).To(HaveTransactionsInOrder(
 			DamageTransaction{
-				User: b.getPokemonInBattle(0, 0),
-				Target: target{
-					Pokemon:   b.getPokemonInBattle(1, 0),
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
+				User:   b.getPokemonInBattle(0, 0),
+				Target: b.getTarget(1, 0),
 				Damage: 61,
 			},
 			HealTransaction{
@@ -1933,13 +1583,8 @@ var _ = Describe("Draining moves", func() {
 
 		Expect(t).To(HaveTransactionsInOrder(
 			DamageTransaction{
-				User: b.getPokemonInBattle(0, 0),
-				Target: target{
-					Pokemon:   b.getPokemonInBattle(1, 0),
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
+				User:   b.getPokemonInBattle(0, 0),
+				Target: b.getTarget(1, 0),
 				Damage: 61,
 			},
 			HealTransaction{
