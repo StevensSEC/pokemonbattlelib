@@ -1508,7 +1508,118 @@ var _ = Describe("Misc/held items", func() {
 		return b, holder
 	}
 
-	Context("when Pokemon hold certain misc. items in battle", func() {
+	When("Pokemon hold bad held items in battle", func() {
+		DescribeTable("Inflicts status after turn",
+			func(item Item, status StatusCondition) {
+				b, holder := setup(item, PkmnBulbasaur)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(InflictStatusTransaction{
+					Target:       holder,
+					StatusEffect: status,
+				}))
+			},
+			Entry("Flame Orb", ItemFlameOrb, StatusBurn),
+			Entry("Toxic Orb", ItemToxicOrb, StatusBadlyPoison),
+		)
+
+		DescribeTable("Move last in priority bracket items",
+			func(item Item) {
+				b, _ := setup(item, PkmnMagikarp)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransactionsInOrder(
+					MoveFailTransaction{
+						User:   b.getPokemonInBattle(0, 0),
+						Reason: FailOther,
+					},
+					MoveFailTransaction{
+						User:   b.getPokemonInBattle(1, 0),
+						Reason: FailOther,
+					},
+				))
+			},
+			Entry("Full Incense", ItemFullIncense),
+			Entry("Lagging Tail", ItemLaggingTail),
+		)
+
+		DescribeTable("Choice Items",
+			func(item Item, stat func(*Pokemon) uint) {
+				b, holder := setup(item, PkmnMachamp)
+				b.SimulateRound()
+				// Restricts user to one move
+				Expect(holder.metadata[MetaLastMove]).To(BeEquivalentTo(GetMove(MoveSplash)))
+				// Stats are boosted by 50%
+				effective := stat(holder)
+				holder.HeldItem = ItemNone
+				Expect(stat(holder)).To(BeNumerically("<", effective))
+			},
+			Entry("Choice Band", ItemChoiceBand, func(p *Pokemon) uint { return p.Attack() }),
+			Entry("Choice Scarf", ItemChoiceScarf, func(p *Pokemon) uint { return p.Speed() }),
+			Entry("Choice Specs", ItemChoiceSpecs, func(p *Pokemon) uint { return p.SpecialAttack() }),
+		)
+
+		It("handles Iron Ball", func() {
+			b, holder := setup(ItemIronBall, PkmnPidgeot)
+			attacker := b.getPokemonInBattle(0, 0)
+			attacker.Moves[0] = GetMove(MoveEarthquake)
+			// Flying immunity negated
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: attacker,
+				Target: target{
+					Pokemon:   holder,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Move:   GetMove(MoveEarthquake),
+				Damage: 36,
+			}))
+			speed := holder.Speed()
+			holder.HeldItem = ItemNone
+			Expect(holder.Speed()).To(BeNumerically(">", speed))
+		})
+
+		It("handles Sticky Barb", func() {
+			b, holder := setup(ItemStickyBarb, PkmnGrimer)
+			attacker := b.getPokemonInBattle(0, 0)
+			t, _ := b.SimulateRound()
+			// Holder takes 1/8 HP damage after every turn
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					Pokemon:   holder,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Damage: holder.MaxHP() / 8,
+			}))
+			// Contact moves damage attacker and pass the sticky barb to the attacker
+			attacker.Moves[0] = GetMove(MoveTackle)
+			t, _ = b.SimulateRound()
+			Expect(t).To(HaveTransactionsInOrder(
+				DamageTransaction{
+					Target: target{
+						Pokemon:   attacker,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Damage: attacker.MaxHP() / 8,
+				},
+				GiveItemTransaction{
+					Target: attacker,
+					Item:   ItemStickyBarb,
+				},
+				GiveItemTransaction{
+					Target: holder,
+					Item:   ItemNone,
+				},
+			))
+			Expect(attacker.HeldItem).To(BeEquivalentTo(ItemStickyBarb))
+		})
+	})
+
+	When("Pokemon hold certain misc. items in battle", func() {
 		It("handles Black Sludge", func() {
 			// Heal poison types for 1/16 HP
 			b, holder := setup(ItemBlackSludge, PkmnGrimer)

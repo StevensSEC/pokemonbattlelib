@@ -23,9 +23,6 @@ func (t DamageTransaction) Mutate(b *Battle) {
 		t.Damage = 1
 	}
 	receiver := t.Target.Pokemon
-	if t.Move != nil {
-		t.User.metadata[MetaLastMove] = t.Move
-	}
 	if receiver.CurrentHP >= t.Damage {
 		receiver.CurrentHP -= t.Damage
 	} else {
@@ -118,7 +115,6 @@ func (t ItemTransaction) Mutate(b *Battle) {
 	// ItemCategoryMedicine
 	case ItemPotion:
 		b.QueueTransaction(target.RestoreHP(20))
-
 	// ItemCategoryInAPinch
 	case ItemApicotBerry:
 		b.QueueTransaction(ModifyStatTransaction{
@@ -195,7 +191,24 @@ func (t ItemTransaction) Mutate(b *Battle) {
 				})
 			}
 		}
+	// ItemCategoryBadHeldItems
+	case ItemFlameOrb:
+		b.QueueTransaction(InflictStatusTransaction{
+			Target:       t.Target.Pokemon,
+			StatusEffect: StatusBurn,
+		})
+	case ItemStickyBarb:
+		b.QueueTransaction(DamageTransaction{
+			Target: t.Target,
+			Damage: target.MaxHP() / 8,
+		})
+	case ItemToxicOrb:
+		b.QueueTransaction(InflictStatusTransaction{
+			Target:       t.Target.Pokemon,
+			StatusEffect: StatusBadlyPoison,
+		})
 	}
+	// In a pinch consumption
 	if target.HeldItem.Category() == ItemCategoryInAPinch && target.CurrentHP <= target.Stats[StatHP]/4 {
 		b.QueueTransaction(ItemTransaction{
 			Target: t.Target,
@@ -225,6 +238,16 @@ func (t PPTransaction) Mutate(b *Battle) {
 			t.Move.CurrentPP = t.Move.MaxPP
 		}
 	}
+}
+
+// A transaction to change the held item of a Pokemon
+type GiveItemTransaction struct {
+	Target *Pokemon
+	Item   Item
+}
+
+func (t GiveItemTransaction) Mutate(b *Battle) {
+	t.Target.HeldItem = t.Item
 }
 
 // A transaction to restore HP to a Pokemon.
