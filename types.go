@@ -25,8 +25,8 @@ const (
 // Table of critical hit chances (denominator of 1/X)
 var CritChances = [5]int{16, 8, 4, 3, 2}
 
-// Table for evasion multiplier
-var EvasionFactor = map[int]uint{
+// Table for accuracy/evasion multiplier
+var AccuracyEvasionMultiplier = map[int]uint{
 	-6: 300,
 	-5: 266,
 	-4: 250,

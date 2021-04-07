@@ -324,10 +324,16 @@ func (p *Pokemon) CritChance() int {
 	return CritChances[stage]
 }
 
+// Returns multiplier for accuracy
+func (p *Pokemon) Accuracy() uint {
+	stage := p.StatModifiers[StatAccuracy]
+	return AccuracyEvasionMultiplier[stage]
+}
+
 // Returns multiplier for evasion
 func (p *Pokemon) Evasion() uint {
 	stage := p.StatModifiers[StatEvasion]
-	return EvasionFactor[stage]
+	return AccuracyEvasionMultiplier[stage]
 }
 
 // display a Pokemon close to how it would appear in a Pokemon battle
