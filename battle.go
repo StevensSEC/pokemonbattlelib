@@ -713,7 +713,8 @@ func (b *Battle) GetResults() BattleResults {
 
 // Results for a Battle.
 type BattleResults struct {
-	Winner int // The team that won the battle.
+	Winner  int // The team that won the battle.
+	Parties []*Party
 }
 
 // An abstraction over all possible actions an `Agent` can make in one round. Each Pokemon gets one turn.

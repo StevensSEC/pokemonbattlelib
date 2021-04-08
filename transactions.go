@@ -357,6 +357,9 @@ type EndBattleTransaction struct {
 func (t EndBattleTransaction) Mutate(b *Battle) {
 	b.State = BattleEnd
 	b.results.Winner = t.Winner
+	for _, p := range b.parties {
+		b.results.Parties = append(b.results.Parties, p.Party)
+	}
 }
 
 // Handles pre-turn status checks. (Paralysis, Sleeping, etc.)

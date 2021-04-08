@@ -17,6 +17,7 @@ func buildRouter() *http.ServeMux {
 	mux.HandleFunc("/battle/simulate", HandleBattleSimulate)
 	mux.HandleFunc("/battle/context", HandleBattleContext)
 	mux.HandleFunc("/battle/act", HandleBattleAct)
+	mux.HandleFunc("/battle/results", HandleBattleResults)
 	mux.HandleFunc("/agent/dumb", HandleDumbAgent)
 	return mux
 }
@@ -267,6 +268,25 @@ func HandleBattleAct(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(200)
 	respondSuccess(w, true)
+}
+
+func HandleBattleResults(w http.ResponseWriter, r *http.Request) {
+	battleId := parseNumberArg(r, "id")
+	hb := battles[battleId]
+
+	results := hb.Battle.GetResults()
+
+	bytes, err := json.Marshal(results)
+	if err != nil {
+		log.Printf("Failed to marshal into JSON: %s", err)
+		w.WriteHeader(500)
+		w.Write([]byte(`Internal server error: failed to marshal battle results`))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	w.Write(bytes)
 }
 
 func HandleDumbAgent(w http.ResponseWriter, r *http.Request) {
