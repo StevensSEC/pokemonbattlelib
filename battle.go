@@ -426,6 +426,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Amount: drain,
 					})
 				}
+				if move.FlinchChance() > 0 && b.rng.Roll(move.FlinchChance(), 100) {
+					b.QueueTransaction(InflictStatusTransaction{
+						Target:       receiver,
+						StatusEffect: StatusFlinch,
+					})
+				}
 				// Other item effects in battle
 				switch user.HeldItem {
 				case ItemKingsRock, ItemRazorFang:

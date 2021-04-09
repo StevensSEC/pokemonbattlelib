@@ -1668,3 +1668,31 @@ var _ = Describe("Draining moves", func() {
 		))
 	})
 })
+
+var _ = Describe("Move Effects", func() {
+	a1 := Agent(new(dumbAgent))
+
+	It("should cause flinching", func() {
+		b := New1v1Battle(
+			GeneratePokemon(PkmnMightyena, WithLevel(20), WithIVs([6]uint8{0, 0, 0, 0, 0, 31}), WithEVs([6]uint8{0, 0, 0, 0, 0, 252}), WithMoves(MoveBite)), &a1,
+			GeneratePokemon(PkmnPonyta, WithLevel(20), WithIVs([6]uint8{31, 0, 31, 0, 31, 0}), WithEVs([6]uint8{252, 0, 0, 0, 0, 0}), WithMoves(MoveTackle)), &a1,
+		)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(DamageTransaction{
+			User:   b.getPokemonInBattle(0, 0),
+			Target: b.getTarget(1, 0),
+		}))
+		Expect(t).To(HaveTransactionsInOrder(
+			InflictStatusTransaction{
+				Target:       b.getPokemonInBattle(1, 0),
+				StatusEffect: StatusFlinch,
+			},
+			ImmobilizeTransaction{
+				Target:       b.getTarget(1, 0),
+				StatusEffect: StatusFlinch,
+			},
+		))
+	})
+})
