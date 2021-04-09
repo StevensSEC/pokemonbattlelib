@@ -471,7 +471,7 @@ var _ = Describe("Turn priority", func() {
 		It("should handle moves with higher priority first", func() {
 			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(5), WithMoves(MovePound))
 			p1.Stats[StatSpeed] = 100
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(5), WithMoves(MoveFakeOut))
+			p2 := GeneratePokemon(PkmnCharmander, WithLevel(5), WithMoves(MoveQuickAttack))
 			p2.Stats[StatSpeed] = 10
 			b := New1v1Battle(p1, &a1, p2, &a2)
 			b.rng = SimpleRNG()
@@ -482,7 +482,7 @@ var _ = Describe("Turn priority", func() {
 					User:   p2,
 					Target: b.getTarget(0, 0),
 					Damage: 5,
-					Move:   GetMove(MoveFakeOut),
+					Move:   GetMove(MoveQuickAttack),
 				},
 				DamageTransaction{
 					User:   p1,
