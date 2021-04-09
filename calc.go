@@ -14,7 +14,7 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	// Weather modifiers
 	if weather == WeatherSandstorm {
 		if receiver.EffectiveType()&TypeRock != 0 {
-			defense *= (defense * 150) / 100
+			defense = (defense * 150) / 100
 		}
 		if move.Id == MoveSolarBeam {
 			movePower /= 2
