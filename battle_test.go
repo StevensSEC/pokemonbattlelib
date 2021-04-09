@@ -1025,7 +1025,7 @@ var _ = Describe("Status Conditions", func() {
 		})
 	})
 
-	Context("when a Pokemon has a status effect, it affects the Pokemon in battle", func() {
+	Context("when a Pokemon has a nonvolatile status effect, it affects the Pokemon in battle", func() {
 		It("should inflict burn and poison damage", func() {
 			pkmn1 := GeneratePokemon(PkmnBulbasaur, defaultMoveOpt)
 			pkmn1.StatusEffects = StatusPoison
@@ -1197,6 +1197,61 @@ var _ = Describe("Status Conditions", func() {
 					StatusEffect: StatusParalyze,
 				},
 			))
+		})
+	})
+
+	Context("Flinching", func() {
+		setup := func() *Battle {
+			b := New1v1Battle(
+				GeneratePokemon(PkmnPikachu, WithLevel(5), WithMoves(MoveTackle)), &a1,
+				GeneratePokemon(PkmnFlareon, WithLevel(5), WithMoves(MoveTackle)), &a1,
+			)
+			b.rng = SimpleRNG()
+			Expect(b.Start()).To(Succeed())
+			pikachu := b.getPokemonInBattle(0, 0)
+			b.QueueTransaction(InflictStatusTransaction{
+				Target:       pikachu,
+				StatusEffect: StatusFlinch,
+			})
+			b.ProcessQueue()
+			Expect(pikachu.StatusEffects.check(StatusFlinch)).To(BeTrue())
+			return b
+		}
+
+		It("should not allow flinching pokemon to attack", func() {
+			b := setup()
+			pikachu := b.getPokemonInBattle(0, 0)
+			t, _ := b.SimulateRound()
+			Expect(t).To(Not(HaveTransaction(DamageTransaction{
+				User: pikachu,
+			})))
+			Expect(t).To(HaveTransaction(ImmobilizeTransaction{
+				Target:       b.getTarget(0, 0),
+				StatusEffect: StatusFlinch,
+			}))
+		})
+
+		It("should not remain flinched after the round has ended", func() {
+			b := setup()
+			pikachu := b.getPokemonInBattle(0, 0)
+			b.SimulateRound()
+			Expect(pikachu.StatusEffects.check(StatusFlinch)).To(BeFalse())
+		})
+
+		It("should be immobilized because of flinching, not paralysis", func() {
+			b := setup()
+			pikachu := b.getPokemonInBattle(0, 0)
+			b.QueueTransaction(InflictStatusTransaction{
+				Target:       pikachu,
+				StatusEffect: StatusParalyze,
+			})
+			b.ProcessQueue()
+			b.rng = NeverRNG()
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(ImmobilizeTransaction{
+				Target:       b.getTarget(0, 0),
+				StatusEffect: StatusFlinch,
+			}))
 		})
 	})
 })
