@@ -252,18 +252,14 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				}
 				if immobilize {
 					b.QueueTransaction(ImmobilizeTransaction{
-						Target: target{
-							Pokemon: user,
-						},
+						Target:       turn.User,
 						StatusEffect: status,
 					})
 					continue // forfeit turn
 				}
 			} else if user.StatusEffects.check(StatusSleep) && move.Id != MoveSnore && move.Id != MoveSleepTalk {
 				b.QueueTransaction(ImmobilizeTransaction{
-					Target: target{
-						Pokemon: user,
-					},
+					Target:       turn.User,
 					StatusEffect: StatusSleep,
 				})
 				continue // forfeit turn
