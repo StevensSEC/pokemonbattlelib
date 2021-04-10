@@ -275,6 +275,13 @@ func (t InflictStatusTransaction) Mutate(b *Battle) {
 	if t.StatusEffect.check(StatusSleep) {
 		t.Target.metadata[MetaSleepTime] = b.rng.Get(1, 5)
 	}
+	if t.Target.Ability == AbilitySteadfast && t.StatusEffect.check(StatusFlinch) {
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: t.Target,
+			Stat:   StatSpeed,
+			Stages: 1,
+		})
+	}
 }
 
 type CureStatusTransaction struct {

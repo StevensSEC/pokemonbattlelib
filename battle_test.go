@@ -471,7 +471,7 @@ var _ = Describe("Turn priority", func() {
 		It("should handle moves with higher priority first", func() {
 			p1 := GeneratePokemon(PkmnBulbasaur, WithLevel(5), WithMoves(MovePound))
 			p1.Stats[StatSpeed] = 100
-			p2 := GeneratePokemon(PkmnCharmander, WithLevel(5), WithMoves(MoveFakeOut))
+			p2 := GeneratePokemon(PkmnCharmander, WithLevel(5), WithMoves(MoveQuickAttack))
 			p2.Stats[StatSpeed] = 10
 			b := New1v1Battle(p1, &a1, p2, &a2)
 			b.rng = SimpleRNG()
@@ -482,7 +482,7 @@ var _ = Describe("Turn priority", func() {
 					User:   p2,
 					Target: b.getTarget(0, 0),
 					Damage: 5,
-					Move:   GetMove(MoveFakeOut),
+					Move:   GetMove(MoveQuickAttack),
 				},
 				DamageTransaction{
 					User:   p1,
@@ -1025,7 +1025,7 @@ var _ = Describe("Status Conditions", func() {
 		})
 	})
 
-	Context("when a Pokemon has a status effect, it affects the Pokemon in battle", func() {
+	Context("when a Pokemon has a nonvolatile status effect, it affects the Pokemon in battle", func() {
 		It("should inflict burn and poison damage", func() {
 			pkmn1 := GeneratePokemon(PkmnBulbasaur, defaultMoveOpt)
 			pkmn1.StatusEffects = StatusPoison
@@ -1197,6 +1197,61 @@ var _ = Describe("Status Conditions", func() {
 					StatusEffect: StatusParalyze,
 				},
 			))
+		})
+	})
+
+	Context("Flinching", func() {
+		setup := func() *Battle {
+			b := New1v1Battle(
+				GeneratePokemon(PkmnPikachu, WithLevel(5), WithMoves(MoveTackle)), &a1,
+				GeneratePokemon(PkmnFlareon, WithLevel(5), WithMoves(MoveTackle)), &a1,
+			)
+			b.rng = SimpleRNG()
+			Expect(b.Start()).To(Succeed())
+			pikachu := b.getPokemonInBattle(0, 0)
+			b.QueueTransaction(InflictStatusTransaction{
+				Target:       pikachu,
+				StatusEffect: StatusFlinch,
+			})
+			b.ProcessQueue()
+			Expect(pikachu.StatusEffects.check(StatusFlinch)).To(BeTrue())
+			return b
+		}
+
+		It("should not allow flinching pokemon to attack", func() {
+			b := setup()
+			pikachu := b.getPokemonInBattle(0, 0)
+			t, _ := b.SimulateRound()
+			Expect(t).To(Not(HaveTransaction(DamageTransaction{
+				User: pikachu,
+			})))
+			Expect(t).To(HaveTransaction(ImmobilizeTransaction{
+				Target:       b.getTarget(0, 0),
+				StatusEffect: StatusFlinch,
+			}))
+		})
+
+		It("should not remain flinched after the round has ended", func() {
+			b := setup()
+			pikachu := b.getPokemonInBattle(0, 0)
+			b.SimulateRound()
+			Expect(pikachu.StatusEffects.check(StatusFlinch)).To(BeFalse())
+		})
+
+		It("should be immobilized because of flinching, not paralysis", func() {
+			b := setup()
+			pikachu := b.getPokemonInBattle(0, 0)
+			b.QueueTransaction(InflictStatusTransaction{
+				Target:       pikachu,
+				StatusEffect: StatusParalyze,
+			})
+			b.ProcessQueue()
+			b.rng = NeverRNG()
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(ImmobilizeTransaction{
+				Target:       b.getTarget(0, 0),
+				StatusEffect: StatusFlinch,
+			}))
 		})
 	})
 })
@@ -1610,6 +1665,63 @@ var _ = Describe("Draining moves", func() {
 			HealTransaction{
 				Target: b.getPokemonInBattle(0, 0),
 				Amount: 39,
+			},
+		))
+	})
+})
+
+var _ = Describe("Move Effects", func() {
+	a1 := Agent(new(dumbAgent))
+
+	It("should cause flinching", func() {
+		b := New1v1Battle(
+			GeneratePokemon(PkmnMightyena, WithLevel(20), WithIVs([6]uint8{0, 0, 0, 0, 0, 31}), WithEVs([6]uint8{0, 0, 0, 0, 0, 252}), WithMoves(MoveBite)), &a1,
+			GeneratePokemon(PkmnPonyta, WithLevel(20), WithIVs([6]uint8{31, 0, 31, 0, 31, 0}), WithEVs([6]uint8{252, 0, 0, 0, 0, 0}), WithMoves(MoveTackle)), &a1,
+		)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(DamageTransaction{
+			User:   b.getPokemonInBattle(0, 0),
+			Target: b.getTarget(1, 0),
+		}))
+		Expect(t).To(HaveTransactionsInOrder(
+			InflictStatusTransaction{
+				Target:       b.getPokemonInBattle(1, 0),
+				StatusEffect: StatusFlinch,
+			},
+			ImmobilizeTransaction{
+				Target:       b.getTarget(1, 0),
+				StatusEffect: StatusFlinch,
+			},
+		))
+	})
+
+	It("should raise speed on flinch for pokemon with steadfast ability", func() {
+		b := New1v1Battle(
+			GeneratePokemon(PkmnMightyena, WithLevel(20), WithIVs([6]uint8{0, 0, 0, 0, 0, 31}), WithEVs([6]uint8{0, 0, 0, 0, 0, 252}), WithMoves(MoveBite)), &a1,
+			GeneratePokemon(PkmnPonyta, WithLevel(20), WithIVs([6]uint8{31, 0, 31, 0, 31, 0}), WithEVs([6]uint8{252, 0, 0, 0, 0, 0}), WithMoves(MoveTackle), WithAbility(AbilitySteadfast)), &a1,
+		)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(DamageTransaction{
+			User:   b.getPokemonInBattle(0, 0),
+			Target: b.getTarget(1, 0),
+		}))
+		Expect(t).To(HaveTransactionsInOrder(
+			InflictStatusTransaction{
+				Target:       b.getPokemonInBattle(1, 0),
+				StatusEffect: StatusFlinch,
+			},
+			ModifyStatTransaction{
+				Target: b.getPokemonInBattle(1, 0),
+				Stat:   StatSpeed,
+				Stages: 1,
+			},
+			ImmobilizeTransaction{
+				Target:       b.getTarget(1, 0),
+				StatusEffect: StatusFlinch,
 			},
 		))
 	})

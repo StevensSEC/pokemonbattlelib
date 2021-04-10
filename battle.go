@@ -238,27 +238,28 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		case FightTurn:
 			move := user.Moves[t.Move]
 			// pre-move checks
-			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) {
+			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) || user.StatusEffects.check(StatusFlinch) {
 				immobilize := false
+				status := user.StatusEffects & StatusNonvolatileMask
 				if user.StatusEffects.check(StatusFreeze) {
 					immobilize = b.rng.Roll(4, 5)
 				} else if user.StatusEffects.check(StatusParalyze) {
 					immobilize = b.rng.Roll(1, 4)
 				}
+				if user.StatusEffects.check(StatusFlinch) {
+					immobilize = true
+					status = StatusFlinch
+				}
 				if immobilize {
 					b.QueueTransaction(ImmobilizeTransaction{
-						Target: target{
-							Pokemon: user,
-						},
-						StatusEffect: user.StatusEffects & StatusNonvolatileMask,
+						Target:       turn.User,
+						StatusEffect: status,
 					})
 					continue // forfeit turn
 				}
 			} else if user.StatusEffects.check(StatusSleep) && move.Id != MoveSnore && move.Id != MoveSleepTalk {
 				b.QueueTransaction(ImmobilizeTransaction{
-					Target: target{
-						Pokemon: user,
-					},
+					Target:       turn.User,
 					StatusEffect: StatusSleep,
 				})
 				continue // forfeit turn
@@ -425,6 +426,12 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Amount: drain,
 					})
 				}
+				if move.FlinchChance() > 0 && b.rng.Roll(move.FlinchChance(), 100) {
+					b.QueueTransaction(InflictStatusTransaction{
+						Target:       receiver,
+						StatusEffect: StatusFlinch,
+					})
+				}
 				// Other item effects in battle
 				switch user.HeldItem {
 				case ItemKingsRock, ItemRazorFang:
@@ -497,6 +504,8 @@ func (b *Battle) postRound() {
 				StatusEffect: cond,
 			})
 		}
+		pkmn.StatusEffects.clear(StatusFlinch) // Flinching only occurs over the course of a single turn. It never bleeds over into the next turn.
+
 		// Weather effects
 		// TODO: check for weather resisting abilities
 		if b.Weather == WeatherSandstorm {
