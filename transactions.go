@@ -112,7 +112,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		// TODO: remove consumed item from party's inventory
 	}
 	switch t.Item {
-	// ItemCategoryMedicine
+	// ItemCategoryHealing
 	case ItemBerryJuice, ItemPotion:
 		b.QueueTransaction(HealTransaction{
 			Target: target,
@@ -174,6 +174,31 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		b.QueueTransaction(HealTransaction{
 			Target: target,
 			Amount: 60,
+		})
+	// ItemCategoryPPRecovery
+	case ItemElixir:
+		for _, m := range target.Moves {
+			b.QueueTransaction(PPTransaction{
+				Move:   m,
+				Amount: 10,
+			})
+		}
+	case ItemEther:
+		b.QueueTransaction(PPTransaction{
+			Move:   t.Move,
+			Amount: 10,
+		})
+	case ItemMaxElixir:
+		for _, m := range target.Moves {
+			b.QueueTransaction(PPTransaction{
+				Move:   m,
+				Amount: int8(m.MaxPP),
+			})
+		}
+	case ItemMaxEther:
+		b.QueueTransaction(PPTransaction{
+			Move:   t.Move,
+			Amount: int8(t.Move.MaxPP),
 		})
 	// ItemCategoryInAPinch
 	case ItemApicotBerry:
