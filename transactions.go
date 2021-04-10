@@ -125,7 +125,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		})
 		b.QueueTransaction(FriendshipTransaction{
 			Target: target,
-			Amount: [3]int{-5, -5, -10}[target.Friendship],
+			Amount: [3]int{-5, -5, -10}[target.Friendship/100],
 		})
 	case ItemEnergyRoot:
 		b.QueueTransaction(HealTransaction{
@@ -134,7 +134,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		})
 		b.QueueTransaction(FriendshipTransaction{
 			Target: target,
-			Amount: [3]int{-10, -10, -15}[target.Friendship],
+			Amount: [3]int{-10, -10, -15}[target.Friendship/100],
 		})
 	case ItemFreshWater:
 		b.QueueTransaction(HealTransaction{
@@ -200,6 +200,36 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			Move:   t.Move,
 			Amount: int8(t.Move.MaxPP),
 		})
+	// ItemCategoryRevival
+	case ItemMaxRevive:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: target.MaxHP(),
+		})
+	case ItemRevivalHerb:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: target.MaxHP(),
+		})
+		b.QueueTransaction(FriendshipTransaction{
+			Target: target,
+			Amount: [3]int{-15, -15, -20}[target.Friendship/100],
+		})
+	case ItemRevive:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: target.MaxHP() / 2,
+		})
+	case ItemSacredAsh:
+		for _, btarget := range b.GetTargetsRef() {
+			pkmn := btarget.Pokemon
+			if btarget.party == t.Target.party && pkmn.CurrentHP == 0 {
+				b.QueueTransaction(HealTransaction{
+					Target: pkmn,
+					Amount: pkmn.MaxHP(),
+				})
+			}
+		}
 	// ItemCategoryInAPinch
 	case ItemApicotBerry:
 		b.QueueTransaction(ModifyStatTransaction{
