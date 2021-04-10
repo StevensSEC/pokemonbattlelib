@@ -143,7 +143,11 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			Stages: 1,
 		})
 	case ItemMicleBerry:
-		// TODO: Perfect accuracy for next move
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: target,
+			Stat:   StatAccuracy,
+			Stages: 1,
+		})
 	case ItemPetayaBerry:
 		b.QueueTransaction(ModifyStatTransaction{
 			Target: target,
