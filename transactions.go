@@ -175,9 +175,17 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			Target: target,
 			Amount: 60,
 		})
+	case ItemSuperPotion:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: 50,
+		})
 	// ItemCategoryPPRecovery
 	case ItemElixir:
 		for _, m := range target.Moves {
+			if m == nil {
+				continue
+			}
 			b.QueueTransaction(PPTransaction{
 				Move:   m,
 				Amount: 10,
@@ -190,6 +198,9 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		})
 	case ItemMaxElixir:
 		for _, m := range target.Moves {
+			if m == nil {
+				continue
+			}
 			b.QueueTransaction(PPTransaction{
 				Move:   m,
 				Amount: int8(m.MaxPP),

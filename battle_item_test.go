@@ -1,0 +1,444 @@
+package pokemonbattlelib
+
+import (
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/gomega"
+)
+
+var _ = Describe("Misc. + Held Items", func() {
+	a1 := Agent(new(dumbAgent))
+	a2 := Agent(new(dumbAgent))
+	var holder *Pokemon
+
+	setup := func(item Item, pkmn int) (*Battle, *Pokemon) {
+		p1 := GeneratePokemon(PkmnSnorlax, WithLevel(25), WithMoves(MoveSplash))
+		holder = GeneratePokemon(pkmn, WithLevel(25), WithMoves(MoveSplash))
+		holder.HeldItem = item
+		b := New1v1Battle(p1, &a1, holder, &a2)
+		b.rng = SimpleRNG()
+		Expect(b.Start()).To(Succeed())
+		return b, holder
+	}
+
+	Context("Bad Held Items", func() {
+		DescribeTable("Inflicts status after turn",
+			func(item Item, status StatusCondition) {
+				b, holder := setup(item, PkmnBulbasaur)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(InflictStatusTransaction{
+					Target:       holder,
+					StatusEffect: status,
+				}))
+			},
+			Entry("Flame Orb", ItemFlameOrb, StatusBurn),
+			Entry("Toxic Orb", ItemToxicOrb, StatusBadlyPoison),
+		)
+
+		DescribeTable("Move last in priority bracket",
+			func(item Item) {
+				b, _ := setup(item, PkmnMagikarp)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransactionsInOrder(
+					MoveFailTransaction{
+						User:   b.getPokemonInBattle(0, 0),
+						Reason: FailOther,
+					},
+					MoveFailTransaction{
+						User:   b.getPokemonInBattle(1, 0),
+						Reason: FailOther,
+					},
+				))
+			},
+			Entry("Full Incense", ItemFullIncense),
+			Entry("Lagging Tail", ItemLaggingTail),
+		)
+
+		Specify("Iron Ball", func() {
+			b, holder := setup(ItemIronBall, PkmnPidgeot)
+			attacker := b.getPokemonInBattle(0, 0)
+			attacker.Moves[0] = GetMove(MoveEarthquake)
+			// Flying immunity negated
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				User: attacker,
+				Target: target{
+					Pokemon:   holder,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Move:   GetMove(MoveEarthquake),
+				Damage: 36,
+			}))
+			speed := holder.Speed()
+			holder.HeldItem = ItemNone
+			Expect(holder.Speed()).To(BeNumerically(">", speed))
+		})
+
+		Specify("Sticky Barb", func() {
+			b, holder := setup(ItemStickyBarb, PkmnGrimer)
+			attacker := b.getPokemonInBattle(0, 0)
+			t, _ := b.SimulateRound()
+			// Holder takes 1/8 HP damage after every turn
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: target{
+					Pokemon:   holder,
+					party:     1,
+					partySlot: 0,
+					Team:      1,
+				},
+				Damage: holder.MaxHP() / 8,
+			}))
+			// Contact moves damage attacker and pass the sticky barb to the attacker
+			attacker.Moves[0] = GetMove(MoveTackle)
+			t, _ = b.SimulateRound()
+			Expect(t).To(HaveTransactionsInOrder(
+				DamageTransaction{
+					Target: target{
+						Pokemon:   attacker,
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Damage: attacker.MaxHP() / 8,
+				},
+				GiveItemTransaction{
+					Target: attacker,
+					Item:   ItemStickyBarb,
+				},
+				GiveItemTransaction{
+					Target: holder,
+					Item:   ItemNone,
+				},
+			))
+			Expect(attacker.HeldItem).To(BeEquivalentTo(ItemStickyBarb))
+		})
+	})
+
+	DescribeTable("Choice Items",
+		func(item Item, stat func(*Pokemon) uint) {
+			b, holder := setup(item, PkmnMachamp)
+			b.SimulateRound()
+			// Restricts user to one move
+			Expect(holder.metadata[MetaLastMove]).To(BeEquivalentTo(GetMove(MoveSplash)))
+			// Stats are boosted by 50%
+			effective := stat(holder)
+			holder.HeldItem = ItemNone
+			Expect(stat(holder)).To(BeNumerically("<", effective))
+		},
+		Entry("Choice Band", ItemChoiceBand, func(p *Pokemon) uint { return p.Attack() }),
+		Entry("Choice Scarf", ItemChoiceScarf, func(p *Pokemon) uint { return p.Speed() }),
+		Entry("Choice Specs", ItemChoiceSpecs, func(p *Pokemon) uint { return p.SpecialAttack() }),
+	)
+
+	Context("Miscellaneous Items", func() {
+		Specify("Black Sludge", func() {
+			// Heal poison types for 1/16 HP
+			b, holder := setup(ItemBlackSludge, PkmnGrimer)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+			// Damage non-poison types for 1/8 HP
+			b, holder = setup(ItemBlackSludge, PkmnAerodactyl)
+			t, _ = b.SimulateRound()
+			Expect(t).ToNot(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: b.getTarget(1, 0),
+				Damage: holder.MaxHP() / 8,
+			}))
+		})
+
+		Specify("Destiny Knot", func() {
+			b, holder := setup(ItemDestinyKnot, PkmnMimeJr)
+			attacker := b.getPokemonInBattle(0, 0)
+			attacker.Moves[0] = GetMove(MoveAttract)
+			attacker.Gender = GenderMale
+			holder.Gender = GenderFemale
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(InflictStatusTransaction{
+				Target:       attacker,
+				StatusEffect: StatusInfatuation,
+			}))
+		})
+
+		Specify("Expert Belt", func() {
+			b, holder := setup(ItemExpertBelt, PkmnMachamp)
+			holder.Moves[0] = GetMove(MoveCloseCombat)
+			t, _ := b.SimulateRound()
+			// Damage boosted by 20%
+			Expect(t).To(HaveTransaction(
+				DamageTransaction{
+					User: holder,
+					Target: target{
+						Pokemon:   b.getPokemonInBattle(0, 0),
+						party:     0,
+						partySlot: 0,
+						Team:      0,
+					},
+					Damage: 201,
+				},
+			))
+		})
+
+		Specify("Leftovers", func() {
+			b, holder := setup(ItemLeftovers, PkmnSnorlax)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(HealTransaction{
+				Target: holder,
+				Amount: holder.MaxHP() / 16,
+			}))
+		})
+
+		Specify("Life Orb", func() {
+			b, holder := setup(ItemLifeOrb, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Boost damage by 30%
+			Expect(DamageDealt(t, holder)).To(Equal(32))
+			// Take 10% of max HP
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: b.getTarget(1, 0),
+				Damage: holder.MaxHP() / 10,
+			}))
+		})
+
+		Specify("Muscle Band", func() {
+			b, holder := setup(ItemMuscleBand, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Boost physical move damage by 10%
+			Expect(DamageDealt(t, holder)).To(Equal(27))
+		})
+
+		Specify("Shell Bell", func() {
+			b, holder := setup(ItemShellBell, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			// Self-inflict 1/8 of dealt damage
+			Expect(t).To(HaveTransaction(DamageTransaction{
+				Target: b.getTarget(1, 0),
+				Damage: 3,
+			}))
+		})
+
+		Specify("White Herb", func() {
+			b, holder := setup(ItemWhiteHerb, PkmnSnorlax)
+			holder.StatModifiers = [9]int{-1, -1, -1, -1, -1, -1, 0, -1, -1}
+			b.SimulateRound()
+			// Consumed after use
+			Expect(holder.HeldItem).To(Equal(ItemNone))
+			// Reset all lowered stat modifiers
+			for _, stage := range holder.StatModifiers {
+				if stage < 0 {
+					Fail("Expected all lowered stats to be reset")
+				}
+			}
+		})
+
+		Specify("Wise Glasses", func() {
+			b, holder := setup(ItemWiseGlasses, PkmnSnorlax)
+			holder.Moves[0] = GetMove(MoveSurf)
+			t, _ := b.SimulateRound()
+			// Boost special move damage by 10%
+			Expect(DamageDealt(t, holder)).To(Equal(16))
+		})
+
+		DescribeTable("Accuracy/evasion items",
+			func(attacking Item, defending Item, op string) {
+				b, holder := setup(ItemNone, PkmnSnorlax)
+				opponent := b.getPokemonInBattle(0, 0)
+				base := CalcAccuracy(b.Weather, holder, opponent, GetMove(MovePound))
+				holder.HeldItem = attacking
+				opponent.HeldItem = defending
+				new := CalcAccuracy(b.Weather, holder, opponent, GetMove(MovePound))
+				Expect(new).To(BeNumerically(op, base))
+			},
+			Entry("Wide Lens", ItemWideLens, ItemNone, ">"),
+			Entry("Bright Powder", ItemNone, ItemBrightPowder, "<"),
+			Entry("Lax Incense", ItemNone, ItemLaxIncense, "<"),
+		)
+
+		DescribeTable("Status curing held items",
+			func(item Item, status StatusCondition) {
+				b, holder := setup(item, PkmnSnorlax)
+				holder.StatusEffects.apply(status)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(CureStatusTransaction{
+					Target:       b.getTarget(1, 0),
+					StatusEffect: status,
+				}))
+				// Item should be consumed after use
+				Expect(holder.HeldItem).To(Equal(ItemNone))
+			},
+			Entry("Mental Herb", ItemMentalHerb, StatusInfatuation),
+		)
+
+		DescribeTable("Flinch inducing items",
+			func(item Item) {
+				b, holder := setup(ItemKingsRock, PkmnLucario)
+				holder.Moves[0] = GetMove(MoveTackle)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(InflictStatusTransaction{
+					Target:       b.getPokemonInBattle(0, 0),
+					StatusEffect: StatusFlinch,
+				}))
+			},
+			Entry("King's Rock", ItemKingsRock),
+			Entry("Razor Fang", ItemRazorFang),
+		)
+
+		DescribeTable("Weather duration boosting rocks",
+			func(item Item, weather Weather, move MoveId) {
+				b, holder := setup(item, PkmnCastform)
+				holder.Moves[0] = GetMove(move)
+				t, _ := b.SimulateRound()
+				Expect(t).To(HaveTransaction(WeatherTransaction{
+					Weather: weather,
+					Turns:   8,
+				}))
+			},
+			Entry("Damp Rock", ItemDampRock, WeatherRain, MoveRainDance),
+			Entry("Heat Rock", ItemHeatRock, WeatherHarshSunlight, MoveSunnyDay),
+			Entry("Icy Rock", ItemIcyRock, WeatherHail, MoveHail),
+			Entry("Smooth Rock", ItemSmoothRock, WeatherSandstorm, MoveSandstorm),
+		)
+	})
+})
+
+var _ = Describe("Medicine Items", func() {
+	var a1 Agent
+	var a2 rcAgent
+	var maxHP int
+	setup := func(item Item) (*Battle, *Pokemon) {
+		a1 = Agent(new(dumbAgent))
+		a2 = newRcAgent()
+		_a2 := Agent(a2)
+		user := GeneratePokemon(PkmnBulbasaur, WithLevel(100), WithMoves(MoveSplash))
+		maxHP = int(user.MaxHP())
+		p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveSplash))
+		b := New1v1Battle(user, &a1, p2, &_a2)
+		Expect(b.Start()).To(Succeed())
+		a2 <- ItemTurn{
+			Item:   item,
+			Target: b.getTarget(0, 0),
+		}
+		return b, user
+	}
+
+	DescribeTable("Healing (HP) medicine",
+		func(item Item, hp int) {
+			b, user := setup(item)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(HealTransaction{
+				Target: user,
+				Amount: uint(hp),
+			}))
+		},
+		Entry("Berry Juice", ItemBerryJuice, 20),
+		Entry("Energy Powder", ItemEnergyPowder, 50),
+		Entry("Energy Root", ItemEnergyRoot, 200),
+		Entry("Fresh Water", ItemFreshWater, 50),
+		Entry("Full Restore", ItemFullRestore, maxHP),
+		Entry("Hyper Potion", ItemHyperPotion, 200),
+		Entry("Lemonade", ItemLemonade, 80),
+		Entry("Max Potion", ItemMaxPotion, maxHP),
+		Entry("Moomoo Milk", ItemMoomooMilk, 100),
+		Entry("Potion", ItemPotion, 20),
+		Entry("Soda Pop", ItemSodaPop, 60),
+		Entry("Super Potion", ItemSuperPotion, 50),
+	)
+
+	DescribeTable("Friendship medicine",
+		func(item Item, amount int) {
+			b, user := setup(item)
+			user.Friendship = MaxFriendship
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(FriendshipTransaction{
+				Target: user,
+				Amount: amount,
+			}))
+		},
+		Entry("Energy Powder", ItemEnergyPowder, -10),
+		Entry("Energy Root", ItemEnergyRoot, -15),
+		Entry("Revival Herb", ItemRevivalHerb, -20),
+	)
+
+	DescribeTable("PP Recovery",
+		func(item Item, pp0, pp1 int) {
+			b, user := setup(item)
+			user.Moves[1] = GetMove(MoveTackle)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(PPTransaction{
+				Move:   user.Moves[0],
+				Amount: int8(pp0),
+			}))
+			if pp1 != 0 {
+				Expect(t).To(HaveTransaction(PPTransaction{
+					Move:   user.Moves[1],
+					Amount: int8(pp1),
+				}))
+			}
+		},
+		Entry("Elixir", ItemElixir, 10, 10),
+		Entry("Ether", ItemEther, 10, 0),
+		Entry("Max Elixir", ItemMaxElixir, 40, 35),
+		Entry("Max Ether", ItemMaxEther, 40, 0),
+	)
+})
+
+var _ = Describe("In-a-pinch Berries", func() {
+	a1 := Agent(new(dumbAgent))
+	a2 := Agent(new(dumbAgent))
+	var holder *Pokemon
+
+	setup := func(item Item) *Battle {
+		holder = GeneratePokemon(
+			PkmnGrotle,
+			WithLevel(25),
+			WithMoves(MoveSplash),
+			WithIVs([6]uint8{1, 1, 1, 20, 1, 1}),
+		)
+		holder.HeldItem = item
+		holder.CurrentHP = holder.MaxHP() / 4
+		b := New1v1Battle(
+			GeneratePokemon(PkmnCombusken, WithLevel(25), WithMoves(MoveSplash)), &a1,
+			holder, &a2,
+		)
+		b.rng = SimpleRNG()
+		Expect(b.Start()).To(Succeed())
+		return b
+	}
+
+	DescribeTable("Stat changing in-a-pinch berries",
+		func(item Item, stat, stages int) {
+			b := setup(item)
+			t, _ := b.SimulateRound()
+
+			Expect(t).To(HaveTransaction(ItemTransaction{
+				Target: b.getTarget(1, 0),
+				IsHeld: true,
+				Item:   holder.HeldItem,
+			}))
+			Expect(t).To(HaveTransaction(ModifyStatTransaction{
+				Target: holder,
+				Stat:   stat,
+				Stages: stages,
+			}))
+			Expect(b.getPokemonInBattle(0, 0).HeldItem).To(Equal(ItemNone))
+			Expect(b.getPokemonInBattle(1, 0).HeldItem).To(Equal(ItemNone))
+		},
+		Entry("Apicot Berry", ItemApicotBerry, StatSpDef, 1),
+		Entry("Ganlon Berry", ItemGanlonBerry, StatDef, 1),
+		Entry("Lansat Berry", ItemLansatBerry, StatCritChance, 2),
+		Entry("Liechi Berry", ItemLiechiBerry, StatAtk, 1),
+		Entry("Micle Berry", ItemMicleBerry, StatAccuracy, 1),
+		Entry("Petaya Berry", ItemPetayaBerry, StatSpAtk, 1),
+		Entry("Salac Berry", ItemSalacBerry, StatSpeed, 1),
+	)
+})
