@@ -113,8 +113,68 @@ func (t ItemTransaction) Mutate(b *Battle) {
 	}
 	switch t.Item {
 	// ItemCategoryMedicine
-	case ItemPotion:
-		b.QueueTransaction(target.RestoreHP(20))
+	case ItemBerryJuice, ItemPotion:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: 20,
+		})
+	case ItemEnergyPowder:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: 50,
+		})
+		b.QueueTransaction(FriendshipTransaction{
+			Target: target,
+			Amount: [3]int{-5, -5, -10}[target.Friendship],
+		})
+	case ItemEnergyRoot:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: 200,
+		})
+		b.QueueTransaction(FriendshipTransaction{
+			Target: target,
+			Amount: [3]int{-10, -10, -15}[target.Friendship],
+		})
+	case ItemFreshWater:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: 50,
+		})
+	case ItemFullRestore:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: target.MaxHP(),
+		})
+		b.QueueTransaction(CureStatusTransaction{
+			Target:       t.Target,
+			StatusEffect: target.StatusEffects,
+		})
+	case ItemHyperPotion:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: 200,
+		})
+	case ItemLemonade:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: 80,
+		})
+	case ItemMaxPotion:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: target.MaxHP(),
+		})
+	case ItemMoomooMilk:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: 100,
+		})
+	case ItemSodaPop:
+		b.QueueTransaction(HealTransaction{
+			Target: target,
+			Amount: 60,
+		})
 	// ItemCategoryInAPinch
 	case ItemApicotBerry:
 		b.QueueTransaction(ModifyStatTransaction{
@@ -229,17 +289,12 @@ type PPTransaction struct {
 }
 
 func (t PPTransaction) Mutate(b *Battle) {
-	// This is why we should just use int
-	if t.Amount < 0 {
-		n := uint8(t.Amount * -1)
-		if t.Move.CurrentPP < n {
-			n = t.Move.CurrentPP
-		}
-		t.Move.CurrentPP -= n
-	} else {
-		t.Move.CurrentPP += uint8(t.Amount)
-		if t.Move.CurrentPP > t.Move.MaxPP {
+	t.Move.CurrentPP += uint8(t.Amount)
+	if t.Move.CurrentPP >= t.Move.MaxPP {
+		if t.Amount > 0 {
 			t.Move.CurrentPP = t.Move.MaxPP
+		} else {
+			t.Move.CurrentPP = 0
 		}
 	}
 }
@@ -262,6 +317,9 @@ type HealTransaction struct {
 
 func (t HealTransaction) Mutate(b *Battle) {
 	t.Target.CurrentHP += t.Amount
+	if t.Target.CurrentHP > t.Target.MaxHP() {
+		t.Target.CurrentHP = t.Target.MaxHP()
+	}
 }
 
 // A transaction to apply a status effect to a Pokemon.
