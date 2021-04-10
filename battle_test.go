@@ -1551,6 +1551,7 @@ var _ = Describe("In-a-pinch Berries", func() {
 		Entry("Ganlon Berry", ItemGanlonBerry, StatDef, 1),
 		Entry("Lansat Berry", ItemLansatBerry, StatCritChance, 2),
 		Entry("Liechi Berry", ItemLiechiBerry, StatAtk, 1),
+		Entry("Micle Berry", ItemMicleBerry, StatAccuracy, 1),
 		Entry("Petaya Berry", ItemPetayaBerry, StatSpAtk, 1),
 		Entry("Salac Berry", ItemSalacBerry, StatSpeed, 1),
 	)
