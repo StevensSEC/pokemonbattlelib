@@ -315,6 +315,7 @@ var _ = Describe("Medicine Items", func() {
 	var a1 Agent
 	var a2 rcAgent
 	var maxHP int
+	var fullCure = StatusNonvolatileMask | StatusConfusion
 	setup := func(item Item) (*Battle, *Pokemon) {
 		a1 = Agent(new(dumbAgent))
 		a2 = newRcAgent()
@@ -331,7 +332,7 @@ var _ = Describe("Medicine Items", func() {
 		return b, user
 	}
 
-	DescribeTable("Healing (HP) medicine",
+	DescribeTable("Healing (HP)",
 		func(item Item, hp int) {
 			b, user := setup(item)
 			t, _ := b.SimulateRound()
@@ -354,7 +355,7 @@ var _ = Describe("Medicine Items", func() {
 		Entry("Super Potion", ItemSuperPotion, 50),
 	)
 
-	DescribeTable("Friendship medicine",
+	DescribeTable("Friendship",
 		func(item Item, amount int) {
 			b, user := setup(item)
 			user.Friendship = MaxFriendship
@@ -389,6 +390,28 @@ var _ = Describe("Medicine Items", func() {
 		Entry("Ether", ItemEther, 10, 0),
 		Entry("Max Elixir", ItemMaxElixir, 40, 35),
 		Entry("Max Ether", ItemMaxEther, 40, 0),
+	)
+
+	DescribeTable("Status Cures",
+		func(item Item, status StatusCondition) {
+			b, user := setup(item)
+			user.StatusEffects = status
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(CureStatusTransaction{
+				Target:       b.getTarget(0, 0),
+				StatusEffect: status,
+			}))
+		},
+		Entry("Full Restore", ItemFullRestore, fullCure),
+		Entry("Antidote", ItemAntidote, StatusPoison),
+		Entry("Awakening", ItemAwakening, StatusSleep),
+		Entry("Burn Heal", ItemBurnHeal, StatusBurn),
+		Entry("Full Heal", ItemFullHeal, fullCure),
+		Entry("Heal Powder", ItemHealPowder, fullCure),
+		Entry("Ice Heal", ItemIceHeal, StatusFreeze),
+		Entry("Lava Cookie", ItemLavaCookie, fullCure),
+		Entry("Old Gateau", ItemOldGateau, fullCure),
+		Entry("Paralyze Heal", ItemParalyzeHeal, StatusParalyze),
 	)
 })
 

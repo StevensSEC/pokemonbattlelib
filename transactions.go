@@ -112,8 +112,9 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		// TODO: remove consumed item from party's inventory
 	}
 	switch t.Item.Category() {
-	case ItemCategoryHealing:
+	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
 		fIndex := target.Friendship / 100
+		fullCure := StatusNonvolatileMask | StatusConfusion
 		medicineData := map[Item]struct {
 			Heal       uint
 			Cure       StatusCondition
@@ -124,7 +125,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			ItemEnergyPowder: {Heal: 50, Friendship: [3]int{-5, -5, -10}[fIndex]},
 			ItemEnergyRoot:   {Heal: 200, Friendship: [3]int{-10, -10, -15}[fIndex]},
 			ItemFreshWater:   {Heal: 50},
-			ItemFullRestore:  {Heal: target.MaxHP(), Cure: target.StatusEffects},
+			ItemFullRestore:  {Heal: target.MaxHP(), Cure: fullCure},
 			ItemHyperPotion:  {Heal: 200},
 			ItemLemonade:     {Heal: 80},
 			ItemMaxPotion:    {Heal: target.MaxHP()},
@@ -132,25 +133,51 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			ItemPotion:       {Heal: 20},
 			ItemSodaPop:      {Heal: 60},
 			ItemSuperPotion:  {Heal: 50},
+			// Revival
+			ItemMaxRevive:   {Heal: target.MaxHP()},
+			ItemRevivalHerb: {Heal: target.MaxHP(), Friendship: [3]int{-15, -15, -20}[fIndex]},
+			ItemRevive:      {Heal: target.MaxHP() / 2},
+			// Status Cures
+			ItemAntidote:     {Cure: StatusPoison},
+			ItemAwakening:    {Cure: StatusSleep},
+			ItemBurnHeal:     {Cure: StatusBurn},
+			ItemFullHeal:     {Cure: fullCure},
+			ItemHealPowder:   {Cure: fullCure, Friendship: [3]int{-5, -5, -10}[fIndex]},
+			ItemIceHeal:      {Cure: StatusFreeze},
+			ItemLavaCookie:   {Cure: fullCure},
+			ItemOldGateau:    {Cure: fullCure},
+			ItemParalyzeHeal: {Cure: StatusParalyze},
 		}
-		data := medicineData[t.Item]
-		if data.Heal > 0 {
-			b.QueueTransaction(HealTransaction{
-				Target: target,
-				Amount: data.Heal,
-			})
-		}
-		if data.Friendship != 0 {
-			b.QueueTransaction(FriendshipTransaction{
-				Target: target,
-				Amount: data.Friendship,
-			})
-		}
-		if data.Cure != StatusNone {
-			b.QueueTransaction(CureStatusTransaction{
-				Target:       t.Target,
-				StatusEffect: data.Cure,
-			})
+		data, ok := medicineData[t.Item]
+		if ok {
+			if data.Heal > 0 {
+				b.QueueTransaction(HealTransaction{
+					Target: target,
+					Amount: data.Heal,
+				})
+			}
+			if data.Friendship != 0 {
+				b.QueueTransaction(FriendshipTransaction{
+					Target: target,
+					Amount: data.Friendship,
+				})
+			}
+			if data.Cure != StatusNone {
+				b.QueueTransaction(CureStatusTransaction{
+					Target:       t.Target,
+					StatusEffect: data.Cure,
+				})
+			}
+		} else if t.Item == ItemSacredAsh {
+			for _, btarget := range b.GetTargetsRef() {
+				pkmn := btarget.Pokemon
+				if btarget.party == t.Target.party && pkmn.CurrentHP == 0 {
+					b.QueueTransaction(HealTransaction{
+						Target: pkmn,
+						Amount: pkmn.MaxHP(),
+					})
+				}
+			}
 		}
 	}
 	switch t.Item {
@@ -185,36 +212,6 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			Move:   t.Move,
 			Amount: int8(t.Move.MaxPP),
 		})
-	// ItemCategoryRevival
-	case ItemMaxRevive:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: target.MaxHP(),
-		})
-	case ItemRevivalHerb:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: target.MaxHP(),
-		})
-		b.QueueTransaction(FriendshipTransaction{
-			Target: target,
-			Amount: [3]int{-15, -15, -20}[target.Friendship/100],
-		})
-	case ItemRevive:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: target.MaxHP() / 2,
-		})
-	case ItemSacredAsh:
-		for _, btarget := range b.GetTargetsRef() {
-			pkmn := btarget.Pokemon
-			if btarget.party == t.Target.party && pkmn.CurrentHP == 0 {
-				b.QueueTransaction(HealTransaction{
-					Target: pkmn,
-					Amount: pkmn.MaxHP(),
-				})
-			}
-		}
 	// ItemCategoryInAPinch
 	case ItemApicotBerry:
 		b.QueueTransaction(ModifyStatTransaction{
