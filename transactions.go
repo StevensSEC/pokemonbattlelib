@@ -111,75 +111,49 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		}
 		// TODO: remove consumed item from party's inventory
 	}
+	switch t.Item.Category() {
+	case ItemCategoryHealing:
+		fIndex := target.Friendship / 100
+		medicineData := map[Item]struct {
+			Heal       uint
+			Cure       StatusCondition
+			Friendship int
+		}{
+			// Healing
+			ItemBerryJuice:   {Heal: 20},
+			ItemEnergyPowder: {Heal: 50, Friendship: [3]int{-5, -5, -10}[fIndex]},
+			ItemEnergyRoot:   {Heal: 200, Friendship: [3]int{-10, -10, -15}[fIndex]},
+			ItemFreshWater:   {Heal: 50},
+			ItemFullRestore:  {Heal: target.MaxHP(), Cure: target.StatusEffects},
+			ItemHyperPotion:  {Heal: 200},
+			ItemLemonade:     {Heal: 80},
+			ItemMaxPotion:    {Heal: target.MaxHP()},
+			ItemMoomooMilk:   {Heal: 100},
+			ItemPotion:       {Heal: 20},
+			ItemSodaPop:      {Heal: 60},
+			ItemSuperPotion:  {Heal: 50},
+		}
+		data := medicineData[t.Item]
+		if data.Heal > 0 {
+			b.QueueTransaction(HealTransaction{
+				Target: target,
+				Amount: data.Heal,
+			})
+		}
+		if data.Friendship != 0 {
+			b.QueueTransaction(FriendshipTransaction{
+				Target: target,
+				Amount: data.Friendship,
+			})
+		}
+		if data.Cure != StatusNone {
+			b.QueueTransaction(CureStatusTransaction{
+				Target:       t.Target,
+				StatusEffect: data.Cure,
+			})
+		}
+	}
 	switch t.Item {
-	// ItemCategoryHealing
-	case ItemBerryJuice, ItemPotion:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: 20,
-		})
-	case ItemEnergyPowder:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: 50,
-		})
-		b.QueueTransaction(FriendshipTransaction{
-			Target: target,
-			Amount: [3]int{-5, -5, -10}[target.Friendship/100],
-		})
-	case ItemEnergyRoot:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: 200,
-		})
-		b.QueueTransaction(FriendshipTransaction{
-			Target: target,
-			Amount: [3]int{-10, -10, -15}[target.Friendship/100],
-		})
-	case ItemFreshWater:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: 50,
-		})
-	case ItemFullRestore:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: target.MaxHP(),
-		})
-		b.QueueTransaction(CureStatusTransaction{
-			Target:       t.Target,
-			StatusEffect: target.StatusEffects,
-		})
-	case ItemHyperPotion:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: 200,
-		})
-	case ItemLemonade:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: 80,
-		})
-	case ItemMaxPotion:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: target.MaxHP(),
-		})
-	case ItemMoomooMilk:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: 100,
-		})
-	case ItemSodaPop:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: 60,
-		})
-	case ItemSuperPotion:
-		b.QueueTransaction(HealTransaction{
-			Target: target,
-			Amount: 50,
-		})
 	// ItemCategoryPPRecovery
 	case ItemElixir:
 		for _, m := range target.Moves {
