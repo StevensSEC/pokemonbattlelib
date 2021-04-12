@@ -157,7 +157,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		case ItemRevive:
 			b.QueueTransaction(HealTransaction{
 				Target: target,
-				Amount: target.MaxHP(),
+				Amount: target.MaxHP() / 2,
 			})
 		}
 	}

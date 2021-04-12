@@ -314,14 +314,12 @@ var _ = Describe("Misc. + Held Items", func() {
 var _ = Describe("Medicine Items", func() {
 	var a1 Agent
 	var a2 rcAgent
-	var maxHP int
 	var fullCure = StatusNonvolatileMask | StatusConfusion
 	setup := func(item Item) (*Battle, *Pokemon) {
 		a1 = Agent(new(dumbAgent))
 		a2 = newRcAgent()
 		_a2 := Agent(a2)
 		user := GeneratePokemon(PkmnBulbasaur, WithLevel(100), WithMoves(MoveSplash))
-		maxHP = int(user.MaxHP())
 		p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveSplash))
 		b := New1v1Battle(user, &a1, p2, &_a2)
 		Expect(b.Start()).To(Succeed())
@@ -338,6 +336,10 @@ var _ = Describe("Medicine Items", func() {
 			fainted := GeneratePokemon(PkmnIvysaur, defaultMoveOpt)
 			if item.Category() == ItemCategoryRevival {
 				user.CurrentHP = 0
+				hp = int(user.MaxHP())
+				if item == ItemRevive {
+					hp /= 2
+				}
 			}
 			if item == ItemSacredAsh {
 				fainted.CurrentHP = 0
@@ -360,19 +362,19 @@ var _ = Describe("Medicine Items", func() {
 		Entry("Energy Powder", ItemEnergyPowder, 50),
 		Entry("Energy Root", ItemEnergyRoot, 200),
 		Entry("Fresh Water", ItemFreshWater, 50),
-		Entry("Full Restore", ItemFullRestore, maxHP),
+		Entry("Full Restore", ItemFullRestore, 0),
 		Entry("Hyper Potion", ItemHyperPotion, 200),
 		Entry("Lemonade", ItemLemonade, 80),
-		Entry("Max Potion", ItemMaxPotion, maxHP),
+		Entry("Max Potion", ItemMaxPotion, 0),
 		Entry("Moomoo Milk", ItemMoomooMilk, 100),
 		Entry("Potion", ItemPotion, 20),
 		Entry("Soda Pop", ItemSodaPop, 60),
 		Entry("Super Potion", ItemSuperPotion, 50),
 		// Revival
-		Entry("Max Revive", ItemMaxRevive, maxHP),
-		Entry("Revival Herb", ItemRevivalHerb, maxHP),
-		Entry("Revive", ItemRevive, maxHP/2),
-		Entry("Sacred Ash", ItemSacredAsh, maxHP),
+		Entry("Max Revive", ItemMaxRevive, 0),
+		Entry("Revival Herb", ItemRevivalHerb, 0),
+		Entry("Revive", ItemRevive, 0),
+		Entry("Sacred Ash", ItemSacredAsh, 0),
 	)
 
 	DescribeTable("Friendship",
