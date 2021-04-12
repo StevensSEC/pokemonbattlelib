@@ -111,6 +111,28 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		}
 		// TODO: remove consumed item from party's inventory
 	}
+	switch t.Item.Category() {
+	case ItemCategoryStatBoost:
+		if t.Item == ItemDireHit {
+			b.QueueTransaction(ModifyStatTransaction{
+				Target: target,
+				Stat:   StatCritChance,
+				Stages: +2,
+			})
+		} else if t.Item == ItemGuardSpec {
+			target.metadata[MetaStatChangeImmune] = 5
+		} else {
+			b.QueueTransaction(ModifyStatTransaction{
+				Target: target,
+				Stat:   battleItemStats[t.Item],
+				Stages: +1,
+			})
+		}
+		b.QueueTransaction(FriendshipTransaction{
+			Target: target,
+			Amount: [3]int{1, 1, 0}[target.Friendship/100],
+		})
+	}
 	switch t.Item {
 	// ItemCategoryMedicine
 	case ItemPotion:

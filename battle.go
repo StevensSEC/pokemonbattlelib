@@ -505,7 +505,13 @@ func (b *Battle) postRound() {
 			})
 		}
 		pkmn.StatusEffects.clear(StatusFlinch) // Flinching only occurs over the course of a single turn. It never bleeds over into the next turn.
-
+		if v, ok := t.Pokemon.metadata[MetaStatChangeImmune]; ok {
+			turns := v.(int)
+			pkmn.metadata[MetaStatChangeImmune] = turns - 1
+			if turns == 0 {
+				delete(pkmn.metadata, MetaStatChangeImmune)
+			}
+		}
 		// Weather effects
 		// TODO: check for weather resisting abilities
 		if b.Weather == WeatherSandstorm {
