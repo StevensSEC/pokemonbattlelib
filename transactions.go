@@ -113,41 +113,10 @@ func (t ItemTransaction) Mutate(b *Battle) {
 	}
 	switch t.Item.Category() {
 	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
-		fIndex := target.Friendship / 100
-		fullCure := StatusNonvolatileMask | StatusConfusion
-		medicineData := map[Item]struct {
-			Heal       uint
-			Cure       StatusCondition
-			Friendship int
-		}{
-			// Healing
-			ItemBerryJuice:   {Heal: 20},
-			ItemEnergyPowder: {Heal: 50, Friendship: [3]int{-5, -5, -10}[fIndex]},
-			ItemEnergyRoot:   {Heal: 200, Friendship: [3]int{-10, -10, -15}[fIndex]},
-			ItemFreshWater:   {Heal: 50},
-			ItemFullRestore:  {Heal: target.MaxHP(), Cure: fullCure},
-			ItemHyperPotion:  {Heal: 200},
-			ItemLemonade:     {Heal: 80},
-			ItemMaxPotion:    {Heal: target.MaxHP()},
-			ItemMoomooMilk:   {Heal: 100},
-			ItemPotion:       {Heal: 20},
-			ItemSodaPop:      {Heal: 60},
-			ItemSuperPotion:  {Heal: 50},
-			// Revival
-			ItemMaxRevive:   {Heal: target.MaxHP()},
-			ItemRevivalHerb: {Heal: target.MaxHP(), Friendship: [3]int{-15, -15, -20}[fIndex]},
-			ItemRevive:      {Heal: target.MaxHP() / 2},
-			// Status Cures
-			ItemAntidote:     {Cure: StatusPoison},
-			ItemAwakening:    {Cure: StatusSleep},
-			ItemBurnHeal:     {Cure: StatusBurn},
-			ItemFullHeal:     {Cure: fullCure},
-			ItemHealPowder:   {Cure: fullCure, Friendship: [3]int{-5, -5, -10}[fIndex]},
-			ItemIceHeal:      {Cure: StatusFreeze},
-			ItemLavaCookie:   {Cure: fullCure},
-			ItemOldGateau:    {Cure: fullCure},
-			ItemParalyzeHeal: {Cure: StatusParalyze},
+		if t.Item.Category() == ItemCategoryRevival && target.CurrentHP != 0 {
+			return
 		}
+		fIndex := target.Friendship / 100
 		data, ok := medicineData[t.Item]
 		if ok {
 			if data.Heal > 0 {
@@ -156,10 +125,10 @@ func (t ItemTransaction) Mutate(b *Battle) {
 					Amount: data.Heal,
 				})
 			}
-			if data.Friendship != 0 {
+			if amount := data.Friendship[fIndex]; amount != 0 {
 				b.QueueTransaction(FriendshipTransaction{
 					Target: target,
-					Amount: data.Friendship,
+					Amount: amount,
 				})
 			}
 			if data.Cure != StatusNone {
@@ -168,16 +137,28 @@ func (t ItemTransaction) Mutate(b *Battle) {
 					StatusEffect: data.Cure,
 				})
 			}
-		} else if t.Item == ItemSacredAsh {
-			for _, btarget := range b.GetTargetsRef() {
-				pkmn := btarget.Pokemon
-				if btarget.party == t.Target.party && pkmn.CurrentHP == 0 {
+		}
+		// Other medicine item effects
+		switch t.Item {
+		case ItemSacredAsh:
+			for _, pkmn := range b.parties[t.Target.party].pokemon() {
+				if pkmn.CurrentHP == 0 {
 					b.QueueTransaction(HealTransaction{
 						Target: pkmn,
 						Amount: pkmn.MaxHP(),
 					})
 				}
 			}
+		case ItemFullRestore, ItemMaxPotion, ItemMaxRevive, ItemRevivalHerb:
+			b.QueueTransaction(HealTransaction{
+				Target: target,
+				Amount: target.MaxHP(),
+			})
+		case ItemRevive:
+			b.QueueTransaction(HealTransaction{
+				Target: target,
+				Amount: target.MaxHP(),
+			})
 		}
 	}
 	switch t.Item {

@@ -335,12 +335,27 @@ var _ = Describe("Medicine Items", func() {
 	DescribeTable("Healing (HP)",
 		func(item Item, hp int) {
 			b, user := setup(item)
+			fainted := GeneratePokemon(PkmnIvysaur, defaultMoveOpt)
+			if item.Category() == ItemCategoryRevival {
+				user.CurrentHP = 0
+			}
+			if item == ItemSacredAsh {
+				fainted.CurrentHP = 0
+				b.parties[0].AddPokemon(fainted)
+			}
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(HealTransaction{
 				Target: user,
 				Amount: uint(hp),
 			}))
+			if item == ItemSacredAsh {
+				Expect(t).To(HaveTransaction(HealTransaction{
+					Target: fainted,
+					Amount: fainted.MaxHP(),
+				}))
+			}
 		},
+		// Healing
 		Entry("Berry Juice", ItemBerryJuice, 20),
 		Entry("Energy Powder", ItemEnergyPowder, 50),
 		Entry("Energy Root", ItemEnergyRoot, 200),
@@ -353,12 +368,20 @@ var _ = Describe("Medicine Items", func() {
 		Entry("Potion", ItemPotion, 20),
 		Entry("Soda Pop", ItemSodaPop, 60),
 		Entry("Super Potion", ItemSuperPotion, 50),
+		// Revival
+		Entry("Max Revive", ItemMaxRevive, maxHP),
+		Entry("Revival Herb", ItemRevivalHerb, maxHP),
+		Entry("Revive", ItemRevive, maxHP/2),
+		Entry("Sacred Ash", ItemSacredAsh, maxHP),
 	)
 
 	DescribeTable("Friendship",
 		func(item Item, amount int) {
 			b, user := setup(item)
 			user.Friendship = MaxFriendship
+			if item == ItemRevivalHerb {
+				user.CurrentHP = 0
+			}
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(FriendshipTransaction{
 				Target: user,
