@@ -331,14 +331,14 @@ var _ = Describe("Medicine Items", func() {
 	}
 
 	DescribeTable("Healing (HP)",
-		func(item Item, hp int) {
+		func(item Item, expectedHP int) {
 			b, user := setup(item)
 			fainted := GeneratePokemon(PkmnIvysaur, defaultMoveOpt)
 			if item.Category() == ItemCategoryRevival {
 				user.CurrentHP = 0
-				hp = int(user.MaxHP())
+				expectedHP = int(user.MaxHP())
 				if item == ItemRevive {
-					hp /= 2
+					expectedHP /= 2
 				}
 			}
 			if item == ItemSacredAsh {
@@ -348,7 +348,7 @@ var _ = Describe("Medicine Items", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(HealTransaction{
 				Target: user,
-				Amount: uint(hp),
+				Amount: uint(expectedHP),
 			}))
 			if item == ItemSacredAsh {
 				Expect(t).To(HaveTransaction(HealTransaction{
