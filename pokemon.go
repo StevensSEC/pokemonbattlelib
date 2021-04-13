@@ -57,6 +57,7 @@ type PokemonMeta int
 const (
 	MetaLastMove PokemonMeta = iota
 	MetaSleepTime
+	MetaStatChangeImmune
 )
 
 // Constants for growth rates of a Pokemon

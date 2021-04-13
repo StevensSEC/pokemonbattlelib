@@ -1,5 +1,18 @@
 package pokemonbattlelib
 
+var battleItemFlutes = map[Item]StatusCondition{
+	ItemBlueFlute:   StatusSleep,
+	ItemRedFlute:    StatusInfatuation,
+	ItemYellowFlute: StatusConfusion,
+}
+var battleItemStats = map[Item]int{
+	ItemXAccuracy: StatAccuracy,
+	ItemXAttack:   StatAtk,
+	ItemXDefense:  StatDef,
+	ItemXSpAtk:    StatSpAtk,
+	ItemXSpDef:    StatSpDef,
+	ItemXSpeed:    StatSpeed,
+}
 var fullCure = StatusNonvolatileMask | StatusConfusion
 var medicineData = map[Item]struct {
 	Heal       uint
