@@ -47,8 +47,8 @@ const (
 	ItemCategoryPPRecovery
 	ItemCategoryRevival
 	ItemCategoryStatusCures
-
-	ItemCategoryMulch
+	// Category 31 does not exist
+	ItemCategoryMulch = iota + 2
 	ItemCategorySpecialBalls
 	ItemCategoryStandardBalls
 	ItemCategoryDexCompletion

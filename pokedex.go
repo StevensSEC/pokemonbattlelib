@@ -1,5 +1,10 @@
 package pokemonbattlelib
 
+var battleItemFlutes = map[Item]StatusCondition{
+	ItemBlueFlute:   StatusSleep,
+	ItemRedFlute:    StatusInfatuation,
+	ItemYellowFlute: StatusConfusion,
+}
 var battleItemStats = map[Item]int{
 	ItemXAccuracy: StatAccuracy,
 	ItemXAttack:   StatAtk,

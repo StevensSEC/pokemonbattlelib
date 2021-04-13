@@ -441,22 +441,37 @@ var _ = Describe("Medicine Items", func() {
 })
 
 var _ = Describe("Battle Items", func() {
-	var a1 Agent
-	var a2 rcAgent
+	var a1 rcAgent
+	var a2 Agent
 	setup := func(item Item) (*Battle, *Pokemon) {
-		a1 = Agent(new(dumbAgent))
-		a2 = newRcAgent()
-		_a2 := Agent(a2)
+		a1 = newRcAgent()
+		_a1 := Agent(a1)
+		a2 = Agent(new(dumbAgent))
 		user := GeneratePokemon(PkmnBulbasaur, WithLevel(100), WithMoves(MoveSplash))
 		p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveSplash))
-		b := New1v1Battle(user, &a1, p2, &_a2)
+		b := New1v1Battle(user, &_a1, p2, &a2)
 		Expect(b.Start()).To(Succeed())
-		a2 <- ItemTurn{
+		a1 <- ItemTurn{
 			Item:   item,
 			Target: b.getTarget(0, 0),
 		}
 		return b, user
 	}
+
+	DescribeTable("Flutes",
+		func(item Item, status StatusCondition) {
+			b, user := setup(item)
+			user.StatusEffects = status
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(CureStatusTransaction{
+				Target:       b.getTarget(0, 0),
+				StatusEffect: status,
+			}))
+		},
+		Entry("Blue Flute", ItemBlueFlute, StatusSleep),
+		Entry("Red Flute", ItemRedFlute, StatusInfatuation),
+		Entry("Yellow Flute", ItemYellowFlute, StatusConfusion),
+	)
 
 	DescribeTable("Stat Boosts",
 		func(item Item, stat, stages int) {
@@ -499,7 +514,7 @@ var _ = Describe("Battle Items", func() {
 			Stages:        -2,
 		})
 		// No-op for RC Agent
-		a2 <- ItemTurn{
+		a1 <- ItemTurn{
 			Item:   ItemNone,
 			Target: b.getTarget(0, 0),
 		}

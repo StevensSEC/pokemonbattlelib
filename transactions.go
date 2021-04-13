@@ -112,6 +112,11 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		// TODO: remove consumed item from party's inventory
 	}
 	switch t.Item.Category() {
+	case ItemCategoryFlutes:
+		b.QueueTransaction(CureStatusTransaction{
+			Target:       t.Target,
+			StatusEffect: battleItemFlutes[t.Item],
+		})
 	case ItemCategoryStatBoost:
 		if t.Item == ItemDireHit {
 			b.QueueTransaction(ModifyStatTransaction{
