@@ -132,11 +132,87 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			Target: target,
 			Amount: [3]int{1, 1, 0}[target.Friendship/100],
 		})
+	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
+		if t.Item.Category() == ItemCategoryRevival && target.CurrentHP != 0 {
+			return
+		}
+		fIndex := target.Friendship / 100
+		data, ok := medicineData[t.Item]
+		if ok {
+			if data.Heal > 0 {
+				b.QueueTransaction(HealTransaction{
+					Target: target,
+					Amount: data.Heal,
+				})
+			}
+			if amount := data.Friendship[fIndex]; amount != 0 {
+				b.QueueTransaction(FriendshipTransaction{
+					Target: target,
+					Amount: amount,
+				})
+			}
+			if data.Cure != StatusNone {
+				b.QueueTransaction(CureStatusTransaction{
+					Target:       t.Target,
+					StatusEffect: data.Cure,
+				})
+			}
+		}
+		// Other medicine item effects
+		switch t.Item {
+		case ItemSacredAsh:
+			for _, pkmn := range b.parties[t.Target.party].pokemon() {
+				if pkmn.CurrentHP == 0 {
+					b.QueueTransaction(HealTransaction{
+						Target: pkmn,
+						Amount: pkmn.MaxHP(),
+					})
+				}
+			}
+		case ItemFullRestore, ItemMaxPotion, ItemMaxRevive, ItemRevivalHerb:
+			b.QueueTransaction(HealTransaction{
+				Target: target,
+				Amount: target.MaxHP(),
+			})
+		case ItemRevive:
+			b.QueueTransaction(HealTransaction{
+				Target: target,
+				Amount: target.MaxHP() / 2,
+			})
+		}
 	}
 	switch t.Item {
-	// ItemCategoryMedicine
-	case ItemPotion:
-		b.QueueTransaction(target.RestoreHP(20))
+	// ItemCategoryPPRecovery
+	case ItemElixir:
+		for _, m := range target.Moves {
+			if m == nil {
+				continue
+			}
+			b.QueueTransaction(PPTransaction{
+				Move:   m,
+				Amount: 10,
+			})
+		}
+	case ItemEther:
+		b.QueueTransaction(PPTransaction{
+			Move:   t.Move,
+			Amount: 10,
+		})
+	case ItemMaxElixir:
+		for _, m := range target.Moves {
+			if m == nil {
+				continue
+			}
+			b.QueueTransaction(PPTransaction{
+				Move:   m,
+				Amount: int8(m.MaxPP),
+			})
+		}
+	case ItemMaxEther:
+		b.QueueTransaction(PPTransaction{
+			Move:   t.Move,
+			Amount: int8(t.Move.MaxPP),
+		})
 	// ItemCategoryInAPinch
 	case ItemApicotBerry:
 		b.QueueTransaction(ModifyStatTransaction{
@@ -251,17 +327,12 @@ type PPTransaction struct {
 }
 
 func (t PPTransaction) Mutate(b *Battle) {
-	// This is why we should just use int
-	if t.Amount < 0 {
-		n := uint8(t.Amount * -1)
-		if t.Move.CurrentPP < n {
-			n = t.Move.CurrentPP
-		}
-		t.Move.CurrentPP -= n
-	} else {
-		t.Move.CurrentPP += uint8(t.Amount)
-		if t.Move.CurrentPP > t.Move.MaxPP {
+	t.Move.CurrentPP += uint8(t.Amount)
+	if t.Move.CurrentPP >= t.Move.MaxPP {
+		if t.Amount > 0 {
 			t.Move.CurrentPP = t.Move.MaxPP
+		} else {
+			t.Move.CurrentPP = 0
 		}
 	}
 }
@@ -284,6 +355,9 @@ type HealTransaction struct {
 
 func (t HealTransaction) Mutate(b *Battle) {
 	t.Target.CurrentHP += t.Amount
+	if t.Target.CurrentHP > t.Target.MaxHP() {
+		t.Target.CurrentHP = t.Target.MaxHP()
+	}
 }
 
 // A transaction to apply a status effect to a Pokemon.
@@ -420,12 +494,17 @@ func (t MoveFailTransaction) Mutate(b *Battle) {
 
 // Modifies a stat's stages in the interval [-6, 6]
 type ModifyStatTransaction struct {
-	Target *Pokemon
-	Stat   int
-	Stages int
+	Target        *Pokemon
+	SelfInflicted bool
+	Stat          int
+	Stages        int
 }
 
 func (t ModifyStatTransaction) Mutate(b *Battle) {
+	_, immune := t.Target.metadata[MetaStatChangeImmune]
+	if immune && t.Stages < 0 && !t.SelfInflicted {
+		return
+	}
 	stage := t.Target.StatModifiers[t.Stat] + t.Stages
 	min := MinStatModifier
 	max := MaxStatModifier

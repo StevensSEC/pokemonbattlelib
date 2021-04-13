@@ -224,7 +224,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	blog.Println("Sorting turns")
 	// Sort turns using an in-place stable sort
 	b.sortTurns(&turns)
-
 	// Run turns in sorted order and update battle state
 	for len(turns) > 0 {
 		turn := turns[0]
@@ -471,7 +470,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		}
 	}
 	b.postRound()
-
 	b.ProcessQueue()
 	if len(b.tQueue) > 0 {
 		blog.Panic("FATAL: There are still unprocessed transactions at the end of the round.")

@@ -360,14 +360,6 @@ func (p Pokemon) String() string {
 	return p.GetName()
 }
 
-// Restore HP to a Pokemon. Can also be used to revive a fainted Pokemon.
-func (p *Pokemon) RestoreHP(amount uint) Transaction {
-	if diff := p.MaxHP() - p.CurrentHP; diff <= amount {
-		amount = diff
-	}
-	return HealTransaction{Target: p, Amount: amount}
-}
-
 func (p *Pokemon) MarshalJSON() ([]byte, error) {
 	type alias Pokemon // required to not enter infinite recursive loop
 	return json.Marshal(&struct {
