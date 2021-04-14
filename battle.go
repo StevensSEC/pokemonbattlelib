@@ -609,14 +609,16 @@ func (t target) String() string {
 		t.party, t.partySlot, t.Team, t.Pokemon)
 }
 
-func (t *target) MarshalJSON() ([]byte, error) {
+func (t target) MarshalJSON() ([]byte, error) {
 	type alias target // required to not enter infinite recursive loop
 	return json.Marshal(&struct {
 		Party int
 		Slot  int
 		*alias
 	}{
-		alias: (*alias)(t),
+		Party: t.party,
+		Slot:  t.partySlot,
+		alias: (*alias)(&t),
 	})
 }
 
