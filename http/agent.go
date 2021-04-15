@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	. "github.com/StevensSEC/pokemonbattlelib"
-	"github.com/mitchellh/mapstructure"
 )
 
 type HttpCallbackAgent struct {
@@ -48,21 +47,33 @@ type HttpTurn struct {
 
 func (hT *HttpTurn) GetTurn() Turn {
 	var turn Turn
-	var err error
 	switch hT.Type {
 	case 0:
 		var t FightTurn
-		err = mapstructure.Decode(hT.Args, &t)
+		// HACK: required to unmarshal private fields
+		bytes, err := json.Marshal(hT.Args)
+		if err != nil {
+			log.Panicf("Failed to decode turn arguments: %s", err)
+		}
+		err = json.Unmarshal(bytes, &t)
+		if err != nil {
+			log.Panicf("Failed to decode turn arguments: %s", err)
+		}
 		turn = Turn(t)
 	case 1:
 		var t ItemTurn
-		err = mapstructure.Decode(hT.Args, &t)
+		// HACK: required to unmarshal private fields
+		bytes, err := json.Marshal(hT.Args)
+		if err != nil {
+			log.Panicf("Failed to decode turn arguments: %s", err)
+		}
+		err = json.Unmarshal(bytes, &t)
+		if err != nil {
+			log.Panicf("Failed to decode turn arguments: %s", err)
+		}
 		turn = Turn(t)
 	default:
 		log.Panic("unknown turn number")
-	}
-	if err != nil {
-		log.Panicf("Failed to decode map into turn struct: %s", err)
 	}
 	return turn
 }
