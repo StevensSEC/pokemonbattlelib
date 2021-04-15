@@ -264,8 +264,11 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			Stages: 1,
 		})
 	case ItemStarfBerry:
-		// TODO: boost random stat, requires battle RNG to be available.
-	// ItemCategoryHeldItems
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: target,
+			Stat:   b.rng.Get(StatAtk, StatSpeed),
+			Stages: 2,
+		})
 	case ItemBlackSludge:
 		if target.Type&TypePoison != 0 {
 			b.QueueTransaction(HealTransaction{

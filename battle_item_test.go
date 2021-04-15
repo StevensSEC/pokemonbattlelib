@@ -575,5 +575,6 @@ var _ = Describe("In-a-pinch Berries", func() {
 		Entry("Micle Berry", ItemMicleBerry, StatAccuracy, 1),
 		Entry("Petaya Berry", ItemPetayaBerry, StatSpAtk, 1),
 		Entry("Salac Berry", ItemSalacBerry, StatSpeed, 1),
+		Entry("Starf Berry", ItemStarfBerry, StatSpeed, 2), //Don't know what to do with the StatSpeed (don't know how to implement rng into this)
 	)
 })
