@@ -112,6 +112,31 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		// TODO: remove consumed item from party's inventory
 	}
 	switch t.Item.Category() {
+	case ItemCategoryFlutes:
+		b.QueueTransaction(CureStatusTransaction{
+			Target:       t.Target,
+			StatusEffect: battleItemFlutes[t.Item],
+		})
+	case ItemCategoryStatBoost:
+		if t.Item == ItemDireHit {
+			b.QueueTransaction(ModifyStatTransaction{
+				Target: target,
+				Stat:   StatCritChance,
+				Stages: +2,
+			})
+		} else if t.Item == ItemGuardSpec {
+			target.metadata[MetaStatChangeImmune] = 5
+		} else {
+			b.QueueTransaction(ModifyStatTransaction{
+				Target: target,
+				Stat:   battleItemStats[t.Item],
+				Stages: +1,
+			})
+		}
+		b.QueueTransaction(FriendshipTransaction{
+			Target: target,
+			Amount: [3]int{1, 1, 0}[target.Friendship/100],
+		})
 	case ItemCategoryHealing, ItemCategoryRevival, ItemCategoryStatusCures:
 		if t.Item.Category() == ItemCategoryRevival && target.CurrentHP != 0 {
 			return
@@ -239,8 +264,11 @@ func (t ItemTransaction) Mutate(b *Battle) {
 			Stages: 1,
 		})
 	case ItemStarfBerry:
-		// TODO: boost random stat, requires battle RNG to be available.
-	// ItemCategoryHeldItems
+		b.QueueTransaction(ModifyStatTransaction{
+			Target: target,
+			Stat:   b.rng.Get(StatAtk, StatSpeed),
+			Stages: 2,
+		})
 	case ItemBlackSludge:
 		if target.Type&TypePoison != 0 {
 			b.QueueTransaction(HealTransaction{
@@ -474,12 +502,17 @@ func (t MoveFailTransaction) Mutate(b *Battle) {
 
 // Modifies a stat's stages in the interval [-6, 6]
 type ModifyStatTransaction struct {
-	Target *Pokemon
-	Stat   int
-	Stages int
+	Target        *Pokemon
+	SelfInflicted bool
+	Stat          int
+	Stages        int
 }
 
 func (t ModifyStatTransaction) Mutate(b *Battle) {
+	_, immune := t.Target.metadata[MetaStatChangeImmune]
+	if immune && t.Stages < 0 && !t.SelfInflicted {
+		return
+	}
 	stage := t.Target.StatModifiers[t.Stat] + t.Stages
 	min := MinStatModifier
 	max := MaxStatModifier

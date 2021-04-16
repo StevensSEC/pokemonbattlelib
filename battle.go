@@ -224,7 +224,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	blog.Println("Sorting turns")
 	// Sort turns using an in-place stable sort
 	b.sortTurns(&turns)
-
 	// Run turns in sorted order and update battle state
 	for len(turns) > 0 {
 		turn := turns[0]
@@ -471,7 +470,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		}
 	}
 	b.postRound()
-
 	b.ProcessQueue()
 	if len(b.tQueue) > 0 {
 		blog.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
@@ -505,7 +503,13 @@ func (b *Battle) postRound() {
 			})
 		}
 		pkmn.StatusEffects.clear(StatusFlinch) // Flinching only occurs over the course of a single turn. It never bleeds over into the next turn.
-
+		if v, ok := t.Pokemon.metadata[MetaStatChangeImmune]; ok {
+			turns := v.(int)
+			pkmn.metadata[MetaStatChangeImmune] = turns - 1
+			if turns == 0 {
+				delete(pkmn.metadata, MetaStatChangeImmune)
+			}
+		}
 		// Weather effects
 		// TODO: check for weather resisting abilities
 		if b.Weather == WeatherSandstorm {
@@ -605,14 +609,16 @@ func (t target) String() string {
 		t.party, t.partySlot, t.Team, t.Pokemon)
 }
 
-func (t *target) MarshalJSON() ([]byte, error) {
+func (t target) MarshalJSON() ([]byte, error) {
 	type alias target // required to not enter infinite recursive loop
 	return json.Marshal(&struct {
 		Party int
 		Slot  int
 		*alias
 	}{
-		alias: (*alias)(t),
+		Party: t.party,
+		Slot:  t.partySlot,
+		alias: (*alias)(&t),
 	})
 }
 

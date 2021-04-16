@@ -440,6 +440,93 @@ var _ = Describe("Medicine Items", func() {
 	)
 })
 
+var _ = Describe("Battle Items", func() {
+	var a1 rcAgent
+	var a2 Agent
+	setup := func(item Item) (*Battle, *Pokemon) {
+		a1 = newRcAgent()
+		_a1 := Agent(a1)
+		a2 = Agent(new(dumbAgent))
+		user := GeneratePokemon(PkmnBulbasaur, WithLevel(100), WithMoves(MoveSplash))
+		p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveSplash))
+		b := New1v1Battle(user, &_a1, p2, &a2)
+		Expect(b.Start()).To(Succeed())
+		a1 <- ItemTurn{
+			Item:   item,
+			Target: b.getTarget(0, 0),
+		}
+		return b, user
+	}
+
+	DescribeTable("Flutes",
+		func(item Item, status StatusCondition) {
+			b, user := setup(item)
+			user.StatusEffects = status
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(CureStatusTransaction{
+				Target:       b.getTarget(0, 0),
+				StatusEffect: status,
+			}))
+		},
+		Entry("Blue Flute", ItemBlueFlute, StatusSleep),
+		Entry("Red Flute", ItemRedFlute, StatusInfatuation),
+		Entry("Yellow Flute", ItemYellowFlute, StatusConfusion),
+	)
+
+	DescribeTable("Stat Boosts",
+		func(item Item, stat, stages int) {
+			b, user := setup(item)
+			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(ModifyStatTransaction{
+				Target: user,
+				Stat:   stat,
+				Stages: stages,
+			}))
+			Expect(t).To(HaveTransaction(FriendshipTransaction{
+				Target: user,
+				Amount: 1,
+			}))
+		},
+		Entry("Dire Hit", ItemDireHit, StatCritChance, 2),
+		Entry("X Accuracy", ItemXAccuracy, StatAccuracy, 1),
+		Entry("X Attack", ItemXAttack, StatAtk, 1),
+		Entry("X Defense", ItemXDefense, StatDef, 1),
+		Entry("X Sp. Atk", ItemXSpAtk, StatSpAtk, 1),
+		Entry("X Sp. Def", ItemXSpDef, StatSpDef, 1),
+		Entry("X Speed", ItemXSpeed, StatSpeed, 1),
+	)
+
+	Specify("Guard Spec", func() {
+		b, user := setup(ItemGuardSpec)
+		b.SimulateRound()
+		Expect(user.metadata).To(HaveKeyWithValue(MetaStatChangeImmune, 4))
+		for stat := 0; stat < len(user.StatModifiers); stat += 1 {
+			b.QueueTransaction(ModifyStatTransaction{
+				Target: user,
+				Stat:   stat,
+				Stages: -1,
+			})
+		}
+		b.QueueTransaction(ModifyStatTransaction{
+			Target:        user,
+			SelfInflicted: true,
+			Stat:          StatAtk,
+			Stages:        -2,
+		})
+		// No-op for RC Agent
+		a1 <- ItemTurn{
+			Item:   ItemNone,
+			Target: b.getTarget(0, 0),
+		}
+		b.SimulateRound()
+		Expect(user.StatModifiers).ToNot(ContainElement(-1))
+		// Self-inflicted stat debuffs are valid
+		Expect(user.StatModifiers[StatAtk]).To(Equal(-2))
+		// Decreases every round
+		Expect(user.metadata).To(HaveKeyWithValue(MetaStatChangeImmune, 3))
+	})
+})
+
 var _ = Describe("In-a-pinch Berries", func() {
 	a1 := Agent(new(dumbAgent))
 	a2 := Agent(new(dumbAgent))
@@ -488,5 +575,6 @@ var _ = Describe("In-a-pinch Berries", func() {
 		Entry("Micle Berry", ItemMicleBerry, StatAccuracy, 1),
 		Entry("Petaya Berry", ItemPetayaBerry, StatSpAtk, 1),
 		Entry("Salac Berry", ItemSalacBerry, StatSpeed, 1),
+		Entry("Starf Berry", ItemStarfBerry, StatSpeed, 2), //Don't know what to do with the StatSpeed (don't know how to implement rng into this)
 	)
 })

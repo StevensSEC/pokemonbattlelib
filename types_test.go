@@ -1,6 +1,7 @@
 package pokemonbattlelib
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 
@@ -296,5 +297,28 @@ var _ = Describe("Abilities", func() {
 
 	It("should panic if given an invalid Ability", func() {
 		Expect(func() { _ = Ability(math.MaxUint16).String() }).To(Panic())
+	})
+})
+
+var _ = Describe("target", func() {
+	It("should unmarshal json", func() {
+		bytes := []byte("{\"Party\": 1, \"Slot\": 2}")
+		var t target
+		Expect(json.Unmarshal(bytes, &t)).To(Succeed())
+		Expect(t.party).To(Equal(1))
+		Expect(t.partySlot).To(Equal(2))
+	})
+
+	It("should unmarshal json from marshalled json", func() {
+		bytes, err := json.Marshal(target{
+			party:     1,
+			partySlot: 2,
+		})
+		Expect(err).To(Succeed())
+		Expect(string(bytes)).To(ContainSubstring("2"))
+		var t target
+		Expect(json.Unmarshal(bytes, &t)).To(Succeed())
+		Expect(t.party).To(Equal(1))
+		Expect(t.partySlot).To(Equal(2))
 	})
 })
