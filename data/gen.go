@@ -624,7 +624,7 @@ func main() {
 	}
 	output += "}\n\n"
 	// Add move constants
-	output += "// Create move constant enum for quick reference\nconst (\n" +
+	output += "// Move constants for quick and easy reference\nconst (\n" +
 		"MoveNone MoveId = iota\n"
 	for _, m := range moves {
 		name := cleanName(m.Name)
@@ -661,7 +661,7 @@ func main() {
 			item_flags[r[0]] = append(item_flags[r[0]], itemFlagMap[v])
 		}
 	}
-	output += "// Create item constant enum for quick reference\n"
+	output += "// Item constants for quick and easy reference\n"
 	item_names_csv := getCsvReader("data/item_names.csv")
 	item_vars := make(map[string]string) // data IDs to constants
 	item_names := make(map[string]string)

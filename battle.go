@@ -55,6 +55,7 @@ func (b *Battle) SetSeed(seed uint) {
 	b.rng.SetSeed(seed)
 }
 
+// Add a party to the battle, controlled by an agent. This method is preferred over `AddBattleParty`.
 func (b *Battle) AddParty(p *Party, a *Agent, team int) {
 	b.AddBattleParty(&battleParty{
 		Party:         p,
