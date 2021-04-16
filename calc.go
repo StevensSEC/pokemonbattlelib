@@ -84,7 +84,7 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 // Calculate the accuracy of a move, accounting for weather/evasion/held items/etc.
 func CalcAccuracy(weather Weather, user, receiver *Pokemon, move *Move) uint {
 	evasion := receiver.Evasion()
-	accuracy := move.Accuracy() * (user.Accuracy() / 100) * (evasion / 100)
+	accuracy := (move.Accuracy() * user.Accuracy() * evasion) / 10000
 	if weather == WeatherFog {
 		accuracy = (accuracy * 3) / 5
 	}
