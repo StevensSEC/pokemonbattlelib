@@ -39,7 +39,7 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	}
 	elementalEffect := GetElementalEffect(moveType, receiver.EffectiveType(), receiver.HeldItem)
 	// Account for ground type moves on grounded Pokemon
-	if move.Type()&TypeGround > 0 && receiver.Type&TypeFlying > 0 && receiver.IsGrounded() {
+	if moveType&TypeGround > 0 && receiver.Type&TypeFlying > 0 && receiver.IsGrounded() {
 		elementalEffect -= NoEffect
 	}
 	if elementalEffect > NormalEffect {
@@ -50,11 +50,11 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	// Weather type modifier
 	if rain, sun := weather == WeatherRain, weather == WeatherHarshSunlight; (rain && move.Type() == TypeWater) || (sun && move.Type() == TypeFire) {
 		damage = (damage * 150) / 100
-	} else if (rain && move.Type() == TypeFire) || (sun && move.Type() == TypeWater) {
+	} else if (rain && moveType == TypeFire) || (sun && moveType == TypeWater) {
 		damage /= 2
 	}
 	// Stab modifier
-	if move != nil && user.EffectiveType()&move.Type() != 0 {
+	if move != nil && user.EffectiveType()&moveType != 0 {
 		if user.Ability == AbilityAdaptability {
 			damage *= 2
 		} else {
@@ -80,6 +80,11 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	case ItemWiseGlasses:
 		if move.Category() == MoveCategorySpecial {
 			damage = (damage * 110) / 100
+		}
+	}
+	if c := user.HeldItem.Category(); c == ItemCategoryPlates || c == ItemCategoryTypeEnhancement {
+		if moveType == typeItemData[user.HeldItem] {
+			damage = (damage * 120) / 100
 		}
 	}
 	return damage

@@ -309,6 +309,66 @@ var _ = Describe("Misc. + Held Items", func() {
 			Entry("Smooth Rock", ItemSmoothRock, WeatherSandstorm, MoveSandstorm),
 		)
 	})
+
+	DescribeTable("Plates/Type Enhancement",
+		func(item Item, expectedType Type) {
+			b, holder := setup(ItemNone, PkmnArceus)
+			holder.Moves[0] = GetMove(MoveJudgment)
+			t, _ := b.SimulateRound()
+			damage := DamageDealt(t, holder)
+			b, holder = setup(item, PkmnArceus)
+			holder.Moves[0] = GetMove(MoveJudgment)
+			t, _ = b.SimulateRound()
+			if item.Category() == ItemCategoryPlates {
+				Expect(holder.EffectiveType()).To(Equal(expectedType))
+			}
+			if item.Category() == ItemCategoryPlates && expectedType == TypeGhost { // Normal immune to ghost
+				Expect(DamageDealt(t, holder)).To(BeEquivalentTo(0))
+			} else {
+				Expect(DamageDealt(t, holder)).To(BeNumerically(">", damage))
+			}
+		},
+		// Plates
+		Entry("Draco Plate", ItemDracoPlate, TypeDragon),
+		Entry("Dread Plate", ItemDreadPlate, TypeDark),
+		Entry("Earth Plate", ItemEarthPlate, TypeGround),
+		Entry("Fist Plate", ItemFistPlate, TypeFighting),
+		Entry("Flame Plate", ItemFlamePlate, TypeFire),
+		Entry("Icicle Plate", ItemIciclePlate, TypeIce),
+		Entry("Insect Plate", ItemInsectPlate, TypeBug),
+		Entry("Iron Plate", ItemIronPlate, TypeSteel),
+		Entry("Meadow Plate", ItemMeadowPlate, TypeGrass),
+		Entry("Mind Plate", ItemMindPlate, TypePsychic),
+		Entry("Sky Plate", ItemSkyPlate, TypeFlying),
+		Entry("Splash Plate", ItemSplashPlate, TypeWater),
+		Entry("Spooky Plate", ItemSpookyPlate, TypeGhost),
+		Entry("Stone Plate", ItemStonePlate, TypeRock),
+		Entry("Toxic Plate", ItemToxicPlate, TypePoison),
+		Entry("Zap Plate", ItemZapPlate, TypeElectric),
+		// Type Enhancement
+		Entry("BlackBelt", ItemBlackBelt, TypeFighting),
+		Entry("BlackGlasses", ItemBlackGlasses, TypeDark),
+		Entry("Charcoal", ItemCharcoal, TypeFire),
+		Entry("DragonFang", ItemDragonFang, TypeDragon),
+		Entry("HardStone", ItemHardStone, TypeRock),
+		Entry("Magnet", ItemMagnet, TypeElectric),
+		Entry("MetalCoat", ItemMetalCoat, TypeSteel),
+		Entry("MiracleSeed", ItemMiracleSeed, TypeGrass),
+		Entry("MysticWater", ItemMysticWater, TypeWater),
+		Entry("NeverMeltIce", ItemNeverMeltIce, TypeIce),
+		Entry("OddIncense", ItemOddIncense, TypePsychic),
+		Entry("PoisonBarb", ItemPoisonBarb, TypePoison),
+		Entry("RockIncense", ItemRockIncense, TypeRock),
+		Entry("RoseIncense", ItemRoseIncense, TypeGrass),
+		Entry("SeaIncense", ItemSeaIncense, TypeWater),
+		Entry("SharpBeak", ItemSharpBeak, TypeFlying),
+		Entry("SilkScarf", ItemSilkScarf, TypeNormal),
+		Entry("SilverPowder", ItemSilverPowder, TypeBug),
+		Entry("SoftSand", ItemSoftSand, TypeGround),
+		Entry("SpellTag", ItemSpellTag, TypeGhost),
+		Entry("TwistedSpoon", ItemTwistedSpoon, TypePsychic),
+		Entry("WaveIncense", ItemWaveIncense, TypeWater),
+	)
 })
 
 var _ = Describe("Medicine Items", func() {
