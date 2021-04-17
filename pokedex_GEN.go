@@ -1864,7 +1864,7 @@ var AllMoves = []MoveData{
 	{"Shadow Sky", 0, MoveCategoryStatus, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect},
 }
 
-// Create move constant enum for quick reference
+// Move constants for quick and easy reference
 const (
 	MoveNone MoveId = iota
 	MovePound
@@ -2354,7 +2354,7 @@ const (
 	MoveShadowSky
 )
 
-// Create item constant enum for quick reference
+// Item constants for quick and easy reference
 const (
 	ItemNone Item = iota
 	ItemMasterBall
