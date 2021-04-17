@@ -83,6 +83,9 @@ func BenchmarkBattle(b *testing.B) {
 		p1 := randParty()
 		p2 := randParty()
 		battle = NewSingleBattle(p1, &a1, p2, &a1)
+		rng := battle.rng.(*LCRNG)
+		var seed uint32
+		seed = uint32(*rng)
 		err := battle.Start()
 		if err != nil {
 			panic(err)
@@ -112,7 +115,9 @@ func BenchmarkBattle(b *testing.B) {
 			rounds++
 
 			if rounds > 100 {
+				fmt.Printf("\n\nBATTLE GOT STUCK:\n")
 				dumpBattle(battle)
+				fmt.Printf("b.SetSeed(%d)\n", seed)
 				// log.Panic("Battle is stuck!")
 				stuck++
 				break
