@@ -55,6 +55,7 @@ func (b *Battle) SetSeed(seed uint) {
 	b.rng.SetSeed(seed)
 }
 
+// Add a party to the battle, controlled by an agent. This method is preferred over `AddBattleParty`.
 func (b *Battle) AddParty(p *Party, a *Agent, team int) {
 	b.AddBattleParty(&battleParty{
 		Party:         p,
@@ -278,12 +279,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// Status Moves
 			if move.Category() == MoveCategoryStatus {
 				switch move.Id {
-				case MoveDoubleTeam:
-					b.QueueTransaction(ModifyStatTransaction{
-						Target: user,
-						Stat:   StatEvasion,
-						Stages: +1,
-					})
 				case MoveStunSpore:
 					b.QueueTransaction(InflictStatusTransaction{
 						Target:       t.Target.Pokemon,
@@ -347,12 +342,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Weather: WeatherSandstorm,
 						Turns:   turns,
 					})
-				case MoveHowl:
-					b.QueueTransaction(ModifyStatTransaction{
-						Target: user,
-						Stat:   StatAtk,
-						Stages: +1,
-					})
 				case MoveSplash:
 					b.QueueTransaction(MoveFailTransaction{
 						User:   user,
@@ -372,7 +361,26 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						})
 					}
 				default:
-					blog.Printf("Unimplemented status move: %s", move.Name())
+					if move.StatStages() != 0 {
+						if move.Targets() == MoveTargetUser {
+							b.QueueTransaction(ModifyStatTransaction{
+								Target:        user,
+								SelfInflicted: true,
+								Stat:          int(move.AffectedStat()),
+								Stages:        int(move.StatStages()),
+							})
+						} else if move.Targets() == MoveTargetSelected || move.Targets() == MoveTargetAllOpponents {
+							b.QueueTransaction(ModifyStatTransaction{
+								Target: t.Target.Pokemon,
+								Stat:   int(move.AffectedStat()),
+								Stages: int(move.StatStages()),
+							})
+						} else {
+							blog.Printf("Unknown target for stat modifying move: %s: %v", move.Name(), move.Targets())
+						}
+					} else {
+						blog.Printf("Unimplemented status move: %s", move.Name())
+					}
 				}
 			} else {
 				// Physical/Special Moves
@@ -411,19 +419,31 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					Damage: uint(damage),
 				})
 				// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
+				// However, if Drain is negative, it's actually recoil damage.
 				if move.Drain() != 0 {
-					drain := damage * uint(move.Drain()) / 100
-					if user.HeldItem == ItemBigRoot {
-						drain = drain * 130 / 100 // 30% more HP than normal
+					drain := int(damage) * move.Drain() / 100
+					if drain > 0 {
+						// These multiplers only apply to draining moves, not recoil moves
+						if user.HeldItem == ItemBigRoot {
+							drain = drain * 130 / 100 // 30% more HP than normal
+						}
 					}
 					if drain == 0 {
 						// Min 1 HP drain
 						drain = 1
 					}
-					b.QueueTransaction(HealTransaction{
-						Target: user,
-						Amount: drain,
-					})
+					if drain > 0 {
+						b.QueueTransaction(HealTransaction{
+							Target: user,
+							Amount: uint(drain),
+						})
+					} else {
+						// recoil damage
+						b.QueueTransaction(DamageTransaction{
+							Target: turn.User,
+							Damage: uint(-drain),
+						})
+					}
 				}
 				if move.FlinchChance() > 0 && b.rng.Roll(move.FlinchChance(), 100) {
 					b.QueueTransaction(InflictStatusTransaction{
