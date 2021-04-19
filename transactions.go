@@ -266,32 +266,6 @@ func (t DamageTransaction) Mutate(b *Battle) {
 		b.QueueTransaction(FaintTransaction{
 			Target: t.Target,
 		})
-		// friendship is lowered based on level difference
-		levelGap := t.User.Level - receiver.Level
-		loss := -1
-		if levelGap >= 30 {
-			if receiver.Friendship < 200 {
-				loss = -5
-			} else {
-				loss = -10
-			}
-		}
-		b.QueueTransaction(FriendshipTransaction{
-			Target: receiver,
-			Amount: loss,
-		})
-		// EVs are gained based on EV yield of defeated Pokemon
-		evGain := receiver.GetEVYield()
-		for stat, amount := range evGain {
-			if amount == 0 {
-				continue
-			}
-			b.QueueTransaction(EVTransaction{
-				Target: t.User,
-				Stat:   stat,
-				Amount: uint8(amount),
-			})
-		}
 	}
 }
 
@@ -628,6 +602,36 @@ type FaintTransaction struct {
 }
 
 func (t FaintTransaction) Mutate(b *Battle) {
+	// EVs are gained based on EV yield of defeated Pokemon
+	evGain := t.Target.Pokemon.GetEVYield()
+	for _, opponent := range b.GetOpponents(b.GetParty(&t.Target)) {
+		// friendship is lowered based on level difference
+		levelGap := opponent.Pokemon.Level - t.Target.Pokemon.Level
+		loss := -1
+		if levelGap >= 30 {
+			if t.Target.Pokemon.Friendship < 200 {
+				loss = -5
+			} else {
+				loss = -10
+			}
+		}
+		b.QueueTransaction(FriendshipTransaction{
+			Target: t.Target.Pokemon,
+			Amount: loss,
+		})
+
+		for stat, amount := range evGain {
+			if amount == 0 {
+				continue
+			}
+			b.QueueTransaction(EVTransaction{
+				Target: opponent.Pokemon,
+				Stat:   stat,
+				Amount: uint8(amount),
+			})
+		}
+	}
+
 	p := b.parties[t.Target.party]
 	p.SetInactive(t.Target.partySlot)
 	anyAlive := false
