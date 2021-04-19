@@ -261,6 +261,20 @@ func (matcher *singleTransactionMatcher) NegatedFailureMessage(actual interface{
 	)
 }
 
+func orderedTransactionDiffLine(idx int, t Transaction) string {
+	line := fmt.Sprintf("%d. %T", idx+1, t)
+	switch tt := t.(type) {
+	case UseMoveTransaction:
+		line += fmt.Sprintf(" - user: %d, %d  target: %d, %d  move: %s",
+			tt.User.party, tt.User.partySlot,
+			tt.Target.party, tt.Target.partySlot,
+			tt.Move,
+		)
+	}
+	line += "\n"
+	return line
+}
+
 // Given a sequence of transactions, match if a given set of transactions is present in the sequence, and the order matches.
 type orderedTransactionMatcher struct {
 	expected []Transaction
@@ -314,13 +328,13 @@ func (matcher *orderedTransactionMatcher) Match(actual interface{}) (success boo
 func (matcher *orderedTransactionMatcher) FailureMessage(actual interface{}) (message string) {
 	wantOrder := ""
 	for i, t := range matcher.expected {
-		wantOrder += fmt.Sprintf("%d. %T\n", i+1, t)
+		wantOrder += orderedTransactionDiffLine(i, t)
 	}
 	switch transactions := actual.(type) {
 	case []Transaction:
 		gotOrder := ""
 		for i, t := range transactions {
-			gotOrder += fmt.Sprintf("%d. %T\n", i+1, t)
+			gotOrder += orderedTransactionDiffLine(i, t)
 		}
 		msg := fmt.Sprintf("Expected the sequence of transactions to have these transactions in this order:\n%s"+
 			"\nReceived the following transactions:\n%s",
