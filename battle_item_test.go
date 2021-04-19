@@ -40,9 +40,17 @@ var _ = Describe("Misc. + Held Items", func() {
 				b, _ := setup(item, PkmnMagikarp)
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransactionsInOrder(
+					UseMoveTransaction{
+						User:   b.getTarget(0, 0),
+						Target: b.getTarget(1, 0),
+					},
 					MoveFailTransaction{
 						User:   b.getPokemonInBattle(0, 0),
 						Reason: FailOther,
+					},
+					UseMoveTransaction{
+						User:   b.getTarget(1, 0),
+						Target: b.getTarget(0, 0),
 					},
 					MoveFailTransaction{
 						User:   b.getPokemonInBattle(1, 0),
@@ -60,14 +68,13 @@ var _ = Describe("Misc. + Held Items", func() {
 			attacker.Moves[0] = GetMove(MoveEarthquake)
 			// Flying immunity negated
 			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(UseMoveTransaction{
+				User:   b.getTarget(0, 0),
+				Target: b.getTarget(1, 0),
+			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: attacker,
-				Target: target{
-					Pokemon:   holder,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
+				User:   attacker,
+				Target: b.getTarget(1, 0),
 				Move:   GetMove(MoveEarthquake),
 				Damage: 36,
 			}))
@@ -80,14 +87,13 @@ var _ = Describe("Misc. + Held Items", func() {
 			b, holder := setup(ItemStickyBarb, PkmnGrimer)
 			attacker := b.getPokemonInBattle(0, 0)
 			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(UseMoveTransaction{
+				User:   b.getTarget(0, 0),
+				Target: b.getTarget(1, 0),
+			}))
 			// Holder takes 1/8 HP damage after every turn
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: target{
-					Pokemon:   holder,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
+				Target: b.getTarget(1, 0),
 				Damage: holder.MaxHP() / 8,
 			}))
 			// Contact moves damage attacker and pass the sticky barb to the attacker
@@ -95,12 +101,7 @@ var _ = Describe("Misc. + Held Items", func() {
 			t, _ = b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
-					Target: target{
-						Pokemon:   attacker,
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					Target: b.getTarget(0, 0),
 					Damage: attacker.MaxHP() / 8,
 				},
 				GiveItemTransaction{
@@ -171,16 +172,15 @@ var _ = Describe("Misc. + Held Items", func() {
 			b, holder := setup(ItemExpertBelt, PkmnMachamp)
 			holder.Moves[0] = GetMove(MoveCloseCombat)
 			t, _ := b.SimulateRound()
+			Expect(t).To(HaveTransaction(UseMoveTransaction{
+				User:   b.getTarget(1, 0),
+				Target: b.getTarget(0, 0),
+			}))
 			// Damage boosted by 20%
 			Expect(t).To(HaveTransaction(
 				DamageTransaction{
-					User: holder,
-					Target: target{
-						Pokemon:   b.getPokemonInBattle(0, 0),
-						party:     0,
-						partySlot: 0,
-						Team:      0,
-					},
+					User:   b.getPokemonInBattle(1, 0),
+					Target: b.getTarget(0, 0),
 					Damage: 201,
 				},
 			))
