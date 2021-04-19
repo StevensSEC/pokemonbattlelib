@@ -386,6 +386,9 @@ func (p *Pokemon) UnmarshalJSON(data []byte) error {
 
 // Get the Pokemon's current elemental type, accounting for any abilities or conditions that would affect it.
 func (p *Pokemon) EffectiveType() Type {
+	if p.NatDex == PkmnArceus && p.HeldItem.Category() == ItemCategoryPlates {
+		return typeItemData[p.HeldItem]
+	}
 	return p.Type
 }
 

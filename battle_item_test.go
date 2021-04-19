@@ -309,6 +309,76 @@ var _ = Describe("Misc. + Held Items", func() {
 			Entry("Smooth Rock", ItemSmoothRock, WeatherSandstorm, MoveSandstorm),
 		)
 	})
+
+	DescribeTable("Plates",
+		func(item Item, expectedType Type) {
+			b, holder := setup(ItemNone, PkmnArceus)
+			receiver := b.getPokemonInBattle(0, 0)
+			damage := CalcMoveDamage(b.Weather, holder, receiver, GetMove(MoveJudgment))
+			holder.HeldItem = item
+			heldDamage := CalcMoveDamage(b.Weather, holder, receiver, GetMove(MoveJudgment))
+			Expect(holder.EffectiveType()).To(Equal(expectedType))
+			if expectedType == TypeGhost { // Normal immune to ghost
+				Expect(heldDamage).To(BeEquivalentTo(0))
+			} else {
+				Expect(heldDamage).To(BeNumerically(">", damage))
+			}
+		},
+		Entry("Draco Plate", ItemDracoPlate, TypeDragon),
+		Entry("Dread Plate", ItemDreadPlate, TypeDark),
+		Entry("Earth Plate", ItemEarthPlate, TypeGround),
+		Entry("Fist Plate", ItemFistPlate, TypeFighting),
+		Entry("Flame Plate", ItemFlamePlate, TypeFire),
+		Entry("Icicle Plate", ItemIciclePlate, TypeIce),
+		Entry("Insect Plate", ItemInsectPlate, TypeBug),
+		Entry("Iron Plate", ItemIronPlate, TypeSteel),
+		Entry("Meadow Plate", ItemMeadowPlate, TypeGrass),
+		Entry("Mind Plate", ItemMindPlate, TypePsychic),
+		Entry("Sky Plate", ItemSkyPlate, TypeFlying),
+		Entry("Splash Plate", ItemSplashPlate, TypeWater),
+		Entry("Spooky Plate", ItemSpookyPlate, TypeGhost),
+		Entry("Stone Plate", ItemStonePlate, TypeRock),
+		Entry("Toxic Plate", ItemToxicPlate, TypePoison),
+		Entry("Zap Plate", ItemZapPlate, TypeElectric),
+	)
+
+	DescribeTable("Type Enhancement",
+		func(item Item, expectedType Type) {
+			b, holder := setup(ItemNone, PkmnArceus)
+			receiver := b.getPokemonInBattle(0, 0)
+			m := GetMove(NewMove(10, MoveCategoryStatus, expectedType))
+			damage := CalcMoveDamage(b.Weather, holder, receiver, m)
+			holder.HeldItem = item
+			heldDamage := CalcMoveDamage(b.Weather, holder, receiver, m)
+			if expectedType == TypeGhost { // Normal immune to ghost
+				Expect(heldDamage).To(BeEquivalentTo(0))
+			} else {
+				Expect(heldDamage).To(BeNumerically(">", damage))
+			}
+		},
+		Entry("BlackBelt", ItemBlackBelt, TypeFighting),
+		Entry("BlackGlasses", ItemBlackGlasses, TypeDark),
+		Entry("Charcoal", ItemCharcoal, TypeFire),
+		Entry("DragonFang", ItemDragonFang, TypeDragon),
+		Entry("HardStone", ItemHardStone, TypeRock),
+		Entry("Magnet", ItemMagnet, TypeElectric),
+		Entry("MetalCoat", ItemMetalCoat, TypeSteel),
+		Entry("MiracleSeed", ItemMiracleSeed, TypeGrass),
+		Entry("MysticWater", ItemMysticWater, TypeWater),
+		Entry("NeverMeltIce", ItemNeverMeltIce, TypeIce),
+		Entry("OddIncense", ItemOddIncense, TypePsychic),
+		Entry("PoisonBarb", ItemPoisonBarb, TypePoison),
+		Entry("RockIncense", ItemRockIncense, TypeRock),
+		Entry("RoseIncense", ItemRoseIncense, TypeGrass),
+		Entry("SeaIncense", ItemSeaIncense, TypeWater),
+		Entry("SharpBeak", ItemSharpBeak, TypeFlying),
+		Entry("SilkScarf", ItemSilkScarf, TypeNormal),
+		Entry("SilverPowder", ItemSilverPowder, TypeBug),
+		Entry("SoftSand", ItemSoftSand, TypeGround),
+		Entry("SpellTag", ItemSpellTag, TypeGhost),
+		Entry("TwistedSpoon", ItemTwistedSpoon, TypePsychic),
+		Entry("WaveIncense", ItemWaveIncense, TypeWater),
+	)
 })
 
 var _ = Describe("Medicine Items", func() {
