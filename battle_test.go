@@ -1290,6 +1290,47 @@ var _ = Describe("Draining moves", func() {
 	})
 })
 
+var _ = Describe("Recoil moves", func() {
+	a1 := Agent(new(dumbAgent))
+	var b *Battle
+
+	BeforeEach(func() {
+		b = NewSingleBattle(
+			NewOccupiedParty(
+				GeneratePokemon(PkmnPikachu,
+					WithLevel(25),
+					WithMoves(MoveVoltTackle),
+				),
+			),
+			&a1,
+			NewOccupiedParty(
+				GeneratePokemon(PkmnBidoof,
+					WithLevel(25),
+					WithMoves(MoveSplash),
+				),
+			),
+			&a1,
+		)
+		b.rng = SimpleRNG()
+		Expect(b.Start()).To(Succeed())
+	})
+
+	It("should damage the target and damage the user", func() {
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransactionsInOrder(
+			DamageTransaction{
+				User:   b.getPokemonInBattle(0, 0),
+				Target: b.getTarget(1, 0),
+				Damage: 57,
+			},
+			DamageTransaction{
+				Target: b.getTarget(0, 0),
+				Damage: 18,
+			},
+		))
+	})
+})
+
 var _ = Describe("Move Effects", func() {
 	a1 := Agent(new(dumbAgent))
 

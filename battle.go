@@ -419,19 +419,31 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 					Damage: uint(damage),
 				})
 				// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
+				// However, if Drain is negative, it's actually recoil damage.
 				if move.Drain() != 0 {
-					drain := damage * uint(move.Drain()) / 100
-					if user.HeldItem == ItemBigRoot {
-						drain = drain * 130 / 100 // 30% more HP than normal
+					drain := int(damage) * move.Drain() / 100
+					if drain > 0 {
+						// These multiplers only apply to draining moves, not recoil moves
+						if user.HeldItem == ItemBigRoot {
+							drain = drain * 130 / 100 // 30% more HP than normal
+						}
 					}
 					if drain == 0 {
 						// Min 1 HP drain
 						drain = 1
 					}
-					b.QueueTransaction(HealTransaction{
-						Target: user,
-						Amount: drain,
-					})
+					if drain > 0 {
+						b.QueueTransaction(HealTransaction{
+							Target: user,
+							Amount: uint(drain),
+						})
+					} else {
+						// recoil damage
+						b.QueueTransaction(DamageTransaction{
+							Target: turn.User,
+							Damage: uint(-drain),
+						})
+					}
 				}
 				if move.FlinchChance() > 0 && b.rng.Roll(move.FlinchChance(), 100) {
 					b.QueueTransaction(InflictStatusTransaction{
