@@ -310,25 +310,20 @@ var _ = Describe("Misc. + Held Items", func() {
 		)
 	})
 
-	DescribeTable("Plates/Type Enhancement",
+	DescribeTable("Plates",
 		func(item Item, expectedType Type) {
 			b, holder := setup(ItemNone, PkmnArceus)
-			holder.Moves[0] = GetMove(MoveJudgment)
-			t, _ := b.SimulateRound()
-			damage := DamageDealt(t, holder)
-			b, holder = setup(item, PkmnArceus)
-			holder.Moves[0] = GetMove(MoveJudgment)
-			t, _ = b.SimulateRound()
-			if item.Category() == ItemCategoryPlates {
-				Expect(holder.EffectiveType()).To(Equal(expectedType))
-			}
-			if item.Category() == ItemCategoryPlates && expectedType == TypeGhost { // Normal immune to ghost
-				Expect(DamageDealt(t, holder)).To(BeEquivalentTo(0))
+			receiver := b.getPokemonInBattle(0, 0)
+			damage := CalcMoveDamage(b.Weather, holder, receiver, GetMove(MoveJudgment))
+			holder.HeldItem = item
+			heldDamage := CalcMoveDamage(b.Weather, holder, receiver, GetMove(MoveJudgment))
+			Expect(holder.EffectiveType()).To(Equal(expectedType))
+			if expectedType == TypeGhost { // Normal immune to ghost
+				Expect(heldDamage).To(BeEquivalentTo(0))
 			} else {
-				Expect(DamageDealt(t, holder)).To(BeNumerically(">", damage))
+				Expect(heldDamage).To(BeNumerically(">", damage))
 			}
 		},
-		// Plates
 		Entry("Draco Plate", ItemDracoPlate, TypeDragon),
 		Entry("Dread Plate", ItemDreadPlate, TypeDark),
 		Entry("Earth Plate", ItemEarthPlate, TypeGround),
@@ -345,7 +340,22 @@ var _ = Describe("Misc. + Held Items", func() {
 		Entry("Stone Plate", ItemStonePlate, TypeRock),
 		Entry("Toxic Plate", ItemToxicPlate, TypePoison),
 		Entry("Zap Plate", ItemZapPlate, TypeElectric),
-		// Type Enhancement
+	)
+
+	DescribeTable("Type Enhancement",
+		func(item Item, expectedType Type) {
+			b, holder := setup(ItemNone, PkmnArceus)
+			receiver := b.getPokemonInBattle(0, 0)
+			m := GetMove(NewMove(10, MoveCategoryStatus, expectedType))
+			damage := CalcMoveDamage(b.Weather, holder, receiver, m)
+			holder.HeldItem = item
+			heldDamage := CalcMoveDamage(b.Weather, holder, receiver, m)
+			if expectedType == TypeGhost { // Normal immune to ghost
+				Expect(heldDamage).To(BeEquivalentTo(0))
+			} else {
+				Expect(heldDamage).To(BeNumerically(">", damage))
+			}
+		},
 		Entry("BlackBelt", ItemBlackBelt, TypeFighting),
 		Entry("BlackGlasses", ItemBlackGlasses, TypeDark),
 		Entry("Charcoal", ItemCharcoal, TypeFire),
