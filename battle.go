@@ -279,12 +279,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// Status Moves
 			if move.Category() == MoveCategoryStatus {
 				switch move.Id {
-				case MoveDoubleTeam:
-					b.QueueTransaction(ModifyStatTransaction{
-						Target: user,
-						Stat:   StatEvasion,
-						Stages: +1,
-					})
 				case MoveStunSpore:
 					b.QueueTransaction(InflictStatusTransaction{
 						Target:       t.Target.Pokemon,
@@ -348,12 +342,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						Weather: WeatherSandstorm,
 						Turns:   turns,
 					})
-				case MoveHowl:
-					b.QueueTransaction(ModifyStatTransaction{
-						Target: user,
-						Stat:   StatAtk,
-						Stages: +1,
-					})
 				case MoveSplash:
 					b.QueueTransaction(MoveFailTransaction{
 						User:   user,
@@ -373,7 +361,26 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 						})
 					}
 				default:
-					blog.Printf("Unimplemented status move: %s", move.Name())
+					if move.StatStages() != 0 {
+						if move.Targets() == MoveTargetUser {
+							b.QueueTransaction(ModifyStatTransaction{
+								Target:        user,
+								SelfInflicted: true,
+								Stat:          int(move.AffectedStat()),
+								Stages:        int(move.StatStages()),
+							})
+						} else if move.Targets() == MoveTargetSelected || move.Targets() == MoveTargetAllOpponents {
+							b.QueueTransaction(ModifyStatTransaction{
+								Target: t.Target.Pokemon,
+								Stat:   int(move.AffectedStat()),
+								Stages: int(move.StatStages()),
+							})
+						} else {
+							blog.Printf("Unknown target for stat modifying move: %s: %v", move.Name(), move.Targets())
+						}
+					} else {
+						blog.Printf("Unimplemented status move: %s", move.Name())
+					}
 				}
 			} else {
 				// Physical/Special Moves

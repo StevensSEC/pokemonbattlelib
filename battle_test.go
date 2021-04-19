@@ -307,30 +307,6 @@ var _ = Describe("One round of battle", func() {
 	})
 
 	Context("when certain moves are used in battle", func() {
-		DescribeTable("Changing Pokemon stat modifiers",
-			func(id MoveId, stat, stages int) {
-				charmander.Moves[0] = GetMove(id)
-				Expect(battle.Start()).To(Succeed())
-				t, _ := battle.SimulateRound()
-				Expect(t).To(HaveTransaction(ModifyStatTransaction{
-					Target: charmander,
-					Stat:   stat,
-					Stages: stages,
-				}))
-				// Bound by min/max stat modifier
-				charmander.StatModifiers[stat] = MaxStatModifier
-				t, _ = battle.SimulateRound()
-				Expect(t).To(HaveTransaction(ModifyStatTransaction{
-					Target: charmander,
-					Stat:   stat,
-					Stages: stages,
-				}))
-				Expect(charmander.StatModifiers[stat]).To(BeEquivalentTo(MaxStatModifier))
-			},
-			Entry("Howl", MoveHowl, StatAtk, +1),
-			Entry("Double Team", MoveDoubleTeam, StatEvasion, +1),
-		)
-
 		It("should change a move's PP", func() {
 			battle.rng = AlwaysRNG()
 			charmander.Moves[0] = GetMove(MoveSpite)
