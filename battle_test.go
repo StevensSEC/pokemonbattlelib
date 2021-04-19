@@ -164,25 +164,13 @@ var _ = Describe("One round of battle", func() {
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: charmander,
-				Target: target{
-					Pokemon:   squirtle,
-					party:     1,
-					partySlot: 0,
-					Team:      1,
-				},
-				Move:   GetMove(MovePound),
+				User:   battle.getPokemonInBattle(0, 0),
+				Target: battle.getTarget(1, 0),
 				Damage: 3,
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				User: squirtle,
-				Target: target{
-					Pokemon:   charmander,
-					party:     0,
-					partySlot: 0,
-					Team:      0,
-				},
-				Move:   GetMove(MovePound),
+				User:   battle.getPokemonInBattle(1, 0),
+				Target: battle.getTarget(0, 0),
 				Damage: 3,
 			}))
 		})
