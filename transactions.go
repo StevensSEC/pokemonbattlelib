@@ -166,7 +166,6 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 		}
 		damage *= crit
 		b.QueueTransaction(DamageTransaction{
-			User:   t.User.Pokemon,
 			Target: t.Target,
 			Move:   t.Move,
 			Damage: uint(damage),
@@ -232,7 +231,6 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 
 // A transaction to deal damage to an opponent Pokemon.
 type DamageTransaction struct {
-	User         *Pokemon
 	Target       target
 	Move         *Move
 	Damage       uint

@@ -73,7 +73,6 @@ var _ = Describe("Misc. + Held Items", func() {
 				Target: b.getTarget(1, 0),
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				User:   attacker,
 				Target: b.getTarget(1, 0),
 				Move:   GetMove(MoveEarthquake),
 				Damage: 36,
@@ -179,7 +178,6 @@ var _ = Describe("Misc. + Held Items", func() {
 			// Damage boosted by 20%
 			Expect(t).To(HaveTransaction(
 				DamageTransaction{
-					User:   b.getPokemonInBattle(1, 0),
 					Target: b.getTarget(0, 0),
 					Damage: 201,
 				},

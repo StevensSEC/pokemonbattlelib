@@ -168,7 +168,6 @@ var _ = Describe("One round of battle", func() {
 				Target: battle.getTarget(1, 0),
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				User:   battle.getPokemonInBattle(0, 0),
 				Target: battle.getTarget(1, 0),
 				Damage: 3,
 			}))
@@ -177,7 +176,6 @@ var _ = Describe("One round of battle", func() {
 				Target: battle.getTarget(0, 0),
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				User:   battle.getPokemonInBattle(1, 0),
 				Target: battle.getTarget(0, 0),
 				Damage: 3,
 			}))
@@ -446,7 +444,6 @@ var _ = Describe("Turn priority", func() {
 					Move:   GetMove(MovePound),
 				},
 				DamageTransaction{
-					User:   bulbasaur,
 					Target: b.getTarget(1, 0),
 					Move:   GetMove(MovePound),
 					Damage: 3,
@@ -472,7 +469,6 @@ var _ = Describe("Turn priority", func() {
 					Move:   GetMove(MoveQuickAttack),
 				},
 				DamageTransaction{
-					User:   p2,
 					Target: b.getTarget(0, 0),
 					Damage: 5,
 					Move:   GetMove(MoveQuickAttack),
@@ -483,7 +479,6 @@ var _ = Describe("Turn priority", func() {
 					Move:   GetMove(MovePound),
 				},
 				DamageTransaction{
-					User:   p1,
 					Target: b.getTarget(1, 0),
 					Damage: 5,
 					Move:   GetMove(MovePound),
@@ -505,7 +500,6 @@ var _ = Describe("Turn priority", func() {
 					Move:   GetMove(MovePound),
 				},
 				DamageTransaction{
-					User:   ninjask,
 					Target: b.getTarget(0, 0),
 					Move:   GetMove(MovePound),
 					Damage: 3,
@@ -516,7 +510,6 @@ var _ = Describe("Turn priority", func() {
 					Move:   GetMove(MovePound),
 				},
 				DamageTransaction{
-					User:   charmander,
 					Target: b.getTarget(1, 0),
 					Move:   GetMove(MovePound),
 					Damage: 3,
@@ -746,7 +739,6 @@ var _ = Describe("Weather", func() {
 				t, _ := b.SimulateRound()
 
 				Expect(t).To(HaveTransaction(DamageTransaction{
-					User:   nil,
 					Target: b.getTarget(1, 0),
 					Move:   nil,
 					Damage: 0,
@@ -848,7 +840,6 @@ var _ = Describe("Fainting", func() {
 			))
 			Expect(t).ToNot(HaveTransaction(
 				DamageTransaction{
-					User:   pkmn1,
 					Target: b.getTarget(1, 0),
 				},
 			))
@@ -916,7 +907,6 @@ var _ = Describe("Fainting", func() {
 			t, _ := b.SimulateRound()
 			holderTarget := b.getTarget(0, 0)
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				User:   b.getPokemonInBattle(1, 0),
 				Target: holderTarget,
 			}))
 			Expect(t).ToNot(HaveTransaction(FaintTransaction{
@@ -931,7 +921,6 @@ var _ = Describe("Fainting", func() {
 			target := b.getTarget(0, 0)
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
-					User:   b.getPokemonInBattle(1, 0),
 					Target: target,
 				},
 				ItemTransaction{
@@ -982,7 +971,6 @@ var _ = Describe("Battle end", func() {
 			))
 			Expect(t).ToNot(HaveTransaction(
 				DamageTransaction{
-					User:   pkmn1,
 					Target: b.getTarget(1, 0),
 				},
 			))
@@ -1292,7 +1280,6 @@ var _ = Describe("Draining moves", func() {
 				Target: b.getTarget(1, 0),
 			},
 			DamageTransaction{
-				User:   b.getPokemonInBattle(0, 0),
 				Target: b.getTarget(1, 0),
 				Damage: 61,
 			},
@@ -1313,7 +1300,6 @@ var _ = Describe("Draining moves", func() {
 				Target: b.getTarget(1, 0),
 			},
 			DamageTransaction{
-				User:   b.getPokemonInBattle(0, 0),
 				Target: b.getTarget(1, 0),
 				Damage: 61,
 			},
@@ -1354,7 +1340,6 @@ var _ = Describe("Recoil moves", func() {
 		t, _ := b.SimulateRound()
 		Expect(t).To(HaveTransactionsInOrder(
 			DamageTransaction{
-				User:   b.getPokemonInBattle(0, 0),
 				Target: b.getTarget(1, 0),
 				Damage: 57,
 			},
@@ -1378,7 +1363,6 @@ var _ = Describe("Move Effects", func() {
 		Expect(b.Start()).To(Succeed())
 		t, _ := b.SimulateRound()
 		Expect(t).To(HaveTransaction(DamageTransaction{
-			User:   b.getPokemonInBattle(0, 0),
 			Target: b.getTarget(1, 0),
 		}))
 		Expect(t).To(HaveTransactionsInOrder(
@@ -1402,7 +1386,6 @@ var _ = Describe("Move Effects", func() {
 		Expect(b.Start()).To(Succeed())
 		t, _ := b.SimulateRound()
 		Expect(t).To(HaveTransaction(DamageTransaction{
-			User:   b.getPokemonInBattle(0, 0),
 			Target: b.getTarget(1, 0),
 		}))
 		Expect(t).To(HaveTransactionsInOrder(

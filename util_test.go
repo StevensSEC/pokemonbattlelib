@@ -360,11 +360,15 @@ func (matcher *orderedTransactionMatcher) NegatedFailureMessage(actual interface
 /* Tools for testing the library */
 // Check for damage dealt (if any) by a Pokemon in battle
 func DamageDealt(t []Transaction, p *Pokemon) int {
-	for _, x := range t {
-		if v, ok := x.(DamageTransaction); !ok {
+	for i, x := range t {
+		if v, ok := x.(UseMoveTransaction); !ok {
 			continue
-		} else if v.User == p {
-			return int(v.Damage)
+		} else if v.User.Pokemon == p {
+			if d, ok := t[i+1].(DamageTransaction); !ok {
+				continue
+			} else {
+				return int(d.Damage)
+			}
 		}
 	}
 	return 0
