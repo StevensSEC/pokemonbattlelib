@@ -121,7 +121,7 @@ var _ = Describe("Misc. + Held Items", func() {
 			b, holder := setup(item, PkmnMachamp)
 			b.SimulateRound()
 			// Restricts user to one move
-			Expect(holder.metadata[MetaLastMove]).To(BeEquivalentTo(GetMove(MoveSplash)))
+			Expect(holder.metadata[MetaLastMove]).To(BeEquivalentTo(holder.Moves[0]))
 			// Stats are boosted by 50%
 			effective := stat(holder)
 			holder.HeldItem = ItemNone

@@ -268,6 +268,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// use the move
 			receiver := t.Target.Pokemon
 			accuracy := CalcAccuracy(b.Weather, user, receiver, move)
+			b.QueueTransaction(PPTransaction{
+				Move:   move,
+				Amount: -1,
+			})
 			if move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
 				b.QueueTransaction(MoveFailTransaction{
 					User:   user,

@@ -163,7 +163,6 @@ var _ = Describe("One round of battle", func() {
 		It("should create 2 damage transactions", func() {
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
-			Expect(t).To(HaveLen(2))
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				User: charmander,
 				Target: target{
@@ -323,6 +322,18 @@ var _ = Describe("One round of battle", func() {
 			// Ensure that PP stays in bounds
 			Expect(squirtle.Moves[0].CurrentPP).To(BeEquivalentTo(0))
 		})
+	})
+	It("should decrement move's PP by 1 when used", func() {
+		battle.rng = AlwaysRNG()
+		a := Agent(new(dumbAgent))
+		p1 := GeneratePokemon(PkmnSquirtle, WithMoves(MoveSplash))
+		p2 := GeneratePokemon(PkmnSquirtle, WithMoves(MoveSplash))
+		b := New1v1Battle(p1, &a, p2, &a)
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(PPTransaction{
+			Amount: -1,
+		}))
 	})
 })
 
@@ -965,17 +976,15 @@ var _ = Describe("Battle metadata", func() {
 	Context("Pokemon metadata", func() {
 		It("should record the last used move of Pokemon in battle", func() {
 			a1 := Agent(new(dumbAgent))
-			razorLeaf := GetMove(MoveRazorLeaf)
 			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveRazorLeaf))
-			ember := GetMove(MoveEmber)
 			p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveEmber))
 			b := New1v1Battle(p1, &a1, p2, &a1)
 			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
-			Expect(p1.metadata).ToNot(HaveKeyWithValue(MetaLastMove, razorLeaf))
+			Expect(p1.metadata).ToNot(HaveKeyWithValue(MetaLastMove, p1.Moves[0]))
 			b.SimulateRound()
-			Expect(p1.metadata).To(HaveKeyWithValue(MetaLastMove, razorLeaf))
-			Expect(p2.metadata).To(HaveKeyWithValue(MetaLastMove, ember))
+			Expect(p1.metadata).To(HaveKeyWithValue(MetaLastMove, p1.Moves[0]))
+			Expect(p2.metadata).To(HaveKeyWithValue(MetaLastMove, p2.Moves[0]))
 		})
 	})
 })
