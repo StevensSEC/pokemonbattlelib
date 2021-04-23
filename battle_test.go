@@ -348,6 +348,18 @@ var _ = Describe("One round of battle", func() {
 			Expect(squirtle.Moves[0].CurrentPP).To(BeEquivalentTo(0))
 		})
 	})
+	It("should decrement move's PP by 1 when used", func() {
+		battle.rng = AlwaysRNG()
+		a := Agent(new(dumbAgent))
+		p1 := GeneratePokemon(PkmnSquirtle, WithMoves(MoveSplash))
+		p2 := GeneratePokemon(PkmnSquirtle, WithMoves(MoveSplash))
+		b := New1v1Battle(p1, &a, p2, &a)
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(PPTransaction{
+			Amount: -1,
+		}))
+	})
 })
 
 var _ = Describe("Using items in battle", func() {
