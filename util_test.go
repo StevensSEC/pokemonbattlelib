@@ -360,18 +360,29 @@ func (matcher *orderedTransactionMatcher) NegatedFailureMessage(actual interface
 /* Tools for testing the library */
 // Check for damage dealt (if any) by a Pokemon in battle
 func DamageDealt(t []Transaction, p *Pokemon) int {
-	for i, x := range t {
-		if v, ok := x.(UseMoveTransaction); !ok {
+	var usemove *UseMoveTransaction
+	var start int
+	for i := start; i < len(t); i++ {
+		if v, ok := t[i].(UseMoveTransaction); !ok {
 			continue
 		} else if v.User.Pokemon == p {
-			if d, ok := t[i+1].(DamageTransaction); !ok {
-				continue
-			} else {
+			usemove = &v
+			break
+		}
+	}
+	if usemove == nil {
+		// This might work better as a gomega matcher
+		return -1 // failure, pokemon did not use a move
+	}
+
+	for i := start; i < len(t); i++ {
+		if d, ok := t[i].(DamageTransaction); ok {
+			if d.Move == usemove.Move {
 				return int(d.Damage)
 			}
 		}
 	}
-	return 0
+	return -2 // failure, move was used but did not deal damage
 }
 
 // Custom RNG struct which allows for predictable RNG output in a battle
