@@ -1,10 +1,10 @@
 package pokemonbattlelib
 
-// import (
-// 	. "github.com/onsi/ginkgo"
-// 	. "github.com/onsi/ginkgo/extensions/table"
-// 	. "github.com/onsi/gomega"
-// )
+import (
+	. "github.com/onsi/ginkgo"
+	// . "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/gomega"
+)
 
 // TODO: Move tests involving moves here
 
@@ -23,3 +23,43 @@ func NewMove(power uint, category MoveCategory, moveType Type) MoveId {
 
 var TestMoveDefault = NewMove(10, MoveCategoryPhysical, TypeNormal)
 var TestMoveNoDamage = NewMove(0, MoveCategoryPhysical, TypeNormal)
+
+var _ = Describe("Move PP Consumption", func() {
+	a := Agent(new(dumbAgent))
+	It("should decrement move's PP by 1 when used", func() {
+		b := New1v1Battle(
+			GeneratePokemon(PkmnSquirtle, WithMoves(MoveSplash)), &a,
+			GeneratePokemon(PkmnSquirtle, WithMoves(MoveSplash)), &a,
+		)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransactionsInOrder(
+			PPTransaction{
+				Amount: -1,
+			},
+			PPTransaction{
+				Amount: -1,
+			},
+		))
+	})
+
+	It("should decrease the opponent's last used move's PP by 4 when a pokemon uses Spite", func() {
+		p1 := GeneratePokemon(PkmnCharmander, WithMoves(MoveSpite))
+		p2 := GeneratePokemon(PkmnSquirtle, defaultMoveOpt)
+		b := New1v1Battle(p1, &a, p2, &a)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		b.SimulateRound() // set Pokemon's last move
+		p1.CurrentHP = p1.MaxHP()
+		p2.CurrentHP = p2.MaxHP()
+		p2.Moves[0].CurrentPP = 1
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(PPTransaction{
+			Move:   p2.Moves[0],
+			Amount: -4,
+		}))
+		// Ensure that PP stays in bounds
+		Expect(p2.Moves[0].CurrentPP).To(BeEquivalentTo(0))
+	})
+})

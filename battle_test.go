@@ -298,37 +298,6 @@ var _ = Describe("One round of battle", func() {
 			}))
 		})
 	})
-
-	Context("when certain moves are used in battle", func() {
-		It("should change a move's PP", func() {
-			battle.rng = AlwaysRNG()
-			charmander.Moves[0] = GetMove(MoveSpite)
-			Expect(battle.Start()).To(Succeed())
-			battle.SimulateRound() // set Pokemon's last move
-			charmander.CurrentHP = charmander.MaxHP()
-			squirtle.CurrentHP = squirtle.MaxHP()
-			squirtle.Moves[0].CurrentPP = 1
-			t, _ := battle.SimulateRound()
-			Expect(t).To(HaveTransaction(PPTransaction{
-				Move:   squirtle.Moves[0],
-				Amount: -4,
-			}))
-			// Ensure that PP stays in bounds
-			Expect(squirtle.Moves[0].CurrentPP).To(BeEquivalentTo(0))
-		})
-	})
-	It("should decrement move's PP by 1 when used", func() {
-		battle.rng = AlwaysRNG()
-		a := Agent(new(dumbAgent))
-		p1 := GeneratePokemon(PkmnSquirtle, WithMoves(MoveSplash))
-		p2 := GeneratePokemon(PkmnSquirtle, WithMoves(MoveSplash))
-		b := New1v1Battle(p1, &a, p2, &a)
-		Expect(b.Start()).To(Succeed())
-		t, _ := b.SimulateRound()
-		Expect(t).To(HaveTransaction(PPTransaction{
-			Amount: -1,
-		}))
-	})
 })
 
 var _ = Describe("Using items in battle", func() {
