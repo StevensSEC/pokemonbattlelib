@@ -406,6 +406,11 @@ type FaintTransaction struct {
 }
 
 func (t FaintTransaction) Mutate(b *Battle) {
+	if b.ruleset&BattleRuleNoFaint != 0 {
+		pkmn := b.getPokemon(t.Target)
+		pkmn.CurrentHP = pkmn.MaxHP()
+		return
+	}
 	p := b.parties[t.Target.party]
 	p.SetInactive(t.Target.partySlot)
 	anyAlive := false

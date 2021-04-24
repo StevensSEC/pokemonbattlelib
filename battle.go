@@ -14,6 +14,7 @@ type Battle struct {
 	ShiftSet bool    // shift or set battle style for NPC trainer battles
 	State    BattleState
 	rng      RNG
+	ruleset  BattleRule
 
 	parties  []*battleParty             // All parties participating in the battle
 	metadata map[BattleMeta]interface{} // Metadata to be tracked during a battle
@@ -22,6 +23,12 @@ type Battle struct {
 	tProcessed []Transaction
 	results    BattleResults
 }
+
+type BattleRule int
+
+const (
+	BattleRuleNoFaint BattleRule = 1 << iota
+)
 
 type BattleMeta int
 

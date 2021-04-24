@@ -346,7 +346,7 @@ var _ = Describe("Misc. + Held Items", func() {
 		func(item Item, expectedType Type) {
 			b, holder := setup(ItemNone, PkmnArceus)
 			receiver := b.getPokemonInBattle(0, 0)
-			m := GetMove(NewMove(10, MoveCategoryStatus, expectedType))
+			m := GetMove(NewMove(10, expectedType))
 			damage := CalcMoveDamage(b.Weather, holder, receiver, m)
 			holder.HeldItem = item
 			heldDamage := CalcMoveDamage(b.Weather, holder, receiver, m)
@@ -403,7 +403,7 @@ var _ = Describe("Medicine Items", func() {
 	DescribeTable("Healing (HP)",
 		func(item Item, expectedHP int) {
 			b, user := setup(item)
-			fainted := GeneratePokemon(PkmnIvysaur, defaultMoveOpt)
+			fainted := PkmnDefault()
 			if item.Category() == ItemCategoryRevival {
 				user.CurrentHP = 0
 				expectedHP = int(user.MaxHP())
