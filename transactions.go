@@ -8,9 +8,229 @@ type Transaction interface {
 	Mutate(b *Battle) // Modifies the battle to apply the transaction. Can also queue additional transactions via b.QueueTransaction().
 }
 
+type UseMoveTransaction struct {
+	User   target
+	Target target
+	Move   *Move
+}
+
+func (t UseMoveTransaction) Mutate(b *Battle) {
+	receiver := t.Target.Pokemon
+	accuracy := CalcAccuracy(b.Weather, t.User.Pokemon, receiver, t.Move)
+	b.QueueTransaction(PPTransaction{
+		Move:   t.Move,
+		Amount: -1,
+	})
+	if t.Move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
+		b.QueueTransaction(MoveFailTransaction{
+			User:   t.User.Pokemon,
+			Reason: FailMiss,
+		})
+		return
+	}
+	// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
+	// Status Moves
+	if t.Move.Category() == MoveCategoryStatus {
+		switch t.Move.Id {
+		case MoveStunSpore:
+			b.QueueTransaction(InflictStatusTransaction{
+				Target:       t.Target.Pokemon,
+				StatusEffect: StatusParalyze,
+			})
+		case MoveSpite:
+			if m := t.Target.Pokemon.metadata[MetaLastMove]; m != nil {
+				b.QueueTransaction(PPTransaction{
+					Move:   m.(*Move),
+					Amount: -4,
+				})
+			}
+		case MoveAttract:
+			g1, g2 := t.User.Pokemon.Gender, receiver.Gender
+			// Only applies when Pokemon are opposite gender
+			if g1 != GenderGenderless && g2 != GenderGenderless && g1 != g2 {
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       receiver,
+					StatusEffect: StatusInfatuation,
+				})
+				if receiver.HeldItem == ItemDestinyKnot {
+					b.QueueTransaction(InflictStatusTransaction{
+						Target:       t.User.Pokemon,
+						StatusEffect: StatusInfatuation,
+					})
+				}
+			}
+		case MoveRainDance:
+			turns := 5
+			if t.User.Pokemon.HeldItem == ItemDampRock {
+				turns = 8
+			}
+			b.QueueTransaction(WeatherTransaction{
+				Weather: WeatherRain,
+				Turns:   turns,
+			})
+		case MoveSunnyDay:
+			turns := 5
+			if t.User.Pokemon.HeldItem == ItemHeatRock {
+				turns = 8
+			}
+			b.QueueTransaction(WeatherTransaction{
+				Weather: WeatherHarshSunlight,
+				Turns:   turns,
+			})
+		case MoveHail:
+			turns := 5
+			if t.User.Pokemon.HeldItem == ItemIcyRock {
+				turns = 8
+			}
+			b.QueueTransaction(WeatherTransaction{
+				Weather: WeatherHail,
+				Turns:   turns,
+			})
+		case MoveSandstorm:
+			turns := 5
+			if t.User.Pokemon.HeldItem == ItemSmoothRock {
+				turns = 8
+			}
+			b.QueueTransaction(WeatherTransaction{
+				Weather: WeatherSandstorm,
+				Turns:   turns,
+			})
+		case MoveSplash:
+			b.QueueTransaction(MoveFailTransaction{
+				User:   t.User.Pokemon,
+				Reason: FailOther,
+			})
+		case MoveDefog:
+			if b.Weather == WeatherFog {
+				b.QueueTransaction(WeatherTransaction{
+					Weather: WeatherClearSkies,
+				})
+			}
+		case MoveMoonlight, MoveSynthesis, MoveMorningSun:
+			if b.Weather == WeatherFog {
+				b.QueueTransaction(HealTransaction{
+					Target: t.User.Pokemon,
+					Amount: t.User.Pokemon.MaxHP() / 4,
+				})
+			}
+		default:
+			if t.Move.StatStages() != 0 {
+				if t.Move.Targets() == MoveTargetUser {
+					b.QueueTransaction(ModifyStatTransaction{
+						Target:        t.User.Pokemon,
+						SelfInflicted: true,
+						Stat:          int(t.Move.AffectedStat()),
+						Stages:        int(t.Move.StatStages()),
+					})
+				} else if t.Move.Targets() == MoveTargetSelected || t.Move.Targets() == MoveTargetAllOpponents {
+					b.QueueTransaction(ModifyStatTransaction{
+						Target: t.Target.Pokemon,
+						Stat:   int(t.Move.AffectedStat()),
+						Stages: int(t.Move.StatStages()),
+					})
+				} else {
+					blog.Printf("Unknown target for stat modifying move: %s: %v", t.Move.Name(), t.Move.Targets())
+				}
+			} else {
+				blog.Printf("Unimplemented status move: %s", t.Move.Name())
+			}
+		}
+	} else {
+		// Physical/Special Moves
+		damage := CalcMoveDamage(b.Weather, t.User.Pokemon, receiver, t.Move)
+		var crit uint = 1
+		if b.rng.Roll(1, t.User.Pokemon.CritChance()) {
+			crit = 2
+		}
+		// Receiver effects
+		if receiver.HeldItem != ItemNone {
+			switch receiver.HeldItem {
+			case ItemStickyBarb:
+				b.QueueTransaction(DamageTransaction{
+					Target: t.User,
+					Damage: t.User.Pokemon.MaxHP() / 8,
+				})
+				if t.Move.Flags()&FlagContact != 0 && t.User.Pokemon.HeldItem == ItemNone {
+					b.QueueTransaction(
+						GiveItemTransaction{
+							Target: t.User.Pokemon,
+							Item:   receiver.HeldItem,
+						},
+						GiveItemTransaction{
+							Target: receiver,
+							Item:   ItemNone,
+						},
+					)
+				}
+			}
+		}
+		damage *= crit
+		b.QueueTransaction(DamageTransaction{
+			Target: t.Target,
+			Move:   t.Move,
+			Damage: uint(damage),
+		})
+		// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
+		// However, if Drain is negative, it's actually recoil damage.
+		if t.Move.Drain() != 0 {
+			drain := int(damage) * t.Move.Drain() / 100
+			if drain > 0 {
+				// These multiplers only apply to draining moves, not recoil moves
+				if t.User.Pokemon.HeldItem == ItemBigRoot {
+					drain = drain * 130 / 100 // 30% more HP than normal
+				}
+			}
+			if drain == 0 {
+				// Min 1 HP drain
+				drain = 1
+			}
+			if drain > 0 {
+				b.QueueTransaction(HealTransaction{
+					Target: t.User.Pokemon,
+					Amount: uint(drain),
+				})
+			} else {
+				// recoil damage
+				b.QueueTransaction(DamageTransaction{
+					Target: t.User,
+					Damage: uint(-drain),
+				})
+			}
+		}
+		if t.Move.FlinchChance() > 0 && b.rng.Roll(t.Move.FlinchChance(), 100) {
+			b.QueueTransaction(InflictStatusTransaction{
+				Target:       receiver,
+				StatusEffect: StatusFlinch,
+			})
+		}
+		// Other item effects in battle
+		switch t.User.Pokemon.HeldItem {
+		case ItemKingsRock, ItemRazorFang:
+			// King's Rock makes non-flinching moves have a 10% to cause flinch
+			// TODO: ensure only certain moves are affected -> https://bulbapedia.bulbagarden.net/wiki/King%27s_Rock
+			if t.Move.FlinchChance() == 0 && b.rng.Roll(1, 10) {
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       receiver,
+					StatusEffect: StatusFlinch,
+				})
+			}
+		case ItemLifeOrb:
+			b.QueueTransaction(DamageTransaction{
+				Target: t.User,
+				Damage: t.User.Pokemon.MaxHP() / 10,
+			})
+		case ItemShellBell:
+			b.QueueTransaction(DamageTransaction{
+				Target: t.User,
+				Damage: uint(damage / 8),
+			})
+		}
+	}
+	t.User.Pokemon.metadata[MetaLastMove] = t.Move
+}
+
 // A transaction to deal damage to an opponent Pokemon.
 type DamageTransaction struct {
-	User         *Pokemon
 	Target       target
 	Move         *Move
 	Damage       uint
@@ -44,32 +264,6 @@ func (t DamageTransaction) Mutate(b *Battle) {
 		b.QueueTransaction(FaintTransaction{
 			Target: t.Target,
 		})
-		// friendship is lowered based on level difference
-		levelGap := t.User.Level - receiver.Level
-		loss := -1
-		if levelGap >= 30 {
-			if receiver.Friendship < 200 {
-				loss = -5
-			} else {
-				loss = -10
-			}
-		}
-		b.QueueTransaction(FriendshipTransaction{
-			Target: receiver,
-			Amount: loss,
-		})
-		// EVs are gained based on EV yield of defeated Pokemon
-		evGain := receiver.GetEVYield()
-		for stat, amount := range evGain {
-			if amount == 0 {
-				continue
-			}
-			b.QueueTransaction(EVTransaction{
-				Target: t.User,
-				Stat:   stat,
-				Amount: uint8(amount),
-			})
-		}
 	}
 }
 
@@ -406,11 +600,41 @@ type FaintTransaction struct {
 }
 
 func (t FaintTransaction) Mutate(b *Battle) {
-	if b.ruleset&BattleRuleNoFaint != 0 {
+	if b.ruleset&BattleRuleFaint == 0 {
 		pkmn := b.getPokemon(t.Target)
 		pkmn.CurrentHP = pkmn.MaxHP()
 		return
 	}
+	// EVs are gained based on EV yield of defeated Pokemon
+	evGain := t.Target.Pokemon.GetEVYield()
+	for _, opponent := range b.GetOpponents(b.GetParty(&t.Target)) {
+		// friendship is lowered based on level difference
+		levelGap := opponent.Pokemon.Level - t.Target.Pokemon.Level
+		loss := -1
+		if levelGap >= 30 {
+			if t.Target.Pokemon.Friendship < 200 {
+				loss = -5
+			} else {
+				loss = -10
+			}
+		}
+		b.QueueTransaction(FriendshipTransaction{
+			Target: t.Target.Pokemon,
+			Amount: loss,
+		})
+
+		for stat, amount := range evGain {
+			if amount == 0 {
+				continue
+			}
+			b.QueueTransaction(EVTransaction{
+				Target: opponent.Pokemon,
+				Stat:   stat,
+				Amount: uint8(amount),
+			})
+		}
+	}
+
 	p := b.parties[t.Target.party]
 	p.SetInactive(t.Target.partySlot)
 	anyAlive := false
