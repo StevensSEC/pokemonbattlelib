@@ -261,6 +261,20 @@ func (matcher *singleTransactionMatcher) NegatedFailureMessage(actual interface{
 	)
 }
 
+func orderedTransactionDiffLine(idx int, t Transaction) string {
+	line := fmt.Sprintf("%d. %T", idx+1, t)
+	switch tt := t.(type) {
+	case UseMoveTransaction:
+		line += fmt.Sprintf(" - user: %d, %d  target: %d, %d  move: %s",
+			tt.User.party, tt.User.partySlot,
+			tt.Target.party, tt.Target.partySlot,
+			tt.Move,
+		)
+	}
+	line += "\n"
+	return line
+}
+
 // Given a sequence of transactions, match if a given set of transactions is present in the sequence, and the order matches.
 type orderedTransactionMatcher struct {
 	expected []Transaction
@@ -314,13 +328,13 @@ func (matcher *orderedTransactionMatcher) Match(actual interface{}) (success boo
 func (matcher *orderedTransactionMatcher) FailureMessage(actual interface{}) (message string) {
 	wantOrder := ""
 	for i, t := range matcher.expected {
-		wantOrder += fmt.Sprintf("%d. %T\n", i+1, t)
+		wantOrder += orderedTransactionDiffLine(i, t)
 	}
 	switch transactions := actual.(type) {
 	case []Transaction:
 		gotOrder := ""
 		for i, t := range transactions {
-			gotOrder += fmt.Sprintf("%d. %T\n", i+1, t)
+			gotOrder += orderedTransactionDiffLine(i, t)
 		}
 		msg := fmt.Sprintf("Expected the sequence of transactions to have these transactions in this order:\n%s"+
 			"\nReceived the following transactions:\n%s",
@@ -346,14 +360,29 @@ func (matcher *orderedTransactionMatcher) NegatedFailureMessage(actual interface
 /* Tools for testing the library */
 // Check for damage dealt (if any) by a Pokemon in battle
 func DamageDealt(t []Transaction, p *Pokemon) int {
-	for _, x := range t {
-		if v, ok := x.(DamageTransaction); !ok {
+	var usemove *UseMoveTransaction
+	var start int
+	for i := start; i < len(t); i++ {
+		if v, ok := t[i].(UseMoveTransaction); !ok {
 			continue
-		} else if v.User == p {
-			return int(v.Damage)
+		} else if v.User.Pokemon == p {
+			usemove = &v
+			break
 		}
 	}
-	return 0
+	if usemove == nil {
+		// This might work better as a gomega matcher
+		return -1 // failure, pokemon did not use a move
+	}
+
+	for i := start; i < len(t); i++ {
+		if d, ok := t[i].(DamageTransaction); ok {
+			if d.Move == usemove.Move {
+				return int(d.Damage)
+			}
+		}
+	}
+	return -2 // failure, move was used but did not deal damage
 }
 
 // Custom RNG struct which allows for predictable RNG output in a battle
