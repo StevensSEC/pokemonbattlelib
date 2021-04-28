@@ -168,7 +168,7 @@ var _ = Describe("One round of battle", func() {
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: b.getTarget(1, 0),
-				Damage: 3,
+				Damage: 2,
 			}))
 			Expect(t).To(HaveTransaction(UseMoveTransaction{
 				User:   b.getTarget(1, 0),
@@ -176,7 +176,7 @@ var _ = Describe("One round of battle", func() {
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: b.getTarget(0, 0),
-				Damage: 3,
+				Damage: 2,
 			}))
 		})
 
@@ -191,11 +191,10 @@ var _ = Describe("One round of battle", func() {
 	Context("when dealing damage to a Pokemon", func() {
 		It("should account for same-type attack bonus", func() {
 			p1 = PkmnWithType(TypeFire)
-			p1.Moves[0] = GetMove(NewMove(10, TypeFire))
+			p1.Moves[0] = GetMove(RegisterMoveWithType(TypeFire))
 			p2 := PkmnNoDamage()
 			b = New1v1Battle(p1, &a1, p2, &a2)
-			b.rng = SimpleRNG()
-
+			b.rng = NeverRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			damage := DamageDealt(t, p1)
@@ -218,7 +217,7 @@ var _ = Describe("One round of battle", func() {
 				a2 = Agent(dumbAgent{})
 				_a1 = Agent(a1)
 				b = NewBattle()
-				b.ruleset &= &BattleRuleFaint
+				b.ruleset &= ^BattleRuleFaint
 				b.rng = SimpleRNG()
 			})
 
@@ -249,13 +248,13 @@ var _ = Describe("One round of battle", func() {
 		})
 
 		It("should account for critical hits", func() {
-			Expect(b.Start()).To(Succeed())
-			t, _ := b.SimulateRound()
 			pkmn := PkmnDefault()
 			b = New1v1Battle(pkmn, &a1, PkmnNoDamage(), &a2)
+			Expect(b.Start()).To(Succeed())
+			t, _ := b.SimulateRound()
 			damage := DamageDealt(t, pkmn)
-			t, _ = b.SimulateRound()
 			b.rng = AlwaysRNG()
+			t, _ = b.SimulateRound()
 			Expect(DamageDealt(t, pkmn)).To(BeNumerically(">", damage))
 		})
 
@@ -388,12 +387,12 @@ var _ = Describe("Turn priority", func() {
 				UseMoveTransaction{
 					User:   b.getTarget(0, 0),
 					Target: b.getTarget(1, 0),
-					Move:   GetMove(MovePound),
+					Move:   GetMove(TestMoveDefault),
 				},
 				DamageTransaction{
 					Target: b.getTarget(1, 0),
 					Move:   GetMove(TestMoveDefault),
-					Damage: 3,
+					Damage: 2,
 				},
 			))
 		})
@@ -417,17 +416,17 @@ var _ = Describe("Turn priority", func() {
 				},
 				DamageTransaction{
 					Target: b.getTarget(0, 0),
-					Damage: 5,
+					Damage: 3,
 					Move:   GetMove(MoveQuickAttack),
 				},
 				UseMoveTransaction{
 					User:   b.getTarget(0, 0),
 					Target: b.getTarget(1, 0),
-					Move:   GetMove(MovePound),
+					Move:   GetMove(TestMoveDefault),
 				},
 				DamageTransaction{
 					Target: b.getTarget(1, 0),
-					Damage: 5,
+					Damage: 2,
 					Move:   GetMove(TestMoveDefault),
 				},
 			))
@@ -444,22 +443,22 @@ var _ = Describe("Turn priority", func() {
 				UseMoveTransaction{
 					User:   b.getTarget(1, 0),
 					Target: b.getTarget(0, 0),
-					Move:   GetMove(MovePound),
+					Move:   GetMove(TestMoveDefault),
 				},
 				DamageTransaction{
 					Target: b.getTarget(0, 0),
 					Move:   GetMove(TestMoveDefault),
-					Damage: 3,
+					Damage: 2,
 				},
 				UseMoveTransaction{
 					User:   b.getTarget(0, 0),
 					Target: b.getTarget(1, 0),
-					Move:   GetMove(MovePound),
+					Move:   GetMove(TestMoveDefault),
 				},
 				DamageTransaction{
 					Target: b.getTarget(1, 0),
 					Move:   GetMove(TestMoveDefault),
-					Damage: 3,
+					Damage: 2,
 				},
 			))
 		})
@@ -729,20 +728,19 @@ var _ = Describe("Fainting", func() {
 		b  *Battle
 	)
 
-	BeforeEach(func() {
-		scary_monster := GeneratePokemon(PkmnSquirtle, WithLevel(100), WithMoves(MovePound))
-		scary_monster.Stats[StatSpeed] = 1
-		p1 = NewOccupiedParty(
-			GeneratePokemon(PkmnCharmander, WithMoves(MovePound)),
-			GeneratePokemon(PkmnTurtwig, WithMoves(MovePound)),
-		)
-		p2 = NewOccupiedParty(scary_monster) // and nice sprites
-		b = NewSingleBattle(p1, &a1, p2, &a2)
-		b.rng = SimpleRNG()
-	})
-
 	Context("after a Pokemon faints in battle", func() {
 		It("should switch to the next available Pokemon", func() {
+			pkmn1 := PkmnDefault()
+			pkmn2 := PkmnDefault()
+			pkmn2.CurrentHP = 1
+			pkmn3 := PkmnDefault()
+			p1 = NewOccupiedParty(
+				pkmn2,
+				pkmn3,
+			)
+			p2 = NewOccupiedParty(pkmn1) // and nice sprites
+			b = NewSingleBattle(p1, &a1, p2, &a2)
+			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			// Charmander smashed his nubby little fist into Squirtle as
@@ -767,13 +765,13 @@ var _ = Describe("Fainting", func() {
 			pkmn1 := PkmnDefault()
 			pkmn2 := PkmnDefault()
 			pkmn3 := PkmnDefault()
-			party1 := NewOccupiedParty(pkmn1, pkmn3)
+			p1 := NewOccupiedParty(pkmn1, pkmn3)
 			pkmn1.CurrentHP = 1
-			party1.AddPokemon(pkmn1, pkmn3)
-			party2 := NewOccupiedParty(pkmn2)
+			p1.AddPokemon(pkmn1, pkmn3)
+			p2 := NewOccupiedParty(pkmn2)
 			pkmn2.Stats[StatSpeed] = 255
-			party2.AddPokemon(pkmn2)
-			b := NewSingleBattle(party1, &a1, party2, &a2)
+			p2.AddPokemon(pkmn2)
+			b := NewSingleBattle(p1, &a1, p2, &a2)
 			Expect(b.Start()).To(Succeed())
 			t, ended := b.SimulateRound()
 			Expect(ended).To(BeFalse(), "Expected SimulateRound to NOT indicate that the battle has ended, but it did.")
@@ -811,10 +809,12 @@ var _ = Describe("Fainting", func() {
 			dies.CurrentHP = 1
 			dies.Friendship = 100
 			dies2 := PkmnDefault()
-			dies.CurrentHP = 1
+			dies2.CurrentHP = 1
 			dies2.Friendship = 200
+			pkmn := PkmnDefault()
+			pkmn.Level = 50
 			p1 := NewOccupiedParty(dies, dies2)
-			p2 := NewOccupiedParty(PkmnDefault())
+			p2 := NewOccupiedParty(pkmn)
 			b = NewSingleBattle(p1, &a1, p2, &a2)
 			Expect(b.Start()).To(Succeed())
 			b.SimulateRound()
@@ -825,7 +825,7 @@ var _ = Describe("Fainting", func() {
 
 		It("should gain EVs when defeating Pokemon", func() {
 			winner := PkmnDefault()
-			loser := PkmnNoDamage()
+			loser := GeneratePokemon(PkmnBulbasaur, WithMoves(TestMoveDefault))
 			loser.CurrentHP = 1
 			p1 = NewOccupiedParty(winner)
 			p2 = NewOccupiedParty(loser)
@@ -979,12 +979,12 @@ var _ = Describe("Status Conditions", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target:       b.getTarget(0, 0),
-				Damage:       1,
+				Damage:       12,
 				StatusEffect: StatusPoison,
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target:       b.getTarget(1, 0),
-				Damage:       1,
+				Damage:       12,
 				StatusEffect: StatusBurn,
 			}))
 		})
@@ -1000,7 +1000,7 @@ var _ = Describe("Status Conditions", func() {
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target:       b.getTarget(0, 0),
-				Damage:       12,
+				Damage:       6,
 				StatusEffect: StatusBadlyPoison,
 			}))
 		})

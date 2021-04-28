@@ -18,13 +18,13 @@ func RegisterMoveWithType(t Type) MoveId {
 	return RegisterMove(MoveData{
 		Power:        10,
 		Type:         t,
-		Accuracy:     100,
-		InitialMaxPP: ^uint8(0),
+		Category:     MoveCategoryPhysical,
+		InitialMaxPP: 100,
 	})
 }
 
-var TestMoveDefault = RegisterMove(MoveData{Power: 10, Accuracy: 100, InitialMaxPP: ^uint8(0)})
-var TestMoveNoDamage = RegisterMove(MoveData{Power: 0, Accuracy: 100, InitialMaxPP: ^uint8(0)})
+var TestMoveDefault = RegisterMove(MoveData{Name: "Default", Category: MoveCategoryPhysical, Power: 10, Accuracy: 100, InitialMaxPP: 100})
+var TestMoveNoDamage = RegisterMove(MoveData{Name: "No Damage", InitialMaxPP: 100})
 
 var _ = Describe("Move PP Consumption", func() {
 	a := Agent(new(dumbAgent))
@@ -47,14 +47,13 @@ var _ = Describe("Move PP Consumption", func() {
 	})
 
 	It("should decrease the opponent's last used move's PP by 4 when a pokemon uses Spite", func() {
-		p1 := GeneratePokemon(PkmnCharmander, WithMoves(MoveSpite))
-		p2 := GeneratePokemon(PkmnSquirtle, defaultMoveOpt)
+		p1 := PkmnDefault()
+		p2 := PkmnDefault()
+		p1.Moves[0] = GetMove(MoveSpite)
 		b := New1v1Battle(p1, &a, p2, &a)
 		b.rng = AlwaysRNG()
 		Expect(b.Start()).To(Succeed())
-		b.SimulateRound() // set Pokemon's last move
-		p1.CurrentHP = p1.MaxHP()
-		p2.CurrentHP = p2.MaxHP()
+		p2.metadata[MetaLastMove] = p2.Moves[0]
 		p2.Moves[0].CurrentPP = 1
 		t, _ := b.SimulateRound()
 		Expect(t).To(HaveTransaction(PPTransaction{

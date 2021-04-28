@@ -344,7 +344,7 @@ var _ = Describe("Misc. + Held Items", func() {
 		func(item Item, expectedType Type) {
 			b, holder := setup(ItemNone, PkmnArceus)
 			receiver := b.getPokemonInBattle(0, 0)
-			m := GetMove(NewMove(10, expectedType))
+			m := GetMove(RegisterMoveWithType(expectedType))
 			damage := CalcMoveDamage(b.Weather, holder, receiver, m)
 			holder.HeldItem = item
 			heldDamage := CalcMoveDamage(b.Weather, holder, receiver, m)

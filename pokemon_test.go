@@ -9,7 +9,8 @@ import (
 )
 
 func NewPokemon() *Pokemon {
-	return &Pokemon{NatDex: 0, Level: 1, Ability: AbilityIlluminate}
+	stats := [6]uint{100, 4, 4, 4, 4, 4}
+	return &Pokemon{NatDex: 0, Level: 1, Stats: stats, CurrentHP: 100, Ability: AbilityIlluminate, metadata: make(map[PokemonMeta]interface{})}
 }
 
 func PkmnDefault() *Pokemon {
