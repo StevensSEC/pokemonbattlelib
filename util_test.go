@@ -265,7 +265,7 @@ func orderedTransactionDiffLine(idx int, t Transaction) string {
 	line := fmt.Sprintf("%d. %T", idx+1, t)
 	switch tt := t.(type) {
 	case UseMoveTransaction:
-		line += fmt.Sprintf(" - user: %d, %d  target: %d, %d  move: %s",
+		line += fmt.Sprintf(" - User [%d,%d] Target: [%d,%d] Move: %s",
 			tt.User.party, tt.User.partySlot,
 			tt.Target.party, tt.Target.partySlot,
 			tt.Move,
