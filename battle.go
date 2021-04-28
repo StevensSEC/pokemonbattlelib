@@ -209,6 +209,10 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			case ItemTurn:
 				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
 				turn = t
+			case SwitchTurn:
+				t.Current.Pokemon = b.getPokemonInBattle(t.Current.party, t.Current.partySlot)
+				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
+				turn = t
 			}
 			turns = append(turns, TurnContext{
 				User: target{
@@ -276,6 +280,19 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Target: t.Target,
 				Item:   t.Item,
 				Move:   t.Target.Pokemon.Moves[t.Move],
+			})
+		case SwitchTurn:
+			party := b.GetParty(&t.Target)
+			if _, ok := party.activePokemon[t.Target.partySlot]; ok {
+				blog.Panic(ErrorCannotSwitch)
+			}
+			pkmn := b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
+			if pkmn.CurrentHP == 0 {
+				blog.Panic(ErrorCannotSwitch)
+			}
+			party.SetInactive(t.Current.partySlot)
+			b.QueueTransaction(SendOutTransaction{
+				Target: t.Target,
 			})
 		default:
 			blog.Panicf("Unknown turn of type %v", t)
@@ -578,4 +595,14 @@ type ItemTurn struct {
 
 func (turn ItemTurn) Priority() int {
 	return 1
+}
+
+// A turn to represent switching an active Pokemon for a different, inactive Pokemon in battle.
+type SwitchTurn struct {
+	Current target // The current active target being swapped out
+	Target  target // The target to swap to
+}
+
+func (turn SwitchTurn) Priority() int {
+	return 2
 }

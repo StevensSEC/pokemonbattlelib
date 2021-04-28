@@ -300,6 +300,12 @@ var _ = Describe("One round of battle", func() {
 	})
 })
 
+var _ = Describe("Switching Pokemon", func() {
+	Context("when switching Pokemon in battle", func() {
+		// TODO
+	})
+})
+
 var _ = Describe("Using items in battle", func() {
 	agent := Agent(new(healAgent))
 	var (
@@ -392,6 +398,7 @@ var _ = Describe("Turn priority", func() {
 			},
 			Entry("FightTurn", FightTurn{}, 0),
 			Entry("ItemTurn", ItemTurn{}, 1),
+			Entry("SwitchTurn", SwitchTurn{}, 2),
 		)
 
 		It("should order turns properly based on priority", func() {
