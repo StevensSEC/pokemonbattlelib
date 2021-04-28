@@ -87,4 +87,10 @@ var typeItemData = map[Item]Type{
 	ItemWaveIncense:  TypeWater,
 }
 
+// Creates a new move and returns the ID of the move created
+func RegisterMove(data MoveData) MoveId {
+	AllMoves = append(AllMoves, data)
+	return MoveId(len(AllMoves))
+}
+
 //go:generate go run data/gen.go

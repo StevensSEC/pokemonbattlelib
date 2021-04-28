@@ -191,7 +191,7 @@ var _ = Describe("One round of battle", func() {
 	Context("when dealing damage to a Pokemon", func() {
 		It("should account for same-type attack bonus", func() {
 			p1 = PkmnWithType(TypeFire)
-			p1.Moves[0] = GetMove(RegisterMoveWithType(TypeFire))
+			p1.Moves[0] = GetMove(registerMoveWithType(TypeFire))
 			p2 := PkmnNoDamage()
 			b = New1v1Battle(p1, &a1, p2, &a2)
 			b.rng = NeverRNG()

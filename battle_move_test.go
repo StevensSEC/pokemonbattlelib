@@ -8,13 +8,7 @@ import (
 
 // TODO: Move tests involving moves here
 
-// Creates a new move and returns the ID of the move created
-func RegisterMove(data MoveData) MoveId {
-	AllMoves = append(AllMoves, data)
-	return MoveId(len(AllMoves))
-}
-
-func RegisterMoveWithType(t Type) MoveId {
+func registerMoveWithType(t Type) MoveId {
 	return RegisterMove(MoveData{
 		Power:        10,
 		Type:         t,

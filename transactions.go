@@ -601,6 +601,7 @@ type FaintTransaction struct {
 
 func (t FaintTransaction) Mutate(b *Battle) {
 	if b.ruleset&BattleRuleFaint == 0 {
+		blog.Println("Fainting is disabled - Pokemon HP fully restored")
 		pkmn := b.getPokemon(t.Target)
 		pkmn.CurrentHP = pkmn.MaxHP()
 		return
