@@ -14,6 +14,7 @@ type Battle struct {
 	ShiftSet bool    // shift or set battle style for NPC trainer battles
 	State    BattleState
 	rng      RNG
+	ruleset  BattleRule
 
 	parties  []*battleParty             // All parties participating in the battle
 	metadata map[BattleMeta]interface{} // Metadata to be tracked during a battle
@@ -22,6 +23,13 @@ type Battle struct {
 	tProcessed []Transaction
 	results    BattleResults
 }
+
+type BattleRule int
+
+const (
+	BattleRuleFaint BattleRule = 1 << iota
+)
+const BattleRuleSetDefault = BattleRuleFaint
 
 type BattleMeta int
 
@@ -41,8 +49,9 @@ const (
 func NewBattle() *Battle {
 	rng := LCRNG(rand.Uint32())
 	b := Battle{
-		State: BattleBeforeStart,
-		rng:   RNG(&rng),
+		State:   BattleBeforeStart,
+		rng:     RNG(&rng),
+		ruleset: BattleRuleSetDefault,
 		metadata: map[BattleMeta]interface{}{
 			MetaWeatherTurns: 0,
 		},
@@ -225,7 +234,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			})
 		}
 	}
-
 	blog.Println("Sorting turns")
 	// Sort turns using an in-place stable sort
 	b.sortTurns(&turns)

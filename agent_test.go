@@ -33,8 +33,8 @@ var _ = Describe("Agents", func() {
 			}
 			return FightTurn{Move: 0, Target: ctx.Opponents[0]}
 		}))
-		party1 := NewOccupiedParty(GeneratePokemon(PkmnCharmander, defaultMoveOpt))
-		party2 := NewOccupiedParty(GeneratePokemon(PkmnSquirtle, defaultMoveOpt))
+		party1 := NewOccupiedParty(PkmnDefault())
+		party2 := NewOccupiedParty(PkmnDefault())
 		b.AddParty(party1, &_a1, 0)
 		b.AddParty(party2, &a2, 1)
 		Expect(b.Start()).To(Succeed())

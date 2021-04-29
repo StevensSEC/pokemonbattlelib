@@ -600,6 +600,12 @@ type FaintTransaction struct {
 }
 
 func (t FaintTransaction) Mutate(b *Battle) {
+	if b.ruleset&BattleRuleFaint == 0 {
+		blog.Println("Fainting is disabled - Pokemon HP fully restored")
+		pkmn := b.getPokemon(t.Target)
+		pkmn.CurrentHP = pkmn.MaxHP()
+		return
+	}
 	// EVs are gained based on EV yield of defeated Pokemon
 	evGain := t.Target.Pokemon.GetEVYield()
 	for _, opponent := range b.GetOpponents(b.GetParty(&t.Target)) {

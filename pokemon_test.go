@@ -8,6 +8,37 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+func NewPokemon() *Pokemon {
+	stats := [6]uint{100, 4, 4, 4, 4, 4}
+	return &Pokemon{NatDex: 0, Level: 1, Stats: stats, CurrentHP: 100, Ability: AbilityIlluminate, metadata: make(map[PokemonMeta]interface{})}
+}
+
+func PkmnDefault() *Pokemon {
+	pkmn := NewPokemon()
+	pkmn.Moves[0] = GetMove(TestMoveDefault)
+	return pkmn
+}
+
+func PkmnNoDamage() *Pokemon {
+	pkmn := NewPokemon()
+	pkmn.Moves[0] = GetMove(TestMoveNoDamage)
+	return pkmn
+}
+
+func PkmnWithType(t Type) *Pokemon {
+	pkmn := PkmnDefault()
+	pkmn.Type = t
+	return pkmn
+}
+
+func PkmnWithMoves(m ...MoveId) *Pokemon {
+	pkmn := PkmnDefault()
+	for i := 0; i < len(m); i += 1 {
+		pkmn.Moves[i] = GetMove(m[i])
+	}
+	return pkmn
+}
+
 var _ = Describe("Pokemon generation", func() {
 	It("generates a Pokemon given just a dex number", func() {
 		p := GeneratePokemon(PkmnWartortle)

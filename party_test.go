@@ -32,8 +32,8 @@ var _ = Describe("Active pokemon", func() {
 
 	BeforeEach(func() {
 		party = newOccupiedBattleParty(&agent, 0,
-			GeneratePokemon(PkmnSquirtle, defaultMoveOpt),
-			GeneratePokemon(PkmnBlastoise, defaultMoveOpt),
+			GeneratePokemon(PkmnSquirtle, WithMoves(TestMoveDefault)),
+			GeneratePokemon(PkmnBlastoise, WithMoves(TestMoveDefault)),
 		)
 	})
 

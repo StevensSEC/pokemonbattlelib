@@ -84,8 +84,7 @@ func BenchmarkBattle(b *testing.B) {
 		p2 := randParty()
 		battle = NewSingleBattle(p1, &a1, p2, &a1)
 		rng := battle.rng.(*LCRNG)
-		var seed uint32
-		seed = uint32(*rng)
+		seed := uint32(*rng)
 		err := battle.Start()
 		if err != nil {
 			panic(err)
