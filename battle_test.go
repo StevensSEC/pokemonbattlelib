@@ -301,8 +301,16 @@ var _ = Describe("One round of battle", func() {
 })
 
 var _ = Describe("Switching Pokemon", func() {
+	a1 := Agent(newRcAgent())
+	a2 := Agent(newRcAgent())
+
+	setup := func() *Battle {
+		pkmn1 := PkmnDefault()
+		return nil
+	}
+
 	Context("when switching Pokemon in battle", func() {
-		// TODO
+		b := setup()
 	})
 })
 
