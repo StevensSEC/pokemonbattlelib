@@ -277,16 +277,39 @@ var _ = Describe("One round of battle", func() {
 })
 
 var _ = Describe("Switching Pokemon", func() {
-	a1 := Agent(newRcAgent())
-	a2 := Agent(newRcAgent())
+	a1 := newRcAgent()
+	a2 := newRcAgent()
 
 	setup := func() *Battle {
 		pkmn1 := PkmnDefault()
-		return nil
+		pkmn2 := PkmnDefault()
+		pkmn3 := PkmnDefault()
+		_a1 := Agent(a1)
+		_a2 := Agent(a2)
+		b := NewSingleBattle(NewOccupiedParty(pkmn1), &_a1, NewOccupiedParty(pkmn2, pkmn3), &_a2)
+		Expect(b.Start()).To(Succeed())
+		return b
 	}
 
-	Context("when switching Pokemon in battle", func() {
-		b := setup()
+	FContext("when switching Pokemon in battle", func() {
+		It("should allow switching before other turns", func() {
+			b := setup()
+			t2 := b.getTarget(1, 0)
+			t3 := b.getTarget(1, 1)
+			a1 <- FightTurn{Move: 0, Target: t2}
+			a2 <- SwitchTurn{Current: t2, Target: t3}
+			pkmn2 := t2.Pokemon
+			pkmn3 := t3.Pokemon
+			t, _ := b.SimulateRound()
+			Expect(b.getPokemonInBattle(1, 1)).To(Equal(pkmn2))
+			Expect(b.getPokemonInBattle(1, 0)).To(Equal(pkmn3))
+			Expect(t).To(HaveTransaction(
+				UseMoveTransaction{
+					User:   b.getTarget(0, 0),
+					Target: t2,
+				},
+			))
+		})
 	})
 })
 
