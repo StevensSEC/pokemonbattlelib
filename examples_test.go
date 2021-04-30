@@ -2,8 +2,33 @@
 
 package pokemonbattlelib
 
-import "fmt"
+import (
+	"fmt"
+)
 
+func ExampleBattle() {
+	p1 := GeneratePokemon(PkmnPikachu,
+		WithLevel(20),
+		WithMoves(MoveThunderShock))
+	p2 := GeneratePokemon(PkmnBulbasaur,
+		WithLevel(20),
+		WithMoves(MoveTackle))
+	a1 := Agent(new(dumbAgent))
+	b := New1v1Battle(p1, &a1, p2, &a1)
+	transactions, _ := b.SimulateRound()
+	for _, t := range transactions {
+		switch tt := t.(type) {
+		case DamageTransaction:
+			fmt.Printf("%s used %s on %s for %d damage", tt.User, tt.Move, tt.Target.Pokemon, tt.Damage)
+		case HealTransaction:
+			fmt.Printf("%s healed for %d HP", tt.Target, tt.Amount)
+		case FaintTransaction:
+			fmt.Printf("%s fainted", tt.Target.Pokemon)
+		default:
+			fmt.Printf("Transaction: %T - %v", t, t)
+		}
+	}
+}
 func ExampleGeneratePokemon() {
 	pkmn := GeneratePokemon(PkmnPikachu,
 		WithLevel(28),
