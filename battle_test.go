@@ -801,7 +801,7 @@ var _ = Describe("Fainting", func() {
 			b.AddParty(p2, &a2, 1)
 			Expect(b.Start()).To(Succeed())
 			b.SimulateRound()
-			Expect(dies.Friendship).To(Equal(99))
+			Expect(b.getPokemonInBattle(0, 0).Friendship).To(Equal(99))
 		})
 
 		It("should lose 5 or 10 friendship when fainting", func() {
@@ -818,9 +818,9 @@ var _ = Describe("Fainting", func() {
 			b = NewSingleBattle(p1, &a1, p2, &a2)
 			Expect(b.Start()).To(Succeed())
 			b.SimulateRound()
-			Expect(dies.Friendship).To(Equal(95))
+			Expect(b.getPokemonInBattle(0, 0).Friendship).To(Equal(95))
 			b.SimulateRound()
-			Expect(dies2.Friendship).To(Equal(190))
+			Expect(b.getPokemonInBattle(0, 1).Friendship).To(Equal(190))
 		})
 
 		It("should gain EVs when defeating Pokemon", func() {

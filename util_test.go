@@ -13,15 +13,7 @@ import (
 
 // Used for custom gomega matchers. Checks to see if a is probably the same pokemon as b based on values that are unlikely to change as a result of a transaction.
 func comparePokemon(a, b *Pokemon) bool {
-	if a == nil && b == nil {
-		return true
-	} else if a == nil || b == nil {
-		return false
-	}
-	return a.NatDex == b.NatDex &&
-		a.Nature == b.Nature &&
-		a.Gender == b.Gender &&
-		a.Type == b.Type
+	return a == b
 }
 
 // Used for custom gomega matchers. For simplicity, the fields of the struct are hardcoded. If we need to add more fields to `target` something is probably wrong.
