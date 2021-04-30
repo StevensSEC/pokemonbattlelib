@@ -18,8 +18,10 @@ func ExampleBattle() {
 	transactions, _ := b.SimulateRound()
 	for _, t := range transactions {
 		switch tt := t.(type) {
+		case UseMoveTransaction:
+			fmt.Printf("%s used %s on %s", tt.User, tt.Move, tt.Target.Pokemon)
 		case DamageTransaction:
-			fmt.Printf("%s used %s on %s for %d damage", tt.User, tt.Move, tt.Target.Pokemon, tt.Damage)
+			fmt.Printf(" %s took %d damage", tt.Target.Pokemon, tt.Damage)
 		case HealTransaction:
 			fmt.Printf("%s healed for %d HP", tt.Target, tt.Amount)
 		case FaintTransaction:
@@ -28,6 +30,11 @@ func ExampleBattle() {
 			fmt.Printf("Transaction: %T - %v", t, t)
 		}
 	}
+	//Output
+	//Pikachu, Thunder Shock, Bulbasaur
+	//Bulbasaur, Thunder Shock Damage Amount
+	//Pikachu or Bulbasaur, Amount of HP healed
+	//Bulbasaur fainted
 }
 func ExampleGeneratePokemon() {
 	pkmn := GeneratePokemon(PkmnPikachu,
