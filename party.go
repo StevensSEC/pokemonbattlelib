@@ -48,12 +48,13 @@ func (p *Party) AddPokemon(pkmn ...*Pokemon) error {
 	return nil
 }
 
-// A Pokemon battleParty. Can hold up to 6 Pokemon. Also manages how many pokemon are out on the battlefield. Only used inside of Battles.
+// A Pokemon battleParty. Can hold up to 6 Pokemon. Also manages how many pokemon are out on the battlefield.
+// Only used inside of Battles.
 type battleParty struct {
 	Party         *Party
-	Agent         *Agent           // The agent that has control over this party
-	activePokemon map[int]*Pokemon // Map containing slots and references to active Pokemon on the battlefield
-	team          int              // The team that this party belongs to
+	Agent         *Agent        // The agent that has control over this party
+	activePokemon map[uint]uint // Map of slots for active Pokemon to actual party slots
+	team          int           // The team that this party belongs to
 }
 
 func (p *battleParty) pokemon() []*Pokemon {
