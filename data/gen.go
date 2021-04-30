@@ -25,6 +25,8 @@ var statNames = map[int]string{
 	4: "StatSpAtk",
 	5: "StatSpDef",
 	6: "StatSpeed",
+	7: "StatAccuracy",
+	8: "StatEvasion",
 }
 
 type data_pokemon struct {
@@ -73,6 +75,8 @@ type data_move struct {
 	FlinchChance  int
 	StatChance    int
 	Flags         []string
+	AffectedStat  string
+	StatChange    int
 }
 
 type data_item struct {
@@ -612,15 +616,39 @@ func main() {
 			moves[i].StatChance = parseInt(v[12])
 		}
 	}
+	// get all stat changes that moves do
+	move_stat_change := getCsvReader("data/move_meta_stat_changes.csv")
+	for {
+		record, err := move_stat_change.Read()
+		if err == io.EOF {
+			break
+		}
+		mid := parseInt(record[0])
+		stat := parseInt(record[1])
+		stages := parseInt(record[2])
+		for i, m := range moves {
+			if m.Id != mid {
+				continue
+			}
+			(&moves[i]).AffectedStat = statNames[stat]
+			(&moves[i]).StatChange = stages
+			break
+		}
+	}
 	output += "var AllMoves = []MoveData{\n"
 	for _, m := range moves {
 		flags := strings.Join(m.Flags, " | ")
 		if len(m.Flags) == 0 {
 			flags = "0"
 		}
-		output += fmt.Sprintf("\t{%q, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s,},\n",
+		affectedStat := m.AffectedStat
+		if len(m.AffectedStat) == 0 {
+			affectedStat = "0"
+		}
+		output += fmt.Sprintf("\t{%q, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %d},\n",
 			m.Name, m.Type, m.DamageClass, m.Targets, m.Priority, m.Power, m.Accuracy, m.PP,
-			m.MinHits, m.MaxHits, m.MinTurns, m.MaxTurns, m.Drain, m.Healing, m.CritRate, m.AilmentChance, m.FlinchChance, m.StatChance, flags)
+			m.MinHits, m.MaxHits, m.MinTurns, m.MaxTurns, m.Drain, m.Healing, m.CritRate,
+			m.AilmentChance, m.FlinchChance, m.StatChance, flags, affectedStat, m.StatChange)
 	}
 	output += "}\n\n"
 	// Add move constants

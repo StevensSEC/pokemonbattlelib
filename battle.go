@@ -14,6 +14,7 @@ type Battle struct {
 	ShiftSet bool    // shift or set battle style for NPC trainer battles
 	State    BattleState
 	rng      RNG
+	ruleset  BattleRule
 
 	parties  []*battleParty             // All parties participating in the battle
 	metadata map[BattleMeta]interface{} // Metadata to be tracked during a battle
@@ -22,6 +23,13 @@ type Battle struct {
 	tProcessed []Transaction
 	results    BattleResults
 }
+
+type BattleRule int
+
+const (
+	BattleRuleFaint BattleRule = 1 << iota
+)
+const BattleRuleSetDefault = BattleRuleFaint
 
 type BattleMeta int
 
@@ -41,8 +49,9 @@ const (
 func NewBattle() *Battle {
 	rng := LCRNG(rand.Uint32())
 	b := Battle{
-		State: BattleBeforeStart,
-		rng:   RNG(&rng),
+		State:   BattleBeforeStart,
+		rng:     RNG(&rng),
+		ruleset: BattleRuleSetDefault,
 		metadata: map[BattleMeta]interface{}{
 			MetaWeatherTurns: 0,
 		},
@@ -221,7 +230,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			})
 		}
 	}
-
 	blog.Println("Sorting turns")
 	// Sort turns using an in-place stable sort
 	b.sortTurns(&turns)
@@ -266,200 +274,11 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			}
 
 			// use the move
-			receiver := t.Target.Pokemon
-			accuracy := CalcAccuracy(b.Weather, user, receiver, move)
-			b.QueueTransaction(PPTransaction{
-				Move:   move,
-				Amount: -1,
+			b.QueueTransaction(UseMoveTransaction{
+				User:   turn.User,
+				Target: t.Target,
+				Move:   turn.User.Pokemon.Moves[t.Move],
 			})
-			if move.Accuracy() != 0 && !b.rng.Roll(int(accuracy), 100) {
-				b.QueueTransaction(MoveFailTransaction{
-					User:   user,
-					Reason: FailMiss,
-				})
-				continue
-			}
-			// See: https://github.com/StevensSEC/pokemonbattlelib/wiki/Requirements#fight-using-a-move
-			// Status Moves
-			if move.Category() == MoveCategoryStatus {
-				switch move.Id {
-				case MoveDoubleTeam:
-					b.QueueTransaction(ModifyStatTransaction{
-						Target: user,
-						Stat:   StatEvasion,
-						Stages: +1,
-					})
-				case MoveStunSpore:
-					b.QueueTransaction(InflictStatusTransaction{
-						Target:       t.Target.Pokemon,
-						StatusEffect: StatusParalyze,
-					})
-				case MoveSpite:
-					if m := t.Target.Pokemon.metadata[MetaLastMove]; m != nil {
-						b.QueueTransaction(PPTransaction{
-							Move:   m.(*Move),
-							Amount: -4,
-						})
-					}
-				case MoveAttract:
-					g1, g2 := user.Gender, receiver.Gender
-					// Only applies when Pokemon are opposite gender
-					if g1 != GenderGenderless && g2 != GenderGenderless && g1 != g2 {
-						b.QueueTransaction(InflictStatusTransaction{
-							Target:       receiver,
-							StatusEffect: StatusInfatuation,
-						})
-						if receiver.HeldItem == ItemDestinyKnot {
-							b.QueueTransaction(InflictStatusTransaction{
-								Target:       user,
-								StatusEffect: StatusInfatuation,
-							})
-						}
-					}
-				case MoveRainDance:
-					turns := 5
-					if user.HeldItem == ItemDampRock {
-						turns = 8
-					}
-					b.QueueTransaction(WeatherTransaction{
-						Weather: WeatherRain,
-						Turns:   turns,
-					})
-				case MoveSunnyDay:
-					turns := 5
-					if user.HeldItem == ItemHeatRock {
-						turns = 8
-					}
-					b.QueueTransaction(WeatherTransaction{
-						Weather: WeatherHarshSunlight,
-						Turns:   turns,
-					})
-				case MoveHail:
-					turns := 5
-					if user.HeldItem == ItemIcyRock {
-						turns = 8
-					}
-					b.QueueTransaction(WeatherTransaction{
-						Weather: WeatherHail,
-						Turns:   turns,
-					})
-				case MoveSandstorm:
-					turns := 5
-					if user.HeldItem == ItemSmoothRock {
-						turns = 8
-					}
-					b.QueueTransaction(WeatherTransaction{
-						Weather: WeatherSandstorm,
-						Turns:   turns,
-					})
-				case MoveHowl:
-					b.QueueTransaction(ModifyStatTransaction{
-						Target: user,
-						Stat:   StatAtk,
-						Stages: +1,
-					})
-				case MoveSplash:
-					b.QueueTransaction(MoveFailTransaction{
-						User:   user,
-						Reason: FailOther,
-					})
-				case MoveDefog:
-					if b.Weather == WeatherFog {
-						b.QueueTransaction(WeatherTransaction{
-							Weather: WeatherClearSkies,
-						})
-					}
-				case MoveMoonlight, MoveSynthesis, MoveMorningSun:
-					if b.Weather == WeatherFog {
-						b.QueueTransaction(HealTransaction{
-							Target: user,
-							Amount: user.MaxHP() / 4,
-						})
-					}
-				default:
-					blog.Printf("Unimplemented status move: %s", move.Name())
-				}
-			} else {
-				// Physical/Special Moves
-				damage := CalcMoveDamage(b.Weather, user, receiver, move)
-				var crit uint = 1
-				if b.rng.Roll(1, user.CritChance()) {
-					crit = 2
-				}
-				// Receiver effects
-				if receiver.HeldItem != ItemNone {
-					switch receiver.HeldItem {
-					case ItemStickyBarb:
-						b.QueueTransaction(DamageTransaction{
-							Target: turn.User,
-							Damage: user.MaxHP() / 8,
-						})
-						if move.Flags()&FlagContact != 0 && user.HeldItem == ItemNone {
-							b.QueueTransaction(
-								GiveItemTransaction{
-									Target: user,
-									Item:   receiver.HeldItem,
-								},
-								GiveItemTransaction{
-									Target: receiver,
-									Item:   ItemNone,
-								},
-							)
-						}
-					}
-				}
-				damage *= crit
-				b.QueueTransaction(DamageTransaction{
-					User:   user,
-					Target: t.Target,
-					Move:   user.Moves[t.Move],
-					Damage: uint(damage),
-				})
-				// Handle draining moves (Absorb, Mega Drain, Giga Drain, Drain Punch, etc.)
-				if move.Drain() != 0 {
-					drain := damage * uint(move.Drain()) / 100
-					if user.HeldItem == ItemBigRoot {
-						drain = drain * 130 / 100 // 30% more HP than normal
-					}
-					if drain == 0 {
-						// Min 1 HP drain
-						drain = 1
-					}
-					b.QueueTransaction(HealTransaction{
-						Target: user,
-						Amount: drain,
-					})
-				}
-				if move.FlinchChance() > 0 && b.rng.Roll(move.FlinchChance(), 100) {
-					b.QueueTransaction(InflictStatusTransaction{
-						Target:       receiver,
-						StatusEffect: StatusFlinch,
-					})
-				}
-				// Other item effects in battle
-				switch user.HeldItem {
-				case ItemKingsRock, ItemRazorFang:
-					// King's Rock makes non-flinching moves have a 10% to cause flinch
-					// TODO: ensure only certain moves are affected -> https://bulbapedia.bulbagarden.net/wiki/King%27s_Rock
-					if move.FlinchChance() == 0 && b.rng.Roll(1, 10) {
-						b.QueueTransaction(InflictStatusTransaction{
-							Target:       receiver,
-							StatusEffect: StatusFlinch,
-						})
-					}
-				case ItemLifeOrb:
-					b.QueueTransaction(DamageTransaction{
-						Target: turn.User,
-						Damage: user.MaxHP() / 10,
-					})
-				case ItemShellBell:
-					b.QueueTransaction(DamageTransaction{
-						Target: turn.User,
-						Damage: uint(damage / 8),
-					})
-				}
-			}
-			user.metadata[MetaLastMove] = move
 		case ItemTurn:
 			b.QueueTransaction(ItemTransaction{
 				Target: t.Target,

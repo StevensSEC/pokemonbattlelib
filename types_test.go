@@ -13,7 +13,7 @@ import (
 var _ = Describe("Elemental types", func() {
 	DescribeTable("GetElementalEffect()",
 		func(move, def Type, want Effectiveness) {
-			Expect(GetElementalEffect(move, def, ItemNone)).To(Equal(want))
+			Expect(GetElementalEffect(move, def)).To(Equal(want))
 		},
 		Entry("Water -> Fire", TypeWater, TypeFire, SuperEffective),
 		Entry("Grass -> Water", TypeGrass, TypeWater, SuperEffective),

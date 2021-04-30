@@ -44,5 +44,53 @@ var medicineData = map[Item]struct {
 	ItemOldGateau:    {Cure: fullCure},
 	ItemParalyzeHeal: {Cure: StatusParalyze},
 }
+var typeItemData = map[Item]Type{
+	// Plates
+	ItemDracoPlate:  TypeDragon,
+	ItemDreadPlate:  TypeDark,
+	ItemEarthPlate:  TypeGround,
+	ItemFistPlate:   TypeFighting,
+	ItemFlamePlate:  TypeFire,
+	ItemIciclePlate: TypeIce,
+	ItemInsectPlate: TypeBug,
+	ItemIronPlate:   TypeSteel,
+	ItemMeadowPlate: TypeGrass,
+	ItemMindPlate:   TypePsychic,
+	ItemSkyPlate:    TypeFlying,
+	ItemSplashPlate: TypeWater,
+	ItemSpookyPlate: TypeGhost,
+	ItemStonePlate:  TypeRock,
+	ItemToxicPlate:  TypePoison,
+	ItemZapPlate:    TypeElectric,
+	// Type Enhancement
+	ItemBlackBelt:    TypeFighting,
+	ItemBlackGlasses: TypeDark,
+	ItemCharcoal:     TypeFire,
+	ItemDragonFang:   TypeDragon,
+	ItemHardStone:    TypeRock,
+	ItemMagnet:       TypeElectric,
+	ItemMetalCoat:    TypeSteel,
+	ItemMiracleSeed:  TypeGrass,
+	ItemMysticWater:  TypeWater,
+	ItemNeverMeltIce: TypeIce,
+	ItemOddIncense:   TypePsychic,
+	ItemPoisonBarb:   TypePoison,
+	ItemRockIncense:  TypeRock,
+	ItemRoseIncense:  TypeGrass,
+	ItemSeaIncense:   TypeWater,
+	ItemSharpBeak:    TypeFlying,
+	ItemSilkScarf:    TypeNormal,
+	ItemSilverPowder: TypeBug,
+	ItemSoftSand:     TypeGround,
+	ItemSpellTag:     TypeGhost,
+	ItemTwistedSpoon: TypePsychic,
+	ItemWaveIncense:  TypeWater,
+}
+
+// Creates a new move and returns the ID of the move created
+func RegisterMove(data MoveData) MoveId {
+	AllMoves = append(AllMoves, data)
+	return MoveId(len(AllMoves))
+}
 
 //go:generate go run data/gen.go

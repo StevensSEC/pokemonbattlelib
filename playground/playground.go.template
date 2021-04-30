@@ -2,9 +2,38 @@ package main
 
 import (
 	"fmt"
+	"log"
 
-	lib "github.com/StevensSEC/pokemonbattlelib"
+	. "github.com/StevensSEC/pokemonbattlelib"
 )
+
+type sampleAgent struct{}
+
+func (sampleAgent) Act(ctx *BattleContext) Turn {
+	best := 0
+	for i, target := range ctx.Opponents {
+		if target.Pokemon.Defense() < ctx.Opponents[best].Pokemon.Defense() {
+			best = i
+		}
+	}
+	opponent := ctx.Opponents[best].Pokemon
+	var strongestMove int
+	var strongestDamage uint
+	for i, move := range ctx.Pokemon.Moves {
+		if move == nil {
+			continue
+		}
+		damage := CalcMoveDamage(ctx.Battle.Weather, &ctx.Pokemon, opponent, move)
+		if damage > strongestDamage {
+			strongestDamage = damage
+			strongestMove = i
+		}
+	}
+	return FightTurn{
+		Move:   strongestMove,
+		Target: ctx.Opponents[best],
+	}
+}
 
 func check(err error) {
 	if err != nil {
@@ -13,7 +42,44 @@ func check(err error) {
 }
 
 func main() {
-	b := lib.NewBattle()
+	// set up the battle
+	a := Agent(new(sampleAgent))
+	party0 := NewOccupiedParty(
+		GeneratePokemon(PkmnBulbasaur, WithMoves(MoveTackle)),
+	)
+	party1 := NewOccupiedParty(
+		GeneratePokemon(PkmnBulbasaur, WithMoves(MoveTackle)),
+	)
+	b := NewBattle()
+	b.AddParty(party0, &a, 0)
+	b.AddParty(party1, &a, 1)
 	err := b.Start()
 	check(err)
+
+	// Run the battle
+	for {
+		for _, t := range b.GetTargetsRef() {
+			log.Printf("%s - %d HP", t.Pokemon, t.Pokemon.CurrentHP)
+		}
+		transactions, ended := b.SimulateRound()
+		for _, t := range transactions {
+			switch tt := t.(type) {
+			case UseMoveTransaction:
+				log.Printf("%s used %s on %s", tt.User, tt.Move, tt.Target.Pokemon)
+			case DamageTransaction:
+				log.Printf(" %s took %d damage", tt.Target.Pokemon, tt.Damage)
+			case HealTransaction:
+				log.Printf("%s healed for %d HP", tt.Target, tt.Amount)
+			case FaintTransaction:
+				log.Printf("%s fainted", tt.Target.Pokemon)
+			default:
+				log.Printf("Transaction: %T - %v", t, t)
+			}
+		}
+		if ended {
+			break
+		}
+	}
+	result := b.GetResults()
+	log.Printf("Winner: Team %d", result.Winner)
 }

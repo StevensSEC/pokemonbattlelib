@@ -83,6 +83,8 @@ func BenchmarkBattle(b *testing.B) {
 		p1 := randParty()
 		p2 := randParty()
 		battle = NewSingleBattle(p1, &a1, p2, &a1)
+		rng := battle.rng.(*LCRNG)
+		seed := uint32(*rng)
 		err := battle.Start()
 		if err != nil {
 			panic(err)
@@ -92,8 +94,10 @@ func BenchmarkBattle(b *testing.B) {
 			transactions, ended := battle.SimulateRound()
 			for _, t := range transactions {
 				switch tt := t.(type) {
+				case UseMoveTransaction:
+					log.Printf("%s used %s on %s", tt.User, tt.Move, tt.Target.Pokemon)
 				case DamageTransaction:
-					log.Printf("%s used %s on %s for %d damage", tt.User, tt.Move, tt.Target.Pokemon, tt.Damage)
+					log.Printf(" %s took %d damage", tt.Target.Pokemon, tt.Damage)
 				case HealTransaction:
 					log.Printf("%s healed for %d HP", tt.Target, tt.Amount)
 				case FaintTransaction:
@@ -112,7 +116,9 @@ func BenchmarkBattle(b *testing.B) {
 			rounds++
 
 			if rounds > 100 {
+				fmt.Printf("\n\nBATTLE GOT STUCK:\n")
 				dumpBattle(battle)
+				fmt.Printf("b.SetSeed(%d)\n", seed)
 				// log.Panic("Battle is stuck!")
 				stuck++
 				break
