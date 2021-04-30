@@ -508,6 +508,9 @@ func main() {
 			continue
 		}
 		mid := parseInt(record[0])
+		if mid >= 10000 {
+			continue // skip these, because they are the shaow moves from pokemon XD, see #355
+		}
 		moveType := 1 << (parseInt(record[3]) - 1)
 		power := parseInt(record[4])
 		pp := parseInt(record[5])

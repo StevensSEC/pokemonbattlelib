@@ -1844,24 +1844,6 @@ var AllMoves = []MoveData{
 	{"Seed Flare", 2048, MoveCategorySpecial, 10, 0, 120, 85, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, FlagProtect | FlagMirror, StatSpDef, -2},
 	{"Ominous Wind", 128, MoveCategorySpecial, 10, 0, 60, 100, 5, 0, 0, 0, 0, 0, 0, 0, 10, 0, 10, FlagProtect | FlagMirror, StatSpeed, 1},
 	{"Shadow Force", 128, MoveCategoryPhysical, 10, 0, 120, 100, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagCharge | FlagMirror, 0, 0},
-	{"Shadow Rush", 0, MoveCategoryPhysical, 10, 0, 55, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect, 0, 0},
-	{"Shadow Blast", 0, MoveCategoryPhysical, 10, 0, 80, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect, 0, 0},
-	{"Shadow Blitz", 0, MoveCategoryPhysical, 10, 0, 40, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror, 0, 0},
-	{"Shadow Bolt", 0, MoveCategorySpecial, 10, 0, 75, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect, 0, 0},
-	{"Shadow Break", 0, MoveCategoryPhysical, 10, 0, 75, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror, 0, 0},
-	{"Shadow Chill", 0, MoveCategorySpecial, 10, 0, 75, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror, 0, 0},
-	{"Shadow End", 0, MoveCategoryPhysical, 10, 0, 120, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagContact | FlagProtect | FlagMirror, 0, 0},
-	{"Shadow Fire", 0, MoveCategorySpecial, 10, 0, 75, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror, 0, 0},
-	{"Shadow Rave", 0, MoveCategorySpecial, 6, 0, 70, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror, 0, 0},
-	{"Shadow Storm", 0, MoveCategorySpecial, 6, 0, 95, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect, 0, 0},
-	{"Shadow Wave", 0, MoveCategorySpecial, 6, 0, 50, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect, 0, 0},
-	{"Shadow Down", 0, MoveCategoryStatus, 6, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror, 0, 0},
-	{"Shadow Half", 0, MoveCategorySpecial, 12, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagRecharge | FlagProtect, 0, 0},
-	{"Shadow Hold", 0, MoveCategoryStatus, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror, 0, 0},
-	{"Shadow Mist", 0, MoveCategoryStatus, 6, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror, 0, 0},
-	{"Shadow Panic", 0, MoveCategoryStatus, 6, 0, 0, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect | FlagMirror | FlagSound, 0, 0},
-	{"Shadow Shed", 0, MoveCategoryStatus, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect, 0, 0},
-	{"Shadow Sky", 0, MoveCategoryStatus, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FlagProtect, 0, 0},
 }
 
 // Move constants for quick and easy reference
@@ -2334,24 +2316,6 @@ const (
 	MoveSeedFlare
 	MoveOminousWind
 	MoveShadowForce
-	MoveShadowRush
-	MoveShadowBlast
-	MoveShadowBlitz
-	MoveShadowBolt
-	MoveShadowBreak
-	MoveShadowChill
-	MoveShadowEnd
-	MoveShadowFire
-	MoveShadowRave
-	MoveShadowStorm
-	MoveShadowWave
-	MoveShadowDown
-	MoveShadowHalf
-	MoveShadowHold
-	MoveShadowMist
-	MoveShadowPanic
-	MoveShadowShed
-	MoveShadowSky
 )
 
 // Item constants for quick and easy reference
