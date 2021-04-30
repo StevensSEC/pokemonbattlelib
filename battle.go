@@ -213,7 +213,6 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// use the ground truth instead of a copy to let the garbage collector clean up the copied memory when it can
 			switch t := turn.(type) {
 			case FightTurn:
-				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
 				turn = t // because the type check creates a copy (again...), we need to make sure that this version of the turn gets placed into the turn list
 			case ItemTurn:
 				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
@@ -248,6 +247,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 		}
 		switch t := turn.Turn.(type) {
 		case FightTurn:
+			// Ensure that Pokemon pointer is correct, even after switch turns
+			t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
 			move := user.Moves[t.Move]
 			// pre-move checks
 			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) || user.StatusEffects.check(StatusFlinch) {
@@ -290,18 +291,17 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Move:   t.Target.Pokemon.Moves[t.Move],
 			})
 		case SwitchTurn:
-			party := b.GetParty(&t.Target)
-			if _, ok := party.activePokemon[t.Target.partySlot]; ok {
+			p := b.GetParty(&t.Target)
+			if p.IsActivePokemon(t.Target.partySlot) {
 				blog.Panic(ErrorCannotSwitch)
 			}
 			pkmn := b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
 			if pkmn.CurrentHP == 0 {
 				blog.Panic(ErrorCannotSwitch)
 			}
-			party.SetInactive(t.Current.partySlot)
-			b.QueueTransaction(SendOutTransaction{
-				Target: t.Target,
-			})
+			a, b := t.Current.partySlot, t.Target.partySlot
+			p.Party.Pokemon[a], p.Party.Pokemon[b] = p.Party.Pokemon[b], p.Party.Pokemon[a]
+			p.activePokemon[a] = p.Party.Pokemon[a]
 		default:
 			blog.Panicf("Unknown turn of type %v", t)
 		}

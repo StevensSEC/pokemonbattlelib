@@ -1,6 +1,8 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -291,13 +293,14 @@ var _ = Describe("Switching Pokemon", func() {
 		return b
 	}
 
-	FContext("when switching Pokemon in battle", func() {
+	Context("when switching Pokemon in battle", func() {
 		It("should allow switching before other turns", func() {
 			b := setup()
 			t2 := b.getTarget(1, 0)
 			t3 := b.getTarget(1, 1)
 			a1 <- FightTurn{Move: 0, Target: t2}
 			a2 <- SwitchTurn{Current: t2, Target: t3}
+			fmt.Println(b.parties)
 			pkmn2 := t2.Pokemon
 			pkmn3 := t3.Pokemon
 			t, _ := b.SimulateRound()
@@ -309,6 +312,16 @@ var _ = Describe("Switching Pokemon", func() {
 					Target: t2,
 				},
 			))
+		})
+
+		FIt("should not allow switching to invalid Pokemon", func() {
+			b := setup()
+			t2 := b.getTarget(1, 0)
+			t3 := b.getTarget(1, 1)
+			a1 <- FightTurn{Move: 0, Target: t2}
+			a2 <- SwitchTurn{Current: t2, Target: t3}
+			b.parties[1].SetActive(1)
+			Expect(b.SimulateRound()).ToNot(Succeed())
 		})
 	})
 })
