@@ -58,3 +58,29 @@ var _ = Describe("Move PP Consumption", func() {
 		Expect(p2.Moves[0].CurrentPP).To(BeEquivalentTo(0))
 	})
 })
+
+var _ = Describe("Move Damage", func() {
+	a := Agent(new(dumbAgent))
+
+	It("should always do 20 damage when using sonic boom", func() {
+		b := New1v1Battle(
+			PkmnWithMoves(MoveSonicBoom), &a,
+			PkmnWithMoves(TestMoveNoDamage), &a,
+		)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransactionsInOrder(
+			UseMoveTransaction{
+				User:   b.getTarget(0, 0),
+				Target: b.getTarget(1, 0),
+				Move:   b.getPokemonInBattle(0, 0).Moves[0],
+			},
+			DamageTransaction{
+				Target: b.getTarget(1, 0),
+				Move:   b.getPokemonInBattle(0, 0).Moves[0],
+				Damage: 20,
+			},
+		))
+	})
+})
