@@ -7,10 +7,11 @@ import (
 
 // Handles all pre-turn logic
 func (b *Battle) preRound() {
-	for _, t := range b.GetTargetsRef() {
-		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
+	for _, t := range b.AllTargets() {
+		pkmn := b.getPokemon(t)
+		if v, ok := pkmn.metadata[MetaSleepTime]; ok && v.(int) == 0 && pkmn.StatusEffects.check(StatusSleep) {
 			b.QueueTransaction(CureStatusTransaction{
-				Target:       *t,
+				Target:       t,
 				StatusEffect: StatusSleep,
 			})
 		}
@@ -21,8 +22,8 @@ func (b *Battle) sortTurns(turns *[]TurnContext) {
 	sort.SliceStable(*turns, func(i, j int) bool {
 		turnA := (*turns)[i].Turn
 		turnB := (*turns)[j].Turn
-		pkmnA := (*turns)[i].User.Pokemon
-		pkmnB := (*turns)[j].User.Pokemon
+		pkmnA := b.getPokemon((*turns)[i].User)
+		pkmnB := b.getPokemon((*turns)[j].User)
 		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
 			switch turnA.(type) {
 			case FightTurn:
@@ -68,30 +69,15 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	b.ProcessQueue()
 	// Collects all turn info from each active Pokemon
 	turns := make([]TurnContext, 0)
-	for i, party := range b.parties {
-		for j, pokemon := range party.activePokemon {
-			ctx := b.getContext(party, pokemon)
-			blog.Printf("Requesting turn from agent %d for pokemon %d (%s)", i, j, pokemon)
-			turn := (*party.Agent).Act(ctx)
-			// use the ground truth instead of a copy to let the garbage collector clean up the copied memory when it can
-			switch t := turn.(type) {
-			case FightTurn:
-				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
-				turn = t // because the type check creates a copy (again...), we need to make sure that this version of the turn gets placed into the turn list
-			case ItemTurn:
-				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
-				turn = t
-			}
-			turns = append(turns, TurnContext{
-				User: target{
-					Pokemon:   b.getPokemonInBattle(i, j), // use the ground truth instead of a copy
-					party:     i,
-					partySlot: j,
-					Team:      party.team,
-				},
-				Turn: turn,
-			})
-		}
+	for _, t := range b.AllTargets() {
+		blog.Printf("Requesting turn for target: %v", t)
+		party := b.parties[t.party]
+		ctx := b.GetBattleContext(t)
+		turn := (*party.Agent).Act(ctx)
+		turns = append(turns, TurnContext{
+			User: t,
+			Turn: turn,
+		})
 	}
 	blog.Println("Sorting turns")
 	// Sort turns using an in-place stable sort
@@ -100,8 +86,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	for len(turns) > 0 {
 		turn := turns[0]
 		turns = turns[1:]
-		blog.Printf("Processing Turn %T for %s", turn.Turn, turn.User.Pokemon)
-		user := turn.User.Pokemon
+		user := b.getPokemon(turn.User)
+		blog.Printf("Processing Turn %T for %s", turn.Turn, user)
 		if user.CurrentHP == 0 {
 			continue
 		}
@@ -140,13 +126,14 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			b.QueueTransaction(UseMoveTransaction{
 				User:   turn.User,
 				Target: t.Target,
-				Move:   turn.User.Pokemon.Moves[t.Move],
+				Move:   user.Moves[t.Move],
 			})
 		case ItemTurn:
+			receiver := b.getPokemon(t.Target)
 			b.QueueTransaction(ItemTransaction{
 				Target: t.Target,
 				Item:   t.Item,
-				Move:   t.Target.Pokemon.Moves[t.Move],
+				Move:   receiver.Moves[t.Move],
 			})
 		default:
 			blog.Panicf("Unknown turn of type %v", t)
@@ -170,8 +157,8 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 func (b *Battle) postRound() {
 	blog.Println("Post-round")
 	// Effects on every Pokemon
-	for _, t := range b.GetTargetsRef() {
-		pkmn := t.Pokemon
+	for _, t := range b.AllTargets() {
+		pkmn := b.getPokemon(t)
 		// Status effects
 		if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
 			cond := pkmn.StatusEffects & StatusNonvolatileMask
@@ -184,13 +171,13 @@ func (b *Battle) postRound() {
 				damage = pkmn.MaxHP() / 16
 			}
 			b.QueueTransaction(DamageTransaction{
-				Target:       *t,
+				Target:       t,
 				Damage:       damage,
 				StatusEffect: cond,
 			})
 		}
 		pkmn.StatusEffects.clear(StatusFlinch) // Flinching only occurs over the course of a single turn. It never bleeds over into the next turn.
-		if v, ok := t.Pokemon.metadata[MetaStatChangeImmune]; ok {
+		if v, ok := pkmn.metadata[MetaStatChangeImmune]; ok {
 			turns := v.(int)
 			pkmn.metadata[MetaStatChangeImmune] = turns - 1
 			if turns == 0 {
@@ -203,7 +190,7 @@ func (b *Battle) postRound() {
 			if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
 				damage := pkmn.MaxHP() / 16
 				b.QueueTransaction(DamageTransaction{
-					Target: *t,
+					Target: t,
 					Damage: damage,
 				})
 			}
@@ -211,21 +198,21 @@ func (b *Battle) postRound() {
 			if pkmn.EffectiveType()&TypeIce == 0 {
 				damage := pkmn.MaxHP() / 16
 				b.QueueTransaction(DamageTransaction{
-					Target: *t,
+					Target: t,
 					Damage: damage,
 				})
 			}
 			// Held item effects
 			if pkmn.HeldItem != ItemNone {
 				b.QueueTransaction(ItemTransaction{
-					Target: *t,
+					Target: t,
 					Item:   pkmn.HeldItem,
 				})
 			}
 		}
 		if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
 			b.QueueTransaction(ItemTransaction{
-				Target: *t,
+				Target: t,
 				IsHeld: true,
 				Item:   pkmn.HeldItem,
 			})
@@ -233,7 +220,7 @@ func (b *Battle) postRound() {
 		// Held item effects
 		if pkmn.HeldItem != ItemNone {
 			b.QueueTransaction(ItemTransaction{
-				Target: *t,
+				Target: t,
 				IsHeld: true,
 				Item:   pkmn.HeldItem,
 			})

@@ -119,8 +119,8 @@ func (hb *httpBattle) QueueNextTurn(targetId int, turn Turn) {
 }
 
 func (hb *httpBattle) FlushTurns() {
-	for i, t := range hb.Battle.GetTargets() {
-		p := hb.Battle.GetParty(&t)
+	for i, t := range hb.Battle.AllTargets() {
+		p := hb.Battle.GetParty(t)
 		switch a := (*p.Agent).(type) {
 		case WaiterAgent:
 			turn := hb.queuedTurns[i]
@@ -237,9 +237,9 @@ func HandleBattleContext(w http.ResponseWriter, r *http.Request) {
 	targetIdx := parseNumberArg(r, "target")
 
 	b := battles[battleId].Battle
-	target := b.GetTargets()[targetIdx]
+	target := b.AllTargets()[targetIdx]
 
-	bytes, err := json.Marshal(b.GetRoundContext(target))
+	bytes, err := json.Marshal(b.GetBattleContext(target))
 	if err != nil {
 		log.Printf("Failed to marshal into JSON: %s", err)
 		w.WriteHeader(500)

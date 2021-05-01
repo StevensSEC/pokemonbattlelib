@@ -77,6 +77,11 @@ func (b *Battle) AddBattleParty(p ...*battleParty) {
 	b.parties = append(b.parties, p...)
 }
 
+// Gets the battle party for a given target
+func (b *Battle) GetParty(t target) *battleParty {
+	return b.parties[t.party]
+}
+
 // Gets a reference to a Pokemon from a target
 func (b *Battle) getPokemon(t target) *Pokemon {
 	if t.party >= uint(len(b.parties)) {
@@ -90,7 +95,7 @@ func (b *Battle) getPokemon(t target) *Pokemon {
 }
 
 // Gets all the active Pokemon (targets) in the battle
-func (b *Battle) allTargets() []target {
+func (b *Battle) AllTargets() []target {
 	targets := make([]target, 0)
 	for party, p := range b.parties {
 		for slot := range p.activePokemon {
@@ -105,9 +110,9 @@ func (b *Battle) allTargets() []target {
 }
 
 // Gets all active ally Pokemon for a party
-func (b *Battle) GetAllies(p *battleParty) []target {
+func (b *Battle) getAllies(p *battleParty) []target {
 	allies := make([]target, 0)
-	targets := b.allTargets()
+	targets := b.AllTargets()
 	for _, target := range targets {
 		party := b.parties[target.party]
 		if party.team == p.team {
@@ -118,9 +123,9 @@ func (b *Battle) GetAllies(p *battleParty) []target {
 }
 
 // Gets all active opponent Pokemon for a party
-func (b *Battle) GetOpponents(p *battleParty) []target {
+func (b *Battle) getOpponents(p *battleParty) []target {
 	opponents := make([]target, 0)
-	targets := b.allTargets()
+	targets := b.AllTargets()
 	for _, target := range targets {
 		party := b.parties[target.party]
 		if party.team != p.team {
@@ -207,7 +212,15 @@ type BattleContext struct {
 	target target // The party/slot of the acting Pokemon
 }
 
-// TODO
+func (b *Battle) GetBattleContext(t target) *BattleContext {
+	p := b.parties[t.party]
+	return &BattleContext{
+		Battle: *b,
+		Team:   p.team,
+		target: t,
+	}
+}
+
 func (bc *BattleContext) Self() AgentTarget {
 	return AgentTarget{
 		target:  bc.target,
@@ -217,23 +230,44 @@ func (bc *BattleContext) Self() AgentTarget {
 }
 
 func (bc *BattleContext) Allies() []AgentTarget {
-	p := bc.Battle.parties[target.party]
-	// return all allies
+	b := bc.Battle
+	p := b.parties[bc.target.party]
+	targets := make([]AgentTarget, 0)
+	for _, t := range b.getAllies(p) {
+		targets = append(targets, AgentTarget{
+			target:  t,
+			Team:    b.parties[t.party].team,
+			Pokemon: *b.getPokemon(t),
+		})
+	}
+	return targets
 }
 
 func (bc *BattleContext) Opponents() []AgentTarget {
-	p := bc.Battle.parties[target.party]
-	// return all opponents
+	b := bc.Battle
+	p := b.parties[bc.target.party]
+	targets := make([]AgentTarget, 0)
+	for _, t := range b.getOpponents(p) {
+		targets = append(targets, AgentTarget{
+			target:  t,
+			Team:    b.parties[t.party].team,
+			Pokemon: *b.getPokemon(t),
+		})
+	}
+	return targets
 }
 
 func (bc *BattleContext) Targets() []AgentTarget {
-	p := bc.Battle.parties[target.party]
-	// return all targets
-}
-
-// Get the battle context that will be shared with the client
-func (b *Battle) GetRoundContext(t target) *BattleContext {
-	return b.getContext(b.parties[t.party], b.parties[t.party].activePokemon[t.partySlot])
+	b := bc.Battle
+	targets := make([]AgentTarget, 0)
+	for _, t := range b.AllTargets() {
+		targets = append(targets, AgentTarget{
+			target:  t,
+			Team:    b.parties[t.party].team,
+			Pokemon: *b.getPokemon(t),
+		})
+	}
+	return targets
 }
 
 // Get the results of the battle. The battle must be in the `BattleEnd` state.
