@@ -322,11 +322,11 @@ var _ = Describe("Getting pokemon from parties", func() {
 
 	BeforeEach(func() {
 		p1 := NewOccupiedParty(
-			GeneratePokemon(PkmnCharmander, WithMoves(TestMoveDefault)),
-			GeneratePokemon(PkmnSquirtle, WithMoves(TestMoveDefault)),
-			GeneratePokemon(PkmnMetapod, WithMoves(TestMoveDefault)),
+			PkmnWithMoves(TestMoveDefault),
+			PkmnWithMoves(TestMoveDefault),
+			PkmnWithMoves(TestMoveDefault),
 		)
-		p2 := NewOccupiedParty(GeneratePokemon(PkmnBeedrill, WithMoves(TestMoveDefault)))
+		p2 := NewOccupiedParty(PkmnWithMoves(TestMoveDefault))
 		b = NewSingleBattle(p1, &a1, p2, &a2)
 	})
 
@@ -433,8 +433,8 @@ var _ = Describe("Turn priority", func() {
 		})
 
 		It("should handle faster Pokemon first", func() {
-			p1 := GeneratePokemon(PkmnCharmander, WithMoves(TestMoveDefault))
-			p2 := GeneratePokemon(PkmnNinjask, WithMoves(TestMoveDefault)) // ninjask is faster than charmander
+			p1 := PkmnWithMoves(TestMoveDefault)
+			p2 := PkmnWithMoves(TestMoveDefault) // ninjask is faster than charmander
 			b := New1v1Battle(p1, &a1, p2, &a2)
 			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
@@ -619,8 +619,8 @@ var _ = Describe("Weather", func() {
 			})
 
 			It("should cause sandstorm damage", func() {
-				bidoof := GeneratePokemon(PkmnBidoof, WithMoves(MoveTackle))
-				bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSolarBeam))
+				bidoof := PkmnWithMoves(MoveTackle)
+				bulbasaur := PkmnWithMoves(MoveSolarBeam)
 				b := New1v1Battle(bidoof, &a1, bulbasaur, &a2)
 				b.rng = SimpleRNG()
 				b.Weather = WeatherHail
@@ -675,8 +675,8 @@ var _ = Describe("Weather", func() {
 			})
 
 			It("should cause hail damage", func() {
-				bidoof := GeneratePokemon(PkmnBidoof, WithMoves(MoveTackle))
-				bulbasaur := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSolarBeam))
+				bidoof := PkmnWithMoves(MoveTackle)
+				bulbasaur := PkmnWithMoves(MoveSolarBeam)
 				b := New1v1Battle(bidoof, &a1, bulbasaur, &a2)
 				b.rng = SimpleRNG()
 				b.Weather = WeatherHail
@@ -825,7 +825,7 @@ var _ = Describe("Fainting", func() {
 
 		It("should gain EVs when defeating Pokemon", func() {
 			winner := PkmnDefault()
-			loser := GeneratePokemon(PkmnBulbasaur, WithMoves(TestMoveDefault))
+			loser := PkmnWithMoves(TestMoveDefault)
 			loser.CurrentHP = 1
 			p1 = NewOccupiedParty(winner)
 			p2 = NewOccupiedParty(loser)
@@ -933,8 +933,8 @@ var _ = Describe("Battle metadata", func() {
 	Context("Pokemon metadata", func() {
 		It("should record the last used move of Pokemon in battle", func() {
 			a1 := Agent(new(dumbAgent))
-			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveRazorLeaf))
-			p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveEmber))
+			p1 := PkmnWithMoves(MoveRazorLeaf)
+			p2 := PkmnWithMoves(MoveEmber)
 			b := New1v1Battle(p1, &a1, p2, &a1)
 			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
@@ -952,8 +952,8 @@ var _ = Describe("Status Conditions", func() {
 
 	Context("when using certain moves in battle causes status effects", func() {
 		It("should inflict paralysis from MoveStunSpore", func() {
-			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSplash))
-			pkmn2 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveStunSpore))
+			pkmn1 := PkmnWithMoves(MoveSplash)
+			pkmn2 := PkmnWithMoves(MoveStunSpore)
 			b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
 			b.rng = AlwaysRNG()
 			Expect(b.Start()).To(Succeed())

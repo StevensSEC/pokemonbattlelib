@@ -21,8 +21,8 @@ var _ = Describe("Stat-changing moves", func() {
 
 	DescribeTable("Should modify the User's stats",
 		func(id MoveId, stat, stages int) {
-			charmander := GeneratePokemon(PkmnCharmander, WithMoves(id))
-			squirtle := GeneratePokemon(PkmnSquirtle, WithMoves(MovePound))
+			charmander := PkmnWithMoves(id)
+			squirtle := PkmnWithMoves(MovePound)
 			battle := New1v1Battle(charmander, &agent1, squirtle, &agent1)
 			battle.rng = SimpleRNG()
 			Expect(battle.Start()).To(Succeed())
@@ -51,8 +51,8 @@ var _ = Describe("Stat-changing moves", func() {
 
 	DescribeTable("Should modify the Opponents's stats",
 		func(id MoveId, stat, stages int) {
-			charmander := GeneratePokemon(PkmnCharmander, WithMoves(id))
-			squirtle := GeneratePokemon(PkmnSquirtle, WithMoves(MovePound))
+			charmander := PkmnWithMoves(id)
+			squirtle := PkmnWithMoves(MovePound)
 			battle := New1v1Battle(charmander, &agent1, squirtle, &agent1)
 			battle.rng = AlwaysRNG()
 			Expect(battle.Start()).To(Succeed())

@@ -388,7 +388,7 @@ var _ = Describe("Medicine Items", func() {
 		a2 = newRcAgent()
 		_a2 := Agent(a2)
 		user := GeneratePokemon(PkmnBulbasaur, WithLevel(100), WithMoves(MoveSplash))
-		p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveSplash))
+		p2 := PkmnWithMoves(MoveSplash)
 		b := New1v1Battle(user, &a1, p2, &_a2)
 		Expect(b.Start()).To(Succeed())
 		a2 <- ItemTurn{
@@ -516,7 +516,7 @@ var _ = Describe("Battle Items", func() {
 		_a1 := Agent(a1)
 		a2 = Agent(new(dumbAgent))
 		user := GeneratePokemon(PkmnBulbasaur, WithLevel(100), WithMoves(MoveSplash))
-		p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveSplash))
+		p2 := PkmnWithMoves(MoveSplash)
 		b := New1v1Battle(user, &_a1, p2, &a2)
 		Expect(b.Start()).To(Succeed())
 		a1 <- ItemTurn{

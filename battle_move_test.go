@@ -24,8 +24,8 @@ var _ = Describe("Move PP Consumption", func() {
 	a := Agent(new(dumbAgent))
 	It("should decrement move's PP by 1 when used", func() {
 		b := New1v1Battle(
-			GeneratePokemon(PkmnSquirtle, WithMoves(TestMoveNoDamage)), &a,
-			GeneratePokemon(PkmnSquirtle, WithMoves(TestMoveNoDamage)), &a,
+			PkmnWithMoves(TestMoveNoDamage), &a,
+			PkmnWithMoves(TestMoveNoDamage), &a,
 		)
 		b.rng = AlwaysRNG()
 		Expect(b.Start()).To(Succeed())
