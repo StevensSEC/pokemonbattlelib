@@ -165,6 +165,10 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 			}
 		}
 		damage *= crit
+		if t.Move.Id == MoveSonicBoom {
+			// always deals 20 damage, no matter what
+			damage = 20
+		}
 		b.QueueTransaction(DamageTransaction{
 			Target: t.Target,
 			Move:   t.Move,
