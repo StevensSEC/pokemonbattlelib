@@ -119,6 +119,7 @@ type MoveData struct {
 	Flags         MoveFlags
 	AffectedStat  uint8 // if this move modifies stats, this is the stat it modifies
 	StatStages    int8  // if 0, then this move does not modify stats
+	Ailment       StatusCondition
 }
 
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.

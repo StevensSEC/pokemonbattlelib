@@ -270,6 +270,15 @@ func orderedTransactionDiffLine(idx int, t Transaction) string {
 			tt.Target.party, tt.Target.partySlot,
 			tt.Move,
 		)
+	case DamageTransaction:
+		line += fmt.Sprintf(" - Target: [%d, %d] Damage: %d",
+			tt.Target.party, tt.Target.partySlot,
+			tt.Damage,
+		)
+	case InflictStatusTransaction:
+		line += fmt.Sprintf(" - Target: %s Status: %s",
+			tt.Target,
+			tt.StatusEffect)
 	}
 	line += "\n"
 	return line
