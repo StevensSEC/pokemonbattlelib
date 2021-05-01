@@ -619,17 +619,19 @@ func (t FaintTransaction) Mutate(b *Battle) {
 				loss = -10
 			}
 		}
+
 		b.QueueTransaction(FriendshipTransaction{
 			Target: t.Target.Pokemon,
 			Amount: loss,
 		})
 
+		pkmn := b.getPokemon(opponent) // this is required because GetOpponents returns a copy of the targets
 		for stat, amount := range evGain {
 			if amount == 0 {
 				continue
 			}
 			b.QueueTransaction(EVTransaction{
-				Target: opponent.Pokemon,
+				Target: pkmn,
 				Stat:   stat,
 				Amount: uint8(amount),
 			})
