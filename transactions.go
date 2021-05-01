@@ -32,11 +32,6 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 	// Status Moves
 	if t.Move.Category() == MoveCategoryStatus {
 		switch t.Move.Id {
-		case MoveStunSpore:
-			b.QueueTransaction(InflictStatusTransaction{
-				Target:       t.Target.Pokemon,
-				StatusEffect: StatusParalyze,
-			})
 		case MoveSpite:
 			if m := t.Target.Pokemon.metadata[MetaLastMove]; m != nil {
 				b.QueueTransaction(PPTransaction{
@@ -114,7 +109,12 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 				})
 			}
 		default:
-			if t.Move.StatStages() != 0 {
+			if t.Move.Ailment() != StatusNone {
+				b.QueueTransaction(InflictStatusTransaction{
+					Target:       receiver,
+					StatusEffect: t.Move.Ailment(),
+				})
+			} else if t.Move.StatStages() != 0 {
 				if t.Move.Targets() == MoveTargetUser {
 					b.QueueTransaction(ModifyStatTransaction{
 						Target:        t.User.Pokemon,
@@ -205,6 +205,12 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 			b.QueueTransaction(InflictStatusTransaction{
 				Target:       receiver,
 				StatusEffect: StatusFlinch,
+			})
+		}
+		if t.Move.AilmentChance() > 0 && b.rng.Roll(t.Move.AilmentChance(), 100) {
+			b.QueueTransaction(InflictStatusTransaction{
+				Target:       receiver,
+				StatusEffect: t.Move.Ailment(),
 			})
 		}
 		// Other item effects in battle

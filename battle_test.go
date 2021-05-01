@@ -933,8 +933,8 @@ var _ = Describe("Battle metadata", func() {
 	Context("Pokemon metadata", func() {
 		It("should record the last used move of Pokemon in battle", func() {
 			a1 := Agent(new(dumbAgent))
-			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveRazorLeaf))
-			p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveEmber))
+			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(TestMoveNoDamage))
+			p2 := GeneratePokemon(PkmnCharmander, WithMoves(TestMoveNoDamage))
 			b := New1v1Battle(p1, &a1, p2, &a1)
 			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
@@ -949,23 +949,6 @@ var _ = Describe("Battle metadata", func() {
 var _ = Describe("Status Conditions", func() {
 	a1 := Agent(new(dumbAgent))
 	a2 := Agent(new(dumbAgent))
-
-	Context("when using certain moves in battle causes status effects", func() {
-		It("should inflict paralysis from MoveStunSpore", func() {
-			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSplash))
-			pkmn2 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveStunSpore))
-			b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
-			b.rng = AlwaysRNG()
-			Expect(b.Start()).To(Succeed())
-			t, _ := b.SimulateRound()
-			Expect(t).To(HaveTransaction(
-				InflictStatusTransaction{
-					Target:       pkmn1,
-					StatusEffect: StatusParalyze,
-				},
-			))
-		})
-	})
 
 	Context("when a Pokemon has a nonvolatile status effect, it affects the Pokemon in battle", func() {
 		It("should inflict burn and poison damage", func() {
