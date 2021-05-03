@@ -166,7 +166,7 @@ type target struct {
 }
 
 func (t target) String() string {
-	return fmt.Sprintf("Target[%d, %d]", t.party, t.slot)
+	return fmt.Sprintf("target{%d, %d}", t.party, t.slot)
 }
 
 func (t target) MarshalJSON() ([]byte, error) {

@@ -247,9 +247,9 @@ func orderedTransactionDiffLine(idx int, t Transaction) string {
 	line := fmt.Sprintf("%d. %T", idx+1, t)
 	switch tt := t.(type) {
 	case UseMoveTransaction:
-		line += fmt.Sprintf(" - User [%d,%d] Target: [%d,%d] Move: %s",
-			tt.User.party, tt.User.slot,
-			tt.Target.party, tt.Target.slot,
+		line += fmt.Sprintf(" - User<%s> | Receiver<%s> | Move<%s>",
+			tt.User,
+			tt.Target,
 			tt.Move,
 		)
 	}
@@ -341,29 +341,29 @@ func (matcher *orderedTransactionMatcher) NegatedFailureMessage(actual interface
 
 /* Tools for testing the library */
 // Check for damage dealt (if any) by a Pokemon in battle
-func DamageDealt(t []Transaction, p *Pokemon) int {
-	// var usemove *UseMoveTransaction
-	// var start int
-	// for i := start; i < len(t); i++ {
-	// 	if v, ok := t[i].(UseMoveTransaction); !ok {
-	// 		continue
-	// 	} else if v.User.Pokemon == p {
-	// 		usemove = &v
-	// 		break
-	// 	}
-	// }
-	// if usemove == nil {
-	// 	// This might work better as a gomega matcher
-	// 	return -1 // failure, pokemon did not use a move
-	// }
+func DamageDealt(t []Transaction, user target) int {
+	var usemove *UseMoveTransaction
+	var start int
+	for i := start; i < len(t); i++ {
+		if v, ok := t[i].(UseMoveTransaction); !ok {
+			continue
+		} else if v.User == user {
+			usemove = &v
+			break
+		}
+	}
+	if usemove == nil {
+		// This might work better as a gomega matcher
+		return -1 // failure, pokemon did not use a move
+	}
 
-	// for i := start; i < len(t); i++ {
-	// 	if d, ok := t[i].(DamageTransaction); ok {
-	// 		if d.Move == usemove.Move {
-	// 			return int(d.Damage)
-	// 		}
-	// 	}
-	// }
+	for i := start; i < len(t); i++ {
+		if d, ok := t[i].(DamageTransaction); ok {
+			if d.Move == usemove.Move {
+				return int(d.Damage)
+			}
+		}
+	}
 	return -2 // failure, move was used but did not deal damage
 }
 

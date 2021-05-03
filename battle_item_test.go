@@ -198,7 +198,7 @@ var _ = Describe("Misc. + Held Items", func() {
 			holder.Moves[0] = GetMove(MoveTackle)
 			t, _ := b.SimulateRound()
 			// Boost damage by 30%
-			Expect(DamageDealt(t, holder)).To(Equal(32))
+			Expect(DamageDealt(t, target{1, 0})).To(Equal(32))
 			// Take 10% of max HP
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{1, 0},
@@ -211,7 +211,7 @@ var _ = Describe("Misc. + Held Items", func() {
 			holder.Moves[0] = GetMove(MoveTackle)
 			t, _ := b.SimulateRound()
 			// Boost physical move damage by 10%
-			Expect(DamageDealt(t, holder)).To(Equal(27))
+			Expect(DamageDealt(t, target{1, 0})).To(Equal(27))
 		})
 
 		Specify("Shell Bell", func() {
@@ -244,7 +244,7 @@ var _ = Describe("Misc. + Held Items", func() {
 			holder.Moves[0] = GetMove(MoveSurf)
 			t, _ := b.SimulateRound()
 			// Boost special move damage by 10%
-			Expect(DamageDealt(t, holder)).To(Equal(16))
+			Expect(DamageDealt(t, target{1, 0})).To(Equal(16))
 		})
 
 		DescribeTable("Accuracy/evasion items",
