@@ -125,13 +125,13 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			// use the move
 			b.QueueTransaction(UseMoveTransaction{
 				User:   turn.User,
-				Target: t.Target,
+				Target: t.Target.target,
 				Move:   user.Moves[t.Move],
 			})
 		case ItemTurn:
-			receiver := b.getPokemon(t.Target)
+			receiver := b.getPokemon(t.Target.target)
 			b.QueueTransaction(ItemTransaction{
-				Target: t.Target,
+				Target: t.Target.target,
 				Item:   t.Item,
 				Move:   receiver.Moves[t.Move],
 			})

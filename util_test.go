@@ -24,14 +24,6 @@ func comparePokemon(a, b *Pokemon) bool {
 		a.Type == b.Type
 }
 
-// Used for custom gomega matchers. For simplicity, the fields of the struct are hardcoded. If we need to add more fields to `target` something is probably wrong.
-func compareTargets(a, b target) bool {
-	return comparePokemon(a.Pokemon, b.Pokemon) &&
-		a.party == b.party &&
-		a.partySlot == b.partySlot &&
-		a.Team == b.Team
-}
-
 // Helper struct for finding differences in objects for testing
 type diff struct {
 	expected interface{} // The expected value
@@ -77,16 +69,6 @@ func transactionDiff(expected, got Transaction) map[string]diff {
 			a := rfA.Interface().(*Pokemon)
 			b := rfB.Interface().(*Pokemon)
 			if !comparePokemon(a, b) {
-				result[typeField.Name] = diff{
-					expected: a,
-					got:      b,
-				}
-			}
-			continue
-		} else if rfA.Type() == reflect.TypeOf(target{}) {
-			a := rfA.Interface().(target)
-			b := rfB.Interface().(target)
-			if !compareTargets(a, b) {
 				result[typeField.Name] = diff{
 					expected: a,
 					got:      b,
@@ -266,8 +248,8 @@ func orderedTransactionDiffLine(idx int, t Transaction) string {
 	switch tt := t.(type) {
 	case UseMoveTransaction:
 		line += fmt.Sprintf(" - User [%d,%d] Target: [%d,%d] Move: %s",
-			tt.User.party, tt.User.partySlot,
-			tt.Target.party, tt.Target.partySlot,
+			tt.User.party, tt.User.slot,
+			tt.Target.party, tt.Target.slot,
 			tt.Move,
 		)
 	}
@@ -360,28 +342,28 @@ func (matcher *orderedTransactionMatcher) NegatedFailureMessage(actual interface
 /* Tools for testing the library */
 // Check for damage dealt (if any) by a Pokemon in battle
 func DamageDealt(t []Transaction, p *Pokemon) int {
-	var usemove *UseMoveTransaction
-	var start int
-	for i := start; i < len(t); i++ {
-		if v, ok := t[i].(UseMoveTransaction); !ok {
-			continue
-		} else if v.User.Pokemon == p {
-			usemove = &v
-			break
-		}
-	}
-	if usemove == nil {
-		// This might work better as a gomega matcher
-		return -1 // failure, pokemon did not use a move
-	}
+	// var usemove *UseMoveTransaction
+	// var start int
+	// for i := start; i < len(t); i++ {
+	// 	if v, ok := t[i].(UseMoveTransaction); !ok {
+	// 		continue
+	// 	} else if v.User.Pokemon == p {
+	// 		usemove = &v
+	// 		break
+	// 	}
+	// }
+	// if usemove == nil {
+	// 	// This might work better as a gomega matcher
+	// 	return -1 // failure, pokemon did not use a move
+	// }
 
-	for i := start; i < len(t); i++ {
-		if d, ok := t[i].(DamageTransaction); ok {
-			if d.Move == usemove.Move {
-				return int(d.Damage)
-			}
-		}
-	}
+	// for i := start; i < len(t); i++ {
+	// 	if d, ok := t[i].(DamageTransaction); ok {
+	// 		if d.Move == usemove.Move {
+	// 			return int(d.Damage)
+	// 		}
+	// 	}
+	// }
 	return -2 // failure, move was used but did not deal damage
 }
 
@@ -437,7 +419,7 @@ func newBattlePartyOld(agent *Agent, team int) *battleParty {
 	return &battleParty{
 		Party:         NewParty(),
 		Agent:         agent,
-		activePokemon: make(map[int]*Pokemon),
+		activePokemon: make(map[uint]uint),
 		team:          team,
 	}
 }

@@ -169,12 +169,6 @@ func (t target) String() string {
 	return fmt.Sprintf("Target[%d, %d]", t.party, t.slot)
 }
 
-type AgentTarget struct {
-	target          // Inherit party/slot from `target`
-	Team    int     // The team that the Pokemon belongs to
-	Pokemon Pokemon // Copy of Pokemon for Agents to use
-}
-
 func (t target) MarshalJSON() ([]byte, error) {
 	type alias target // required to not enter infinite recursive loop
 	return json.Marshal(&struct {
@@ -204,6 +198,12 @@ func (t *target) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+type AgentTarget struct {
+	target          // Inherit party/slot from `target`
+	Team    int     // The team that the Pokemon belongs to
+	Pokemon Pokemon // Copy of Pokemon for Agents to use
 }
 
 type BattleContext struct {
@@ -297,8 +297,8 @@ type TurnContext struct {
 
 // A turn to represent a Pokemon using a Move.
 type FightTurn struct {
-	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
-	Target target // Info containing data determining the target of
+	Move   int         // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
+	Target AgentTarget // Info containing data determining the target of
 }
 
 func (turn FightTurn) Priority() int {
@@ -307,9 +307,9 @@ func (turn FightTurn) Priority() int {
 
 // A turn to represent using an item from the Party's inventory. An item turn has the a higher priority than any move.
 type ItemTurn struct {
-	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
-	Target target // Info containing data determining the target of
-	Item   Item   // Which item is being consumed
+	Move   int         // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
+	Target AgentTarget // Info containing data determining the target of
+	Item   Item        // Which item is being consumed
 }
 
 func (turn ItemTurn) Priority() int {

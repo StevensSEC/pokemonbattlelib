@@ -24,10 +24,10 @@ var _ = Describe("Misc. + Held Items", func() {
 	Context("Bad Held Items", func() {
 		DescribeTable("Inflicts status after turn",
 			func(item Item, status StatusCondition) {
-				b, holder := setup(item, PkmnBulbasaur)
+				b, _ := setup(item, PkmnBulbasaur)
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransaction(InflictStatusTransaction{
-					Target:       holder,
+					Target:       target{1, 0},
 					StatusEffect: status,
 				}))
 			},
@@ -41,19 +41,19 @@ var _ = Describe("Misc. + Held Items", func() {
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransactionsInOrder(
 					UseMoveTransaction{
-						User:   b.getTarget(0, 0),
-						Target: b.getTarget(1, 0),
+						User:   target{0, 0},
+						Target: target{1, 0},
 					},
 					MoveFailTransaction{
-						User:   b.getPokemonInBattle(0, 0),
+						User:   target{0, 0},
 						Reason: FailOther,
 					},
 					UseMoveTransaction{
-						User:   b.getTarget(1, 0),
-						Target: b.getTarget(0, 0),
+						User:   target{1, 0},
+						Target: target{0, 0},
 					},
 					MoveFailTransaction{
-						User:   b.getPokemonInBattle(1, 0),
+						User:   target{1, 0},
 						Reason: FailOther,
 					},
 				))
@@ -64,16 +64,16 @@ var _ = Describe("Misc. + Held Items", func() {
 
 		Specify("Iron Ball", func() {
 			b, holder := setup(ItemIronBall, PkmnPidgeot)
-			attacker := b.getPokemonInBattle(0, 0)
+			attacker := b.getPokemon(target{0, 0})
 			attacker.Moves[0] = GetMove(MoveEarthquake)
 			// Flying immunity negated
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(UseMoveTransaction{
-				User:   b.getTarget(0, 0),
-				Target: b.getTarget(1, 0),
+				User:   target{0, 0},
+				Target: target{1, 0},
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: b.getTarget(1, 0),
+				Target: target{1, 0},
 				Move:   GetMove(MoveEarthquake),
 				Damage: 36,
 			}))
@@ -84,15 +84,15 @@ var _ = Describe("Misc. + Held Items", func() {
 
 		Specify("Sticky Barb", func() {
 			b, holder := setup(ItemStickyBarb, PkmnGrimer)
-			attacker := b.getPokemonInBattle(0, 0)
+			attacker := b.getPokemon(target{0, 0})
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(UseMoveTransaction{
-				User:   b.getTarget(0, 0),
-				Target: b.getTarget(1, 0),
+				User:   target{0, 0},
+				Target: target{1, 0},
 			}))
 			// Holder takes 1/8 HP damage after every turn
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: b.getTarget(1, 0),
+				Target: target{1, 0},
 				Damage: holder.MaxHP() / 8,
 			}))
 			// Contact moves damage attacker and pass the sticky barb to the attacker
@@ -100,15 +100,15 @@ var _ = Describe("Misc. + Held Items", func() {
 			t, _ = b.SimulateRound()
 			Expect(t).To(HaveTransactionsInOrder(
 				DamageTransaction{
-					Target: b.getTarget(0, 0),
+					Target: target{0, 0},
 					Damage: attacker.MaxHP() / 8,
 				},
 				GiveItemTransaction{
-					Target: attacker,
+					Target: target{0, 0},
 					Item:   ItemStickyBarb,
 				},
 				GiveItemTransaction{
-					Target: holder,
+					Target: target{1, 0},
 					Item:   ItemNone,
 				},
 			))
@@ -138,31 +138,31 @@ var _ = Describe("Misc. + Held Items", func() {
 			b, holder := setup(ItemBlackSludge, PkmnGrimer)
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(HealTransaction{
-				Target: holder,
+				Target: target{1, 0},
 				Amount: holder.MaxHP() / 16,
 			}))
 			// Damage non-poison types for 1/8 HP
 			b, holder = setup(ItemBlackSludge, PkmnAerodactyl)
 			t, _ = b.SimulateRound()
 			Expect(t).ToNot(HaveTransaction(HealTransaction{
-				Target: holder,
+				Target: target{1, 0},
 				Amount: holder.MaxHP() / 16,
 			}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: b.getTarget(1, 0),
+				Target: target{1, 0},
 				Damage: holder.MaxHP() / 8,
 			}))
 		})
 
 		Specify("Destiny Knot", func() {
 			b, holder := setup(ItemDestinyKnot, PkmnMimeJr)
-			attacker := b.getPokemonInBattle(0, 0)
+			attacker := b.getPokemon(target{0, 0})
 			attacker.Moves[0] = GetMove(MoveAttract)
 			attacker.Gender = GenderMale
 			holder.Gender = GenderFemale
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(InflictStatusTransaction{
-				Target:       attacker,
+				Target:       target{0, 0},
 				StatusEffect: StatusInfatuation,
 			}))
 		})
@@ -172,13 +172,13 @@ var _ = Describe("Misc. + Held Items", func() {
 			holder.Moves[0] = GetMove(MoveCloseCombat)
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(UseMoveTransaction{
-				User:   b.getTarget(1, 0),
-				Target: b.getTarget(0, 0),
+				User:   target{1, 0},
+				Target: target{0, 0},
 			}))
 			// Damage boosted by 20%
 			Expect(t).To(HaveTransaction(
 				DamageTransaction{
-					Target: b.getTarget(0, 0),
+					Target: target{0, 0},
 					Damage: 201,
 				},
 			))
@@ -188,7 +188,7 @@ var _ = Describe("Misc. + Held Items", func() {
 			b, holder := setup(ItemLeftovers, PkmnSnorlax)
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(HealTransaction{
-				Target: holder,
+				Target: target{1, 0},
 				Amount: holder.MaxHP() / 16,
 			}))
 		})
@@ -201,7 +201,7 @@ var _ = Describe("Misc. + Held Items", func() {
 			Expect(DamageDealt(t, holder)).To(Equal(32))
 			// Take 10% of max HP
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: b.getTarget(1, 0),
+				Target: target{1, 0},
 				Damage: holder.MaxHP() / 10,
 			}))
 		})
@@ -220,7 +220,7 @@ var _ = Describe("Misc. + Held Items", func() {
 			t, _ := b.SimulateRound()
 			// Self-inflict 1/8 of dealt damage
 			Expect(t).To(HaveTransaction(DamageTransaction{
-				Target: b.getTarget(1, 0),
+				Target: target{1, 0},
 				Damage: 3,
 			}))
 		})
@@ -250,7 +250,7 @@ var _ = Describe("Misc. + Held Items", func() {
 		DescribeTable("Accuracy/evasion items",
 			func(attacking Item, defending Item, op string) {
 				b, holder := setup(ItemNone, PkmnSnorlax)
-				opponent := b.getPokemonInBattle(0, 0)
+				opponent := b.getPokemon(target{0, 0})
 				base := CalcAccuracy(b.Weather, holder, opponent, GetMove(MovePound))
 				holder.HeldItem = attacking
 				opponent.HeldItem = defending
@@ -268,7 +268,7 @@ var _ = Describe("Misc. + Held Items", func() {
 				holder.StatusEffects.apply(status)
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransaction(CureStatusTransaction{
-					Target:       b.getTarget(1, 0),
+					Target:       target{1, 0},
 					StatusEffect: status,
 				}))
 				// Item should be consumed after use
@@ -283,7 +283,7 @@ var _ = Describe("Misc. + Held Items", func() {
 				holder.Moves[0] = GetMove(MoveTackle)
 				t, _ := b.SimulateRound()
 				Expect(t).To(HaveTransaction(InflictStatusTransaction{
-					Target:       b.getPokemonInBattle(0, 0),
+					Target:       target{0, 0},
 					StatusEffect: StatusFlinch,
 				}))
 			},
@@ -311,7 +311,7 @@ var _ = Describe("Misc. + Held Items", func() {
 	DescribeTable("Plates",
 		func(item Item, expectedType Type) {
 			b, holder := setup(ItemNone, PkmnArceus)
-			receiver := b.getPokemonInBattle(0, 0)
+			receiver := b.getPokemon(target{0, 0})
 			damage := CalcMoveDamage(b.Weather, holder, receiver, GetMove(MoveJudgment))
 			holder.HeldItem = item
 			heldDamage := CalcMoveDamage(b.Weather, holder, receiver, GetMove(MoveJudgment))
@@ -343,7 +343,7 @@ var _ = Describe("Misc. + Held Items", func() {
 	DescribeTable("Type Enhancement",
 		func(item Item, expectedType Type) {
 			b, holder := setup(ItemNone, PkmnArceus)
-			receiver := b.getPokemonInBattle(0, 0)
+			receiver := b.getPokemon(target{0, 0})
 			m := GetMove(registerMoveWithType(expectedType))
 			damage := CalcMoveDamage(b.Weather, holder, receiver, m)
 			holder.HeldItem = item
@@ -392,8 +392,10 @@ var _ = Describe("Medicine Items", func() {
 		b := New1v1Battle(user, &a1, p2, &_a2)
 		Expect(b.Start()).To(Succeed())
 		a2 <- ItemTurn{
-			Item:   item,
-			Target: b.getTarget(0, 0),
+			Item: item,
+			Target: AgentTarget{
+				target: target{0, 0},
+			},
 		}
 		return b, user
 	}
@@ -415,12 +417,12 @@ var _ = Describe("Medicine Items", func() {
 			}
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(HealTransaction{
-				Target: user,
+				Target: target{0, 0},
 				Amount: uint(expectedHP),
 			}))
 			if item == ItemSacredAsh {
 				Expect(t).To(HaveTransaction(HealTransaction{
-					Target: fainted,
+					Target: target{0, 1},
 					Amount: fainted.MaxHP(),
 				}))
 			}
@@ -454,7 +456,7 @@ var _ = Describe("Medicine Items", func() {
 			}
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(FriendshipTransaction{
-				Target: user,
+				Target: target{0, 0},
 				Amount: amount,
 			}))
 		},
@@ -491,7 +493,7 @@ var _ = Describe("Medicine Items", func() {
 			user.StatusEffects = status
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(CureStatusTransaction{
-				Target:       b.getTarget(0, 0),
+				Target:       target{0, 0},
 				StatusEffect: status,
 			}))
 		},
@@ -520,8 +522,10 @@ var _ = Describe("Battle Items", func() {
 		b := New1v1Battle(user, &_a1, p2, &a2)
 		Expect(b.Start()).To(Succeed())
 		a1 <- ItemTurn{
-			Item:   item,
-			Target: b.getTarget(0, 0),
+			Item: item,
+			Target: AgentTarget{
+				target: target{0, 0},
+			},
 		}
 		return b, user
 	}
@@ -532,7 +536,7 @@ var _ = Describe("Battle Items", func() {
 			user.StatusEffects = status
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(CureStatusTransaction{
-				Target:       b.getTarget(0, 0),
+				Target:       target{0, 0},
 				StatusEffect: status,
 			}))
 		},
@@ -543,15 +547,15 @@ var _ = Describe("Battle Items", func() {
 
 	DescribeTable("Stat Boosts",
 		func(item Item, stat, stages int) {
-			b, user := setup(item)
+			b, _ := setup(item)
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(ModifyStatTransaction{
-				Target: user,
+				Target: target{0, 0},
 				Stat:   stat,
 				Stages: stages,
 			}))
 			Expect(t).To(HaveTransaction(FriendshipTransaction{
-				Target: user,
+				Target: target{0, 0},
 				Amount: 1,
 			}))
 		},
@@ -570,21 +574,23 @@ var _ = Describe("Battle Items", func() {
 		Expect(user.metadata).To(HaveKeyWithValue(MetaStatChangeImmune, 4))
 		for stat := 0; stat < len(user.StatModifiers); stat += 1 {
 			b.QueueTransaction(ModifyStatTransaction{
-				Target: user,
+				Target: target{0, 0},
 				Stat:   stat,
 				Stages: -1,
 			})
 		}
 		b.QueueTransaction(ModifyStatTransaction{
-			Target:        user,
+			Target:        target{0, 0},
 			SelfInflicted: true,
 			Stat:          StatAtk,
 			Stages:        -2,
 		})
 		// No-op for RC Agent
 		a1 <- ItemTurn{
-			Item:   ItemNone,
-			Target: b.getTarget(0, 0),
+			Item: ItemNone,
+			Target: AgentTarget{
+				target: target{0, 0},
+			},
 		}
 		b.SimulateRound()
 		Expect(user.StatModifiers).ToNot(ContainElement(-1))
@@ -624,17 +630,17 @@ var _ = Describe("In-a-pinch Berries", func() {
 			t, _ := b.SimulateRound()
 
 			Expect(t).To(HaveTransaction(ItemTransaction{
-				Target: b.getTarget(1, 0),
+				Target: target{1, 0},
 				IsHeld: true,
 				Item:   holder.HeldItem,
 			}))
 			Expect(t).To(HaveTransaction(ModifyStatTransaction{
-				Target: holder,
+				Target: target{1, 0},
 				Stat:   stat,
 				Stages: stages,
 			}))
-			Expect(b.getPokemonInBattle(0, 0).HeldItem).To(Equal(ItemNone))
-			Expect(b.getPokemonInBattle(1, 0).HeldItem).To(Equal(ItemNone))
+			Expect(b.getPokemon(target{0, 0}).HeldItem).To(Equal(ItemNone))
+			Expect(b.getPokemon(target{1, 0}).HeldItem).To(Equal(ItemNone))
 		},
 		Entry("Apicot Berry", ItemApicotBerry, StatSpDef, 1),
 		Entry("Ganlon Berry", ItemGanlonBerry, StatDef, 1),
