@@ -784,7 +784,7 @@ var _ = Describe("Fainting", func() {
 			b.AddParty(p2, &a2, 1)
 			Expect(b.Start()).To(Succeed())
 			b.SimulateRound()
-			Expect(dies.Friendship).To(Equal(99))
+			Expect(b.getPokemon(target{0, 0}).Friendship).To(Equal(99))
 		})
 
 		It("should lose 5 or 10 friendship when fainting", func() {
@@ -801,9 +801,9 @@ var _ = Describe("Fainting", func() {
 			b = NewSingleBattle(p1, &a1, p2, &a2)
 			Expect(b.Start()).To(Succeed())
 			b.SimulateRound()
-			Expect(dies.Friendship).To(Equal(95))
+			Expect(b.getPokemon(target{0, 0}).Friendship).To(Equal(95))
 			b.SimulateRound()
-			Expect(dies2.Friendship).To(Equal(190))
+			Expect(b.getPokemon(target{0, 1}).Friendship).To(Equal(190))
 		})
 
 		It("should gain EVs when defeating Pokemon", func() {
@@ -916,8 +916,8 @@ var _ = Describe("Battle metadata", func() {
 	Context("Pokemon metadata", func() {
 		It("should record the last used move of Pokemon in battle", func() {
 			a1 := Agent(new(dumbAgent))
-			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveRazorLeaf))
-			p2 := GeneratePokemon(PkmnCharmander, WithMoves(MoveEmber))
+			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(TestMoveNoDamage))
+			p2 := GeneratePokemon(PkmnCharmander, WithMoves(TestMoveNoDamage))
 			b := New1v1Battle(p1, &a1, p2, &a1)
 			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
@@ -932,23 +932,6 @@ var _ = Describe("Battle metadata", func() {
 var _ = Describe("Status Conditions", func() {
 	a1 := Agent(new(dumbAgent))
 	a2 := Agent(new(dumbAgent))
-
-	Context("when using certain moves in battle causes status effects", func() {
-		It("should inflict paralysis from MoveStunSpore", func() {
-			pkmn1 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveSplash))
-			pkmn2 := GeneratePokemon(PkmnBulbasaur, WithMoves(MoveStunSpore))
-			b := New1v1Battle(pkmn1, &a1, pkmn2, &a2)
-			b.rng = AlwaysRNG()
-			Expect(b.Start()).To(Succeed())
-			t, _ := b.SimulateRound()
-			Expect(t).To(HaveTransaction(
-				InflictStatusTransaction{
-					Target:       target{0, 0},
-					StatusEffect: StatusParalyze,
-				},
-			))
-		})
-	})
 
 	Context("when a Pokemon has a nonvolatile status effect, it affects the Pokemon in battle", func() {
 		It("should inflict burn and poison damage", func() {

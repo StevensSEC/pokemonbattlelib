@@ -18,6 +18,79 @@ func registerMoveWithType(t Type) MoveId {
 
 var TestMoveDefault = RegisterMove(MoveData{Name: "Default", Category: MoveCategoryPhysical, Power: 10, Accuracy: 100, InitialMaxPP: 100})
 var TestMoveNoDamage = RegisterMove(MoveData{Name: "No Damage", InitialMaxPP: 100})
+var TestMoveInflictBurn = RegisterMove(MoveData{Name: "Inflict Burn", Category: MoveCategoryStatus, InitialMaxPP: 100, Ailment: StatusBurn})
+var TestMoveDamageAndInflictBurn = RegisterMove(MoveData{Name: "Damage and Inflict Burn", Category: MoveCategoryPhysical, InitialMaxPP: 100, AilmentChance: 100, Ailment: StatusBurn, Power: 10})
+
+var _ = Describe("Move Status Inflict", func() {
+	a := Agent(new(dumbAgent))
+	It("should inflict burn", func() {
+		b := New1v1Battle(
+			PkmnWithMoves(TestMoveInflictBurn), &a,
+			PkmnWithMoves(TestMoveNoDamage), &a,
+		)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(
+			InflictStatusTransaction{
+				Target:       target{1, 0},
+				StatusEffect: StatusBurn,
+			},
+		))
+	})
+
+	It("should deal damage and inflict burn", func() {
+		// see: https://github.com/StevensSEC/pokemonbattlelib/pull/366#discussion_r624527986
+		b := New1v1Battle(
+			PkmnWithMoves(TestMoveDamageAndInflictBurn), &a,
+			PkmnWithMoves(TestMoveNoDamage), &a,
+		)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransactionsInOrder(
+			DamageTransaction{
+				Target: target{1, 0},
+				Move:   b.getPokemon(target{0, 0}).Moves[0],
+				Damage: 4,
+			},
+			InflictStatusTransaction{
+				Target:       target{1, 0},
+				StatusEffect: StatusBurn,
+			},
+		))
+	})
+
+	It("should inflict paralysis from MoveStunSpore", func() {
+		pkmn1 := PkmnWithMoves(TestMoveNoDamage)
+		pkmn2 := PkmnWithMoves(MoveStunSpore)
+		b := New1v1Battle(pkmn1, &a, pkmn2, &a)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(
+			InflictStatusTransaction{
+				Target:       target{0, 0},
+				StatusEffect: StatusParalyze,
+			},
+		))
+	})
+
+	It("should inflict poison from MovePoisonSting", func() {
+		pkmn1 := PkmnWithMoves(TestMoveNoDamage)
+		pkmn2 := PkmnWithMoves(MovePoisonSting)
+		b := New1v1Battle(pkmn1, &a, pkmn2, &a)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(
+			InflictStatusTransaction{
+				Target:       target{0, 0},
+				StatusEffect: StatusPoison,
+			},
+		))
+	})
+})
 
 var _ = Describe("Move PP Consumption", func() {
 	a := Agent(new(dumbAgent))
@@ -55,5 +128,31 @@ var _ = Describe("Move PP Consumption", func() {
 		}))
 		// Ensure that PP stays in bounds
 		Expect(p2.Moves[0].CurrentPP).To(BeEquivalentTo(0))
+	})
+})
+
+var _ = Describe("Move Damage", func() {
+	a := Agent(new(dumbAgent))
+
+	It("should always do 20 damage when using sonic boom", func() {
+		b := New1v1Battle(
+			PkmnWithMoves(MoveSonicBoom), &a,
+			PkmnWithMoves(TestMoveNoDamage), &a,
+		)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransactionsInOrder(
+			UseMoveTransaction{
+				User:   target{0, 0},
+				Target: target{1, 0},
+				Move:   b.getPokemon(target{0, 0}).Moves[0],
+			},
+			DamageTransaction{
+				Target: target{1, 0},
+				Move:   b.getPokemon(target{0, 0}).Moves[0],
+				Damage: 20,
+			},
+		))
 	})
 })

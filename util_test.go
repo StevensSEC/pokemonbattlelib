@@ -13,15 +13,7 @@ import (
 
 // Used for custom gomega matchers. Checks to see if a is probably the same pokemon as b based on values that are unlikely to change as a result of a transaction.
 func comparePokemon(a, b *Pokemon) bool {
-	if a == nil && b == nil {
-		return true
-	} else if a == nil || b == nil {
-		return false
-	}
-	return a.NatDex == b.NatDex &&
-		a.Nature == b.Nature &&
-		a.Gender == b.Gender &&
-		a.Type == b.Type
+	return a == b
 }
 
 // Helper struct for finding differences in objects for testing
@@ -247,11 +239,20 @@ func orderedTransactionDiffLine(idx int, t Transaction) string {
 	line := fmt.Sprintf("%d. %T", idx+1, t)
 	switch tt := t.(type) {
 	case UseMoveTransaction:
-		line += fmt.Sprintf(" - User<%s> | Receiver<%s> | Move<%s>",
+		line += fmt.Sprintf(" - User<%s> | Receiver<%s> | Move: %s",
 			tt.User,
 			tt.Target,
 			tt.Move,
 		)
+	case DamageTransaction:
+		line += fmt.Sprintf(" - Target<%s> | Damage: %d",
+			tt.Target,
+			tt.Damage,
+		)
+	case InflictStatusTransaction:
+		line += fmt.Sprintf(" - Target<%s> | Status: %s",
+			tt.Target,
+			tt.StatusEffect)
 	}
 	line += "\n"
 	return line
