@@ -47,6 +47,26 @@ const (
 	MoveTargetAll
 )
 
+// Helps define the bahavior of moves.
+type MoveMetaCategory uint8
+
+const (
+	MoveMetaCategoryDamage MoveMetaCategory = iota
+	MoveMetaCategoryAilment
+	MoveMetaCategoryNetGoodStats
+	MoveMetaCategoryHeal
+	MoveMetaCategoryDamageAilment
+	MoveMetaCategorySwagger
+	MoveMetaCategoryDamageLower
+	MoveMetaCategoryDamageRaise
+	MoveMetaCategoryDamageHeal
+	MoveMetaCategoryOhko // One hit knock out
+	MoveMetaCategoryWholeFieldEffect
+	MoveMetaCategoryFieldEffect
+	MoveMetaCategoryForceSwitch
+	MoveMetaCategoryUnique
+)
+
 type MoveFlags uint32
 
 const (
@@ -120,6 +140,7 @@ type MoveData struct {
 	AffectedStat  uint8 // if this move modifies stats, this is the stat it modifies
 	StatStages    int8  // if 0, then this move does not modify stats
 	Ailment       StatusCondition
+	MetaCategory  MoveMetaCategory
 }
 
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.

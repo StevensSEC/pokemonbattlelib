@@ -53,6 +53,23 @@ var ailmentNames = map[int]string{
 	24: "StatusNone", // FIXME: not implemented
 }
 
+var moveMetaCategoryNames = map[int]string{
+	0:  "MoveMetaCategoryDamage",
+	1:  "MoveMetaCategoryAilment",
+	2:  "MoveMetaCategoryNetGoodStats",
+	3:  "MoveMetaCategoryHeal",
+	4:  "MoveMetaCategoryDamageAilment",
+	5:  "MoveMetaCategorySwagger",
+	6:  "MoveMetaCategoryDamageLower",
+	7:  "MoveMetaCategoryDamageRaise",
+	8:  "MoveMetaCategoryDamageHeal",
+	9:  "MoveMetaCategoryOhko",
+	10: "MoveMetaCategoryWholeFieldEffect",
+	11: "MoveMetaCategoryFieldEffect",
+	12: "MoveMetaCategoryForceSwitch",
+	13: "MoveMetaCategoryUnique",
+}
+
 type data_pokemon struct {
 	Identifier        string
 	SpeciesId         int
@@ -109,6 +126,7 @@ type data_move struct {
 	AffectedStat  string
 	StatChange    int
 	Ailment       string
+	MetaCategory  string
 }
 
 type data_item struct {
@@ -669,6 +687,7 @@ func main() {
 			if m.Id != mid {
 				continue
 			}
+			moves[i].MetaCategory = moveMetaCategoryNames[parseInt(v[1])]
 			moves[i].Ailment = ailmentNames[parseInt(v[2])]
 			moves[i].MinHits = parseInt(v[3])
 			moves[i].MaxHits = parseInt(v[4])
@@ -711,10 +730,10 @@ func main() {
 		if len(m.AffectedStat) == 0 {
 			affectedStat = "0"
 		}
-		output += fmt.Sprintf("\t{%q, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %d, %s},\n",
+		output += fmt.Sprintf("\t{%q, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %d, %s, %s},\n",
 			m.Name, m.Type, m.DamageClass, m.Targets, m.Priority, m.Power, m.Accuracy, m.PP,
 			m.MinHits, m.MaxHits, m.MinTurns, m.MaxTurns, m.Drain, m.Healing, m.CritRate,
-			m.AilmentChance, m.FlinchChance, m.StatChance, flags, affectedStat, m.StatChange, m.Ailment)
+			m.AilmentChance, m.FlinchChance, m.StatChance, flags, affectedStat, m.StatChange, m.Ailment, m.MetaCategory)
 	}
 	output += "}\n\n"
 	// Add move constants
