@@ -28,7 +28,7 @@ var _ = Describe("Stat-changing moves", func() {
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
 			Expect(t).To(HaveTransaction(ModifyStatTransaction{
-				Target:        charmander,
+				Target:        target{0, 0},
 				SelfInflicted: true,
 				Stat:          stat,
 				Stages:        stages,
@@ -37,7 +37,7 @@ var _ = Describe("Stat-changing moves", func() {
 			charmander.StatModifiers[stat] = MaxStatModifier
 			t, _ = battle.SimulateRound()
 			Expect(t).To(HaveTransaction(ModifyStatTransaction{
-				Target:        charmander,
+				Target:        target{0, 0},
 				SelfInflicted: true,
 				Stat:          stat,
 				Stages:        stages,
@@ -58,7 +58,7 @@ var _ = Describe("Stat-changing moves", func() {
 			Expect(battle.Start()).To(Succeed())
 			t, _ := battle.SimulateRound()
 			Expect(t).To(HaveTransaction(ModifyStatTransaction{
-				Target: squirtle,
+				Target: target{1, 0},
 				Stat:   stat,
 				Stages: stages,
 			}))

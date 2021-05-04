@@ -41,7 +41,7 @@ var _ = Describe("Gender", func() {
 		Expect(GenderFemale.String()).To(Equal("♀"))
 		Expect(GenderMale.String()).To(Equal("♂"))
 		Expect(func() {
-			var _ = Gender(-1).String()
+			var _ = Gender(255).String()
 		}).To(Panic())
 	})
 })
@@ -305,20 +305,20 @@ var _ = Describe("target", func() {
 		bytes := []byte("{\"Party\": 1, \"Slot\": 2}")
 		var t target
 		Expect(json.Unmarshal(bytes, &t)).To(Succeed())
-		Expect(t.party).To(Equal(1))
-		Expect(t.partySlot).To(Equal(2))
+		Expect(t.party).To(BeEquivalentTo(1))
+		Expect(t.slot).To(BeEquivalentTo(2))
 	})
 
 	It("should unmarshal json from marshalled json", func() {
 		bytes, err := json.Marshal(target{
-			party:     1,
-			partySlot: 2,
+			party: 1,
+			slot:  2,
 		})
 		Expect(err).To(Succeed())
 		Expect(string(bytes)).To(ContainSubstring("2"))
 		var t target
 		Expect(json.Unmarshal(bytes, &t)).To(Succeed())
-		Expect(t.party).To(Equal(1))
-		Expect(t.partySlot).To(Equal(2))
+		Expect(t.party).To(BeEquivalentTo(1))
+		Expect(t.slot).To(BeEquivalentTo(2))
 	})
 })

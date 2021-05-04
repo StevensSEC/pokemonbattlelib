@@ -10,19 +10,20 @@ type smarterAgent struct{}
 
 func (smarterAgent) Act(ctx *BattleContext) Turn {
 	best := 0
-	for i, target := range ctx.Opponents {
-		if target.Pokemon.Defense() < ctx.Opponents[best].Pokemon.Defense() {
+	for i, target := range ctx.Opponents() {
+		if target.Pokemon.Defense() < ctx.Opponents()[best].Pokemon.Defense() {
 			best = i
 		}
 	}
-	opponent := ctx.Opponents[best].Pokemon
+	self := ctx.Self().Pokemon
+	opponent := ctx.Opponents()[best].Pokemon
 	var strongestMove int
 	var strongestDamage uint
-	for i, move := range ctx.Pokemon.Moves {
+	for i, move := range self.Moves {
 		if move == nil {
 			continue
 		}
-		damage := CalcMoveDamage(ctx.Battle.Weather, &ctx.Pokemon, opponent, move)
+		damage := CalcMoveDamage(ctx.Battle.Weather, &self, &opponent, move)
 		if damage > strongestDamage {
 			strongestDamage = damage
 			strongestMove = i
@@ -30,7 +31,7 @@ func (smarterAgent) Act(ctx *BattleContext) Turn {
 	}
 	return FightTurn{
 		Move:   strongestMove,
-		Target: ctx.Opponents[best],
+		Target: ctx.Opponents()[best],
 	}
 }
 
@@ -95,13 +96,13 @@ func BenchmarkBattle(b *testing.B) {
 			for _, t := range transactions {
 				switch tt := t.(type) {
 				case UseMoveTransaction:
-					log.Printf("%s used %s on %s", tt.User, tt.Move, tt.Target.Pokemon)
+					log.Printf("%s used %s on %s", tt.User, tt.Move, tt.Target)
 				case DamageTransaction:
-					log.Printf(" %s took %d damage", tt.Target.Pokemon, tt.Damage)
+					log.Printf(" %s took %d damage", tt.Target, tt.Damage)
 				case HealTransaction:
 					log.Printf("%s healed for %d HP", tt.Target, tt.Amount)
 				case FaintTransaction:
-					log.Printf("%s fainted", tt.Target.Pokemon)
+					log.Printf("%s fainted", tt.Target)
 				default:
 					log.Printf("Transaction: %T - %v", t, t)
 				}
