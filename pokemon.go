@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/rand"
 )
 
 // Maximum number of moves a Pokemon can have in its moveset
@@ -39,6 +40,8 @@ type PokemonData struct {
 	BaseStats  [6]int // base stats of a Pokemon
 	EvYield    [6]int // effort points gained when Pokemon is defeated
 	GrowthRate int
+	IsBiGender bool  // true if this Pokemon must have `Male` or `Female`, false if this Pokemon must be `Genderless`
+	GenderRate uint8 // Female to Male ratio. This number is used to create the ratio `GenderRate` : 8 - `GenderRate`. 0 is always male, 8 is always female.
 }
 
 func (p *Pokemon) Data() PokemonData {
@@ -98,6 +101,9 @@ func GeneratePokemon(natdex int, opts ...GeneratePokemonOption) *Pokemon {
 	// apply data
 	p.Type = p.Data().Type
 	p.Ability = p.Data().Ability
+	if p.Data().IsBiGender {
+		p.Gender = RandomGender(p.Data().GenderRate)
+	}
 
 	for _, opt := range opts {
 		opt(p)
@@ -151,6 +157,12 @@ func WithMoves(moves ...MoveId) GeneratePokemonOption {
 		for i, id := range moves {
 			p.Moves[i] = GetMove(id)
 		}
+	}
+}
+
+func WithGender(g Gender) GeneratePokemonOption {
+	return func(p *Pokemon) {
+		p.Gender = g
 	}
 }
 
@@ -397,6 +409,7 @@ var ErrorValidationMissingAbility = errors.New("Pokemon needs to have an ability
 var ErrorValidationInvalidLevel = errors.New("Pokemon has invalid level.")
 var ErrorValidationInvalidIvs = errors.New("Pokemon has invalid IVs.")
 var ErrorValidationInvalidEvs = errors.New("Pokemon has invalid EVs.")
+var ErrorValidationInvalidGender = errors.New("Pokemon has invalid gender.")
 
 // Used to pick and choose which validation rules to enforce
 type PokemonValidationRules uint8
@@ -407,9 +420,10 @@ const (
 	PkmnRuleValidLevel
 	PkmnRuleValidIvs
 	PkmnRuleValidEvs
+	PkmnRuleValidGender
 )
 
-const PkmnRuleSetDefault = PkmnRuleHasMoves | PkmnRuleHasAbility | PkmnRuleValidLevel | PkmnRuleValidIvs | PkmnRuleValidEvs
+const PkmnRuleSetDefault = PkmnRuleHasMoves | PkmnRuleHasAbility | PkmnRuleValidLevel | PkmnRuleValidIvs | PkmnRuleValidEvs | PkmnRuleValidGender
 
 func (p *Pokemon) Validate(rules PokemonValidationRules) error {
 	if rules&PkmnRuleHasMoves > 0 {
@@ -442,4 +456,25 @@ func (p *Pokemon) Validate(rules PokemonValidationRules) error {
 	}
 
 	return nil
+}
+
+// Get a random gender according to the gender rate.
+func RandomGender(rate uint8) Gender {
+	// Gender rate can be used to derive a Female to Male ratio
+	// rate : 8-rate
+	// See: https://bulbapedia.bulbagarden.net/wiki/List_of_Pokémon_by_gender_ratio
+	if rate > 8 {
+		rate = 8
+	}
+	if rate == 0 {
+		return GenderMale
+	}
+	if rate == 8 {
+		return GenderFemale
+	}
+	if uint8(rand.Intn(9))+1 <= rate {
+		return GenderFemale
+	} else {
+		return GenderMale
+	}
 }

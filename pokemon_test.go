@@ -210,3 +210,21 @@ var _ = Describe("Pokemon Data", func() {
 		Expect(pkmn.Data().Name).To(Equal("Arceus"))
 	})
 })
+
+var _ = Describe("RandomGender", func() {
+	DescribeTable("Should always return one gender",
+		func(rate int, gender Gender) {
+			for i := 0; i < 10000; i++ {
+				Expect(RandomGender(uint8(rate))).To(Equal(gender))
+			}
+		},
+		Entry("Male", 0, GenderMale),
+		Entry("Female", 8, GenderFemale),
+	)
+
+	It("should never return Genderless", func() {
+		for i := 0; i < 10000; i++ {
+			Expect(RandomGender(uint8(i % 9))).ToNot(Equal(GenderGenderless))
+		}
+	})
+})

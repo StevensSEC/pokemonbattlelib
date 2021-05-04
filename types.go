@@ -173,7 +173,7 @@ func (t Type) String() string {
 	return result
 }
 
-type Gender int
+type Gender uint8
 
 const (
 	GenderGenderless Gender = iota

@@ -41,7 +41,7 @@ var _ = Describe("Gender", func() {
 		Expect(GenderFemale.String()).To(Equal("♀"))
 		Expect(GenderMale.String()).To(Equal("♂"))
 		Expect(func() {
-			var _ = Gender(-1).String()
+			var _ = Gender(255).String()
 		}).To(Panic())
 	})
 })
