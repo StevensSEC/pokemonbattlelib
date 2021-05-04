@@ -59,6 +59,8 @@ type data_pokemon struct {
 	Height         int
 	Weight         int
 	BaseExperience int
+	IsBiGender     bool
+	GenderRate     int
 
 	Name       string
 	NatDex     uint16
@@ -340,6 +342,28 @@ func main() {
 		pokemon = append(pokemon, dp)
 	}
 
+	log.Println("Getting species metadata")
+	pkmn_species_csv := getCsvReader("data/pokemon_species.csv")
+	for {
+		record, err := pkmn_species_csv.Read()
+		if err == io.EOF {
+			break
+		}
+		// fmt.Printf("%v\n", record)
+		sid := parseInt(record[0])
+		for i, p := range pokemon {
+			if p.SpeciesId != sid {
+				continue
+			}
+			gender_rate := parseInt(record[8])
+			if gender_rate >= 0 {
+				(&pokemon[i]).IsBiGender = true
+				(&pokemon[i]).GenderRate = gender_rate
+			}
+			break
+		}
+	}
+
 	// find all the pokemon names
 	log.Println("Getting Pokemon names")
 	pkmn_names_csv := getCsvReader("data/pokemon_species_names.csv")
@@ -496,13 +520,13 @@ func main() {
 	}
 
 	output += "\n\n" +
-		"// A map of national pokedex numbers to pokemon data.\n" +
+		"// An array of all registered pokemon data ordered by national pokedex numbers.\n" +
 		"var AllPokemonData = []PokemonData{\n"
 	for _, p := range pokemon {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("{NatDex: %d, Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate])
+		output += fmt.Sprintf("{NatDex: %d, Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s, IsBiGender: %v, GenderRate: %d},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate], p.IsBiGender, p.GenderRate)
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"
