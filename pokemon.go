@@ -459,6 +459,14 @@ func (p *Pokemon) Validate(rules PokemonValidationRules) error {
 		return ErrorValidationInvalidEvs
 	}
 
+	if rules&PkmnRuleValidGender > 0 {
+		if p.Data().IsBiGender && p.Gender == GenderGenderless {
+			return ErrorValidationInvalidGender
+		} else if !p.Data().IsBiGender && p.Gender != GenderGenderless {
+			return ErrorValidationInvalidGender
+		}
+	}
+
 	return nil
 }
 
