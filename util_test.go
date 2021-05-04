@@ -16,14 +16,6 @@ func comparePokemon(a, b *Pokemon) bool {
 	return a == b
 }
 
-// Used for custom gomega matchers. For simplicity, the fields of the struct are hardcoded. If we need to add more fields to `target` something is probably wrong.
-func compareTargets(a, b target) bool {
-	return comparePokemon(a.Pokemon, b.Pokemon) &&
-		a.party == b.party &&
-		a.partySlot == b.partySlot &&
-		a.Team == b.Team
-}
-
 // Helper struct for finding differences in objects for testing
 type diff struct {
 	expected interface{} // The expected value
@@ -69,16 +61,6 @@ func transactionDiff(expected, got Transaction) map[string]diff {
 			a := rfA.Interface().(*Pokemon)
 			b := rfB.Interface().(*Pokemon)
 			if !comparePokemon(a, b) {
-				result[typeField.Name] = diff{
-					expected: a,
-					got:      b,
-				}
-			}
-			continue
-		} else if rfA.Type() == reflect.TypeOf(target{}) {
-			a := rfA.Interface().(target)
-			b := rfB.Interface().(target)
-			if !compareTargets(a, b) {
 				result[typeField.Name] = diff{
 					expected: a,
 					got:      b,
@@ -257,18 +239,18 @@ func orderedTransactionDiffLine(idx int, t Transaction) string {
 	line := fmt.Sprintf("%d. %T", idx+1, t)
 	switch tt := t.(type) {
 	case UseMoveTransaction:
-		line += fmt.Sprintf(" - User [%d,%d] Target: [%d,%d] Move: %s",
-			tt.User.party, tt.User.partySlot,
-			tt.Target.party, tt.Target.partySlot,
+		line += fmt.Sprintf(" - User<%s> | Receiver<%s> | Move: %s",
+			tt.User,
+			tt.Target,
 			tt.Move,
 		)
 	case DamageTransaction:
-		line += fmt.Sprintf(" - Target: [%d, %d] Damage: %d",
-			tt.Target.party, tt.Target.partySlot,
+		line += fmt.Sprintf(" - Target<%s> | Damage: %d",
+			tt.Target,
 			tt.Damage,
 		)
 	case InflictStatusTransaction:
-		line += fmt.Sprintf(" - Target: %s Status: %s",
+		line += fmt.Sprintf(" - Target<%s> | Status: %s",
 			tt.Target,
 			tt.StatusEffect)
 	}
@@ -360,13 +342,13 @@ func (matcher *orderedTransactionMatcher) NegatedFailureMessage(actual interface
 
 /* Tools for testing the library */
 // Check for damage dealt (if any) by a Pokemon in battle
-func DamageDealt(t []Transaction, p *Pokemon) int {
+func DamageDealt(t []Transaction, user target) int {
 	var usemove *UseMoveTransaction
 	var start int
 	for i := start; i < len(t); i++ {
 		if v, ok := t[i].(UseMoveTransaction); !ok {
 			continue
-		} else if v.User.Pokemon == p {
+		} else if v.User == user {
 			usemove = &v
 			break
 		}
@@ -438,7 +420,7 @@ func newBattlePartyOld(agent *Agent, team int) *battleParty {
 	return &battleParty{
 		Party:         NewParty(),
 		Agent:         agent,
-		activePokemon: make(map[int]*Pokemon),
+		activePokemon: make(map[uint]uint),
 		team:          team,
 	}
 }

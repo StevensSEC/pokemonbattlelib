@@ -2,7 +2,6 @@ package pokemonbattlelib
 
 import (
 	. "github.com/onsi/ginkgo"
-	// . "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -34,7 +33,7 @@ var _ = Describe("Move Status Inflict", func() {
 		t, _ := b.SimulateRound()
 		Expect(t).To(HaveTransaction(
 			InflictStatusTransaction{
-				Target:       b.getPokemonInBattle(1, 0),
+				Target:       target{1, 0},
 				StatusEffect: StatusBurn,
 			},
 		))
@@ -51,12 +50,12 @@ var _ = Describe("Move Status Inflict", func() {
 		t, _ := b.SimulateRound()
 		Expect(t).To(HaveTransactionsInOrder(
 			DamageTransaction{
-				Target: b.getTarget(1, 0),
-				Move:   b.getPokemonInBattle(0, 0).Moves[0],
+				Target: target{1, 0},
+				Move:   b.getPokemon(target{0, 0}).Moves[0],
 				Damage: 4,
 			},
 			InflictStatusTransaction{
-				Target:       b.getPokemonInBattle(1, 0),
+				Target:       target{1, 0},
 				StatusEffect: StatusBurn,
 			},
 		))
@@ -71,7 +70,7 @@ var _ = Describe("Move Status Inflict", func() {
 		t, _ := b.SimulateRound()
 		Expect(t).To(HaveTransaction(
 			InflictStatusTransaction{
-				Target:       pkmn1,
+				Target:       target{0, 0},
 				StatusEffect: StatusParalyze,
 			},
 		))
@@ -86,7 +85,7 @@ var _ = Describe("Move Status Inflict", func() {
 		t, _ := b.SimulateRound()
 		Expect(t).To(HaveTransaction(
 			InflictStatusTransaction{
-				Target:       pkmn1,
+				Target:       target{0, 0},
 				StatusEffect: StatusPoison,
 			},
 		))
@@ -145,13 +144,13 @@ var _ = Describe("Move Damage", func() {
 		t, _ := b.SimulateRound()
 		Expect(t).To(HaveTransactionsInOrder(
 			UseMoveTransaction{
-				User:   b.getTarget(0, 0),
-				Target: b.getTarget(1, 0),
-				Move:   b.getPokemonInBattle(0, 0).Moves[0],
+				User:   target{0, 0},
+				Target: target{1, 0},
+				Move:   b.getPokemon(target{0, 0}).Moves[0],
 			},
 			DamageTransaction{
-				Target: b.getTarget(1, 0),
-				Move:   b.getPokemonInBattle(0, 0).Moves[0],
+				Target: target{1, 0},
+				Move:   b.getPokemon(target{0, 0}).Moves[0],
 				Damage: 20,
 			},
 		))

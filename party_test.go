@@ -40,16 +40,16 @@ var _ = Describe("Active pokemon", func() {
 	Context("when managing active Pokemon in a party", func() {
 		It("should correctly add an active Pokemon", func() {
 			party.SetActive(0)
-			Expect(party.GetActivePokemon()).To(HaveLen(1))
-			Expect(party.activePokemon[0].NatDex).To(BeEquivalentTo(PkmnSquirtle))
+			Expect(party.activePokemon).To(HaveLen(1))
+			Expect(party.pokemon()[party.activePokemon[0]].NatDex).To(BeEquivalentTo(PkmnSquirtle))
 			party.SetActive(1)
-			Expect(party.activePokemon[1].NatDex).To(BeEquivalentTo(PkmnBlastoise))
+			Expect(party.pokemon()[party.activePokemon[1]].NatDex).To(BeEquivalentTo(PkmnBlastoise))
 		})
 
 		It("should remove an active Pokemon", func() {
 			party.SetActive(0)
 			party.SetInactive(0)
-			Expect(party.GetActivePokemon()).To(HaveLen(0))
+			Expect(party.activePokemon).To(HaveLen(0))
 		})
 
 		It("should panic when Pokemon should not change active state", func() {
