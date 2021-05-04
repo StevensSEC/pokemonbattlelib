@@ -29,6 +29,30 @@ var statNames = map[int]string{
 	8: "StatEvasion",
 }
 
+var ailmentNames = map[int]string{
+	-1: "StatusNone",
+	0:  "StatusNone",
+	1:  "StatusParalyze",
+	2:  "StatusSleep",
+	3:  "StatusFreeze",
+	4:  "StatusBurn",
+	5:  "StatusPoison",
+	6:  "StatusConfusion",
+	7:  "StatusInfatuation",
+	8:  "StatusCantEscape",
+	9:  "StatusNightmare",
+	12: "StatusTorment",
+	13: "StatusNone", // FIXME: not implemented
+	14: "StatusNone", // FIXME: not implemented
+	15: "StatusHealBlock",
+	17: "StatusNone", // FIXME: not implemented
+	18: "StatusLeechSeed",
+	19: "StatusEmbargo",
+	20: "StatusPerishSong",
+	21: "StatusNone", // FIXME: not implemented
+	24: "StatusNone", // FIXME: not implemented
+}
+
 type data_pokemon struct {
 	Identifier     string
 	SpeciesId      int
@@ -77,6 +101,7 @@ type data_move struct {
 	Flags         []string
 	AffectedStat  string
 	StatChange    int
+	Ailment       string
 }
 
 type data_item struct {
@@ -508,6 +533,9 @@ func main() {
 			continue
 		}
 		mid := parseInt(record[0])
+		if mid >= 10000 {
+			continue // skip these, because they are the shaow moves from pokemon XD, see #355
+		}
 		moveType := 1 << (parseInt(record[3]) - 1)
 		power := parseInt(record[4])
 		pp := parseInt(record[5])
@@ -604,6 +632,7 @@ func main() {
 			if m.Id != mid {
 				continue
 			}
+			moves[i].Ailment = ailmentNames[parseInt(v[2])]
 			moves[i].MinHits = parseInt(v[3])
 			moves[i].MaxHits = parseInt(v[4])
 			moves[i].MinTurns = parseInt(v[5])
@@ -645,10 +674,10 @@ func main() {
 		if len(m.AffectedStat) == 0 {
 			affectedStat = "0"
 		}
-		output += fmt.Sprintf("\t{%q, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %d},\n",
+		output += fmt.Sprintf("\t{%q, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %d, %s},\n",
 			m.Name, m.Type, m.DamageClass, m.Targets, m.Priority, m.Power, m.Accuracy, m.PP,
 			m.MinHits, m.MaxHits, m.MinTurns, m.MaxTurns, m.Drain, m.Healing, m.CritRate,
-			m.AilmentChance, m.FlinchChance, m.StatChance, flags, affectedStat, m.StatChange)
+			m.AilmentChance, m.FlinchChance, m.StatChance, flags, affectedStat, m.StatChange, m.Ailment)
 	}
 	output += "}\n\n"
 	// Add move constants

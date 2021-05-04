@@ -5,9 +5,12 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"sync"
 
 	. "github.com/StevensSEC/pokemonbattlelib"
 )
+
+var battleLock sync.Mutex
 
 func buildRouter() *http.ServeMux {
 	mux := http.NewServeMux()
@@ -112,9 +115,19 @@ type httpBattle struct {
 	Battle      *Battle
 	AgentInputs []*chan Turn
 	queuedTurns map[int]Turn
+	turnLock    sync.Mutex
+}
+
+func newHttpBattle(b *Battle) *httpBattle {
+	return &httpBattle{
+		Battle:      NewBattle(),
+		queuedTurns: make(map[int]Turn),
+	}
 }
 
 func (hb *httpBattle) QueueNextTurn(targetId int, turn Turn) {
+	hb.turnLock.Lock()
+	defer hb.turnLock.Unlock()
 	hb.queuedTurns[targetId] = turn
 }
 
@@ -142,10 +155,7 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		hb := httpBattle{
-			Battle:      NewBattle(),
-			queuedTurns: make(map[int]Turn),
-		}
+		hb := newHttpBattle(NewBattle())
 		if len(args.Parties) > 0 {
 			// deprecated
 			for i := range args.Parties {
@@ -168,7 +178,9 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(400)
 			w.Write([]byte("Bad request: invalid body"))
 		}
-		battles[nextBattleId] = &hb
+		battleLock.Lock()
+		battles[nextBattleId] = hb
+		battleLock.Unlock() // unlock immediately instead of defering
 
 		err = hb.Battle.Start()
 		if err != nil {
