@@ -33,15 +33,19 @@ type Pokemon struct {
 }
 
 type PokemonData struct {
-	NatDex     uint16
-	Name       string
-	Type       Type
-	Ability    Ability
-	BaseStats  [6]int // base stats of a Pokemon
-	EvYield    [6]int // effort points gained when Pokemon is defeated
-	GrowthRate int
-	IsBiGender bool  // true if this Pokemon must have `Male` or `Female`, false if this Pokemon must be `Genderless`
-	GenderRate uint8 // Female to Male ratio. This number is used to create the ratio `GenderRate` : 8 - `GenderRate`. 0 is always male, 8 is always female.
+	NatDex            uint16
+	Name              string
+	Type              Type
+	Ability           Ability
+	BaseStats         [6]int // base stats of a Pokemon
+	EvYield           [6]int // effort points gained when Pokemon is defeated
+	GrowthRate        int
+	IsBiGender        bool  // true if this Pokemon must have `Male` or `Female`, false if this Pokemon must be `Genderless`
+	GenderRate        uint8 // Female to Male ratio. This number is used to create the ratio `GenderRate` : 8 - `GenderRate`. 0 is always male, 8 is always female.
+	HasAlternateForms bool
+	IsLegendary       bool
+	IsMythical        bool
+	EvolvesFrom       uint16 // If zero, then this pokemon does not evolve from another Pokemon.
 }
 
 func (p *Pokemon) Data() PokemonData {

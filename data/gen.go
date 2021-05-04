@@ -54,13 +54,18 @@ var ailmentNames = map[int]string{
 }
 
 type data_pokemon struct {
-	Identifier     string
-	SpeciesId      int
-	Height         int
-	Weight         int
-	BaseExperience int
-	IsBiGender     bool
-	GenderRate     int
+	Identifier        string
+	SpeciesId         int
+	Height            int
+	Weight            int
+	BaseExperience    int
+	IsBiGender        bool
+	GenderRate        int
+	IsLegendary       bool
+	IsMythical        bool
+	CaptureRate       int
+	EvolvesFrom       int
+	HasAlternateForms bool
 
 	Name       string
 	NatDex     uint16
@@ -131,6 +136,10 @@ func parseInt(s string) (n int) {
 		log.Panicln(err)
 	}
 	return n
+}
+
+func parseBool(s string) bool {
+	return s == "1"
 }
 
 func cleanName(s string) string {
@@ -355,11 +364,15 @@ func main() {
 			if p.SpeciesId != sid {
 				continue
 			}
+			(&pokemon[i]).EvolvesFrom = parseInt(record[3])
 			gender_rate := parseInt(record[8])
 			if gender_rate >= 0 {
 				(&pokemon[i]).IsBiGender = true
 				(&pokemon[i]).GenderRate = gender_rate
 			}
+			(&pokemon[i]).HasAlternateForms = parseBool(record[15])
+			(&pokemon[i]).IsLegendary = parseBool(record[16])
+			(&pokemon[i]).IsMythical = parseBool(record[17])
 			break
 		}
 	}
@@ -526,7 +539,7 @@ func main() {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("{NatDex: %d, Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s, IsBiGender: %v, GenderRate: %d},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate], p.IsBiGender, p.GenderRate)
+		output += fmt.Sprintf("{NatDex: %d, Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s, IsBiGender: %v, GenderRate: %d, HasAlternateForms: %v, IsLegendary: %v, IsMythical: %v, EvolvesFrom: %d},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate], p.IsBiGender, p.GenderRate, p.HasAlternateForms, p.IsLegendary, p.IsMythical, p.EvolvesFrom)
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"
