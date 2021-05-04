@@ -9,6 +9,7 @@ A portable library for accurately simulating pokemon battles.
 
 [Documentation](https://pkg.go.dev/github.com/StevensSEC/pokemonbattlelib)
 
+~~~go
 func ExampleBattle() {
 	p1 := GeneratePokemon(PkmnPikachu,
 		WithLevel(20),
@@ -40,6 +41,7 @@ func ExampleBattle() {
 	//Bulbasaur fainted
 }
 //Displaying how a battle works. Two Pokemon are created and keep battling and their stats change such as health, number of moves, etc.
+~~~
 # Contributing
 
 1. Make sure that you at least [have Go 1.15](https://golang.org/dl/)
