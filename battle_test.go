@@ -232,6 +232,7 @@ var _ = Describe("One round of battle", func() {
 		It("should account for critical hits", func() {
 			pkmn := PkmnDefault()
 			b = New1v1Battle(pkmn, &a1, PkmnNoDamage(), &a2)
+			b.rng = NeverRNG()
 			Expect(b.Start()).To(Succeed())
 			t, _ := b.SimulateRound()
 			damage := DamageDealt(t, target{0, 0})
