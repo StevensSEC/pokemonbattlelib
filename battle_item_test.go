@@ -68,10 +68,7 @@ var _ = Describe("Misc. + Held Items", func() {
 			attacker.Moves[0] = GetMove(MoveEarthquake)
 			// Flying immunity negated
 			t, _ := b.SimulateRound()
-			Expect(t).To(HaveTransaction(UseMoveTransaction{
-				User:   target{0, 0},
-				Target: target{1, 0},
-			}))
+			Expect(t).To(UsedAnyMove(target{0, 0}))
 			Expect(t).To(HaveTransaction(DamageTransaction{
 				Target: target{1, 0},
 				Move:   GetMove(MoveEarthquake),

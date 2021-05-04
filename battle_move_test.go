@@ -5,8 +5,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-// TODO: Move tests involving moves here
-
 func registerMoveWithType(t Type) MoveId {
 	return RegisterMove(MoveData{
 		Power:        10,

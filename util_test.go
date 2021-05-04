@@ -340,6 +340,58 @@ func (matcher *orderedTransactionMatcher) NegatedFailureMessage(actual interface
 	)
 }
 
+type usedMoveMatcher struct {
+	user target
+	move *Move
+}
+
+// Check if a Pokemon used any move
+func UsedAnyMove(user target) types.GomegaMatcher {
+	return &usedMoveMatcher{
+		user: user,
+	}
+}
+
+// Check if a Pokemon attacked with a specific move
+func UsedMove(user target, move *Move) types.GomegaMatcher {
+	return &usedMoveMatcher{
+		user: user,
+		move: move,
+	}
+}
+
+func (m *usedMoveMatcher) Match(actual interface{}) (bool, error) {
+	switch transactions := actual.(type) {
+	case []Transaction:
+		for _, t := range transactions {
+			if v, ok := t.(UseMoveTransaction); ok {
+				if m.move == nil && v.User == m.user {
+					return true, nil
+				}
+				if m.move != nil && v.User == m.user && m.move == v.Move {
+					return true, nil
+				}
+			}
+		}
+		return false, nil
+	}
+	return false, errors.New("Was not given a []Transaction")
+}
+
+func (m *usedMoveMatcher) FailureMessage(actual interface{}) string {
+	if m.move == nil {
+		return fmt.Sprintf("%s did not use any move.\n", m.user)
+	}
+	return fmt.Sprintf("%s did not use %s.", m.user, m.move)
+}
+
+func (m *usedMoveMatcher) NegatedFailureMessage(actual interface{}) string {
+	if m.move == nil {
+		return fmt.Sprintf("%s used a move.\n", m.user)
+	}
+	return fmt.Sprintf("%s used the move %s.", m.user, m.move)
+}
+
 /* Tools for testing the library */
 // Check for damage dealt (if any) by a Pokemon in battle
 func DamageDealt(t []Transaction, user target) int {
