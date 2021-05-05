@@ -86,6 +86,16 @@ var _ = Describe("Pokemon generation", func() {
 		Expect(pkmn.Moves).To(BeEquivalentTo([MaxMoves]*Move{GetMove(MovePound), GetMove(MovePursuit), nil, nil}))
 	})
 
+	It("generates a Pokemon that is not genderless", func() {
+		p := GeneratePokemon(PkmnPiplup)
+		Expect(p.Gender).To(Or(Equal(GenderFemale), Equal(GenderMale)))
+	})
+
+	It("generates a Pokemon that has a specific gender", func() {
+		p := GeneratePokemon(PkmnPiplup, WithGender(GenderFemale))
+		Expect(p.Gender).To(Equal(GenderFemale))
+	})
+
 	It("creates Pokemon with accurate stats reflecting its given values", func() {
 		// see: https://bulbapedia.bulbagarden.net/wiki/Stat, scroll down to 'Example'
 		p := GeneratePokemon(
