@@ -169,41 +169,33 @@ func (t target) String() string {
 	return fmt.Sprintf("target{%d, %d}", t.party, t.slot)
 }
 
-func (t target) MarshalJSON() ([]byte, error) {
-	type alias target // required to not enter infinite recursive loop
-	return json.Marshal(&struct {
-		Party uint
-		Slot  uint
-		*alias
-	}{
-		Party: t.party,
-		Slot:  t.slot,
-		alias: (*alias)(&t),
-	})
-}
-
-func (t *target) UnmarshalJSON(data []byte) error {
-	type alias target // required to not enter infinite recursive loop
-	aux := &struct {
-		Party uint
-		Slot  uint
-		*alias
-	}{
-		alias: (*alias)(t),
-	}
-	err := json.Unmarshal(data, &aux)
-	t.party = aux.Party
-	t.slot = aux.Slot
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 type AgentTarget struct {
 	target          // Inherit party/slot from `target`
 	Team    int     // The team that the Pokemon belongs to
 	Pokemon Pokemon // Copy of Pokemon for Agents to use
+}
+
+func (t AgentTarget) MarshalJSON() ([]byte, error) {
+	type alias AgentTarget // required to not enter infinite recursive loop
+	return json.Marshal(&struct {
+		*alias
+	}{
+		alias: (*alias)(&t),
+	})
+}
+
+func (t AgentTarget) UnmarshalJSON(data []byte) error {
+	type alias AgentTarget // required to not enter infinite recursive loop
+	aux := &struct {
+		*alias
+	}{
+		alias: (*alias)(&t),
+	}
+	err := json.Unmarshal(data, &aux)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type BattleContext struct {
