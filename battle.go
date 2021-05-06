@@ -278,6 +278,39 @@ func (b *Battle) GetResults() BattleResults {
 	return b.results
 }
 
+// Custom JSON marshalling for battle context
+func (bc BattleContext) MarshalJSON() ([]byte, error) {
+	type alias BattleContext // required to not enter infinite recursive loop
+	return json.Marshal(&struct {
+		Allies    []AgentTarget
+		Opponents []AgentTarget
+		Targets   []AgentTarget
+		*alias
+	}{
+		Allies:    bc.Allies(),
+		Opponents: bc.Opponents(),
+		Targets:   bc.Targets(),
+		alias:     (*alias)(&bc),
+	})
+}
+
+func (bc BattleContext) UnmarshalJSON(data []byte) error {
+	type alias BattleContext // required to not enter infinite recursive loop
+	aux := &struct {
+		Allies    []AgentTarget
+		Opponents []AgentTarget
+		Targets   []AgentTarget
+		*alias
+	}{
+		alias: (*alias)(&bc),
+	}
+	err := json.Unmarshal(data, &aux)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Results for a Battle.
 type BattleResults struct {
 	Winner  int // The team that won the battle.
