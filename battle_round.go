@@ -135,6 +135,17 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Item:   t.Item,
 				Move:   receiver.Moves[t.Move],
 			})
+		case SwitchTurn:
+			party := b.GetParty(turn.User)
+			if !party.IsActivePokemon(turn.User.slot) {
+				blog.Panic(ErrorCannotSwitch)
+			}
+			pkmn := b.getPokemon(t.Target.target)
+			if pkmn.CurrentHP == 0 {
+				blog.Panic(ErrorCannotSwitch)
+			}
+			party.SetInactive(turn.User.slot)
+			party.activePokemon[turn.User.slot] = t.Target.slot
 		default:
 			blog.Panicf("Unknown turn of type %v", t)
 		}

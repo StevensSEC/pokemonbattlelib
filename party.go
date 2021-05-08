@@ -11,6 +11,7 @@ const MaxPartySize = 6
 
 var ErrorPartyIndex = errors.New("invalid index for party")
 var ErrorPartyFull = fmt.Errorf("party size cannot exceed max of %d Pokemon\n", MaxPartySize)
+var ErrorCannotSwitch = fmt.Errorf("cannot switch to Pokemon as it is already active or fainted\n")
 
 // A Party of Pokemon.
 type Party struct {

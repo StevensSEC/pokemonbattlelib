@@ -87,11 +87,16 @@ func (b *Battle) getPokemon(t target) *Pokemon {
 	if t.party >= uint(len(b.parties)) {
 		panic(ErrorPartyIndex)
 	}
-	p := b.parties[t.party].pokemon()
-	if t.slot >= uint(len(p)) {
+	party := b.parties[t.party]
+	pokemon := party.pokemon()
+	if t.slot >= uint(len(pokemon)) {
 		panic(ErrorPartyIndex)
 	}
-	return p[t.slot]
+	slot := t.slot
+	if party.IsActivePokemon(t.slot) {
+		slot = party.activePokemon[t.slot]
+	}
+	return pokemon[slot]
 }
 
 // Gets all the active Pokemon (targets) in the battle
@@ -314,4 +319,13 @@ type ItemTurn struct {
 
 func (turn ItemTurn) Priority() int {
 	return 1
+}
+
+// A turn to represent switching an active Pokemon for a different, inactive Pokemon in battle.
+type SwitchTurn struct {
+	Target AgentTarget // The target to swap to
+}
+
+func (turn SwitchTurn) Priority() int {
+	return 2
 }
