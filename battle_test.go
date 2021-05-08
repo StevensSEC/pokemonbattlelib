@@ -1,8 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -280,7 +278,7 @@ var _ = Describe("Switching Pokemon", func() {
 		It("should allow switching before other turns", func() {
 			b := setup()
 			a1 <- FightTurn{Move: 0, Target: a1.newTarget(1, 0)}
-			a2 <- SwitchTurn{Current: a2.newTarget(1, 0), Target: a2.newTarget(1, 1)}
+			a2 <- SwitchTurn{Target: a2.newTarget(1, 1)}
 			pkmn2 := b.getPokemon(target{1, 0})
 			pkmn3 := b.getPokemon(target{1, 1})
 			t, _ := b.SimulateRound()
@@ -296,14 +294,12 @@ var _ = Describe("Switching Pokemon", func() {
 			))
 		})
 
-		FIt("should not allow switching to invalid Pokemon", func() {
+		It("should not allow switching to invalid Pokemon", func() {
 			b := setup()
 			a1 <- FightTurn{Move: 0, Target: a1.newTarget(1, 0)}
-			a2 <- SwitchTurn{Current: a2.newTarget(1, 0), Target: a2.newTarget(1, 1)}
-			b.parties[1].SetActive(1)
-			t, ok := b.SimulateRound()
-			fmt.Println(t, ok)
-			// Expect(b.SimulateRound()).ToNot(Succeed())
+			a2 <- SwitchTurn{Target: a2.newTarget(1, 1)}
+			b.getPokemon(target{1, 1}).CurrentHP = 0
+			Expect(func() { b.SimulateRound() }).To(Panic())
 		})
 	})
 })

@@ -323,8 +323,7 @@ func (turn ItemTurn) Priority() int {
 
 // A turn to represent switching an active Pokemon for a different, inactive Pokemon in battle.
 type SwitchTurn struct {
-	Current AgentTarget // The current active target being swapped out
-	Target  AgentTarget // The target to swap to
+	Target AgentTarget // The target to swap to
 }
 
 func (turn SwitchTurn) Priority() int {
