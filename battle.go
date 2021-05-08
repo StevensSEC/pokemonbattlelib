@@ -274,11 +274,13 @@ func (b *Battle) GetResults() BattleResults {
 func (bc BattleContext) MarshalJSON() ([]byte, error) {
 	type alias BattleContext // required to not enter infinite recursive loop
 	return json.Marshal(&struct {
+		Self      AgentTarget
 		Allies    []AgentTarget
 		Opponents []AgentTarget
 		Targets   []AgentTarget
 		*alias
 	}{
+		Self:      bc.Self(),
 		Allies:    bc.Allies(),
 		Opponents: bc.Opponents(),
 		Targets:   bc.Targets(),
@@ -289,6 +291,7 @@ func (bc BattleContext) MarshalJSON() ([]byte, error) {
 func (bc BattleContext) UnmarshalJSON(data []byte) error {
 	type alias BattleContext // required to not enter infinite recursive loop
 	aux := &struct {
+		Self      AgentTarget
 		Allies    []AgentTarget
 		Opponents []AgentTarget
 		Targets   []AgentTarget
