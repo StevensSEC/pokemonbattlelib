@@ -16,6 +16,20 @@ type UseMoveTransaction struct {
 
 func (t UseMoveTransaction) Mutate(b *Battle) {
 	user := b.getPokemon(t.User)
+	// Struggle conditions
+	if t.Move.CurrentPP == 0 {
+		// Ensure that struggle is forced (TODO: move to FightTurn validation)
+		for _, m := range user.Moves {
+			if m != nil && m.CurrentPP > 0 {
+				panic("cannot use a move with 0 PP")
+			}
+		}
+		b.QueueTransaction(UseMoveTransaction{
+			User:   t.User,
+			Target: t.Target,
+			Move:   GetMove(MoveStruggle),
+		})
+	}
 	receiver := b.getPokemon(t.Target)
 	accuracy := CalcAccuracy(b.Weather, user, receiver, t.Move)
 	b.QueueTransaction(PPTransaction{

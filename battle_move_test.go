@@ -1,6 +1,8 @@
 package pokemonbattlelib
 
 import (
+	"fmt"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -152,5 +154,18 @@ var _ = Describe("Move Damage", func() {
 				Damage: 20,
 			},
 		))
+	})
+})
+
+var _ = Describe("Struggle", func() {
+	a := Agent(new(dumbAgent))
+
+	FIt("should use struggle when a Pokemon has no other usable moves", func() {
+		pkmn := PkmnNoDamage()
+		b := New1v1Battle(pkmn, &a, PkmnNoDamage(), &a)
+		pkmn.Moves[0].CurrentPP = 0
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		fmt.Println(t)
 	})
 })
