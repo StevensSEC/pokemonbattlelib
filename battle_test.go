@@ -259,6 +259,51 @@ var _ = Describe("One round of battle", func() {
 	})
 })
 
+var _ = Describe("Switching Pokemon", func() {
+	a1 := newRcAgent()
+	a2 := newRcAgent()
+
+	setup := func() *Battle {
+		pkmn1 := PkmnDefault()
+		pkmn2 := PkmnDefault()
+		pkmn3 := PkmnDefault()
+		_a1 := Agent(a1)
+		_a2 := Agent(a2)
+		b := NewSingleBattle(NewOccupiedParty(pkmn1), &_a1, NewOccupiedParty(pkmn2, pkmn3), &_a2)
+		Expect(b.Start()).To(Succeed())
+		return b
+	}
+
+	Context("when switching Pokemon in battle", func() {
+		It("should allow switching before other turns", func() {
+			b := setup()
+			a1 <- FightTurn{Move: 0, Target: a1.newTarget(1, 0)}
+			a2 <- SwitchTurn{Target: a2.newTarget(1, 1)}
+			pkmn2 := b.getPokemon(target{1, 0})
+			pkmn3 := b.getPokemon(target{1, 1})
+			t, _ := b.SimulateRound()
+			// Pokemon was switched out with other Pokemon
+			Expect(b.getPokemon(target{1, 0})).ToNot(Equal(pkmn2))
+			Expect(b.getPokemon(target{1, 0})).To(Equal(pkmn3))
+			Expect(b.getPokemon(target{1, 1})).To(Equal(pkmn3))
+			Expect(t).To(HaveTransaction(
+				UseMoveTransaction{
+					User:   target{0, 0},
+					Target: target{1, 0},
+				},
+			))
+		})
+
+		It("should not allow switching to invalid Pokemon", func() {
+			b := setup()
+			a1 <- FightTurn{Move: 0, Target: a1.newTarget(1, 0)}
+			a2 <- SwitchTurn{Target: a2.newTarget(1, 1)}
+			b.getPokemon(target{1, 1}).CurrentHP = 0
+			Expect(func() { b.SimulateRound() }).To(Panic())
+		})
+	})
+})
+
 var _ = Describe("Using items in battle", func() {
 	a := Agent(new(healAgent))
 	var (
@@ -352,6 +397,7 @@ var _ = Describe("Turn priority", func() {
 			},
 			Entry("FightTurn", FightTurn{}, 0),
 			Entry("ItemTurn", ItemTurn{}, 1),
+			Entry("SwitchTurn", SwitchTurn{}, 2),
 		)
 
 		It("should order turns properly based on priority", func() {
