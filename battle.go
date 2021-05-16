@@ -170,6 +170,37 @@ type target struct {
 	slot  uint // The slot of the active Pokemon
 }
 
+func (t target) MarshalJSON() ([]byte, error) {
+	type alias target
+	return json.Marshal(&struct {
+		Party uint
+		Slot  uint
+		*alias
+	}{
+		Party: t.party,
+		Slot:  t.slot,
+		alias: (*alias)(&t),
+	})
+}
+
+func (t *target) UnmarshalJSON(data []byte) error {
+	type alias target
+	aux := &struct {
+		Party uint
+		Slot  uint
+		*alias
+	}{
+		alias: (*alias)(t),
+	}
+	err := json.Unmarshal(data, &aux)
+	if err != nil {
+		return err
+	}
+	t.party = aux.Party
+	t.slot = aux.Slot
+	return nil
+}
+
 func (t target) String() string {
 	return fmt.Sprintf("target{%d, %d}", t.party, t.slot)
 }
