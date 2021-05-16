@@ -18,6 +18,7 @@ var TestMoveDefault = RegisterMove(MoveData{Name: "Default", Category: MoveCateg
 var TestMoveNoDamage = RegisterMove(MoveData{Name: "No Damage", InitialMaxPP: 100})
 var TestMoveInflictBurn = RegisterMove(MoveData{Name: "Inflict Burn", Category: MoveCategoryStatus, InitialMaxPP: 100, Ailment: StatusBurn})
 var TestMoveDamageAndInflictBurn = RegisterMove(MoveData{Name: "Damage and Inflict Burn", Category: MoveCategoryPhysical, InitialMaxPP: 100, AilmentChance: 100, Ailment: StatusBurn, Power: 10})
+var TestMoveDamageAndStatChangeSelf = RegisterMove(MoveData{Name: "Damage and Modify user's stat", Category: MoveCategoryPhysical, MetaCategory: MoveMetaCategoryDamageRaise, InitialMaxPP: 100, Power: 10, StatChance: 100, AffectedStat: StatAtk, StatStages: 2})
 
 var _ = Describe("Move Status Inflict", func() {
 	a := Agent(new(dumbAgent))
