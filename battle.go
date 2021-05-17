@@ -170,12 +170,8 @@ type target struct {
 	slot  uint // The slot of the active Pokemon
 }
 
-func (t target) String() string {
-	return fmt.Sprintf("target{%d, %d}", t.party, t.slot)
-}
-
 func (t target) MarshalJSON() ([]byte, error) {
-	type alias target // required to not enter infinite recursive loop
+	type alias target
 	return json.Marshal(&struct {
 		Party uint
 		Slot  uint
@@ -188,7 +184,7 @@ func (t target) MarshalJSON() ([]byte, error) {
 }
 
 func (t *target) UnmarshalJSON(data []byte) error {
-	type alias target // required to not enter infinite recursive loop
+	type alias target
 	aux := &struct {
 		Party uint
 		Slot  uint
@@ -197,18 +193,53 @@ func (t *target) UnmarshalJSON(data []byte) error {
 		alias: (*alias)(t),
 	}
 	err := json.Unmarshal(data, &aux)
-	t.party = aux.Party
-	t.slot = aux.Slot
 	if err != nil {
 		return err
 	}
+	t.party = aux.Party
+	t.slot = aux.Slot
 	return nil
+}
+
+func (t target) String() string {
+	return fmt.Sprintf("target{%d, %d}", t.party, t.slot)
 }
 
 type AgentTarget struct {
 	target          // Inherit party/slot from `target`
 	Team    int     // The team that the Pokemon belongs to
 	Pokemon Pokemon // Copy of Pokemon for Agents to use
+}
+
+func (t AgentTarget) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Party   uint
+		Slot    uint
+		Team    int
+		Pokemon Pokemon
+	}{
+		Party:   t.party,
+		Slot:    t.slot,
+		Team:    t.Team,
+		Pokemon: t.Pokemon,
+	})
+}
+
+func (t *AgentTarget) UnmarshalJSON(data []byte) error {
+	aux := &struct {
+		Party uint
+		Slot  uint
+	}{
+		Party: t.party,
+		Slot:  t.slot,
+	}
+	err := json.Unmarshal(data, &aux)
+	if err != nil {
+		return err
+	}
+	t.party = aux.Party
+	t.slot = aux.Slot
+	return nil
 }
 
 type BattleContext struct {
@@ -281,6 +312,24 @@ func (b *Battle) GetResults() BattleResults {
 		blog.Panic("Unable to get results of a battle that has not ended.")
 	}
 	return b.results
+}
+
+// Custom JSON marshalling for battle context
+func (bc BattleContext) MarshalJSON() ([]byte, error) {
+	type alias BattleContext // required to not enter infinite recursive loop
+	return json.Marshal(&struct {
+		Self      AgentTarget
+		Allies    []AgentTarget
+		Opponents []AgentTarget
+		Targets   []AgentTarget
+		*alias
+	}{
+		Self:      bc.Self(),
+		Allies:    bc.Allies(),
+		Opponents: bc.Opponents(),
+		Targets:   bc.Targets(),
+		alias:     (*alias)(&bc),
+	})
 }
 
 // Results for a Battle.

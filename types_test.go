@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -321,4 +322,65 @@ var _ = Describe("target", func() {
 		Expect(t.party).To(BeEquivalentTo(1))
 		Expect(t.slot).To(BeEquivalentTo(2))
 	})
+})
+
+var _ = Describe("AgentTarget", func() {
+	It("should unmarshal json", func() {
+		bytes := []byte("{\"Party\": 1, \"Slot\": 2}")
+		var t AgentTarget
+		Expect(json.Unmarshal(bytes, &t)).To(Succeed())
+		Expect(t.party).To(BeEquivalentTo(1))
+		Expect(t.slot).To(BeEquivalentTo(2))
+	})
+
+	It("should unmarshal json from marshalled json", func() {
+		bytes, err := json.Marshal(AgentTarget{
+			target: target{
+				party: 1,
+				slot:  2,
+			},
+		})
+		Expect(err).To(Succeed())
+		Expect(string(bytes)).To(ContainSubstring("2"))
+		var t AgentTarget
+		Expect(json.Unmarshal(bytes, &t)).To(Succeed())
+		Expect(t.party).To(BeEquivalentTo(1))
+		Expect(t.slot).To(BeEquivalentTo(2))
+	})
+
+	It("should contain pokemon info when marshalled", func() {
+		bytes, err := json.Marshal(AgentTarget{
+			target: target{
+				party: 1,
+				slot:  2,
+			},
+			Pokemon: *GeneratePokemon(PkmnPikachu),
+		})
+		Expect(err).To(Succeed())
+		Expect(strings.ToLower(string(bytes))).To(ContainSubstring("pokemon"))
+	})
+})
+
+var _ = Describe("BattleContext", func() {
+	DescribeTable("should contain these strings when marshalled",
+		func(substring string) {
+			a := Agent(new(dumbAgent))
+			b := New1v1Battle(GeneratePokemon(PkmnPhanpy, WithMoves(TestMoveNoDamage)), &a, GeneratePokemon(PkmnAzurill, WithMoves(TestMoveNoDamage)), &a)
+			Expect(b.Start()).To(Succeed())
+			ctx := b.GetBattleContext(target{0, 0})
+			bytes, err := json.Marshal(ctx)
+			Expect(err).To(Succeed())
+			Expect(strings.ToLower(string(bytes))).To(ContainSubstring(substring))
+		},
+		// field names
+		Entry("battle context field", "self"),
+		Entry("battle context field", "allies"),
+		Entry("battle context field", "opponents"),
+		Entry("battle context field", "targets"),
+		Entry("agent target field", "pokemon"),
+		Entry("pokemon field", "moves"),
+		// pokemon info
+		Entry("pokemon name", "phanpy"),
+		Entry("pokemon name", "azurill"),
+	)
 })
