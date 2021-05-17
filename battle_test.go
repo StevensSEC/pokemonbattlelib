@@ -707,16 +707,30 @@ var _ = Describe("Battle end", func() {
 var _ = Describe("Battle metadata", func() {
 	Context("Pokemon metadata", func() {
 		It("should record the last used move of Pokemon in battle", func() {
-			a1 := Agent(new(dumbAgent))
-			p1 := GeneratePokemon(PkmnBulbasaur, WithMoves(TestMoveNoDamage))
-			p2 := GeneratePokemon(PkmnCharmander, WithMoves(TestMoveNoDamage))
-			b := New1v1Battle(p1, &a1, p2, &a1)
+			a := Agent(new(dumbAgent))
+			p1 := PkmnNoDamage()
+			p2 := PkmnNoDamage()
+			b := New1v1Battle(p1, &a, p2, &a)
 			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
 			Expect(p1.metadata).ToNot(HaveKeyWithValue(MetaLastMove, p1.Moves[0]))
 			b.SimulateRound()
 			Expect(p1.metadata).To(HaveKeyWithValue(MetaLastMove, p1.Moves[0]))
 			Expect(p2.metadata).To(HaveKeyWithValue(MetaLastMove, p2.Moves[0]))
+		})
+
+		It("should record the last item a Pokemon consumed", func() {
+			a := Agent(new(dumbAgent))
+			p1 := PkmnNoDamage()
+			p1.HeldItem = ItemApicotBerry
+			p1.CurrentHP = 20
+			p2 := PkmnNoDamage()
+			b := New1v1Battle(p1, &a, p2, &a)
+			b.rng = SimpleRNG()
+			Expect(b.Start()).To(Succeed())
+			Expect(p1.metadata).ToNot(HaveKeyWithValue(MetaLastItem, ItemApicotBerry))
+			b.SimulateRound()
+			Expect(p1.metadata).To(HaveKeyWithValue(MetaLastItem, ItemApicotBerry))
 		})
 	})
 })
