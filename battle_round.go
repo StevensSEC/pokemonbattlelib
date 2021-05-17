@@ -213,20 +213,6 @@ func (b *Battle) postRound() {
 					Damage: damage,
 				})
 			}
-			// Held item effects
-			if pkmn.HeldItem != ItemNone {
-				b.QueueTransaction(ItemTransaction{
-					Target: t,
-					Item:   pkmn.HeldItem,
-				})
-			}
-		}
-		if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
-			b.QueueTransaction(ItemTransaction{
-				Target: t,
-				IsHeld: true,
-				Item:   pkmn.HeldItem,
-			})
 		}
 		// Held item effects
 		if pkmn.HeldItem != ItemNone {

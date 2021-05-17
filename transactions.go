@@ -314,6 +314,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 	if t.Item.Flags()&FlagConsumable > 0 {
 		if t.IsHeld {
 			t.Item = receiver.HeldItem // auto-correct if the value is not present or does not match
+			receiver.metadata[MetaLastItem] = receiver.HeldItem
 			receiver.HeldItem = ItemNone
 		}
 		// TODO: remove consumed item from party's inventory
@@ -528,7 +529,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		})
 	}
 	// In a pinch consumption
-	if receiver.HeldItem.Category() == ItemCategoryInAPinch && receiver.CurrentHP <= receiver.Stats[StatHP]/4 {
+	if receiver.HeldItem.Category() == ItemCategoryInAPinch && receiver.CurrentHP <= receiver.MaxHP()/4 {
 		b.QueueTransaction(ItemTransaction{
 			Target: t.Target,
 			IsHeld: true,

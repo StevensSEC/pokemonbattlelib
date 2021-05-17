@@ -62,7 +62,8 @@ func (p *Pokemon) Data() PokemonData {
 type PokemonMeta int
 
 const (
-	MetaLastMove PokemonMeta = iota
+	MetaLastItem PokemonMeta = iota
+	MetaLastMove
 	MetaSleepTime
 	MetaStatChangeImmune
 )
