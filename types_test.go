@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -320,5 +321,42 @@ var _ = Describe("target", func() {
 		Expect(json.Unmarshal(bytes, &t)).To(Succeed())
 		Expect(t.party).To(BeEquivalentTo(1))
 		Expect(t.slot).To(BeEquivalentTo(2))
+	})
+})
+
+var _ = Describe("AgentTarget", func() {
+	It("should unmarshal json", func() {
+		bytes := []byte("{\"Party\": 1, \"Slot\": 2}")
+		var t AgentTarget
+		Expect(json.Unmarshal(bytes, &t)).To(Succeed())
+		Expect(t.party).To(BeEquivalentTo(1))
+		Expect(t.slot).To(BeEquivalentTo(2))
+	})
+
+	It("should unmarshal json from marshalled json", func() {
+		bytes, err := json.Marshal(AgentTarget{
+			target: target{
+				party: 1,
+				slot:  2,
+			},
+		})
+		Expect(err).To(Succeed())
+		Expect(string(bytes)).To(ContainSubstring("2"))
+		var t AgentTarget
+		Expect(json.Unmarshal(bytes, &t)).To(Succeed())
+		Expect(t.party).To(BeEquivalentTo(1))
+		Expect(t.slot).To(BeEquivalentTo(2))
+	})
+
+	It("should contain pokemon info when marshalled", func() {
+		bytes, err := json.Marshal(AgentTarget{
+			target: target{
+				party: 1,
+				slot:  2,
+			},
+			Pokemon: *GeneratePokemon(PkmnPikachu),
+		})
+		Expect(err).To(Succeed())
+		Expect(strings.ToLower(string(bytes))).To(ContainSubstring("pokemon"))
 	})
 })

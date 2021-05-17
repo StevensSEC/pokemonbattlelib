@@ -212,29 +212,33 @@ type AgentTarget struct {
 }
 
 func (t AgentTarget) MarshalJSON() ([]byte, error) {
-	type alias AgentTarget // required to not enter infinite recursive loop
 	return json.Marshal(&struct {
-		Party uint
-		Slot  uint
-		*alias
+		Party   uint
+		Slot    uint
+		Team    int
+		Pokemon Pokemon
 	}{
-		Party: t.target.party,
-		Slot:  t.target.slot,
-		alias: (*alias)(&t),
+		Party:   t.party,
+		Slot:    t.slot,
+		Team:    t.Team,
+		Pokemon: t.Pokemon,
 	})
 }
 
-func (t AgentTarget) UnmarshalJSON(data []byte) error {
-	type alias AgentTarget // required to not enter infinite recursive loop
+func (t *AgentTarget) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		*alias
+		Party uint
+		Slot  uint
 	}{
-		alias: (*alias)(&t),
+		Party: t.party,
+		Slot:  t.slot,
 	}
 	err := json.Unmarshal(data, &aux)
 	if err != nil {
 		return err
 	}
+	t.party = aux.Party
+	t.slot = aux.Slot
 	return nil
 }
 
