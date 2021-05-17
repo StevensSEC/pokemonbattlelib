@@ -180,4 +180,15 @@ var _ = Describe("Struggle", func() {
 		t, _ = b.SimulateRound()
 		Expect(t).ToNot(UsedMove(target{0, 0}, GetMove(MoveStruggle)))
 	})
+
+	It("is disabled with battle rules", func() {
+		pkmn := PkmnNoDamage()
+		b := New1v1Battle(pkmn, &a, PkmnNoDamage(), &a)
+		b.rng = NeverRNG()
+		b.ruleset &= ^BattleRuleStruggle
+		pkmn.Moves[0].CurrentPP = 0
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).ToNot(UsedMove(target{0, 0}, GetMove(MoveStruggle)))
+	})
 })

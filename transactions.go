@@ -18,10 +18,14 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 	user := b.getPokemon(t.User)
 	// Struggle conditions
 	if t.Move.CurrentPP == 0 {
+		if b.ruleset&BattleRuleStruggle == 0 {
+			blog.Println("Struggle is disabled - Pokemon did not use any move.")
+			return
+		}
 		// Ensure that struggle is forced (TODO: move to FightTurn validation)
 		for _, m := range user.Moves {
 			if m != nil && m.CurrentPP > 0 {
-				panic("cannot use a move with 0 PP")
+				panic(ErrorNoPP)
 			}
 		}
 		b.QueueTransaction(UseMoveTransaction{

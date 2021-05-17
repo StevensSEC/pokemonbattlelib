@@ -26,8 +26,9 @@ type BattleRule int
 
 const (
 	BattleRuleFaint BattleRule = 1 << iota
+	BattleRuleStruggle
 )
-const BattleRuleSetDefault = BattleRuleFaint
+const BattleRuleSetDefault = BattleRuleFaint | BattleRuleStruggle
 
 type BattleMeta int
 
