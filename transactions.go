@@ -29,6 +29,11 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 			Target: t.Target,
 			Move:   GetMove(MoveStruggle),
 		})
+		// 1/4 of max HP dealt as recoil damage
+		b.QueueTransaction(DamageTransaction{
+			Target: t.User,
+			Damage: user.MaxHP() / 4,
+		})
 		return
 	}
 	receiver := b.getPokemon(t.Target)
