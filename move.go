@@ -60,7 +60,7 @@ const (
 	MoveMetaCategoryDamageLower                              // Deal damage to target pokemon, and have a chance to apply a stat modifier to the target of the move.
 	MoveMetaCategoryDamageRaise                              // Deal damage to target pokemon, and have a chance to apply a stat modifier to the user of the move.
 	MoveMetaCategoryDamageHeal                               // Deal damage to target pokemon, and restore some of the user's HP. However, this is effectively a noop, because this functionality is only present on moves that have `Drain != 0`.
-	MoveMetaCategoryOhko                                     // One hit knock out. If the move hits the target pokemon, it is generally guarenteed to die (there are exceptions). Always fails if the target pokemon's level is greater than the user's level.
+	MoveMetaCategoryOhko                                     // One hit knock out. If the move hits the target pokemon, it is generally guaranteed to die (there are exceptions). Always fails if the target pokemon's level is greater than the user's level.
 	MoveMetaCategoryWholeFieldEffect                         // Applies a special effect to the entire battlefield (usually weather).
 	MoveMetaCategoryFieldEffect                              // Applies a special effect to the user's side of the battlefield.
 	MoveMetaCategoryForceSwitch                              // Forces the target pokemon to switch out.
