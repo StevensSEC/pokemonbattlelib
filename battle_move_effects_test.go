@@ -121,6 +121,27 @@ var _ = Describe("Move Effects", func() {
 			},
 		))
 	})
+
+	PIt("should deal damage and modify the user's stat (MoveMetaCategoryDamageRaise)", func() {
+		b := New1v1Battle(
+			GeneratePokemon(PkmnMightyena, WithLevel(20), WithMoves(TestMoveDamageAndStatChangeSelf)), &a1,
+			GeneratePokemon(PkmnPonyta, WithLevel(20), WithMoves(TestMoveNoDamage)), &a1,
+		)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransactionsInOrder(
+			DamageTransaction{
+				Target: target{1, 0},
+			},
+			ModifyStatTransaction{
+				Target:        target{0, 0},
+				SelfInflicted: true,
+				Stat:          int(b.getPokemon(target{0, 0}).Moves[0].AffectedStat()),
+				Stages:        int(b.getPokemon(target{0, 0}).Moves[0].StatStages()),
+			},
+		))
+	})
 })
 
 var _ = Describe("Draining moves", func() {
