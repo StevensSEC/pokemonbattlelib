@@ -1,8 +1,6 @@
 package pokemonbattlelib
 
 import (
-	"fmt"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -160,12 +158,21 @@ var _ = Describe("Move Damage", func() {
 var _ = Describe("Struggle", func() {
 	a := Agent(new(dumbAgent))
 
-	FIt("should use struggle when a Pokemon has no other usable moves", func() {
+	It("should use struggle when a Pokemon has no other usable moves", func() {
 		pkmn := PkmnNoDamage()
 		b := New1v1Battle(pkmn, &a, PkmnNoDamage(), &a)
+		b.rng = NeverRNG()
 		pkmn.Moves[0].CurrentPP = 0
 		Expect(b.Start()).To(Succeed())
 		t, _ := b.SimulateRound()
-		fmt.Println(t)
+		Expect(t).To(UsedMove(target{0, 0}, GetMove(MoveStruggle)))
+		Expect(t).To(HaveTransaction(DamageTransaction{
+			Target: target{1, 0},
+			Move:   GetMove(MoveStruggle),
+			Damage: 4,
+		}))
+		pkmn.Moves[0].CurrentPP = pkmn.Moves[0].MaxPP
+		t, _ = b.SimulateRound()
+		Expect(t).ToNot(UsedMove(target{0, 0}, GetMove(MoveStruggle)))
 	})
 })

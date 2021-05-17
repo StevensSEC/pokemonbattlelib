@@ -29,6 +29,7 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 			Target: t.Target,
 			Move:   GetMove(MoveStruggle),
 		})
+		return
 	}
 	receiver := b.getPokemon(t.Target)
 	accuracy := CalcAccuracy(b.Weather, user, receiver, t.Move)
