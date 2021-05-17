@@ -11,6 +11,7 @@ const MaxPartySize = 6
 
 var ErrorPartyIndex = errors.New("invalid index for party")
 var ErrorPartyFull = fmt.Errorf("party size cannot exceed max of %d Pokemon\n", MaxPartySize)
+var ErrorCannotSwitch = fmt.Errorf("cannot switch to Pokemon as it is already active or fainted\n")
 
 // A Party of Pokemon.
 type Party struct {
@@ -48,12 +49,13 @@ func (p *Party) AddPokemon(pkmn ...*Pokemon) error {
 	return nil
 }
 
-// A Pokemon battleParty. Can hold up to 6 Pokemon. Also manages how many pokemon are out on the battlefield. Only used inside of Battles.
+// A Pokemon battleParty. Can hold up to 6 Pokemon. Also manages how many pokemon are out on the battlefield.
+// Only used inside of Battles.
 type battleParty struct {
 	Party         *Party
-	Agent         *Agent           // The agent that has control over this party
-	activePokemon map[int]*Pokemon // Map containing slots and references to active Pokemon on the battlefield
-	team          int              // The team that this party belongs to
+	Agent         *Agent        // The agent that has control over this party
+	activePokemon map[uint]uint // Map of slots for active Pokemon to actual party slots
+	team          int           // The team that this party belongs to
 }
 
 func (p *battleParty) pokemon() []*Pokemon {
@@ -66,15 +68,15 @@ func (p *battleParty) AddPokemon(pkmn ...*Pokemon) error {
 }
 
 // Sets a Pokemon to be active by its index in a party (0-5)
-func (p *battleParty) SetActive(i int) {
+func (p *battleParty) SetActive(i uint) {
 	if p.IsActivePokemon(i) {
 		log.Panicf("pokemon is already out on the battlefield")
 	}
-	p.activePokemon[i] = p.pokemon()[i]
+	p.activePokemon[i] = i
 }
 
 // Sets a Pokemon to be inactive by its index in a party (0-5)
-func (p *battleParty) SetInactive(i int) {
+func (p *battleParty) SetInactive(i uint) {
 	if !p.IsActivePokemon(i) {
 		log.Panicf("pokemon is not out on the battlefield")
 	}
@@ -82,25 +84,12 @@ func (p *battleParty) SetInactive(i int) {
 }
 
 // Checks if a Pokemon in a party is currently active
-func (p *battleParty) IsActivePokemon(i int) bool {
-	if i >= len(p.pokemon()) {
+func (p *battleParty) IsActivePokemon(i uint) bool {
+	if i >= uint(len(p.pokemon())) {
 		log.Panicln(ErrorPartyIndex)
 	}
 	if _, ok := p.activePokemon[i]; ok {
 		return true
 	}
 	return false
-}
-
-// Creates a map of party index to active Pokemon
-func (p *battleParty) GetActivePokemon() map[int]Pokemon {
-	allActive := make(map[int]Pokemon)
-	for i, pokemon := range p.pokemon() {
-		for _, active := range p.activePokemon {
-			if pokemon == active {
-				allActive[i] = *pokemon
-			}
-		}
-	}
-	return allActive
 }

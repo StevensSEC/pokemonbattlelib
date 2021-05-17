@@ -86,6 +86,16 @@ var _ = Describe("Pokemon generation", func() {
 		Expect(pkmn.Moves).To(BeEquivalentTo([MaxMoves]*Move{GetMove(MovePound), GetMove(MovePursuit), nil, nil}))
 	})
 
+	It("generates a Pokemon that is not genderless", func() {
+		p := GeneratePokemon(PkmnPiplup)
+		Expect(p.Gender).To(Or(Equal(GenderFemale), Equal(GenderMale)))
+	})
+
+	It("generates a Pokemon that has a specific gender", func() {
+		p := GeneratePokemon(PkmnPiplup, WithGender(GenderFemale))
+		Expect(p.Gender).To(Equal(GenderFemale))
+	})
+
 	It("creates Pokemon with accurate stats reflecting its given values", func() {
 		// see: https://bulbapedia.bulbagarden.net/wiki/Stat, scroll down to 'Example'
 		p := GeneratePokemon(
@@ -208,5 +218,23 @@ var _ = Describe("Pokemon Data", func() {
 	It("should work for Arceus", func() {
 		pkmn := GeneratePokemon(PkmnArceus)
 		Expect(pkmn.Data().Name).To(Equal("Arceus"))
+	})
+})
+
+var _ = Describe("RandomGender", func() {
+	DescribeTable("Should always return one gender",
+		func(rate int, gender Gender) {
+			for i := 0; i < 10000; i++ {
+				Expect(RandomGender(uint8(rate))).To(Equal(gender))
+			}
+		},
+		Entry("Male", 0, GenderMale),
+		Entry("Female", 8, GenderFemale),
+	)
+
+	It("should never return Genderless", func() {
+		for i := 0; i < 10000; i++ {
+			Expect(RandomGender(uint8(i % 9))).ToNot(Equal(GenderGenderless))
+		}
 	})
 })

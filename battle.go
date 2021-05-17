@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"reflect"
-	"sort"
 )
 
 // A Pokemon battle. Enforces rules of the battle, and queries `Agent`s for turns.
@@ -69,7 +67,7 @@ func (b *Battle) AddParty(p *Party, a *Agent, team int) {
 	b.AddBattleParty(&battleParty{
 		Party:         p,
 		Agent:         a,
-		activePokemon: make(map[int]*Pokemon),
+		activePokemon: make(map[uint]uint),
 		team:          team,
 	})
 }
@@ -79,29 +77,50 @@ func (b *Battle) AddBattleParty(p ...*battleParty) {
 	b.parties = append(b.parties, p...)
 }
 
-// Gets a reference to a Pokemon from a target
-func (b *Battle) getPokemon(t target) *Pokemon {
-	return b.getPokemonInBattle(t.party, t.partySlot)
+// Gets the battle party for a given target
+func (b *Battle) GetParty(t target) *battleParty {
+	return b.parties[t.party]
 }
 
-// Gets a reference to a Pokemon using party ID and party slot
-func (b *Battle) getPokemonInBattle(party, slot int) *Pokemon {
-	if party >= len(b.parties) {
+// Gets a reference to a Pokemon from a target
+func (b *Battle) getPokemon(t target) *Pokemon {
+	if t.party >= uint(len(b.parties)) {
 		panic(ErrorPartyIndex)
 	}
-	p := b.parties[party].pokemon()
-	if slot >= len(p) {
+	party := b.parties[t.party]
+	pokemon := party.pokemon()
+	if t.slot >= uint(len(pokemon)) {
 		panic(ErrorPartyIndex)
 	}
-	return p[slot]
+	slot := t.slot
+	if party.IsActivePokemon(t.slot) {
+		slot = party.activePokemon[t.slot]
+	}
+	return pokemon[slot]
+}
+
+// Gets all the active Pokemon (targets) in the battle
+func (b *Battle) AllTargets() []target {
+	targets := make([]target, 0)
+	for party, p := range b.parties {
+		for slot := range p.activePokemon {
+			t := target{
+				party: uint(party),
+				slot:  slot,
+			}
+			targets = append(targets, t)
+		}
+	}
+	return targets
 }
 
 // Gets all active ally Pokemon for a party
-func (b *Battle) GetAllies(p *battleParty) []target {
+func (b *Battle) getAllies(p *battleParty) []target {
 	allies := make([]target, 0)
-	targets := b.GetTargets()
+	targets := b.AllTargets()
 	for _, target := range targets {
-		if target.Team == p.team {
+		party := b.parties[target.party]
+		if party.team == p.team {
 			allies = append(allies, target)
 		}
 	}
@@ -109,11 +128,12 @@ func (b *Battle) GetAllies(p *battleParty) []target {
 }
 
 // Gets all active opponent Pokemon for a party
-func (b *Battle) GetOpponents(p *battleParty) []target {
+func (b *Battle) getOpponents(p *battleParty) []target {
 	opponents := make([]target, 0)
-	targets := b.GetTargets()
+	targets := b.AllTargets()
 	for _, target := range targets {
-		if target.Team != p.team {
+		party := b.parties[target.party]
+		if party.team != p.team {
 			opponents = append(opponents, target)
 		}
 	}
@@ -122,7 +142,7 @@ func (b *Battle) GetOpponents(p *battleParty) []target {
 
 // Start the battle.
 func (b *Battle) Start() error {
-	// validate
+	// validate team count
 	teams := map[int]int{}
 	for i, party := range b.parties {
 		if len(party.pokemon()) == 0 {
@@ -142,404 +162,148 @@ func (b *Battle) Start() error {
 	return nil
 }
 
-// Handles all pre-turn logic
-func (b *Battle) preRound() {
-	for _, t := range b.GetTargetsRef() {
-		if v, ok := t.Pokemon.metadata[MetaSleepTime]; ok && v.(int) == 0 && t.Pokemon.StatusEffects.check(StatusSleep) {
-			b.QueueTransaction(CureStatusTransaction{
-				Target:       *t,
-				StatusEffect: StatusSleep,
-			})
-		}
-	}
-}
-
-func (b *Battle) sortTurns(turns *[]TurnContext) {
-	sort.SliceStable(*turns, func(i, j int) bool {
-		turnA := (*turns)[i].Turn
-		turnB := (*turns)[j].Turn
-		pkmnA := (*turns)[i].User.Pokemon
-		pkmnB := (*turns)[j].User.Pokemon
-		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
-			switch turnA.(type) {
-			case FightTurn:
-				ftA := turnA.(FightTurn)
-				ftB := turnB.(FightTurn)
-				mvA := pkmnA.Moves[ftA.Move]
-				mvB := pkmnB.Moves[ftB.Move]
-				if mvA.Priority() != mvB.Priority() {
-					return mvA.Priority() > mvB.Priority()
-				}
-				// Held item priority
-				itemLastA := 0
-				itemLastB := 0
-				switch pkmnA.HeldItem {
-				case ItemFullIncense, ItemLaggingTail:
-					itemLastA = 1
-				}
-				switch pkmnB.HeldItem {
-				case ItemFullIncense, ItemLaggingTail:
-					itemLastB = 1
-				}
-				if itemLastA != itemLastB {
-					return itemLastA < itemLastB
-				}
-				// speedy pokemon should go first
-				return pkmnA.Speed() > pkmnB.Speed()
-			}
-		} else {
-			// make higher priority turns go first
-			return turnA.Priority() > turnB.Priority()
-		}
-		// fallthrough
-		return false
-	})
-}
-
-// Simulates a single round of the battle. Returns processed transactions for this turn and indicates whether the battle has ended.
-func (b *Battle) SimulateRound() ([]Transaction, bool) {
-	if b.State != BattleInProgress {
-		blog.Panic("battle is not currently in progress")
-	}
-	b.preRound()
-	b.ProcessQueue()
-	// Collects all turn info from each active Pokemon
-	turns := make([]TurnContext, 0)
-	for i, party := range b.parties {
-		for j, pokemon := range party.activePokemon {
-			ctx := b.getContext(party, pokemon)
-			blog.Printf("Requesting turn from agent %d for pokemon %d (%s)", i, j, pokemon)
-			turn := (*party.Agent).Act(ctx)
-			// use the ground truth instead of a copy to let the garbage collector clean up the copied memory when it can
-			switch t := turn.(type) {
-			case FightTurn:
-				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
-				turn = t // because the type check creates a copy (again...), we need to make sure that this version of the turn gets placed into the turn list
-			case ItemTurn:
-				t.Target.Pokemon = b.getPokemonInBattle(t.Target.party, t.Target.partySlot)
-				turn = t
-			}
-			turns = append(turns, TurnContext{
-				User: target{
-					Pokemon:   b.getPokemonInBattle(i, j), // use the ground truth instead of a copy
-					party:     i,
-					partySlot: j,
-					Team:      party.team,
-				},
-				Turn: turn,
-			})
-		}
-	}
-	blog.Println("Sorting turns")
-	// Sort turns using an in-place stable sort
-	b.sortTurns(&turns)
-	// Run turns in sorted order and update battle state
-	for len(turns) > 0 {
-		turn := turns[0]
-		turns = turns[1:]
-		blog.Printf("Processing Turn %T for %s", turn.Turn, turn.User.Pokemon)
-		user := turn.User.Pokemon
-		if user.CurrentHP == 0 {
-			continue
-		}
-		switch t := turn.Turn.(type) {
-		case FightTurn:
-			move := user.Moves[t.Move]
-			// pre-move checks
-			if user.StatusEffects.check(StatusFreeze) || user.StatusEffects.check(StatusParalyze) || user.StatusEffects.check(StatusFlinch) {
-				immobilize := false
-				status := user.StatusEffects & StatusNonvolatileMask
-				if user.StatusEffects.check(StatusFreeze) {
-					immobilize = b.rng.Roll(4, 5)
-				} else if user.StatusEffects.check(StatusParalyze) {
-					immobilize = b.rng.Roll(1, 4)
-				}
-				if user.StatusEffects.check(StatusFlinch) {
-					immobilize = true
-					status = StatusFlinch
-				}
-				if immobilize {
-					b.QueueTransaction(ImmobilizeTransaction{
-						Target:       turn.User,
-						StatusEffect: status,
-					})
-					continue // forfeit turn
-				}
-			} else if user.StatusEffects.check(StatusSleep) && move.Id != MoveSnore && move.Id != MoveSleepTalk {
-				b.QueueTransaction(ImmobilizeTransaction{
-					Target:       turn.User,
-					StatusEffect: StatusSleep,
-				})
-				continue // forfeit turn
-			}
-
-			// use the move
-			b.QueueTransaction(UseMoveTransaction{
-				User:   turn.User,
-				Target: t.Target,
-				Move:   turn.User.Pokemon.Moves[t.Move],
-			})
-		case ItemTurn:
-			b.QueueTransaction(ItemTransaction{
-				Target: t.Target,
-				Item:   t.Item,
-				Move:   t.Target.Pokemon.Moves[t.Move],
-			})
-		default:
-			blog.Panicf("Unknown turn of type %v", t)
-		}
-		b.ProcessQueue()
-		if b.State == BattleEnd {
-			break
-		}
-	}
-	b.postRound()
-	b.ProcessQueue()
-	if len(b.tQueue) > 0 {
-		blog.Panic("FATAL: There are still unprocessed transactions at the end of the round.")
-	}
-	transactions := b.tProcessed
-	b.tProcessed = []Transaction{}
-	return transactions, b.State == BattleEnd
-}
-
-// Handles all post-round logic
-func (b *Battle) postRound() {
-	blog.Println("Post-round")
-	// Effects on every Pokemon
-	for _, t := range b.GetTargetsRef() {
-		pkmn := t.Pokemon
-		// Status effects
-		if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
-			cond := pkmn.StatusEffects & StatusNonvolatileMask
-			var damage uint
-			switch cond {
-			case StatusBurn, StatusPoison:
-				damage = pkmn.MaxHP() / 8
-			case StatusBadlyPoison:
-				// TODO: implement counter for increasing bad poison damage
-				damage = pkmn.MaxHP() / 16
-			}
-			b.QueueTransaction(DamageTransaction{
-				Target:       *t,
-				Damage:       damage,
-				StatusEffect: cond,
-			})
-		}
-		pkmn.StatusEffects.clear(StatusFlinch) // Flinching only occurs over the course of a single turn. It never bleeds over into the next turn.
-		if v, ok := t.Pokemon.metadata[MetaStatChangeImmune]; ok {
-			turns := v.(int)
-			pkmn.metadata[MetaStatChangeImmune] = turns - 1
-			if turns == 0 {
-				delete(pkmn.metadata, MetaStatChangeImmune)
-			}
-		}
-		// Weather effects
-		// TODO: check for weather resisting abilities
-		if b.Weather == WeatherSandstorm {
-			if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
-				damage := pkmn.MaxHP() / 16
-				b.QueueTransaction(DamageTransaction{
-					Target: *t,
-					Damage: damage,
-				})
-			}
-		} else if b.Weather == WeatherHail {
-			if pkmn.EffectiveType()&TypeIce == 0 {
-				damage := pkmn.MaxHP() / 16
-				b.QueueTransaction(DamageTransaction{
-					Target: *t,
-					Damage: damage,
-				})
-			}
-			// Held item effects
-			if pkmn.HeldItem != ItemNone {
-				b.QueueTransaction(ItemTransaction{
-					Target: *t,
-					Item:   pkmn.HeldItem,
-				})
-			}
-		}
-		if pkmn.HeldItem.Category() == ItemCategoryInAPinch && pkmn.CurrentHP <= pkmn.Stats[StatHP]/4 {
-			b.QueueTransaction(ItemTransaction{
-				Target: *t,
-				IsHeld: true,
-				Item:   pkmn.HeldItem,
-			})
-		}
-		// Held item effects
-		if pkmn.HeldItem != ItemNone {
-			b.QueueTransaction(ItemTransaction{
-				Target: *t,
-				IsHeld: true,
-				Item:   pkmn.HeldItem,
-			})
-		}
-	}
-	// Effects on the battle
-	// Decrease weather counter/clear weather over time
-	if b.Weather != WeatherClearSkies && b.metadata[MetaWeatherTurns] == 0 {
-		b.QueueTransaction(WeatherTransaction{
-			Weather: WeatherClearSkies,
-		})
-	}
-	if turns := b.metadata[MetaWeatherTurns].(int); turns > 0 {
-		b.metadata[MetaWeatherTurns] = turns - 1
-	}
-}
-
-// Add Transactions to the queue.
-func (b *Battle) QueueTransaction(t ...Transaction) {
-	b.tQueue = append(b.tQueue, t...)
-}
-
-// Process Transactions that are in the queue until the queue is empty.
-func (b *Battle) ProcessQueue() {
-	for len(b.tQueue) > 0 {
-		t := b.tQueue[0]
-		blog.Printf("Processing Transaction %T", t)
-		b.tQueue = b.tQueue[1:]
-		t.Mutate(b)
-
-		// add to the list of processed transactions
-		b.tProcessed = append(b.tProcessed, t)
-		if b.State == BattleEnd {
-			break
-		}
-	}
-}
-
+// Targets act as a composite key to determine which Pokemon is being referenced.
+// It composes of the party (index into the battle's parties),
+// and the slot of an active Pokemon within that party.
 type target struct {
-	party     int      // Identifier for a party (index in battle parties, or "party ID")
-	partySlot int      // The slot of the active Pokemon
-	Team      int      // The team that the Pokemon belongs to
-	Pokemon   *Pokemon // Pokemon that is a candidate target
-}
-
-// Create a new target object from party and slot
-func (b *Battle) getTarget(party, slot int) target {
-	p := b.getPokemonInBattle(party, slot)
-	team := b.parties[party].team
-	return target{
-		Pokemon:   p,
-		party:     party,
-		partySlot: slot,
-		Team:      team,
-	}
-}
-
-func (t target) String() string {
-	return fmt.Sprintf("Party %d (Slot %d) | Team %d | Pokemon:\n%s",
-		t.party, t.partySlot, t.Team, t.Pokemon)
+	party uint // Identifier for a party (index in battle parties, or "party ID")
+	slot  uint // The slot of the active Pokemon
 }
 
 func (t target) MarshalJSON() ([]byte, error) {
-	type alias target // required to not enter infinite recursive loop
+	type alias target
 	return json.Marshal(&struct {
-		Party int
-		Slot  int
+		Party uint
+		Slot  uint
 		*alias
 	}{
 		Party: t.party,
-		Slot:  t.partySlot,
+		Slot:  t.slot,
 		alias: (*alias)(&t),
 	})
 }
 
 func (t *target) UnmarshalJSON(data []byte) error {
-	type alias target // required to not enter infinite recursive loop
+	type alias target
 	aux := &struct {
-		Party int
-		Slot  int
+		Party uint
+		Slot  uint
 		*alias
 	}{
 		alias: (*alias)(t),
 	}
 	err := json.Unmarshal(data, &aux)
-	t.party = aux.Party
-	t.partySlot = aux.Slot
 	if err != nil {
 		return err
 	}
+	t.party = aux.Party
+	t.slot = aux.Slot
 	return nil
 }
 
-func (b *Battle) GetParty(t *target) *battleParty {
-	return b.parties[t.party]
+func (t target) String() string {
+	return fmt.Sprintf("target{%d, %d}", t.party, t.slot)
+}
+
+type AgentTarget struct {
+	target          // Inherit party/slot from `target`
+	Team    int     // The team that the Pokemon belongs to
+	Pokemon Pokemon // Copy of Pokemon for Agents to use
+}
+
+func (t AgentTarget) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Party   uint
+		Slot    uint
+		Team    int
+		Pokemon Pokemon
+	}{
+		Party:   t.party,
+		Slot:    t.slot,
+		Team:    t.Team,
+		Pokemon: t.Pokemon,
+	})
+}
+
+func (t *AgentTarget) UnmarshalJSON(data []byte) error {
+	aux := &struct {
+		Party uint
+		Slot  uint
+	}{
+		Party: t.party,
+		Slot:  t.slot,
+	}
+	err := json.Unmarshal(data, &aux)
+	if err != nil {
+		return err
+	}
+	t.party = aux.Party
+	t.slot = aux.Slot
+	return nil
 }
 
 type BattleContext struct {
-	Battle    Battle   // A copy of the current Battle, including weather, state, etc.
-	Pokemon   Pokemon  // A copy of the Pokemon that is acting in this context
-	Team      int      // The team of the acting Pokemon
-	Allies    []target // Targets that are allies of the acting Pokemon
-	Opponents []target // Targets that are opponents of the acting Pokemon
-	Targets   []target // An array of all possible targets that the Pokemon can act on
+	Battle Battle // A copy of the current Battle, including weather, state, etc.
+	Team   int    // The team of the acting Pokemon
+	target target // The party/slot of the acting Pokemon
 }
 
-// Gets a deep copy of all the active Pokemon (targets) in the battle
-func (b *Battle) GetTargets() []target {
-	targets := make([]target, 0)
-	for partyID, party := range b.parties {
-		for slot, active := range party.activePokemon {
-			var pkmn Pokemon
-			bytes, _ := json.Marshal(active)
-			err := json.Unmarshal(bytes, &pkmn)
-			if err != nil {
-				panic(err)
-			}
-			target := target{
-				party:     partyID,
-				partySlot: slot,
-				Team:      party.team,
-				Pokemon:   &pkmn,
-			}
-			targets = append(targets, target)
-		}
-	}
-	return targets
-}
-
-// Gets all the active Pokemon (targets) in the battle with ground truth pointers.
-func (b *Battle) GetTargetsRef() []*target {
-	targets := make([]*target, 0)
-	for partyID, party := range b.parties {
-		for slot := range party.activePokemon {
-			target := target{
-				party:     partyID,
-				partySlot: slot,
-				Team:      party.team,
-			}
-			target.Pokemon = b.getPokemon(target)
-			targets = append(targets, &target)
-		}
-	}
-	return targets
-}
-
-// Gets the current context for a pokemon to act (perform a turn)
-func (b *Battle) getContext(party *battleParty, pokemon *Pokemon) *BattleContext {
-	// not joking, this is *actually* the fastest way to deep copy in Go.
-	// although I didn't benchmark it myself, so I don't know that for a fact.
-	var pkmn Pokemon
-	bytes, _ := json.Marshal(pokemon)
-	err := json.Unmarshal(bytes, &pkmn)
-	if err != nil {
-		panic(err)
-	}
+func (b *Battle) GetBattleContext(t target) *BattleContext {
+	p := b.parties[t.party]
 	return &BattleContext{
-		Battle:    *b,
-		Pokemon:   pkmn,
-		Team:      party.team,
-		Allies:    b.GetAllies(party),
-		Opponents: b.GetOpponents(party),
-		Targets:   b.GetTargets(),
+		Battle: *b,
+		Team:   p.team,
+		target: t,
 	}
 }
 
-// Get the battle context that will be shared with the client
-func (b *Battle) GetRoundContext(t target) *BattleContext {
-	return b.getContext(b.parties[t.party], b.parties[t.party].activePokemon[t.partySlot])
+func (bc *BattleContext) Self() AgentTarget {
+	return AgentTarget{
+		target:  bc.target,
+		Team:    bc.Team,
+		Pokemon: *bc.Battle.getPokemon(bc.target), // Make this a copy!
+	}
+}
+
+func (bc *BattleContext) Allies() []AgentTarget {
+	b := bc.Battle
+	p := b.parties[bc.target.party]
+	targets := make([]AgentTarget, 0)
+	for _, t := range b.getAllies(p) {
+		targets = append(targets, AgentTarget{
+			target:  t,
+			Team:    b.parties[t.party].team,
+			Pokemon: *b.getPokemon(t),
+		})
+	}
+	return targets
+}
+
+func (bc *BattleContext) Opponents() []AgentTarget {
+	b := bc.Battle
+	p := b.parties[bc.target.party]
+	targets := make([]AgentTarget, 0)
+	for _, t := range b.getOpponents(p) {
+		targets = append(targets, AgentTarget{
+			target:  t,
+			Team:    b.parties[t.party].team,
+			Pokemon: *b.getPokemon(t),
+		})
+	}
+	return targets
+}
+
+func (bc *BattleContext) Targets() []AgentTarget {
+	b := bc.Battle
+	targets := make([]AgentTarget, 0)
+	for _, t := range b.AllTargets() {
+		targets = append(targets, AgentTarget{
+			target:  t,
+			Team:    b.parties[t.party].team,
+			Pokemon: *b.getPokemon(t),
+		})
+	}
+	return targets
 }
 
 // Get the results of the battle. The battle must be in the `BattleEnd` state.
@@ -548,6 +312,24 @@ func (b *Battle) GetResults() BattleResults {
 		blog.Panic("Unable to get results of a battle that has not ended.")
 	}
 	return b.results
+}
+
+// Custom JSON marshalling for battle context
+func (bc BattleContext) MarshalJSON() ([]byte, error) {
+	type alias BattleContext // required to not enter infinite recursive loop
+	return json.Marshal(&struct {
+		Self      AgentTarget
+		Allies    []AgentTarget
+		Opponents []AgentTarget
+		Targets   []AgentTarget
+		*alias
+	}{
+		Self:      bc.Self(),
+		Allies:    bc.Allies(),
+		Opponents: bc.Opponents(),
+		Targets:   bc.Targets(),
+		alias:     (*alias)(&bc),
+	})
 }
 
 // Results for a Battle.
@@ -569,8 +351,8 @@ type TurnContext struct {
 
 // A turn to represent a Pokemon using a Move.
 type FightTurn struct {
-	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
-	Target target // Info containing data determining the target of
+	Move   int         // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
+	Target AgentTarget // Info containing data determining the target of
 }
 
 func (turn FightTurn) Priority() int {
@@ -579,11 +361,20 @@ func (turn FightTurn) Priority() int {
 
 // A turn to represent using an item from the Party's inventory. An item turn has the a higher priority than any move.
 type ItemTurn struct {
-	Move   int    // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
-	Target target // Info containing data determining the target of
-	Item   Item   // Which item is being consumed
+	Move   int         // Denotes the index (0-3) of the pokemon's which of the pokemon's moves to use.
+	Target AgentTarget // Info containing data determining the target of
+	Item   Item        // Which item is being consumed
 }
 
 func (turn ItemTurn) Priority() int {
 	return 1
+}
+
+// A turn to represent switching an active Pokemon for a different, inactive Pokemon in battle.
+type SwitchTurn struct {
+	Target AgentTarget // The target to swap to
+}
+
+func (turn SwitchTurn) Priority() int {
+	return 2
 }

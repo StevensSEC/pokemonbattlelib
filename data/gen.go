@@ -29,12 +29,60 @@ var statNames = map[int]string{
 	8: "StatEvasion",
 }
 
+var ailmentNames = map[int]string{
+	-1: "StatusNone",
+	0:  "StatusNone",
+	1:  "StatusParalyze",
+	2:  "StatusSleep",
+	3:  "StatusFreeze",
+	4:  "StatusBurn",
+	5:  "StatusPoison",
+	6:  "StatusConfusion",
+	7:  "StatusInfatuation",
+	8:  "StatusCantEscape",
+	9:  "StatusNightmare",
+	12: "StatusTorment",
+	13: "StatusNone", // FIXME: not implemented
+	14: "StatusNone", // FIXME: not implemented
+	15: "StatusHealBlock",
+	17: "StatusNone", // FIXME: not implemented
+	18: "StatusLeechSeed",
+	19: "StatusEmbargo",
+	20: "StatusPerishSong",
+	21: "StatusNone", // FIXME: not implemented
+	24: "StatusNone", // FIXME: not implemented
+}
+
+var moveMetaCategoryNames = map[int]string{
+	0:  "MoveMetaCategoryDamage",
+	1:  "MoveMetaCategoryAilment",
+	2:  "MoveMetaCategoryNetGoodStats",
+	3:  "MoveMetaCategoryHeal",
+	4:  "MoveMetaCategoryDamageAilment",
+	5:  "MoveMetaCategorySwagger",
+	6:  "MoveMetaCategoryDamageLower",
+	7:  "MoveMetaCategoryDamageRaise",
+	8:  "MoveMetaCategoryDamageHeal",
+	9:  "MoveMetaCategoryOhko",
+	10: "MoveMetaCategoryWholeFieldEffect",
+	11: "MoveMetaCategoryFieldEffect",
+	12: "MoveMetaCategoryForceSwitch",
+	13: "MoveMetaCategoryUnique",
+}
+
 type data_pokemon struct {
-	Identifier     string
-	SpeciesId      int
-	Height         int
-	Weight         int
-	BaseExperience int
+	Identifier        string
+	SpeciesId         int
+	Height            int
+	Weight            int
+	BaseExperience    int
+	IsBiGender        bool
+	GenderRate        int
+	IsLegendary       bool
+	IsMythical        bool
+	CaptureRate       int
+	EvolvesFrom       int
+	HasAlternateForms bool
 
 	Name       string
 	NatDex     uint16
@@ -77,6 +125,8 @@ type data_move struct {
 	Flags         []string
 	AffectedStat  string
 	StatChange    int
+	Ailment       string
+	MetaCategory  string
 }
 
 type data_item struct {
@@ -104,6 +154,10 @@ func parseInt(s string) (n int) {
 		log.Panicln(err)
 	}
 	return n
+}
+
+func parseBool(s string) bool {
+	return s == "1"
 }
 
 func cleanName(s string) string {
@@ -315,6 +369,32 @@ func main() {
 		pokemon = append(pokemon, dp)
 	}
 
+	log.Println("Getting species metadata")
+	pkmn_species_csv := getCsvReader("data/pokemon_species.csv")
+	for {
+		record, err := pkmn_species_csv.Read()
+		if err == io.EOF {
+			break
+		}
+		// fmt.Printf("%v\n", record)
+		sid := parseInt(record[0])
+		for i, p := range pokemon {
+			if p.SpeciesId != sid {
+				continue
+			}
+			(&pokemon[i]).EvolvesFrom = parseInt(record[3])
+			gender_rate := parseInt(record[8])
+			if gender_rate >= 0 {
+				(&pokemon[i]).IsBiGender = true
+				(&pokemon[i]).GenderRate = gender_rate
+			}
+			(&pokemon[i]).HasAlternateForms = parseBool(record[15])
+			(&pokemon[i]).IsLegendary = parseBool(record[16])
+			(&pokemon[i]).IsMythical = parseBool(record[17])
+			break
+		}
+	}
+
 	// find all the pokemon names
 	log.Println("Getting Pokemon names")
 	pkmn_names_csv := getCsvReader("data/pokemon_species_names.csv")
@@ -471,13 +551,13 @@ func main() {
 	}
 
 	output += "\n\n" +
-		"// A map of national pokedex numbers to pokemon data.\n" +
+		"// An array of all registered pokemon data ordered by national pokedex numbers.\n" +
 		"var AllPokemonData = []PokemonData{\n"
 	for _, p := range pokemon {
 		if p.NatDex == 0 {
 			continue
 		}
-		output += fmt.Sprintf("{NatDex: %d, Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate])
+		output += fmt.Sprintf("{NatDex: %d, Name: \"%s\", Type: %v, Ability: %s, BaseStats: %#v, EvYield: %#v, GrowthRate: %s, IsBiGender: %v, GenderRate: %d, HasAlternateForms: %v, IsLegendary: %v, IsMythical: %v, EvolvesFrom: %d},\n", p.NatDex, p.Name, p.Type, p.Ability, p.Stats, p.Evs, growth_rate_strings[p.GrowthRate], p.IsBiGender, p.GenderRate, p.HasAlternateForms, p.IsLegendary, p.IsMythical, p.EvolvesFrom)
 	}
 	output += "}\n\n"
 	output += "// Pokemon const enum for quick lookup\nconst (\n"
@@ -508,6 +588,9 @@ func main() {
 			continue
 		}
 		mid := parseInt(record[0])
+		if mid >= 10000 {
+			continue // skip these, because they are the shaow moves from pokemon XD, see #355
+		}
 		moveType := 1 << (parseInt(record[3]) - 1)
 		power := parseInt(record[4])
 		pp := parseInt(record[5])
@@ -604,6 +687,8 @@ func main() {
 			if m.Id != mid {
 				continue
 			}
+			moves[i].MetaCategory = moveMetaCategoryNames[parseInt(v[1])]
+			moves[i].Ailment = ailmentNames[parseInt(v[2])]
 			moves[i].MinHits = parseInt(v[3])
 			moves[i].MaxHits = parseInt(v[4])
 			moves[i].MinTurns = parseInt(v[5])
@@ -645,10 +730,10 @@ func main() {
 		if len(m.AffectedStat) == 0 {
 			affectedStat = "0"
 		}
-		output += fmt.Sprintf("\t{%q, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %d},\n",
+		output += fmt.Sprintf("\t{%q, %d, %s, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s, %s, %d, %s, %s},\n",
 			m.Name, m.Type, m.DamageClass, m.Targets, m.Priority, m.Power, m.Accuracy, m.PP,
 			m.MinHits, m.MaxHits, m.MinTurns, m.MaxTurns, m.Drain, m.Healing, m.CritRate,
-			m.AilmentChance, m.FlinchChance, m.StatChance, flags, affectedStat, m.StatChange)
+			m.AilmentChance, m.FlinchChance, m.StatChance, flags, affectedStat, m.StatChange, m.Ailment, m.MetaCategory)
 	}
 	output += "}\n\n"
 	// Add move constants

@@ -47,6 +47,26 @@ const (
 	MoveTargetAll
 )
 
+// Helps define the bahavior of moves.
+type MoveMetaCategory uint8
+
+const (
+	MoveMetaCategoryDamage           MoveMetaCategory = iota // Deal damage to target pokemon.
+	MoveMetaCategoryAilment                                  // Apply a status condition to the target of the move.
+	MoveMetaCategoryNetGoodStats                             // Modify the target pokemon's stats.
+	MoveMetaCategoryHeal                                     // Heals the user or a target ally.
+	MoveMetaCategoryDamageAilment                            // Deal damage to target pokemon, and have a chance to apply a status condition to the target of the move.
+	MoveMetaCategorySwagger                                  // Raise the target's stats, and apply confusion.
+	MoveMetaCategoryDamageLower                              // Deal damage to target pokemon, and have a chance to apply a stat modifier to the target of the move.
+	MoveMetaCategoryDamageRaise                              // Deal damage to target pokemon, and have a chance to apply a stat modifier to the user of the move.
+	MoveMetaCategoryDamageHeal                               // Deal damage to target pokemon, and restore some of the user's HP. However, this is effectively a noop, because this functionality is only present on moves that have `Drain != 0`.
+	MoveMetaCategoryOhko                                     // One hit knock out. If the move hits the target pokemon, it is generally guaranteed to die (there are exceptions). Always fails if the target pokemon's level is greater than the user's level.
+	MoveMetaCategoryWholeFieldEffect                         // Applies a special effect to the entire battlefield (usually weather).
+	MoveMetaCategoryFieldEffect                              // Applies a special effect to the user's side of the battlefield.
+	MoveMetaCategoryForceSwitch                              // Forces the target pokemon to switch out.
+	MoveMetaCategoryUnique                                   // For moves that have specific, one-off rules.
+)
+
 type MoveFlags uint32
 
 const (
@@ -119,6 +139,8 @@ type MoveData struct {
 	Flags         MoveFlags
 	AffectedStat  uint8 // if this move modifies stats, this is the stat it modifies
 	StatStages    int8  // if 0, then this move does not modify stats
+	Ailment       StatusCondition
+	MetaCategory  MoveMetaCategory
 }
 
 // Represents a Pokemon's move. Moves can deal damage, heal the user or allies, or cause status effects.
