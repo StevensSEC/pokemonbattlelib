@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"math/rand"
 	"net/http"
@@ -39,4 +40,16 @@ func parseIntSlice(s string) ([]int, error) {
 		nums = append(nums, n)
 	}
 	return nums, nil
+}
+
+func JSONResponse(w http.ResponseWriter, resp interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	bytes, err := json.Marshal(resp)
+	if err != nil {
+		log.Printf("Failed to marshal into JSON: %s", err)
+		w.WriteHeader(500)
+		w.Write([]byte(`Internal server error: failed to marshal response`))
+		return
+	}
+	w.Write(bytes)
 }
