@@ -53,3 +53,16 @@ func JSONResponse(w http.ResponseWriter, resp interface{}) {
 	}
 	w.Write(bytes)
 }
+
+func respondSuccess(w http.ResponseWriter, success bool) {
+	data, err := json.Marshal(responseSuccess{true})
+	if err != nil {
+		log.Panicf("Failed to marshal response.")
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(data)
+}
+
+type responseSuccess struct {
+	Success bool `json:"success"`
+}
