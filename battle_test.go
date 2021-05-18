@@ -116,6 +116,19 @@ var _ = Describe("Battle initialization", func() {
 	})
 })
 
+var _ = Describe("Public Battle interface", func() {
+	It("should be able to use Parties to resolve a target", func() {
+		a := Agent(new(dumbAgent))
+		p1 := NewOccupiedParty(GeneratePokemon(PkmnKirlia, WithMoves(TestMoveNoDamage)))
+		p2 := NewOccupiedParty(GeneratePokemon(PkmnSudowoodo, WithMoves(TestMoveNoDamage)))
+		b := NewSingleBattle(p1, &a, p2, &a)
+		parties := b.Parties()
+		Expect(parties[0]).To(BeIdenticalTo(p1))
+		Expect(parties[1]).To(BeIdenticalTo(p2))
+		Expect(parties[0].Pokemon[0]).To(BeIdenticalTo(b.getPokemon(target{0, 0})))
+	})
+})
+
 var _ = Describe("One round of battle", func() {
 	a1 := Agent(new(dumbAgent))
 	a2 := Agent(new(dumbAgent))
