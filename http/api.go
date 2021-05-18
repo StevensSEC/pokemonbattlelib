@@ -222,11 +222,13 @@ func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
 	type roundResults struct {
 		Transactions []Transaction
 		Ended        bool
+		Parties      []*Party
 	}
 
 	results := roundResults{
 		transactions,
 		ended,
+		hb.Battle.Parties(),
 	}
 
 	bytes, err := json.Marshal(results)

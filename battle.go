@@ -162,6 +162,16 @@ func (b *Battle) Start() error {
 	return nil
 }
 
+// Get the parties that are in this battle.
+func (b *Battle) Parties() []*Party {
+	parties := make([]*Party, len(b.parties))
+	// don't use range to avoid a shallow copy
+	for i := 0; i < len(b.parties); i++ {
+		parties[i] = b.parties[i].Party
+	}
+	return parties
+}
+
 // Targets act as a composite key to determine which Pokemon is being referenced.
 // It composes of the party (index into the battle's parties),
 // and the slot of an active Pokemon within that party.
