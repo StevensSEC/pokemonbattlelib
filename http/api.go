@@ -156,16 +156,7 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 		}
 
 		hb := newHttpBattle(NewBattle())
-		if len(args.Parties) > 0 {
-			// deprecated
-			for i := range args.Parties {
-				// a := Agent(NewHttpCallbackAgent(args.CallbackUrls[i]))
-				wa := NewWaiterAgent()
-				a := Agent(wa)
-				hb.AgentInputs = append(hb.AgentInputs, wa.Input())
-				hb.Battle.AddParty(NewOccupiedParty(args.Parties[i]...), &a, i)
-			}
-		} else if len(args.Teams) > 0 {
+		if len(args.Teams) > 0 {
 			for t, team := range args.Teams {
 				for _, party := range team.Parties {
 					wa := NewWaiterAgent()
@@ -177,6 +168,7 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.WriteHeader(400)
 			w.Write([]byte("Bad request: invalid body"))
+			return
 		}
 		battleLock.Lock()
 		battles[nextBattleId] = hb
@@ -191,20 +183,13 @@ func HandleCreateBattle(w http.ResponseWriter, r *http.Request) {
 		}
 
 		log.Printf("Battle created: %v", hb.Battle)
-		data, err := json.Marshal(struct {
+		JSONResponse(w, struct {
 			BattleId      int
 			ActivePokemon int
 		}{
 			BattleId:      nextBattleId,
 			ActivePokemon: 2, // TODO: change for double battles
 		})
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Internal server error: Failed to marshal response"))
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(data)
 		nextBattleId++
 	} else {
 		w.WriteHeader(400)
@@ -222,24 +207,16 @@ func HandleBattleSimulate(w http.ResponseWriter, r *http.Request) {
 	type roundResults struct {
 		Transactions []Transaction
 		Ended        bool
+		Parties      []*Party
 	}
 
 	results := roundResults{
 		transactions,
 		ended,
+		hb.Battle.Parties(),
 	}
 
-	bytes, err := json.Marshal(results)
-	if err != nil {
-		log.Printf("Failed to marshal into JSON: %s", err)
-		w.WriteHeader(500)
-		w.Write([]byte(`Internal server error: failed to marshal round results`))
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(bytes)
+	JSONResponse(w, results)
 }
 
 func HandleBattleContext(w http.ResponseWriter, r *http.Request) {
@@ -304,17 +281,4 @@ func HandleBattleResults(w http.ResponseWriter, r *http.Request) {
 func HandleDumbAgent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"type": 0, "args": {"target": {"party":0, "slot": 0}, "move": 0}}`))
-}
-
-func respondSuccess(w http.ResponseWriter, success bool) {
-	data, err := json.Marshal(responseSuccess{true})
-	if err != nil {
-		log.Panicf("Failed to marshal response.")
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(data)
-}
-
-type responseSuccess struct {
-	Success bool `json:"success"`
 }
