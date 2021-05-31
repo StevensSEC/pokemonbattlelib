@@ -1,36 +1,43 @@
 package pokemonbattlelib
 
 func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damage uint) {
-	// Compute base damage
-	levelEffect := uint((2 * user.Level / 5) + 2)
-	movePower := move.Power()
-	attack := user.Attack()
-	defense := receiver.Defense()
-	// Move modifiers
-	if move.Category() == MoveCategorySpecial {
-		attack = user.SpecialAttack()
-		defense = receiver.SpecialDefense()
-	}
-	// Weather modifiers
-	if weather == WeatherSandstorm {
-		if receiver.EffectiveType()&TypeRock != 0 {
-			defense = (defense * 150) / 100
+	switch move.Id {
+	// Fixed damage moves
+	case MoveSuperFang:
+		return uint(receiver.CurrentHP / 2)
+	// Moves that use damage formula
+	default:
+		// Compute base damage
+		levelEffect := uint((2 * user.Level / 5) + 2)
+		movePower := move.Power()
+		attack := user.Attack()
+		defense := receiver.Defense()
+		// Move modifiers
+		if move.Category() == MoveCategorySpecial {
+			attack = user.SpecialAttack()
+			defense = receiver.SpecialDefense()
 		}
-		if move.Id == MoveSolarBeam {
+		// Weather modifiers
+		if weather == WeatherSandstorm {
+			if receiver.EffectiveType()&TypeRock != 0 {
+				defense = (defense * 150) / 100
+			}
+			if move.Id == MoveSolarBeam {
+				movePower /= 2
+			}
+		}
+		if weather == WeatherHail && move.Id == MoveSolarBeam {
 			movePower /= 2
 		}
-	}
-	if weather == WeatherHail && move.Id == MoveSolarBeam {
-		movePower /= 2
-	}
-	if weather == WeatherFog {
-		if move.Id == MoveWeatherBall {
-			movePower *= 2
-		} else if move.Id == MoveSolarBeam {
-			movePower /= 2
+		if weather == WeatherFog {
+			if move.Id == MoveWeatherBall {
+				movePower *= 2
+			} else if move.Id == MoveSolarBeam {
+				movePower /= 2
+			}
 		}
+		damage = uint((((levelEffect * movePower * attack / defense) / 50) + 2))
 	}
-	damage = uint((((levelEffect * movePower * attack / defense) / 50) + 2))
 
 	// Other modifiers
 	moveType := move.Type()
