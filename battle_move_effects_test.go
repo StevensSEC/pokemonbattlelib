@@ -247,3 +247,42 @@ var _ = Describe("Recoil moves", func() {
 		))
 	})
 })
+
+var _ = Describe("Fixed damage moves", func() {
+	a1 := Agent(new(dumbAgent))
+	hoppip := GeneratePokemon(PkmnHoppip,
+		WithLevel(25),
+		WithMoves(MoveSplash),
+	)
+	const HOPPIP_HP = 52
+	hoppip.Stats[StatHP] = HOPPIP_HP
+	var b *Battle
+
+	BeforeEach(func() {
+		b = NewSingleBattle(
+			NewOccupiedParty(
+				GeneratePokemon(PkmnRaticate,
+					WithLevel(25),
+					WithMoves(MoveSuperFang),
+				),
+			),
+			&a1,
+			NewOccupiedParty(
+				hoppip,
+			),
+			&a1,
+		)
+		b.rng = SimpleRNG()
+		Expect(b.Start()).To(Succeed())
+	})
+
+	It("should reduce the target's HP to half that amount", func() {
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransactionsInOrder(
+			DamageTransaction{
+				Target: target{1, 0},
+				Damage: HOPPIP_HP / 2,
+			},
+		))
+	})
+})
