@@ -155,3 +155,41 @@ var _ = Describe("Move Damage", func() {
 		))
 	})
 })
+
+var _ = Describe("Struggle", func() {
+	a := Agent(new(dumbAgent))
+
+	It("should use Struggle when a Pokemon has no other usable moves", func() {
+		pkmn := PkmnNoDamage()
+		b := New1v1Battle(pkmn, &a, PkmnNoDamage(), &a)
+		b.rng = NeverRNG()
+		pkmn.Moves[0].CurrentPP = 0
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(UsedMove(target{0, 0}, GetMove(MoveStruggle)))
+		Expect(t).To(HaveTransaction(DamageTransaction{
+			Target: target{1, 0},
+			Move:   GetMove(MoveStruggle),
+			Damage: 4,
+		}))
+		// User takes recoil damage from Struggle
+		Expect(t).To(HaveTransaction(DamageTransaction{
+			Target: target{0, 0},
+			Damage: pkmn.MaxHP() / 4,
+		}))
+		pkmn.Moves[0].CurrentPP = pkmn.Moves[0].MaxPP
+		t, _ = b.SimulateRound()
+		Expect(t).ToNot(UsedMove(target{0, 0}, GetMove(MoveStruggle)))
+	})
+
+	It("is disabled with battle rules", func() {
+		pkmn := PkmnNoDamage()
+		b := New1v1Battle(pkmn, &a, PkmnNoDamage(), &a)
+		b.rng = NeverRNG()
+		b.ruleset &= ^BattleRuleStruggle
+		pkmn.Moves[0].CurrentPP = 0
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).ToNot(UsedMove(target{0, 0}, GetMove(MoveStruggle)))
+	})
+})
