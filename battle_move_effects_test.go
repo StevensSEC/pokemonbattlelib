@@ -247,3 +247,38 @@ var _ = Describe("Recoil moves", func() {
 		))
 	})
 })
+
+var _ = Describe("Fixed damage moves", func() {
+	a1 := Agent(new(dumbAgent))
+
+	It("should reduce the target's HP to half that amount when Super Fang is used", func() {
+		hoppip := GeneratePokemon(PkmnHoppip,
+			WithLevel(25),
+			WithMoves(MoveSplash),
+		)
+		const HOPPIP_HP = 41
+		hoppip.Stats[StatHP] = HOPPIP_HP
+		hoppip.CurrentHP = HOPPIP_HP
+
+		b := NewSingleBattle(
+			NewOccupiedParty(
+				GeneratePokemon(PkmnRaticate,
+					WithLevel(25),
+					WithMoves(MoveSuperFang),
+				),
+			),
+			&a1,
+			NewOccupiedParty(
+				hoppip,
+			),
+			&a1,
+		)
+		b.rng = SimpleRNG()
+		Expect(b.Start()).To(Succeed())
+
+		t, _ := b.SimulateRound()
+		Expect(DamageDealt(t, target{0, 0})).To(Equal(HOPPIP_HP / 2))
+		t, _ = b.SimulateRound()
+		Expect(DamageDealt(t, target{0, 0})).To(Equal((HOPPIP_HP / 2) / 2))
+	})
+})
