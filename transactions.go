@@ -16,6 +16,30 @@ type UseMoveTransaction struct {
 
 func (t UseMoveTransaction) Mutate(b *Battle) {
 	user := b.getPokemon(t.User)
+	// Struggle conditions
+	if t.Move.CurrentPP == 0 {
+		if b.ruleset&BattleRuleStruggle == 0 {
+			blog.Println("Struggle is disabled - Pokemon did not use any move.")
+			return
+		}
+		// Ensure that struggle is forced (TODO: move to FightTurn validation)
+		for _, m := range user.Moves {
+			if m != nil && m.CurrentPP > 0 {
+				panic(ErrorNoPP)
+			}
+		}
+		b.QueueTransaction(UseMoveTransaction{
+			User:   t.User,
+			Target: t.Target,
+			Move:   GetMove(MoveStruggle),
+		})
+		// 1/4 of max HP dealt as recoil damage
+		b.QueueTransaction(DamageTransaction{
+			Target: t.User,
+			Damage: user.MaxHP() / 4,
+		})
+		return
+	}
 	receiver := b.getPokemon(t.Target)
 	accuracy := CalcAccuracy(b.Weather, user, receiver, t.Move)
 	b.QueueTransaction(PPTransaction{

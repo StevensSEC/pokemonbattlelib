@@ -368,7 +368,7 @@ func (m *usedMoveMatcher) Match(actual interface{}) (bool, error) {
 				if m.move == nil && v.User == m.user {
 					return true, nil
 				}
-				if m.move != nil && v.User == m.user && m.move == v.Move {
+				if m.move != nil && v.User == m.user && m.move.Id == v.Move.Id {
 					return true, nil
 				}
 			}

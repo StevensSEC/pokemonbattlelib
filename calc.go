@@ -49,6 +49,9 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	if moveType&TypeGround > 0 && receiver.Type&TypeFlying > 0 && receiver.IsGrounded() {
 		elementalEffect -= NoEffect
 	}
+	if move.Id == MoveStruggle {
+		elementalEffect = 0
+	}
 	if elementalEffect > NormalEffect {
 		damage <<= elementalEffect
 	} else if elementalEffect < NormalEffect {
@@ -61,7 +64,7 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 		damage /= 2
 	}
 	// Stab modifier
-	if move != nil && user.EffectiveType()&moveType != 0 {
+	if move != nil && move.Id != MoveStruggle && user.EffectiveType()&moveType != 0 {
 		if user.Ability == AbilityAdaptability {
 			damage *= 2
 		} else {
