@@ -158,6 +158,11 @@ var _ = Describe("Pokemon generation", func() {
 			p.EVs[StatHP] = 255
 			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidEvs))
 		})
+
+		It("fails when the pokemon knows struggle", func() {
+			p := GeneratePokemon(PkmnPikachu, WithMoves(MoveStruggle))
+			Expect(p.Validate(PkmnRuleSetDefault)).To(MatchError(ErrorValidationInvalidMoves))
+		})
 	})
 })
 

@@ -414,6 +414,7 @@ var ErrorValidationInvalidLevel = errors.New("Pokemon has invalid level.")
 var ErrorValidationInvalidIvs = errors.New("Pokemon has invalid IVs.")
 var ErrorValidationInvalidEvs = errors.New("Pokemon has invalid EVs.")
 var ErrorValidationInvalidGender = errors.New("Pokemon has invalid gender.")
+var ErrorValidationInvalidMoves = errors.New("Pokemon knows a move that is not allowed.")
 
 // Used to pick and choose which validation rules to enforce
 type PokemonValidationRules uint8
@@ -425,9 +426,11 @@ const (
 	PkmnRuleValidIvs
 	PkmnRuleValidEvs
 	PkmnRuleValidGender
+	// Pokemon are not allowed to know the move struggle.
+	PkmnRuleNoStruggle
 )
 
-const PkmnRuleSetDefault = PkmnRuleHasMoves | PkmnRuleHasAbility | PkmnRuleValidLevel | PkmnRuleValidIvs | PkmnRuleValidEvs | PkmnRuleValidGender
+const PkmnRuleSetDefault = PkmnRuleHasMoves | PkmnRuleHasAbility | PkmnRuleValidLevel | PkmnRuleValidIvs | PkmnRuleValidEvs | PkmnRuleValidGender | PkmnRuleNoStruggle
 
 func (p *Pokemon) Validate(rules PokemonValidationRules) error {
 	if rules&PkmnRuleHasMoves > 0 {
@@ -464,6 +467,19 @@ func (p *Pokemon) Validate(rules PokemonValidationRules) error {
 			return ErrorValidationInvalidGender
 		} else if !p.Data().IsBiGender && p.Gender != GenderGenderless {
 			return ErrorValidationInvalidGender
+		}
+	}
+
+	if rules&PkmnRuleNoStruggle > 0 {
+		hasBannedMove := false
+		for _, m := range p.Moves {
+			if m != nil && m.Id == MoveStruggle {
+				hasBannedMove = true
+				break
+			}
+		}
+		if hasBannedMove {
+			return ErrorValidationInvalidMoves
 		}
 	}
 
