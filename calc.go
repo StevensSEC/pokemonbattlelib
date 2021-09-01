@@ -57,6 +57,9 @@ func CalcMoveDamage(weather Weather, user, receiver *Pokemon, move *Move) (damag
 	} else if elementalEffect < NormalEffect {
 		damage >>= elementalEffect * -1 // bitshift operand must be positive
 	}
+	if user.Ability == AbilityIronFist && move.Flags()&FlagPunch != 0 {
+		damage = (damage * 120) / 100
+	}
 	// Weather type modifier
 	if rain, sun := weather == WeatherRain, weather == WeatherHarshSunlight; (rain && move.Type() == TypeWater) || (sun && move.Type() == TypeFire) {
 		damage = (damage * 150) / 100
