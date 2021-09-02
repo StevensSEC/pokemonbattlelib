@@ -466,6 +466,23 @@ func New1v1Battle(p1 *Pokemon, a1 *Agent, p2 *Pokemon, a2 *Agent) *Battle {
 	return NewSingleBattle(NewOccupiedParty(p1), a1, NewOccupiedParty(p2), a2)
 }
 
+// Create a double Battle. A double battle is a battle where 2 pokemon are sent out at a time, and there can be 2-4 parties.
+// This function should only be used in tests.
+func NewDoubleBattle(p1 *Party, a1 *Agent, p2 *Party, a2 *Agent) *Battle {
+	b := NewBattleOfType(BattleTypeDouble)
+	b.AddParty(p1, a1, 0)
+	b.AddParty(p2, a2, 1)
+	return b
+}
+
+// Create a double Battle with only 2 pokemon in each party.
+// This function should only be used in tests.
+func New2v2Battle(p1a, p1b *Pokemon, a1 *Agent, p2a, p2b *Pokemon, a2 *Agent) *Battle {
+	p1 := NewOccupiedParty(p1a, p1b)
+	p2 := NewOccupiedParty(p2a, p2b)
+	return NewDoubleBattle(p1, a1, p2, a2)
+}
+
 // Deprecated: Creates a new party to store Pokemon and assigns them to a team
 // This function should only be used in tests.
 func newBattlePartyOld(agent *Agent, team int) *battleParty {
