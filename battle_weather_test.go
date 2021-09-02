@@ -53,7 +53,7 @@ var _ = Describe("Weather", func() {
 			b.SimulateRound()
 			Expect(b.metadata[MetaWeatherTurns]).To(Equal(4))
 			Expect(b.Weather).ToNot(Equal(WeatherFog))
-			b.getPokemon(target{0, 0}).Moves[0] = GetMove(MoveSplash)
+			b.GetPokemon(target{0, 0}).Moves[0] = GetMove(MoveSplash)
 			b.SimulateRound()
 			Expect(b.metadata[MetaWeatherTurns]).To(Equal(3))
 			b.metadata[MetaWeatherTurns] = 0

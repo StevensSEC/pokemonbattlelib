@@ -90,10 +90,10 @@ var _ = Describe("Battle initialization", func() {
 			b := NewBattle()
 			b.AddParty(party, &agent1, 0)
 			Expect(func() {
-				b.getPokemon(target{1, 5})
+				b.GetPokemon(target{1, 5})
 			}).To(Panic())
 			Expect(func() {
-				b.getPokemon(target{0, 5})
+				b.GetPokemon(target{0, 5})
 			}).To(Panic())
 		})
 	})
@@ -125,7 +125,7 @@ var _ = Describe("Public Battle interface", func() {
 		parties := b.Parties()
 		Expect(parties[0]).To(BeIdenticalTo(p1))
 		Expect(parties[1]).To(BeIdenticalTo(p2))
-		Expect(parties[0].Pokemon[0]).To(BeIdenticalTo(b.getPokemon(target{0, 0})))
+		Expect(parties[0].Pokemon[0]).To(BeIdenticalTo(b.GetPokemon(target{0, 0})))
 	})
 })
 
@@ -292,13 +292,13 @@ var _ = Describe("Switching Pokemon", func() {
 			b := setup()
 			a1 <- FightTurn{Move: 0, Target: a1.newTarget(1, 0)}
 			a2 <- SwitchTurn{Target: a2.newTarget(1, 1)}
-			pkmn2 := b.getPokemon(target{1, 0})
-			pkmn3 := b.getPokemon(target{1, 1})
+			pkmn2 := b.GetPokemon(target{1, 0})
+			pkmn3 := b.GetPokemon(target{1, 1})
 			t, _ := b.SimulateRound()
 			// Pokemon was switched out with other Pokemon
-			Expect(b.getPokemon(target{1, 0})).ToNot(Equal(pkmn2))
-			Expect(b.getPokemon(target{1, 0})).To(Equal(pkmn3))
-			Expect(b.getPokemon(target{1, 1})).To(Equal(pkmn3))
+			Expect(b.GetPokemon(target{1, 0})).ToNot(Equal(pkmn2))
+			Expect(b.GetPokemon(target{1, 0})).To(Equal(pkmn3))
+			Expect(b.GetPokemon(target{1, 1})).To(Equal(pkmn3))
 			Expect(t).To(HaveTransaction(
 				UseMoveTransaction{
 					User:   target{0, 0},
@@ -311,7 +311,7 @@ var _ = Describe("Switching Pokemon", func() {
 			b := setup()
 			a1 <- FightTurn{Move: 0, Target: a1.newTarget(1, 0)}
 			a2 <- SwitchTurn{Target: a2.newTarget(1, 1)}
-			b.getPokemon(target{1, 1}).CurrentHP = 0
+			b.GetPokemon(target{1, 1}).CurrentHP = 0
 			Expect(func() { b.SimulateRound() }).To(Panic())
 		})
 	})
@@ -373,7 +373,7 @@ var _ = Describe("Getting pokemon from parties", func() {
 
 	Context("when getting Pokemon by party/slot", func() {
 		It("should get the Pokemon the user expects", func() {
-			pkmn := b.getPokemon(target{0, 1})
+			pkmn := b.GetPokemon(target{0, 1})
 			Expect(pkmn.NatDex).To(BeEquivalentTo(PkmnSquirtle))
 		})
 	})
@@ -589,7 +589,7 @@ var _ = Describe("Fainting", func() {
 			b.AddParty(p2, &a2, 1)
 			Expect(b.Start()).To(Succeed())
 			b.SimulateRound()
-			Expect(b.getPokemon(target{0, 0}).Friendship).To(Equal(99))
+			Expect(b.GetPokemon(target{0, 0}).Friendship).To(Equal(99))
 		})
 
 		It("should lose 5 or 10 friendship when fainting", func() {
@@ -606,9 +606,9 @@ var _ = Describe("Fainting", func() {
 			b = NewSingleBattle(p1, &a1, p2, &a2)
 			Expect(b.Start()).To(Succeed())
 			b.SimulateRound()
-			Expect(b.getPokemon(target{0, 0}).Friendship).To(Equal(95))
+			Expect(b.GetPokemon(target{0, 0}).Friendship).To(Equal(95))
 			b.SimulateRound()
-			Expect(b.getPokemon(target{0, 1}).Friendship).To(Equal(190))
+			Expect(b.GetPokemon(target{0, 1}).Friendship).To(Equal(190))
 		})
 
 		It("should gain EVs when defeating Pokemon", func() {
@@ -936,7 +936,7 @@ var _ = Describe("Status Conditions", func() {
 			)
 			b.rng = SimpleRNG()
 			Expect(b.Start()).To(Succeed())
-			pikachu := b.getPokemon(target{0, 0})
+			pikachu := b.GetPokemon(target{0, 0})
 			b.QueueTransaction(InflictStatusTransaction{
 				Target:       target{0, 0},
 				StatusEffect: StatusFlinch,
@@ -960,7 +960,7 @@ var _ = Describe("Status Conditions", func() {
 
 		It("should not remain flinched after the round has ended", func() {
 			b := setup()
-			pikachu := b.getPokemon(target{0, 0})
+			pikachu := b.GetPokemon(target{0, 0})
 			b.SimulateRound()
 			Expect(pikachu.StatusEffects.check(StatusFlinch)).To(BeFalse())
 		})

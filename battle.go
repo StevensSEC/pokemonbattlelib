@@ -116,7 +116,7 @@ func (b *Battle) GetParty(t target) *battleParty {
 }
 
 // Gets a reference to a Pokemon from a target
-func (b *Battle) getPokemon(t target) *Pokemon {
+func (b *Battle) GetPokemon(t target) *Pokemon {
 	if t.party >= uint(len(b.parties)) {
 		panic(ErrorPartyIndex)
 	}
@@ -328,7 +328,7 @@ func (bc *BattleContext) Self() AgentTarget {
 	return AgentTarget{
 		target:  bc.target,
 		Team:    bc.Team,
-		Pokemon: *bc.Battle.getPokemon(bc.target), // Make this a copy!
+		Pokemon: *bc.Battle.GetPokemon(bc.target), // Make this a copy!
 	}
 }
 
@@ -340,7 +340,7 @@ func (bc *BattleContext) Allies() []AgentTarget {
 		targets = append(targets, AgentTarget{
 			target:  t,
 			Team:    b.parties[t.party].team,
-			Pokemon: *b.getPokemon(t),
+			Pokemon: *b.GetPokemon(t),
 		})
 	}
 	return targets
@@ -354,7 +354,7 @@ func (bc *BattleContext) Opponents() []AgentTarget {
 		targets = append(targets, AgentTarget{
 			target:  t,
 			Team:    b.parties[t.party].team,
-			Pokemon: *b.getPokemon(t),
+			Pokemon: *b.GetPokemon(t),
 		})
 	}
 	return targets
@@ -367,7 +367,7 @@ func (bc *BattleContext) Targets() []AgentTarget {
 		targets = append(targets, AgentTarget{
 			target:  t,
 			Team:    b.parties[t.party].team,
-			Pokemon: *b.getPokemon(t),
+			Pokemon: *b.GetPokemon(t),
 		})
 	}
 	return targets
