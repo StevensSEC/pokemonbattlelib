@@ -41,7 +41,11 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 		return
 	}
 	receiver := b.GetPokemon(t.Target)
-	accuracy := CalcAccuracy(b.Weather, user, receiver, t.Move)
+	weather := b.Weather
+	if _, ok := b.metadata[MetaWeatherDisabled]; ok {
+		weather = WeatherClearSkies
+	}
+	accuracy := CalcAccuracy(weather, user, receiver, t.Move)
 	b.QueueTransaction(PPTransaction{
 		Move:   t.Move,
 		Amount: -1,
@@ -127,7 +131,7 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 				})
 			}
 		case MoveMoonlight, MoveSynthesis, MoveMorningSun:
-			if b.Weather == WeatherFog {
+			if weather == WeatherFog {
 				b.QueueTransaction(HealTransaction{
 					Target: t.User,
 					Amount: user.MaxHP() / 4,
@@ -162,7 +166,7 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 		}
 	} else {
 		// Physical/Special Moves
-		damage := CalcMoveDamage(b.Weather, user, receiver, t.Move)
+		damage := CalcMoveDamage(weather, user, receiver, t.Move)
 		var crit uint = 1
 		if b.rng.Roll(1, user.CritChance()) {
 			crit = 2
