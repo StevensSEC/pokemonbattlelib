@@ -24,3 +24,24 @@ var _ = Describe("Scrappy", func() {
 		Entry("fighting", TypeFighting),
 	)
 })
+
+var _ = Describe("Ability: Iron Fist", func() {
+	a := Agent(new(dumbAgent))
+
+	It("should have punching moves deal 1.2x damage", func() {
+		b := New1v1Battle(
+			GeneratePokemon(PkmnMachop, WithLevel(15), WithAbility(AbilityIronFist), WithMoves(MoveCometPunch)), &a,
+			GeneratePokemon(PkmnBidoof, WithLevel(15), WithMoves(MoveCometPunch)), &a,
+		)
+		b.rng = AlwaysRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		normalDamage := DamageDealt(t, target{1, 0})
+		boostedDamage := DamageDealt(t, target{0, 0})
+		Expect(normalDamage).To(BeNumerically(">", 0))
+		Expect(boostedDamage).To(BeNumerically(">", 0))
+		Expect(boostedDamage).To(BeNumerically(">", normalDamage))
+		Expect(normalDamage * 120 / 100).To(BeNumerically("==", boostedDamage))
+	})
+
+})
