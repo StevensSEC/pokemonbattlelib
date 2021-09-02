@@ -64,7 +64,7 @@ var _ = Describe("Misc. + Held Items", func() {
 
 		Specify("Iron Ball", func() {
 			b, holder := setup(ItemIronBall, PkmnPidgeot)
-			attacker := b.getPokemon(target{0, 0})
+			attacker := b.GetPokemon(target{0, 0})
 			attacker.Moves[0] = GetMove(MoveEarthquake)
 			// Flying immunity negated
 			t, _ := b.SimulateRound()
@@ -81,7 +81,7 @@ var _ = Describe("Misc. + Held Items", func() {
 
 		Specify("Sticky Barb", func() {
 			b, holder := setup(ItemStickyBarb, PkmnGrimer)
-			attacker := b.getPokemon(target{0, 0})
+			attacker := b.GetPokemon(target{0, 0})
 			t, _ := b.SimulateRound()
 			Expect(t).To(HaveTransaction(UseMoveTransaction{
 				User:   target{0, 0},
@@ -153,7 +153,7 @@ var _ = Describe("Misc. + Held Items", func() {
 
 		Specify("Destiny Knot", func() {
 			b, holder := setup(ItemDestinyKnot, PkmnMimeJr)
-			attacker := b.getPokemon(target{0, 0})
+			attacker := b.GetPokemon(target{0, 0})
 			attacker.Moves[0] = GetMove(MoveAttract)
 			attacker.Gender = GenderMale
 			holder.Gender = GenderFemale
@@ -247,7 +247,7 @@ var _ = Describe("Misc. + Held Items", func() {
 		DescribeTable("Accuracy/evasion items",
 			func(attacking Item, defending Item, op string) {
 				b, holder := setup(ItemNone, PkmnSnorlax)
-				opponent := b.getPokemon(target{0, 0})
+				opponent := b.GetPokemon(target{0, 0})
 				base := CalcAccuracy(b.Weather, holder, opponent, GetMove(MovePound))
 				holder.HeldItem = attacking
 				opponent.HeldItem = defending
@@ -308,7 +308,7 @@ var _ = Describe("Misc. + Held Items", func() {
 	DescribeTable("Plates",
 		func(item Item, expectedType Type) {
 			b, holder := setup(ItemNone, PkmnArceus)
-			receiver := b.getPokemon(target{0, 0})
+			receiver := b.GetPokemon(target{0, 0})
 			damage := CalcMoveDamage(b.Weather, holder, receiver, GetMove(MoveJudgment))
 			holder.HeldItem = item
 			heldDamage := CalcMoveDamage(b.Weather, holder, receiver, GetMove(MoveJudgment))
@@ -340,7 +340,7 @@ var _ = Describe("Misc. + Held Items", func() {
 	DescribeTable("Type Enhancement",
 		func(item Item, expectedType Type) {
 			b, holder := setup(ItemNone, PkmnArceus)
-			receiver := b.getPokemon(target{0, 0})
+			receiver := b.GetPokemon(target{0, 0})
 			m := GetMove(registerMoveWithType(expectedType))
 			damage := CalcMoveDamage(b.Weather, holder, receiver, m)
 			holder.HeldItem = item
@@ -636,8 +636,8 @@ var _ = Describe("In-a-pinch Berries", func() {
 				Stat:   stat,
 				Stages: stages,
 			}))
-			Expect(b.getPokemon(target{0, 0}).HeldItem).To(Equal(ItemNone))
-			Expect(b.getPokemon(target{1, 0}).HeldItem).To(Equal(ItemNone))
+			Expect(b.GetPokemon(target{0, 0}).HeldItem).To(Equal(ItemNone))
+			Expect(b.GetPokemon(target{1, 0}).HeldItem).To(Equal(ItemNone))
 		},
 		Entry("Apicot Berry", ItemApicotBerry, StatSpDef, 1),
 		Entry("Ganlon Berry", ItemGanlonBerry, StatDef, 1),

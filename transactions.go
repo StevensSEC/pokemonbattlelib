@@ -15,7 +15,7 @@ type UseMoveTransaction struct {
 }
 
 func (t UseMoveTransaction) Mutate(b *Battle) {
-	user := b.getPokemon(t.User)
+	user := b.GetPokemon(t.User)
 	// Struggle conditions
 	if t.Move.CurrentPP == 0 {
 		if b.ruleset&BattleRuleStruggle == 0 {
@@ -40,7 +40,7 @@ func (t UseMoveTransaction) Mutate(b *Battle) {
 		})
 		return
 	}
-	receiver := b.getPokemon(t.Target)
+	receiver := b.GetPokemon(t.Target)
 	accuracy := CalcAccuracy(b.Weather, user, receiver, t.Move)
 	b.QueueTransaction(PPTransaction{
 		Move:   t.Move,
@@ -277,7 +277,7 @@ func (t DamageTransaction) Mutate(b *Battle) {
 	if t.Damage == 0 {
 		t.Damage = 1
 	}
-	receiver := b.getPokemon(t.Target)
+	receiver := b.GetPokemon(t.Target)
 	if receiver.CurrentHP >= t.Damage {
 		receiver.CurrentHP -= t.Damage
 	} else {
@@ -309,7 +309,7 @@ type FriendshipTransaction struct {
 }
 
 func (t FriendshipTransaction) Mutate(b *Battle) {
-	pkmn := b.getPokemon(t.Target)
+	pkmn := b.GetPokemon(t.Target)
 	pkmn.Friendship += t.Amount
 }
 
@@ -321,7 +321,7 @@ type EVTransaction struct {
 }
 
 func (t EVTransaction) Mutate(b *Battle) {
-	pkmn := b.getPokemon(t.Target)
+	pkmn := b.GetPokemon(t.Target)
 	pkmn.EVs[t.Stat] += t.Amount
 }
 
@@ -334,7 +334,7 @@ type ItemTransaction struct {
 }
 
 func (t ItemTransaction) Mutate(b *Battle) {
-	receiver := b.getPokemon(t.Target)
+	receiver := b.GetPokemon(t.Target)
 	if t.Item.Flags()&FlagConsumable > 0 {
 		if t.IsHeld {
 			t.Item = receiver.HeldItem // auto-correct if the value is not present or does not match
@@ -400,7 +400,7 @@ func (t ItemTransaction) Mutate(b *Battle) {
 		case ItemSacredAsh:
 			for slot := range b.parties[t.Target.party].pokemon() {
 				pkmnTarget := target{t.Target.party, uint(slot)}
-				pkmn := b.getPokemon(pkmnTarget)
+				pkmn := b.GetPokemon(pkmnTarget)
 				if pkmn.CurrentHP == 0 {
 					b.QueueTransaction(HealTransaction{
 						Target: pkmnTarget,
@@ -586,7 +586,7 @@ type GiveItemTransaction struct {
 }
 
 func (t GiveItemTransaction) Mutate(b *Battle) {
-	pkmn := b.getPokemon(t.Target)
+	pkmn := b.GetPokemon(t.Target)
 	pkmn.HeldItem = t.Item
 }
 
@@ -597,7 +597,7 @@ type HealTransaction struct {
 }
 
 func (t HealTransaction) Mutate(b *Battle) {
-	pkmn := b.getPokemon(t.Target)
+	pkmn := b.GetPokemon(t.Target)
 	pkmn.CurrentHP += t.Amount
 	if pkmn.CurrentHP > pkmn.MaxHP() {
 		pkmn.CurrentHP = pkmn.MaxHP()
@@ -611,7 +611,7 @@ type InflictStatusTransaction struct {
 }
 
 func (t InflictStatusTransaction) Mutate(b *Battle) {
-	pkmn := b.getPokemon(t.Target)
+	pkmn := b.GetPokemon(t.Target)
 	pkmn.StatusEffects.apply(t.StatusEffect)
 	if t.StatusEffect.check(StatusSleep) {
 		pkmn.metadata[MetaSleepTime] = b.rng.Get(1, 5)
@@ -631,7 +631,7 @@ type CureStatusTransaction struct {
 }
 
 func (t CureStatusTransaction) Mutate(b *Battle) {
-	pkmn := b.getPokemon(t.Target)
+	pkmn := b.GetPokemon(t.Target)
 	pkmn.StatusEffects.clear(t.StatusEffect)
 	if t.StatusEffect.check(StatusSleep) {
 		delete(pkmn.metadata, MetaSleepTime)
@@ -644,7 +644,7 @@ type FaintTransaction struct {
 }
 
 func (t FaintTransaction) Mutate(b *Battle) {
-	pkmn := b.getPokemon(t.Target)
+	pkmn := b.GetPokemon(t.Target)
 	if b.ruleset&BattleRuleFaint == 0 {
 		blog.Println("Fainting is disabled - Pokemon HP fully restored")
 		pkmn.CurrentHP = pkmn.MaxHP()
@@ -654,7 +654,7 @@ func (t FaintTransaction) Mutate(b *Battle) {
 	evGain := pkmn.GetEVYield()
 	for _, opponent := range b.getOpponents(b.parties[t.Target.party]) {
 		// Friendship is lowered based on level difference
-		opponentPkmn := b.getPokemon(opponent)
+		opponentPkmn := b.GetPokemon(opponent)
 		levelGap := opponentPkmn.Level - pkmn.Level
 		loss := -1
 		if levelGap >= 30 {
@@ -754,7 +754,7 @@ type ImmobilizeTransaction struct {
 }
 
 func (t ImmobilizeTransaction) Mutate(b *Battle) {
-	receiver := b.getPokemon(t.Target)
+	receiver := b.GetPokemon(t.Target)
 	if t.StatusEffect.check(StatusSleep) {
 		receiver.metadata[MetaSleepTime] = receiver.metadata[MetaSleepTime].(int) - 1
 	}
@@ -779,7 +779,7 @@ type ModifyStatTransaction struct {
 }
 
 func (t ModifyStatTransaction) Mutate(b *Battle) {
-	pkmn := b.getPokemon(t.Target)
+	pkmn := b.GetPokemon(t.Target)
 	_, immune := pkmn.metadata[MetaStatChangeImmune]
 	if immune && t.Stages < 0 && !t.SelfInflicted {
 		return

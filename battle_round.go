@@ -8,7 +8,7 @@ import (
 // Handles all pre-turn logic
 func (b *Battle) preRound() {
 	for _, t := range b.AllTargets() {
-		pkmn := b.getPokemon(t)
+		pkmn := b.GetPokemon(t)
 		if v, ok := pkmn.metadata[MetaSleepTime]; ok && v.(int) == 0 && pkmn.StatusEffects.check(StatusSleep) {
 			b.QueueTransaction(CureStatusTransaction{
 				Target:       t,
@@ -22,8 +22,8 @@ func (b *Battle) sortTurns(turns *[]TurnContext) {
 	sort.SliceStable(*turns, func(i, j int) bool {
 		turnA := (*turns)[i].Turn
 		turnB := (*turns)[j].Turn
-		pkmnA := b.getPokemon((*turns)[i].User)
-		pkmnB := b.getPokemon((*turns)[j].User)
+		pkmnA := b.GetPokemon((*turns)[i].User)
+		pkmnB := b.GetPokemon((*turns)[j].User)
 		if reflect.TypeOf(turnA) == reflect.TypeOf(turnB) {
 			switch turnA.(type) {
 			case FightTurn:
@@ -86,7 +86,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 	for len(turns) > 0 {
 		turn := turns[0]
 		turns = turns[1:]
-		user := b.getPokemon(turn.User)
+		user := b.GetPokemon(turn.User)
 		blog.Printf("Processing Turn %T for %s", turn.Turn, user)
 		if user.CurrentHP == 0 {
 			continue
@@ -129,7 +129,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 				Move:   user.Moves[t.Move],
 			})
 		case ItemTurn:
-			receiver := b.getPokemon(t.Target.target)
+			receiver := b.GetPokemon(t.Target.target)
 			b.QueueTransaction(ItemTransaction{
 				Target: t.Target.target,
 				Item:   t.Item,
@@ -140,7 +140,7 @@ func (b *Battle) SimulateRound() ([]Transaction, bool) {
 			if !party.IsActivePokemon(turn.User.slot) {
 				blog.Panic(ErrorCannotSwitch)
 			}
-			pkmn := b.getPokemon(t.Target.target)
+			pkmn := b.GetPokemon(t.Target.target)
 			if pkmn.CurrentHP == 0 {
 				blog.Panic(ErrorCannotSwitch)
 			}
@@ -169,7 +169,7 @@ func (b *Battle) postRound() {
 	blog.Println("Post-round")
 	// Effects on every Pokemon
 	for _, t := range b.AllTargets() {
-		pkmn := b.getPokemon(t)
+		pkmn := b.GetPokemon(t)
 		// Status effects
 		if pkmn.StatusEffects.check(StatusBurn) || pkmn.StatusEffects.check(StatusPoison) || pkmn.StatusEffects.check(StatusBadlyPoison) {
 			cond := pkmn.StatusEffects & StatusNonvolatileMask

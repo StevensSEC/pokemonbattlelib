@@ -26,11 +26,11 @@ var _ = Describe("Agents", func() {
 		a1 := newRcAgent()
 		_a1 := Agent(a1)
 		a2 := Agent(funkyAgent(func(ctx *BattleContext) Turn {
-			real := b.getPokemon(ctx.Opponents()[0].target)
+			real := b.GetPokemon(ctx.Opponents()[0].target)
 			Expect(&ctx.Opponents()[0].Pokemon).ToNot(BeIdenticalTo(real))
 			Expect(&ctx.Opponents()[0].Pokemon.Moves[0]).ToNot(BeIdenticalTo(real.Moves[0])) // See #294
 			for _, t := range ctx.Targets() {
-				real := b.getPokemon(t.target) // because range makes a copy of the array
+				real := b.GetPokemon(t.target) // because range makes a copy of the array
 				Expect(t.Pokemon).ToNot(BeIdenticalTo(real))
 			}
 			return FightTurn{Move: 0, Target: ctx.Opponents()[0]}

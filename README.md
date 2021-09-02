@@ -25,13 +25,13 @@ transactions, _ := b.SimulateRound()
 for _, t := range transactions {
 	switch tt := t.(type) {
 	case UseMoveTransaction:
-		fmt.Printf("%s used %s on %s\n", b.getPokemon(tt.User), tt.Move, b.getPokemon(tt.Target))
+		fmt.Printf("%s used %s on %s\n", b.GetPokemon(tt.User), tt.Move, b.GetPokemon(tt.Target))
 	case DamageTransaction:
-		fmt.Printf("%s took %d damage\n", b.getPokemon(tt.Target), tt.Damage)
+		fmt.Printf("%s took %d damage\n", b.GetPokemon(tt.Target), tt.Damage)
 	case HealTransaction:
-		fmt.Printf("%s healed for %d HP\n", b.getPokemon(tt.Target), tt.Amount)
+		fmt.Printf("%s healed for %d HP\n", b.GetPokemon(tt.Target), tt.Amount)
 	case FaintTransaction:
-		fmt.Printf("%s fainted\n", b.getPokemon(tt.Target))
+		fmt.Printf("%s fainted\n", b.GetPokemon(tt.Target))
 	case PPTransaction:
 		continue
 	default:

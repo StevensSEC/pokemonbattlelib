@@ -137,8 +137,8 @@ var _ = Describe("Move Effects", func() {
 			ModifyStatTransaction{
 				Target:        target{0, 0},
 				SelfInflicted: true,
-				Stat:          int(b.getPokemon(target{0, 0}).Moves[0].AffectedStat()),
-				Stages:        int(b.getPokemon(target{0, 0}).Moves[0].StatStages()),
+				Stat:          int(b.GetPokemon(target{0, 0}).Moves[0].AffectedStat()),
+				Stages:        int(b.GetPokemon(target{0, 0}).Moves[0].StatStages()),
 			},
 		))
 	})
@@ -188,7 +188,7 @@ var _ = Describe("Draining moves", func() {
 	})
 
 	It("should heal more when the user is holding a big root", func() {
-		b.getPokemon(target{0, 0}).HeldItem = ItemBigRoot
+		b.GetPokemon(target{0, 0}).HeldItem = ItemBigRoot
 		t, _ := b.SimulateRound()
 
 		Expect(t).To(HaveTransactionsInOrder(

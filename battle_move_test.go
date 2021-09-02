@@ -50,7 +50,7 @@ var _ = Describe("Move Status Inflict", func() {
 		Expect(t).To(HaveTransactionsInOrder(
 			DamageTransaction{
 				Target: target{1, 0},
-				Move:   b.getPokemon(target{0, 0}).Moves[0],
+				Move:   b.GetPokemon(target{0, 0}).Moves[0],
 				Damage: 4,
 			},
 			InflictStatusTransaction{
@@ -145,11 +145,11 @@ var _ = Describe("Move Damage", func() {
 			UseMoveTransaction{
 				User:   target{0, 0},
 				Target: target{1, 0},
-				Move:   b.getPokemon(target{0, 0}).Moves[0],
+				Move:   b.GetPokemon(target{0, 0}).Moves[0],
 			},
 			DamageTransaction{
 				Target: target{1, 0},
-				Move:   b.getPokemon(target{0, 0}).Moves[0],
+				Move:   b.GetPokemon(target{0, 0}).Moves[0],
 				Damage: 20,
 			},
 		))
