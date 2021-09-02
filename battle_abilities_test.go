@@ -6,7 +6,30 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Scrappy", func() {
+var _ = Describe("Ability: Air Lock", func() {
+	a := Agent(new(dumbAgent))
+
+	It("should negate the effects of weather", func() {
+		p := PkmnNoDamage()
+		b := New1v1Battle(p, &a, PkmnNoDamage(), &a)
+		b.Weather = WeatherHail
+		b.rng = SimpleRNG()
+		Expect(b.Start()).To(Succeed())
+		t, _ := b.SimulateRound()
+		Expect(t).To(HaveTransaction(DamageTransaction{
+			Target: target{1, 0},
+			Move:   nil,
+		}))
+		p.Ability = AbilityAirLock
+		t, _ = b.SimulateRound()
+		Expect(t).ToNot(HaveTransaction(DamageTransaction{
+			Target: target{1, 0},
+			Move:   nil,
+		}))
+	})
+})
+
+var _ = Describe("Ability: Scrappy", func() {
 	a := Agent(new(dumbAgent))
 
 	PDescribeTable("should allow damage to ghost types",

@@ -34,7 +34,8 @@ const BattleRuleSetDefault = BattleRuleFaint | BattleRuleStruggle
 type BattleMeta int
 
 const (
-	MetaWeatherTurns BattleMeta = iota
+	MetaWeatherDisabled BattleMeta = iota
+	MetaWeatherTurns
 )
 
 type BattleState int

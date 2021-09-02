@@ -7,6 +7,8 @@ import (
 
 // Handles all pre-turn logic
 func (b *Battle) preRound() {
+	// Reset battle side effects
+	delete(b.metadata, MetaWeatherDisabled)
 	for _, t := range b.AllTargets() {
 		pkmn := b.GetPokemon(t)
 		if v, ok := pkmn.metadata[MetaSleepTime]; ok && v.(int) == 0 && pkmn.StatusEffects.check(StatusSleep) {
@@ -14,6 +16,9 @@ func (b *Battle) preRound() {
 				Target:       t,
 				StatusEffect: StatusSleep,
 			})
+		}
+		if pkmn.Ability == AbilityAirLock {
+			b.metadata[MetaWeatherDisabled] = true
 		}
 	}
 }
@@ -197,21 +202,23 @@ func (b *Battle) postRound() {
 		}
 		// Weather effects
 		// TODO: check for weather resisting abilities
-		if b.Weather == WeatherSandstorm {
-			if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
-				damage := pkmn.MaxHP() / 16
-				b.QueueTransaction(DamageTransaction{
-					Target: t,
-					Damage: damage,
-				})
-			}
-		} else if b.Weather == WeatherHail {
-			if pkmn.EffectiveType()&TypeIce == 0 {
-				damage := pkmn.MaxHP() / 16
-				b.QueueTransaction(DamageTransaction{
-					Target: t,
-					Damage: damage,
-				})
+		if _, ok := b.metadata[MetaWeatherDisabled]; !ok {
+			if b.Weather == WeatherSandstorm {
+				if pkmn.EffectiveType()&(TypeRock|TypeGround|TypeSteel) == 0 {
+					damage := pkmn.MaxHP() / 16
+					b.QueueTransaction(DamageTransaction{
+						Target: t,
+						Damage: damage,
+					})
+				}
+			} else if b.Weather == WeatherHail {
+				if pkmn.EffectiveType()&TypeIce == 0 {
+					damage := pkmn.MaxHP() / 16
+					b.QueueTransaction(DamageTransaction{
+						Target: t,
+						Damage: damage,
+					})
+				}
 			}
 		}
 		// Held item effects
