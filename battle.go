@@ -11,6 +11,7 @@ type Battle struct {
 	Weather  Weather // one of the 6 in-battle weather conditions
 	ShiftSet bool    // shift or set battle style for NPC trainer battles
 	State    BattleState
+	Type     BattleType
 	rng      RNG
 	ruleset  BattleRule
 
@@ -44,11 +45,42 @@ const (
 	BattleEnd
 )
 
+type BattleType int
+
+const (
+	BattleTypeSingle BattleType = iota
+	BattleTypeDouble
+)
+
+func (t BattleType) GetMaxActivePokemon() uint {
+	switch t {
+	case BattleTypeDouble:
+		return 2
+	default:
+		return 1
+	}
+}
+
 // Creates a new battle instance, setting initial conditions
 func NewBattle() *Battle {
 	rng := LCRNG(rand.Uint32())
 	b := Battle{
 		State:   BattleBeforeStart,
+		rng:     RNG(&rng),
+		ruleset: BattleRuleSetDefault,
+		metadata: map[BattleMeta]interface{}{
+			MetaWeatherTurns: 0,
+		},
+	}
+	return &b
+}
+
+// Creates a new battle instance, setting initial conditions
+func NewBattleOfType(t BattleType) *Battle {
+	rng := LCRNG(rand.Uint32())
+	b := Battle{
+		State:   BattleBeforeStart,
+		Type:    t,
 		rng:     RNG(&rng),
 		ruleset: BattleRuleSetDefault,
 		metadata: map[BattleMeta]interface{}{
@@ -152,13 +184,27 @@ func (b *Battle) Start() error {
 		teams[party.team]++
 	}
 	if len(teams) != 2 {
-		return fmt.Errorf("Parties have invalid teams. There should be 2 teams with 1 party each, got %d teams", len(teams))
+		if b.Type == BattleTypeSingle {
+			return fmt.Errorf("Parties have invalid teams for single battle. There should be 2 teams with 1 party each, got %d teams.", len(teams))
+		} else if b.Type == BattleTypeDouble {
+			return fmt.Errorf("Parties have invalid teams for double battle. There should be 2 teams with 1-2 parties each, got %d teams.", len(teams))
+		}
 	}
 
 	// Initiate the battle! Send out the first pokemon in the parties.
 	b.State = BattleInProgress
-	for _, party := range b.parties {
-		party.SetActive(0)
+	for i := 0; i < 2; i++ { // assume 2 teams
+		parties := b.GetPartiesOnTeam(i)
+		pkmnPerParty := b.Type.GetMaxActivePokemon() / uint(len(parties))
+		for _, party := range parties {
+			toSendOut := pkmnPerParty
+			if toSendOut > uint(len(party.pokemon())) {
+				toSendOut = uint(len(party.pokemon()))
+			}
+			for j := uint(0); j < toSendOut; j++ {
+				party.SetActive(j)
+			}
+		}
 	}
 	return nil
 }
@@ -169,6 +215,16 @@ func (b *Battle) Parties() []*Party {
 	// don't use range to avoid a shallow copy
 	for i := 0; i < len(b.parties); i++ {
 		parties[i] = b.parties[i].Party
+	}
+	return parties
+}
+
+func (b *Battle) GetPartiesOnTeam(team int) []*battleParty {
+	parties := make([]*battleParty, 0)
+	for _, party := range b.parties {
+		if party.team == team {
+			parties = append(parties, party)
+		}
 	}
 	return parties
 }
